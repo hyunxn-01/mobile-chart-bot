@@ -1,0 +1,44 @@
+name: Weekly Mobile Chart Report
+
+on:
+  schedule:
+    # 매주 월요일 한국 시간 오전 9시 = UTC 일요일 자정 00:00
+    - cron: '0 0 * * 1'
+  workflow_dispatch:  # 수동 실행 버튼
+
+jobs:
+  collect-and-send:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write  # data/last_week.json 커밋 위해 필요
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run chart collector
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: python chart_collector.py
+      
+      - name: Commit data for next week comparison
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/last_week.json
+          git diff --staged --quiet || git commit -m "Update weekly chart data $(date +'%Y-%m-%d')"
+          git push
