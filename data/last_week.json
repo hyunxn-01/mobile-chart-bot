@@ -37,18 +37,18 @@
   },
   {
     "rank": 5,
-    "app_id": "com.ncsoft.lineagem19",
-    "title": "리니지M",
-    "developer": "NC Corp.",
+    "app_id": "com.mergegame.icookie",
+    "title": "가십하버: 합성 & 스토리 게임",
+    "developer": "Microfun Limited",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
     "rank": 6,
-    "app_id": "com.mergegame.icookie",
-    "title": "가십하버: 합성 & 스토리 게임",
-    "developer": "Microfun Limited",
+    "app_id": "com.dreamgames.royalmatch",
+    "title": "로얄 매치 (Royal Match)",
+    "developer": "Dream Games",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
@@ -64,9 +64,9 @@
   },
   {
     "rank": 8,
-    "app_id": "com.dreamgames.royalmatch",
-    "title": "로얄 매치 (Royal Match)",
-    "developer": "Dream Games",
+    "app_id": "com.ncsoft.lineagem19",
+    "title": "리니지M",
+    "developer": "NC Corp.",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
@@ -82,33 +82,6 @@
   },
   {
     "rank": 10,
-    "app_id": "com.nexon.fo4m",
-    "title": "EA SPORTS FC Online M",
-    "developer": "NEXON Company",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 11,
-    "app_id": "jp.konami.pesactionmobile",
-    "title": "eFootball™",
-    "developer": "KONAMI",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 12,
-    "app_id": "com.supercell.laser",
-    "title": "브롤스타즈",
-    "developer": "Supercell",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 13,
     "app_id": "com.mf.cupcake",
     "title": "씨사이드 익스케이프: 합성 & 스토리 게임",
     "developer": "Microfun Limited",
@@ -117,7 +90,7 @@
     "chart": "Top Grossing"
   },
   {
-    "rank": 14,
+    "rank": 11,
     "app_id": "com.playrix.gardenscapes-m3-ios",
     "title": "Gardenscapes",
     "developer": "Playrix",
@@ -126,25 +99,16 @@
     "chart": "Top Grossing"
   },
   {
-    "rank": 15,
-    "app_id": "com.proximabeta.nikke",
-    "title": "승리의 여신: 니케",
-    "developer": "Level Infinite",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 16,
-    "app_id": "com.nexon.devcat.mm",
-    "title": "마비노기 모바일",
+    "rank": 12,
+    "app_id": "com.nexon.fo4m",
+    "title": "EA SPORTS FC Online M",
     "developer": "NEXON Company",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 17,
+    "rank": 13,
     "app_id": "com.fatmerge.global",
     "title": "테이스티 트레블: 합성 게임",
     "developer": "Century Games Pte. Ltd.",
@@ -153,19 +117,55 @@
     "chart": "Top Grossing"
   },
   {
+    "rank": 14,
+    "app_id": "com.nexon.devcat.mm",
+    "title": "마비노기 모바일",
+    "developer": "NEXON Company",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 15,
+    "app_id": "com.riotgames.league.teamfighttactics",
+    "title": "전략적 팀 전투: 리그 오브 레전드 전략 게임",
+    "developer": "Riot Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 16,
+    "app_id": "com.supercell.laser",
+    "title": "브롤스타즈",
+    "developer": "Supercell",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 17,
+    "app_id": "com.proximabeta.nikke",
+    "title": "승리의 여신: 니케",
+    "developer": "Level Infinite",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
     "rank": 18,
-    "app_id": "com.NHNEnt.MSudda",
-    "title": "한게임 섯다&맞고",
-    "developer": "NHN Corp.",
+    "app_id": "com.pubg.krmobile",
+    "title": "배틀그라운드",
+    "developer": "KRAFTON Inc",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
     "rank": 19,
-    "app_id": "com.devsisters.ck",
-    "title": "쿠키런: 킹덤",
-    "developer": "Devsisters",
+    "app_id": "com.greenmushroom.boomblitz.ap",
+    "title": "탑 히어로즈: 영웅의 시대",
+    "developer": "River Game HK Limited",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
@@ -181,72 +181,72 @@
   },
   {
     "rank": 21,
-    "app_id": "com.supermagic.ios.cooptd",
-    "title": "협동 타워 디펜스 : 친구와 함께",
-    "developer": "SuperMagic",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 22,
-    "app_id": "com.ncsoft.lineagem",
-    "title": "리니지M(12)",
-    "developer": "NC Corp.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 23,
-    "app_id": "com.riotgames.league.teamfighttactics",
-    "title": "전략적 팀 전투: 리그 오브 레전드 전략 게임",
-    "developer": "Riot Games",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 24,
     "app_id": "com.playrix.gardenscapes-sweethome",
-    "title": "Homescapes",
+    "title": "Homescapes: Match 3 Games",
     "developer": "Playrix",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
+    "rank": 22,
+    "app_id": "jp.konami.pesactionmobile",
+    "title": "eFootball™",
+    "developer": "KONAMI",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 23,
+    "app_id": "com.netmarble.tskgb",
+    "title": "세븐나이츠 리버스 - 1주년 업데이트",
+    "developer": "Netmarble Corporation",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 24,
+    "app_id": "com.NHNEnt.MSudda",
+    "title": "한게임 섯다&맞고",
+    "developer": "NHN Corp.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
     "rank": 25,
-    "app_id": "com.merge.cooking.theme.restaurant.food",
-    "title": "머지 쿠킹 테마 레스토랑（Merge Cooking）",
-    "developer": "Happibits",
+    "app_id": "com.joycity.im",
+    "title": "임진왜란: 조선의 반격",
+    "developer": "JOYCITY Corp",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
     "rank": 26,
-    "app_id": "com.nexon.fmk",
-    "title": "FC 모바일",
-    "developer": "NEXON Company",
+    "app_id": "com.mf.cola",
+    "title": "핫레스토랑: 머지&쿠킹",
+    "developer": "Microfun Limited",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
     "rank": 27,
-    "app_id": "jp.co.ponos.battlecatskr",
-    "title": "냥코 대전쟁",
-    "developer": "ponos corporation",
+    "app_id": "com.playrix.township-ios",
+    "title": "꿈의 마을 (Township)",
+    "developer": "Playrix",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
     "rank": 28,
-    "app_id": "com.greenmushroom.boomblitz.ap",
-    "title": "탑 히어로즈: 영웅의 시대",
-    "developer": "River Game HK Limited",
+    "app_id": "com.supermagic.ios.cooptd",
+    "title": "협동 타워 디펜스 : 친구와 함께",
+    "developer": "SuperMagic",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
@@ -262,78 +262,6 @@
   },
   {
     "rank": 30,
-    "app_id": "com.playrix.township-ios",
-    "title": "꿈의 마을 (Township)",
-    "developer": "Playrix",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 31,
-    "app_id": "jp.co.bandainamcogames.BNGI0218",
-    "title": "ONE PIECE TREASURE CRUISE",
-    "developer": "Bandai Namco Entertainment Inc.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 32,
-    "app_id": "com.superplaystudios.disneysolitairedreams",
-    "title": "Disney Solitaire",
-    "developer": "SuperPlay",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 33,
-    "app_id": "com.pubg.krmobile",
-    "title": "배틀그라운드",
-    "developer": "KRAFTON Inc",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 34,
-    "app_id": "com.devsisters.gb",
-    "title": "쿠키런: 오븐브레이크",
-    "developer": "Devsisters",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 35,
-    "app_id": "com.nhnent.Qpoker",
-    "title": "한게임 포커",
-    "developer": "NHN Corp.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 36,
-    "app_id": "com.riftsky.mhg.kr.ios",
-    "title": "더 코지 플로리스트",
-    "developer": "RiftSky Games",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 37,
-    "app_id": "com.bailing.lark.roll.dev",
-    "title": "딸깍 다이스",
-    "developer": "HABBY",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 38,
     "app_id": "com.gf.wafh5krkr.hwyios.app",
     "title": "오피스 퀸 키우기",
     "developer": "Wish Interactive Technology Limited",
@@ -342,43 +270,43 @@
     "chart": "Top Grossing"
   },
   {
-    "rank": 39,
-    "app_id": "com.joycity.im",
-    "title": "임진왜란: 조선의 반격",
-    "developer": "JOYCITY Corp",
+    "rank": 31,
+    "app_id": "com.merge.cooking.theme.restaurant.food",
+    "title": "머지 쿠킹 테마 레스토랑（Merge Cooking）",
+    "developer": "Happibits",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 40,
-    "app_id": "com.mf.cola",
-    "title": "핫레스토랑: 머지&쿠킹",
-    "developer": "Microfun Limited",
+    "rank": 32,
+    "app_id": "com.nexon.fmk",
+    "title": "FC 모바일",
+    "developer": "NEXON Company",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 41,
-    "app_id": "com.streetcomplete.pixelmagician",
-    "title": "픽셀 법사 키우기 : 방치형 RPG",
-    "developer": "YONGJIN JO",
+    "rank": 33,
+    "app_id": "com.superplaystudios.disneysolitairedreams",
+    "title": "Disney Solitaire",
+    "developer": "SuperPlay",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 42,
-    "app_id": "com.netmarble.monster2",
-    "title": "몬길: STAR DIVE",
-    "developer": "Netmarble Corporation",
+    "rank": 34,
+    "app_id": "com.devsisters.ck",
+    "title": "쿠키런: 킹덤",
+    "developer": "Devsisters",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 43,
+    "rank": 35,
     "app_id": "com.dreamgames.royalkingdom",
     "title": "로얄 킹덤 (Royal Kingdom)",
     "developer": "Dream Games",
@@ -387,16 +315,7 @@
     "chart": "Top Grossing"
   },
   {
-    "rank": 44,
-    "app_id": "com.phs.global.ios",
-    "title": "라스트 어사일럼: 페스트",
-    "developer": "WISENESS GAME ONLINE INTERNATIONAL LTD",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 45,
+    "rank": 36,
     "app_id": "com.midasplayer.apps.candycrushsaga",
     "title": "캔디크러쉬사가",
     "developer": "King",
@@ -405,10 +324,91 @@
     "chart": "Top Grossing"
   },
   {
+    "rank": 37,
+    "app_id": "com.nianticlabs.pokemongo",
+    "title": "Pokémon GO",
+    "developer": "Niantic, Inc.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 38,
+    "app_id": "io.randomco.travel",
+    "title": "Travel Town - 결합 어드벤처",
+    "developer": "Moon Active",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 39,
+    "app_id": "com.riftsky.mhg.kr.ios",
+    "title": "더 코지 플로리스트",
+    "developer": "RiftSky Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 40,
+    "app_id": "jp.co.ponos.battlecatskr",
+    "title": "냥코 대전쟁",
+    "developer": "ponos corporation",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 41,
+    "app_id": "com.zempot.wplpoker",
+    "title": "WPL : 홀덤, 토너먼트, 오마하, 올인폴드, 픽앤고",
+    "developer": "Zempot Inc.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 42,
+    "app_id": "com.devsisters.gb",
+    "title": "쿠키런: 오븐브레이크",
+    "developer": "Devsisters",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 43,
+    "app_id": "com.readygo.barrel.ios",
+    "title": "라스트 Z: 서바이벌 슈터",
+    "developer": "Omnilojo Pte Ltd",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 44,
+    "app_id": "com.ncsoft.lineagem",
+    "title": "리니지M(12)",
+    "developer": "NC Corp.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 45,
+    "app_id": "com.battle.shoot.dragon",
+    "title": "세포 특공대 - 전략형 타워 디펜스",
+    "developer": "Snap Brain Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
     "rank": 46,
-    "app_id": "com.gametree.lhlr.ios",
-    "title": "그놈은 드래곤",
-    "developer": "GameTree Entertainment",
+    "app_id": "com.nhnent.Qpoker",
+    "title": "한게임 포커",
+    "developer": "NHN Corp.",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
@@ -424,36 +424,36 @@
   },
   {
     "rank": 48,
-    "app_id": "com.zempot.wplpoker",
-    "title": "WPL : 홀덤, 토너먼트, 오마하, 올인폴드, 픽앤고",
-    "developer": "Zempot Inc.",
+    "app_id": "com.ncsoft.aion2",
+    "title": "AION2",
+    "developer": "NC Corp.",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
     "rank": 49,
-    "app_id": "com.nhn.AApoker",
-    "title": "한게임 로얄홀덤",
-    "developer": "NHN Corp.",
+    "app_id": "com.phs.global.ios",
+    "title": "라스트 어사일럼: 페스트",
+    "developer": "WISENESS GAME ONLINE INTERNATIONAL LTD",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
     "rank": 50,
-    "app_id": "com.haegin.kbo",
-    "title": "2026 프로야구GO!",
-    "developer": "HAEGIN Co., Ltd.",
+    "app_id": "com.xd.xdtglobal",
+    "title": "두근두근타운",
+    "developer": "XD Entertainment Co., Ltd.",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
     "rank": 51,
-    "app_id": "com.netmarble.tskgb",
-    "title": "세븐나이츠 리버스",
-    "developer": "Netmarble Corporation",
+    "app_id": "com.nexon.kart",
+    "title": "카트라이더 러쉬플러스",
+    "developer": "NEXON Company",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
@@ -469,33 +469,6 @@
   },
   {
     "rank": 53,
-    "app_id": "com.readygo.barrel.ios",
-    "title": "라스트 Z: 서바이벌 슈터",
-    "developer": "Omnilojo Pte Ltd",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 54,
-    "app_id": "com.nexon.kart",
-    "title": "카트라이더 러쉬플러스",
-    "developer": "NEXON Company",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 55,
-    "app_id": "com.ncsoft.aion2",
-    "title": "AION2",
-    "developer": "NC Corp.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 56,
     "app_id": "com.hottagames.nte",
     "title": "이환",
     "developer": "N2E ENTERTAINMENT PTE. LTD.",
@@ -504,16 +477,7 @@
     "chart": "Top Grossing"
   },
   {
-    "rank": 57,
-    "app_id": "io.randomco.travel",
-    "title": "Travel Town - 결합 어드벤처",
-    "developer": "Moon Active",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 58,
+    "rank": 54,
     "app_id": "com.cedargames.mysterytown",
     "title": "미스터리 타운: 합성 게임 (Mystery Town)",
     "developer": "Cedar Games Studio",
@@ -522,160 +486,34 @@
     "chart": "Top Grossing"
   },
   {
-    "rank": 59,
-    "app_id": "com.nianticlabs.pokemongo",
-    "title": "Pokémon GO",
-    "developer": "Niantic, Inc.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 60,
-    "app_id": "com.team42.Mafia42",
-    "title": "마피아42",
-    "developer": "TEAM42 CO., LTD.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 61,
-    "app_id": "com.nhnent.pokerclassic",
-    "title": "한게임포커 클래식 - 7포커 홀덤 섯다 훌라 슬롯",
-    "developer": "NHN Corp.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 62,
-    "app_id": "games.rivvy.eternalherorpg",
-    "title": "Eternal Hero: 액션 RPG",
-    "developer": "Rivvy",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 63,
-    "app_id": "com.0yweqwsdz8.edweu",
-    "title": "포켓 챔피언: 메가",
-    "developer": "Nanxiong Fenxiang Network Technology Co., Ltd.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 64,
-    "app_id": "com.netmarble.stonkey",
-    "title": "스톤에이지 키우기",
+    "rank": 55,
+    "app_id": "com.netmarble.monster2",
+    "title": "몬길: STAR DIVE",
     "developer": "Netmarble Corporation",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 65,
-    "app_id": "com.gravity.rooc.ios",
-    "title": "라그나로크 오리진 클래식",
-    "developer": "Gravity Game Vision Limited",
+    "rank": 56,
+    "app_id": "com.gametree.lhlr.ios",
+    "title": "그놈은 드래곤",
+    "developer": "GameTree Entertainment",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 66,
-    "app_id": "com.com2us.smon.normal.freefull.apple.kr.ios.universal",
-    "title": "서머너즈 워: 천공의 아레나",
-    "developer": "Com2uS Corp.",
+    "rank": 57,
+    "app_id": "com.haegin.kbo",
+    "title": "2026 프로야구GO!",
+    "developer": "HAEGIN Co., Ltd.",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 67,
-    "app_id": "com.nexon.nsc.maplem",
-    "title": "메이플스토리M",
-    "developer": "NEXON Company",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 68,
-    "app_id": "jp.pokemon.pokemontcgp",
-    "title": "포켓몬 카드 게임 Pocket",
-    "developer": "The Pokemon Company",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 69,
-    "app_id": "com.com2us.probaseball3d.normal.freefull.apple.global.ios.universal",
-    "title": "컴투스프로야구2026",
-    "developer": "Com2uS Corp.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 70,
-    "app_id": "com.camelgames.aoz",
-    "title": "Age of Origins:Tower Defense",
-    "developer": "Hong Kong Ke Mo software Co., Limited",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 71,
-    "app_id": "com.gear2.growslayer",
-    "title": "슬레이어 키우기",
-    "developer": "GEAR2",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 72,
-    "app_id": "com.billionairegames.serares",
-    "title": "변신 키우기",
-    "developer": "Billionairegames",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 73,
-    "app_id": "com.kakaogames.odin",
-    "title": "오딘: 발할라 라이징",
-    "developer": "Kakao Games Corp.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 74,
-    "app_id": "com.games.foundation",
-    "title": "파운데이션: 우주 전선",
-    "developer": "FunPlus International AG",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 75,
-    "app_id": "com.DetailGames.HungryAliens",
-    "title": "QWER의 지구정복 : 외계인은 배고파",
-    "developer": "BY4M STUDIO CO.,LTD.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 76,
+    "rank": 58,
     "app_id": "com.readygo.dark.nbios",
     "title": "Dark War:Survival",
     "developer": "Omnilojo Pte Ltd",
@@ -684,160 +522,133 @@
     "chart": "Top Grossing"
   },
   {
-    "rank": 77,
-    "app_id": "com.playrix.fishdom-freeplay",
-    "title": "피쉬돔 (Fishdom)",
-    "developer": "Playrix",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 78,
-    "app_id": "com.devsisters.CookieRunForKakao",
-    "title": "쿠키런",
-    "developer": "Devsisters",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 79,
-    "app_id": "com.blackflm.cdc",
-    "title": "흑섬의 기대",
-    "developer": "Guangzhou Senhuo Technology Co., Ltd",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 80,
-    "app_id": "com.mobile.legends",
-    "title": "모바일 레전드: Bang Bang",
-    "developer": "MOONTON",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 81,
-    "app_id": "com.supercell.scroll",
-    "title": "클래시 로얄 (Clash Royale)",
-    "developer": "Supercell",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 82,
-    "app_id": "com.ddup.zombiewaves.zw",
-    "title": "좀비 웨이브스",
-    "developer": "FUN FORMULA PTE. LTD.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 83,
-    "app_id": "net.gameduo.gv",
-    "title": "캣 히어로 : 방치형 RPG",
-    "developer": "Game Duo Co.,Ltd.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 84,
-    "app_id": "com.nexon.mdnf",
-    "title": "던전앤파이터 모바일",
+    "rank": 59,
+    "app_id": "com.nexon.nsc.maplem",
+    "title": "메이플스토리M",
     "developer": "NEXON Company",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 85,
-    "app_id": "com.gear2.letsgolegends",
-    "title": "레츠고 레전드!",
-    "developer": "GEAR2",
+    "rank": 60,
+    "app_id": "jp.pokemon.pokemontcgp",
+    "title": "포켓몬 카드 게임 Pocket",
+    "developer": "The Pokemon Company",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 86,
-    "app_id": "com.korea.zzsj.ios",
-    "title": "갓깨비 키우기",
-    "developer": "Joy Net Games",
+    "rank": 61,
+    "app_id": "com.gravity.rooc.ios",
+    "title": "라그나로크 오리진 클래식",
+    "developer": "Gravity Game Vision Limited",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 87,
-    "app_id": "com.supercell.magic",
-    "title": "클래시 오브 클랜",
-    "developer": "Supercell",
+    "rank": 62,
+    "app_id": "com.bailing.lark.roll.dev",
+    "title": "딸깍 다이스",
+    "developer": "HABBY",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 88,
-    "app_id": "com.ryonggame.soulhunteridle",
-    "title": "소울 헌터 키우기 : 방치형 RPG",
-    "developer": "Ryong Game Co., Ltd",
+    "rank": 63,
+    "app_id": "com.nhn.AApoker",
+    "title": "한게임 로얄홀덤",
+    "developer": "NHN Corp.",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 89,
-    "app_id": "com.superplaystudios.dominodreams",
-    "title": "Domino Dreams™",
-    "developer": "SuperPlay",
+    "rank": 64,
+    "app_id": "com.camelgames.aoz",
+    "title": "Age of Origins:Tower Defense",
+    "developer": "Hong Kong Ke Mo software Co., Limited",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 90,
-    "app_id": "com.korea.yzlm.ios",
-    "title": "우와 모험단",
-    "developer": "Joy Net Games",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 91,
-    "app_id": "com.smilegate.chaoszero.stove.ios",
-    "title": "카오스 제로 나이트메어",
-    "developer": "Smilegate, Inc.",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 92,
-    "app_id": "net.peakgames.toonblast",
-    "title": "Toon Blast",
-    "developer": "Peak Games",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Grossing"
-  },
-  {
-    "rank": 93,
-    "app_id": "com.netmarble.sololv",
-    "title": "나 혼자만 레벨업:어라이즈",
+    "rank": 65,
+    "app_id": "com.netmarble.stonkey",
+    "title": "스톤에이지 키우기",
     "developer": "Netmarble Corporation",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 94,
+    "rank": 66,
+    "app_id": "com.ios.cjys.kr",
+    "title": "넋나간 삼국지",
+    "developer": "BYTEFUN GAMES PTE.LTD.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 67,
+    "app_id": "com.team42.Mafia42",
+    "title": "마피아42",
+    "developer": "TEAM42 CO., LTD.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 68,
+    "app_id": "com.streetcomplete.pixelmagician",
+    "title": "픽셀 법사 키우기 : 방치형 RPG",
+    "developer": "YONGJIN JO",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 69,
+    "app_id": "com.0yweqwsdz8.edweu",
+    "title": "포켓 챔피언: 메가",
+    "developer": "Nanxiong Fenxiang Network Technology Co., Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 70,
+    "app_id": "group.theorigin.themaxlevelreturner",
+    "title": "나 혼자 만렙 키우기",
+    "developer": "Punchline Games Co., Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 71,
+    "app_id": "com.com2us.probaseball3d.normal.freefull.apple.global.ios.universal",
+    "title": "컴투스프로야구2026",
+    "developer": "Com2uS Corp.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 72,
+    "app_id": "com.habby.capybara",
+    "title": "카피바라 Go!",
+    "developer": "HABBY",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 73,
     "app_id": "com.wemade.nightcrows",
     "title": "나이트 크로우",
     "developer": "Wemade Co., Ltd.",
@@ -846,43 +657,169 @@
     "chart": "Top Grossing"
   },
   {
-    "rank": 95,
-    "app_id": "com.netease.dfjskr",
-    "title": "레이싱 마스터",
-    "developer": "NETEASE INTERACTIVE ENTERTAINMENT PTE. LTD",
+    "rank": 74,
+    "app_id": "com.korea.yzlm.ios",
+    "title": "우와 모험단",
+    "developer": "Joy Net Games",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 96,
-    "app_id": "com.miHoYo.GenshinImpact",
-    "title": "원신·공월의 노래",
-    "developer": "COGNOSPHERE PTE. LTD.",
+    "rank": 75,
+    "app_id": "com.games.foundation",
+    "title": "파운데이션: 우주 전선",
+    "developer": "FunPlus International AG",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 97,
-    "app_id": "com.everywear.game5",
-    "title": "머지 맨션: 퍼즐과 스토리",
-    "developer": "Metacore Games Oy",
+    "rank": 76,
+    "app_id": "com.xq.archeroii",
+    "title": "궁수의 전설2",
+    "developer": "HABBY",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 98,
-    "app_id": "com.kakaogames.umamusume",
-    "title": "우마무스메 프리티 더비",
-    "developer": "Kakao Games Corp.",
+    "rank": 77,
+    "app_id": "com.nexon.mdnf",
+    "title": "던전앤파이터 모바일",
+    "developer": "NEXON Company",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
   },
   {
-    "rank": 99,
+    "rank": 78,
+    "app_id": "com.supercell.scroll",
+    "title": "클래시 로얄 (Clash Royale)",
+    "developer": "Supercell",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 79,
+    "app_id": "com.i89trillion.strategy.rising",
+    "title": "War Inc: Rising",
+    "developer": "Fastone Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 80,
+    "app_id": "com.DetailGames.HungryAliens",
+    "title": "QWER의 지구정복 : 외계인은 배고파",
+    "developer": "BY4M STUDIO CO.,LTD.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 81,
+    "app_id": "com.korea.zzsj.ios",
+    "title": "갓깨비 키우기",
+    "developer": "Joy Net Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 82,
+    "app_id": "com.nhnent.pokerclassic",
+    "title": "한게임포커 클래식 - 7포커 홀덤 섯다 훌라 슬롯",
+    "developer": "NHN Corp.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 83,
+    "app_id": "com.billionairegames.serares",
+    "title": "변신 키우기",
+    "developer": "Billionairegames",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 84,
+    "app_id": "net.gameduo.gv",
+    "title": "캣 히어로 : 방치형 RPG",
+    "developer": "Game Duo Co.,Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 85,
+    "app_id": "net.peakgames.toonblast",
+    "title": "Toon Blast",
+    "developer": "Peak Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 86,
+    "app_id": "com.playrix.fishdom-freeplay",
+    "title": "피쉬돔 (Fishdom)",
+    "developer": "Playrix",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 87,
+    "app_id": "com.ygjszkr.ios",
+    "title": "귀판오분전",
+    "developer": "Joy Net Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 88,
+    "app_id": "com.ddup.zombiewaves.zw",
+    "title": "좀비 웨이브스",
+    "developer": "FUN FORMULA PTE. LTD.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 89,
+    "app_id": "com.mobile.legends",
+    "title": "모바일 레전드: Bang Bang",
+    "developer": "MOONTON",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 90,
+    "app_id": "jp.co.bandainamcogames.BNGI0218",
+    "title": "ONE PIECE TREASURE CRUISE",
+    "developer": "Bandai Namco Entertainment Inc.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 91,
+    "app_id": "com.papegames.lysk.kr",
+    "title": "러브앤딥스페이스",
+    "developer": "INFOLD PTE. LTD.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 92,
     "app_id": "com.blizzard.diablo.immortal",
     "title": "디아블로 이모탈",
     "developer": "Blizzard Entertainment, Inc.",
@@ -891,10 +828,73 @@
     "chart": "Top Grossing"
   },
   {
+    "rank": 93,
+    "app_id": "com.devsisters.CookieRunForKakao",
+    "title": "쿠키런",
+    "developer": "Devsisters",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 94,
+    "app_id": "com.gear2.growslayer",
+    "title": "슬레이어 키우기",
+    "developer": "GEAR2",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 95,
+    "app_id": "com.actgames.HelloKittyMDS",
+    "title": "헬로키티 마이 드림 스토어",
+    "developer": "ACTGames Co., Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 96,
+    "app_id": "com.kakaogames.odin",
+    "title": "오딘: 발할라 라이징",
+    "developer": "Kakao Games Corp.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 97,
+    "app_id": "com.twokang.historydrift",
+    "title": "난세표류기 - 한국사 방치형 RPG",
+    "developer": "yongsung ko",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 98,
+    "app_id": "com.netease.idv",
+    "title": "Identity V -제5인격",
+    "developer": "NetEase Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
+    "rank": 99,
+    "app_id": "com.ProjectMoon.LimbusCompany",
+    "title": "Limbus Company",
+    "developer": "Project Moon Co., Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Grossing"
+  },
+  {
     "rank": 100,
-    "app_id": "com.papegames.lysk.kr",
-    "title": "러브앤딥스페이스",
-    "developer": "INFOLD PTE. LTD.",
+    "app_id": "com.ryonggame.soulhunteridle",
+    "title": "소울 헌터 키우기 : 방치형 RPG",
+    "developer": "Ryong Game Co., Ltd",
     "category": "게임",
     "platform": "App Store",
     "chart": "Top Grossing"
