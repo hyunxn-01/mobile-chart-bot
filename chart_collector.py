@@ -1,6 +1,6 @@
 """
-한국 App Store 모바일 게임 매출(Top Grossing) 차트 주간 수집·분석·메일 자동화.
-GitHub Actions에서 매주 월요일 한국 시간 오전 9시 자동 실행.
+한국 App Store 모바일 게임 매출(Top Grossing) 차트 일간 수집·분석·메일 자동화.
+GitHub Actions에서 매일 한국 시간 오전 7시 30분 자동 실행.
 
 데이터 소스: Apple iTunes RSS (Top Grossing → 빈 데이터 시 Top Free로 자동 fallback)
 메일 발송: Gmail SMTP
@@ -31,6 +31,8 @@ RECIPIENT_EMAIL = os.environ.get('RECIPIENT_EMAIL')
 
 DATA_DIR = Path('data')
 DATA_DIR.mkdir(exist_ok=True)
+HISTORY_DIR = DATA_DIR / 'history'
+HISTORY_DIR.mkdir(exist_ok=True)
 
 
 def fetch_apple_chart_kr_games(limit=100):
@@ -82,19 +84,31 @@ def fetch_apple_chart_kr_games(limit=100):
 
 
 def load_previous_data():
-    f = DATA_DIR / 'last_week.json'
-    if f.exists():
-        return json.loads(f.read_text(encoding='utf-8'))
-    return None
+    """직전 측정 데이터 로드. history 폴더에서 오늘 제외 가장 최근 파일.
+
+    Returns:
+        (data, date_str) 튜플. 데이터 없으면 (None, None).
+    """
+    today = datetime.now().strftime('%Y-%m-%d')
+    files = sorted(HISTORY_DIR.glob('*.json'))
+    past_files = [f for f in files if f.stem < today]
+    if not past_files:
+        return None, None
+    most_recent = past_files[-1]
+    print(f"[INFO] 비교 기준 데이터: {most_recent.name}")
+    return json.loads(most_recent.read_text(encoding='utf-8')), most_recent.stem
 
 
 def save_current_data(data):
-    f = DATA_DIR / 'last_week.json'
+    """오늘 차트 데이터를 history 폴더에 누적 저장. 같은 날 재실행 시 덮어쓰기."""
+    today = datetime.now().strftime('%Y-%m-%d')
+    f = HISTORY_DIR / f'{today}.json'
     f.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+    print(f"[OK] 데이터 저장: {f}")
 
 
 def compute_changes(previous, current):
-    """전주 대비 변화 계산."""
+    """이전 측정 대비 변화 계산."""
     if not previous:
         return {'is_first_week': True}
     
@@ -128,17 +142,17 @@ def compute_changes(previous, current):
 
 
 def generate_summary_with_claude(current, changes, chart_used):
-    """Claude API로 사업PM 시각의 주간 변화 요약."""
+    """Claude API로 사업PM 시각의 변화 요약."""
     if changes.get('is_first_week'):
-        return (f"이번 주가 첫 데이터 수집입니다 (사용 차트: {chart_used}). "
-                f"다음 주부터 전주 대비 변화 분석이 시작됩니다.\n\n"
-                f"이번 주 수집된 차트: {len(current)}개")
+        return (f"이번이 첫 데이터 수집입니다 (사용 차트: {chart_used}). "
+                f"다음 실행부터 이전 측정 대비 변화 분석이 시작됩니다.\n\n"
+                f"이번에 수집된 차트: {len(current)}개")
     
     client = Anthropic(api_key=ANTHROPIC_API_KEY)
     
-    prompt = f"""한국 App Store 게임 {chart_used} 차트의 주간 변화를 사업PM 관점에서 요약해 주세요.
+    prompt = f"""한국 App Store 게임 {chart_used} 차트의 직전 측정 대비 변화를 사업PM 관점에서 요약해 주세요.
 
-[이번 주 Top 30]
+[이번 측정 Top 30]
 {json.dumps(current[:30], ensure_ascii=False, indent=2)}
 
 [새로 진입한 앱]
@@ -174,10 +188,10 @@ def create_excel_report(current, changes, summary, chart_used):
     
     wb = Workbook()
     
-    # 시트 1: 주간 요약
+    # 시트 1: 요약
     ws = wb.active
-    ws.title = '주간 요약'
-    ws['A1'] = f'한국 App Store 게임 차트 주간 보고서 ({datetime.now().strftime("%Y-%m-%d")})'
+    ws.title = '요약'
+    ws['A1'] = f'한국 App Store 게임 차트 보고서 ({datetime.now().strftime("%Y-%m-%d")})'
     ws['A1'].font = Font(bold=True, size=14)
     ws.merge_cells('A1:D1')
     
@@ -191,8 +205,8 @@ def create_excel_report(current, changes, summary, chart_used):
     ws.column_dimensions['A'].width = 100
     ws.row_dimensions[5].height = 500
     
-    # 시트 2: 이번 주 차트
-    ws2 = wb.create_sheet('이번 주 차트')
+    # 시트 2: 이번 차트
+    ws2 = wb.create_sheet('이번 차트')
     df = pd.DataFrame(current)
     if not df.empty:
         for r in dataframe_to_rows(df, index=False, header=True):
@@ -203,9 +217,9 @@ def create_excel_report(current, changes, summary, chart_used):
         for col_letter, width in [('A', 8), ('B', 30), ('C', 40), ('D', 25), ('E', 20), ('F', 15), ('G', 20)]:
             ws2.column_dimensions[col_letter].width = width
     
-    # 시트 3: 주간 변화
+    # 시트 3: 변화
     if not changes.get('is_first_week'):
-        ws3 = wb.create_sheet('주간 변화')
+        ws3 = wb.create_sheet('변화')
         row = 1
         
         ws3.cell(row=row, column=1, value='■ 신규 진입').font = Font(bold=True, size=12)
@@ -297,12 +311,13 @@ def main():
         raise RuntimeError("모든 차트 수집 실패. Apple RSS 점검 필요.")
     print(f"      → {len(current)}개 수집, 사용 차트: {chart_used}")
     
-    print("[2/4] 이전 주 데이터와 비교...")
-    previous = load_previous_data()
+    print("[2/4] 이전 데이터와 비교...")
+    previous, previous_date = load_previous_data()
     changes = compute_changes(previous, current)
     if changes.get('is_first_week'):
-        print("      → 첫 실행. 다음 주부터 변화 분석.")
+        print("      → 비교 가능한 과거 데이터 없음. 다음 실행부터 변화 분석.")
     else:
+        print(f"      → 비교 기준: {previous_date}")
         print(f"      → 신규 {len(changes.get('new_entries', []))} / 이탈 {len(changes.get('dropped', []))} / 큰 폭 변동 {len(changes.get('rank_changes', []))}")
     
     print("[3/4] Claude로 요약 생성...")
@@ -315,10 +330,10 @@ def main():
     excel_path = create_excel_report(current, changes, summary, chart_used)
     
     today = datetime.now().strftime('%Y-%m-%d')
-    subject = f'[모바일 게임 차트] 주간 보고 {today} ({chart_used})'
+    subject = f'[모바일 게임 차트] 일간 보고 {today} ({chart_used})'
     html_body = f"""
     <div style="font-family: 'Malgun Gothic', sans-serif; line-height: 1.6;">
-      <h2>한국 App Store 게임 차트 주간 보고서</h2>
+      <h2>한국 App Store 게임 차트 일간 보고서</h2>
       <p><strong>수집일:</strong> {today}</p>
       <p><strong>사용 차트:</strong> {chart_used} ({len(current)}개)</p>
       <hr/>
