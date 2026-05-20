@@ -1,6 +1,6 @@
 """
 한국 App Store 모바일 게임 매출 차트 일간 수집·캘린더 기반 이동평균 분석·메일 자동화.
-GitHub Actions에서 매일 한국 시간 오전 7시 30분 자동 실행.
+GitHub Actions / cron-job.org 트리거로 매일 한국 시간 오전 7시 37분 실행.
 
 활성 시간축 (그날 추가되는 분석):
   - 매일: 1일선 (어제 vs 오늘)
@@ -9,12 +9,13 @@ GitHub Actions에서 매일 한국 시간 오전 7시 30분 자동 실행.
   - 분기 시작일(1/1, 4/1, 7/1, 10/1): + 분기선 (전전분기 vs 전분기)
   - 1월 1일: + 1년선 (재작년 vs 작년)
 
-데이터 부족 시: 유의문구 표시하고 그대로 진행 (스킵 없음).
+Claude API 호출은 529 과부하 등 일시 오류 시 자동 재시도. 최종 실패해도 메일은 발송.
 """
 
 import json
 import os
 import smtplib
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from email.mime.multipart import MIMEMultipart
@@ -417,8 +418,31 @@ def run_active_analyses(today_dt, current, active_names):
 
 
 # ============================================================
-# 7. Claude 요약
+# 7. Claude 요약 (재시도 로직 포함)
 # ============================================================
+
+def call_claude_with_retry(prompt, max_tokens, max_retries=4):
+    """Claude API 호출. 529 과부하 등 일시적 에러 시 지수 백오프 재시도.
+    모든 재시도 실패 시 None 반환 (호출부에서 대체 처리)."""
+    client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = client.messages.create(
+                model='claude-haiku-4-5-20251001',
+                max_tokens=max_tokens,
+                messages=[{'role': 'user', 'content': prompt}],
+            )
+            return response.content[0].text
+        except Exception as e:
+            print(f"[WARN] Claude API 실패 (시도 {attempt}/{max_retries}): {e}")
+            if attempt < max_retries:
+                wait = 2 ** attempt  # 2, 4, 8초
+                print(f"       {wait}초 후 재시도...")
+                time.sleep(wait)
+            else:
+                print("[ERROR] Claude API 재시도 모두 실패. 요약 없이 진행.")
+                return None
+
 
 def generate_daily_summary(current, changes, chart_used):
     """1일선만 활성인 평일용 짧은 요약."""
@@ -426,7 +450,6 @@ def generate_daily_summary(current, changes, chart_used):
         return (f"비교 가능한 어제 데이터가 없습니다 (차트: {chart_used}). "
                 f"다음 실행부터 1일 변동 분석이 시작됩니다.")
     
-    client = Anthropic(api_key=ANTHROPIC_API_KEY)
     prompt = f"""한국 App Store 게임 {chart_used} 차트의 1일 변동을 사업PM 관점에서 짧게.
 
 [비교 구간] {changes['period_label']}
@@ -446,9 +469,11 @@ def generate_daily_summary(current, changes, chart_used):
 
 일간은 노이즈 많으니 진짜 시그널만. 미미하면 "특이사항 없음"이라고 솔직하게."""
     
-    response = client.messages.create(model='claude-haiku-4-5-20251001', max_tokens=800,
-                                       messages=[{'role': 'user', 'content': prompt}])
-    return response.content[0].text
+    result = call_claude_with_retry(prompt, max_tokens=800)
+    if result is None:
+        return ("⚠️ AI 요약 생성 실패 — Claude API 일시적 과부하(529). "
+                "차트 데이터와 변화 분석은 정상이며, 잠시 후 재실행하면 요약도 생성됩니다.")
+    return result
 
 
 def generate_comprehensive_summary(current, analyses, chart_used):
@@ -470,7 +495,6 @@ def generate_comprehensive_summary(current, analyses, chart_used):
 상위 변동: {json.dumps(top_changes, ensure_ascii=False)}
 """)
     
-    client = Anthropic(api_key=ANTHROPIC_API_KEY)
     prompt = f"""한국 App Store 게임 {chart_used} 차트의 다중 시간축 변화를 사업PM 관점에서 분석.
 
 [이번 측정 Top 30]
@@ -495,9 +519,11 @@ def generate_comprehensive_summary(current, analyses, chart_used):
 
 군더더기 없이."""
     
-    response = client.messages.create(model='claude-haiku-4-5-20251001', max_tokens=2500,
-                                       messages=[{'role': 'user', 'content': prompt}])
-    return response.content[0].text
+    result = call_claude_with_retry(prompt, max_tokens=2500)
+    if result is None:
+        return ("⚠️ AI 종합 인사이트 생성 실패 — Claude API 일시적 과부하(529). "
+                "시간축별 변화 데이터는 첨부 엑셀에서 정상 확인 가능합니다.")
+    return result
 
 
 # ============================================================
@@ -522,7 +548,6 @@ def _write_changes_to_sheet(ws, changes, title):
             ws.column_dimensions[col_letter].width = width
         return
     
-    # 신규
     ws.cell(row=row, column=1, value='■ 신규 진입').font = Font(bold=True, size=11)
     row += 1
     items = changes.get('new_entries', [])[:30]
@@ -540,7 +565,6 @@ def _write_changes_to_sheet(ws, changes, title):
             row += 1
     row += 2
     
-    # 상승/하락
     for label, sort_key, filter_fn in [
         ('■ 큰 폭 상승', lambda x: -x['change'], lambda x: x['change'] > 0),
         ('■ 큰 폭 하락', lambda x: x['change'], lambda x: x['change'] < 0),
@@ -560,7 +584,6 @@ def _write_changes_to_sheet(ws, changes, title):
                 row += 1
         row += 2
     
-    # 이탈
     ws.cell(row=row, column=1, value='■ 차트 이탈').font = Font(bold=True, size=11)
     row += 1
     items = changes.get('dropped', [])[:30]
