@@ -139,7 +139,6 @@
     .wrap{ padding:14px 14px 40px; }
     .layout{ flex-direction:column; gap:14px; }
     .panel{ flex:1 1 auto; width:100%; }
-    .chartbox{ width:calc(100% + 10px); margin-right:-10px; }
     .canvas-wrap{ height:340px; }
     .canvas-wrap canvas{ touch-action:pan-y; }
     .chartbar{ height:20px; touch-action:none; }
@@ -553,6 +552,8 @@ function init(full){
         x:{ ticks:{ color:'#8b8b85', maxRotation:0, autoSkip:true, maxTicksLimit:14 }, grid:{ display:false } } },
     },
   });
+
+  if(MOB){ chart.options.layout = { padding:{ right: Math.round((chart.chartArea && chart.chartArea.left) || 40) } }; chart.update(); }
 
   document.querySelectorAll('.stab').forEach(b=> b.addEventListener('click',()=> selectChart(b.dataset.src)));
   document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click',()=> switchTf(b.dataset.tf)));
