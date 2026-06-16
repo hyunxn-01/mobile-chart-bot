@@ -107,11 +107,43 @@
   .pubrow[aria-pressed="true"] td.pname{ color:var(--accent); }
   .pubchip{ display:inline-block; font-size:11.5px; color:var(--muted); background:var(--chip);
     border-radius:6px; padding:2px 7px; margin:2px 4px 2px 0; }
+  .panel-toggle{ display:none; width:100%; align-items:center; justify-content:space-between; font:inherit;
+    font-size:14px; font-weight:600; padding:10px 12px; border:1px solid var(--line); border-radius:10px;
+    background:var(--bg); color:var(--text); cursor:pointer; }
+  .panel-toggle .caret{ transition:transform .15s; color:var(--muted); }
+  .panel-toggle[aria-expanded="true"] .caret{ transform:rotate(180deg); }
+  .histcards, .pubcards{ display:flex; flex-direction:column; gap:10px; }
+  .histcard, .pubcard{ border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--panel); }
+  .histcard-head, .pubcard-head{ display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+  .histcard-head b, .pubcard-head b{ font-weight:600; font-size:14px; }
+  .histcard-head .cbar{ display:inline-block; width:10px; height:18px; border-radius:5px; flex:0 0 auto; }
+  .histcard-row{ display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; -webkit-overflow-scrolling:touch; }
+  .hcell{ flex:0 0 auto; text-align:center; min-width:44px; padding:4px 6px; border-radius:7px; background:var(--bg);
+    border:1px solid var(--line); font-variant-numeric:tabular-nums; }
+  .hcell i{ display:block; font-style:normal; font-size:10px; color:var(--muted); margin-bottom:1px; }
+  .hcell b{ font-size:13px; font-weight:600; }
+  .hcell.up b{ color:#16a34a; } .hcell.down b{ color:#dc2626; } .hcell.na b{ color:var(--muted); font-weight:400; }
+  .pubcard{ cursor:pointer; }
+  .pubcard[aria-pressed="true"]{ border-color:var(--accent); }
+  .pubcard[aria-pressed="true"] .pubcard-head b{ color:var(--accent); }
+  .pubcard-head .prank{ font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .pubcard-stats{ font-size:12.5px; color:var(--muted); margin:0 0 7px; font-variant-numeric:tabular-nums; }
+  .pubcard-games{ display:flex; flex-wrap:wrap; }
   @media (max-width:820px){
-    .layout{ flex-direction:column; }
+    .wrap{ padding:14px 14px 40px; }
+    .layout{ flex-direction:column; gap:14px; }
     .panel{ flex:1 1 auto; width:100%; }
-    .canvas-wrap{ height:60vh; min-height:340px; }
-    .list{ max-height:260px; }
+    .canvas-wrap{ height:340px; }
+    .canvas-wrap canvas{ touch-action:none; }
+    .srcrow{ flex-wrap:wrap; gap:8px; }
+    .tabs{ overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; }
+    .tab{ white-space:nowrap; }
+    .hintrow{ flex-direction:column; align-items:stretch; gap:6px; }
+    .resetzoom{ align-self:flex-start; }
+    .panel-toggle{ display:flex; }
+    .panel-body{ display:none; }
+    .panel-body.open{ display:block; }
+    .list{ max-height:300px; }
   }
 </style>
 </head>
@@ -152,13 +184,16 @@
       <p class="viewhint" id="viewhint">전체 보기</p>
     </div>
     <aside class="panel">
-      <div class="row">
-        <input class="search" id="search" type="search" placeholder="게임 검색 (이름·개발사)" aria-label="게임 검색">
-        <button class="clearbtn" id="clear">전체 해제</button>
+      <button class="panel-toggle" id="panelToggle" aria-expanded="false"><span id="panelToggleLabel">게임 검색·선택</span><span class="caret">▾</span></button>
+      <div class="panel-body" id="panelBody">
+        <div class="row">
+          <input class="search" id="search" type="search" placeholder="게임 검색 (이름·개발사)" aria-label="게임 검색">
+          <button class="clearbtn" id="clear">전체 해제</button>
+        </div>
+        <p class="panelnote">옆 숫자 = 가장 최근 차트 순위 · 차트에서 빠진 게임은 'N일 전 이탈'로 표시</p>
+        <p class="selcount" id="selcount">선택된 게임 없음</p>
+        <div class="list" id="list"></div>
       </div>
-      <p class="panelnote">옆 숫자 = 가장 최근 차트 순위 · 차트에서 빠진 게임은 'N일 전 이탈'로 표시</p>
-      <p class="selcount" id="selcount">선택된 게임 없음</p>
-      <div class="list" id="list"></div>
     </aside>
   </div>
 
@@ -205,6 +240,7 @@ function colorFor(aid){
   const i=selected.indexOf(aid);
   return i<0 ? null : PALETTE[i % PALETTE.length];
 }
+function isMobile(){ return window.matchMedia('(max-width:820px)').matches; }
 
 function buildDatasets(){
   const tf=DATA.timeframes[activeTf];
@@ -250,6 +286,8 @@ function switchTf(tf){
 function renderSelCount(){
   const el=document.getElementById('selcount');
   el.textContent = selected.length ? `선택된 게임 ${selected.length}개 — 다시 누르면 해제` : '선택된 게임 없음';
+  const lbl=document.getElementById('panelToggleLabel');
+  if(lbl) lbl.textContent = selected.length ? `게임 검색·선택 · ${selected.length}개` : '게임 검색·선택';
 }
 
 function renderList(){
@@ -290,6 +328,25 @@ function renderHistory(){
     return;
   }
   const labels=tf.labels;
+  if(isMobile()){
+    const short=l=>/^\d{4}-\d{2}-\d{2}$/.test(l)?l.slice(5):l;
+    let h='<div class="histcards">';
+    selected.forEach(aid=>{
+      const c=colorFor(aid), s=tf.series[aid]||[];
+      h+=`<div class="histcard"><div class="histcard-head"><span class="cbar" style="background-color:${c}"></span><b>${esc(DATA.games[aid].title)}</b></div><div class="histcard-row">`;
+      s.forEach((v,i)=>{
+        let cls='na';
+        if(v!=null){ cls=''; const prev=i>0?s[i-1]:null;
+          if(prev!=null&&v<prev) cls='up'; else if(prev!=null&&v>prev) cls='down'; }
+        h+=`<span class="hcell ${cls}"><i>${esc(short(labels[i]))}</i><b>${v!=null?v:'–'}</b></span>`;
+      });
+      h+='</div></div>';
+    });
+    h+='</div>';
+    wrap.innerHTML=h;
+    wrap.querySelectorAll('.histcard-row').forEach(r=>{ r.scrollLeft=r.scrollWidth; });
+    return;
+  }
   let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th><th class="colorcol" title="그래프 색"></th>';
   labels.forEach(l=> h+=`<th>${esc(l)}</th>`);
   h+='</tr></thead><tbody>';
@@ -426,22 +483,37 @@ function renderPublishers(){
     wrap.innerHTML='<p class="empty">데이터가 쌓이면 퍼블리셔 집계가 표시됩니다.</p>';
     return;
   }
-  sub.textContent=`${pub.as_of||''} 차트 기준 · 한 개발사가 차트에 올린 게임 수와 순위 · 행을 누르면 그 퍼블리셔의 게임이 위 그래프에 강조됩니다.`;
-  let h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+
-    '<th>#</th><th class="pname">퍼블리셔</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th><th class="pname">차트 내 게임</th></tr></thead><tbody>';
-  pub.list.forEach((e,idx)=>{
-    const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
-    const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
-    const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
-    h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
-      `<td>${idx+1}</td>`+
-      `<td class="pname">${esc(e.developer)}</td>`+
-      `<td>${e.num_games}</td>`+
-      `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td>`+
-      `<td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
-      `<td class="pgames">${chips}</td></tr>`;
-  });
-  h+='</tbody></table></div>';
+  sub.textContent=`${pub.as_of||''} 차트 기준 · 한 개발사가 차트에 올린 게임 수와 순위 · 누르면 그 퍼블리셔의 게임이 위 그래프에 강조됩니다.`;
+  let h;
+  if(isMobile()){
+    h='<div class="pubcards">';
+    pub.list.forEach((e,idx)=>{
+      const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
+      const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
+      const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
+      h+=`<div class="pubcard pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
+        `<div class="pubcard-head"><span class="prank">#${idx+1}</span><b>${esc(e.developer)}</b></div>`+
+        `<div class="pubcard-stats">게임 ${e.num_games} · 최고 ${e.best_rank!=null?e.best_rank+'위':'–'} · 평균 ${e.avg_rank!=null?e.avg_rank:'–'}</div>`+
+        `<div class="pubcard-games">${chips}</div></div>`;
+    });
+    h+='</div>';
+  } else {
+    h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+
+      '<th>#</th><th class="pname">퍼블리셔</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th><th class="pname">차트 내 게임</th></tr></thead><tbody>';
+    pub.list.forEach((e,idx)=>{
+      const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
+      const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
+      const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
+      h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
+        `<td>${idx+1}</td>`+
+        `<td class="pname">${esc(e.developer)}</td>`+
+        `<td>${e.num_games}</td>`+
+        `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td>`+
+        `<td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
+        `<td class="pgames">${chips}</td></tr>`;
+    });
+    h+='</tbody></table></div>';
+  }
   wrap.innerHTML=h;
   wrap.querySelectorAll('.pubrow').forEach(row=>{
     row.addEventListener('click',()=>{
@@ -467,6 +539,9 @@ function init(full){
   activeChart='grossing'; DATA=FULL.charts.grossing;
   applyChart();
 
+  const MOB=isMobile();
+  if(MOB){ const hint=document.querySelector('.hint'); if(hint) hint.textContent='회색 선이 전체 게임 · 아래에서 선택하면 강조 · 두 손가락으로 벌리면 확대, 한 손가락으로 좌우 드래그하면 이동. (위로 갈수록 높은 순위)'; }
+
   chart=new Chart(document.getElementById('chart'),{
     type:'line',
     data:{ labels:DATA.timeframes.daily.labels, datasets:buildDatasets() },
@@ -476,8 +551,8 @@ function init(full){
       plugins:{ legend:{display:false},
         tooltip:{ filter:(it)=> it.parsed.y!=null,
           callbacks:{ label:(c)=> `${c.dataset.label} · ${c.parsed.y}위` } },
-        zoom:{ pan:{ enabled:false },
-          zoom:{ wheel:{enabled:true}, drag:{ enabled:false }, pinch:{enabled:false}, mode:'x', onZoomComplete:updateScrollbar } } },
+        zoom:{ pan:{ enabled:MOB, mode:'x', onPan:updateScrollbar, onPanComplete:updateScrollbar },
+          zoom:{ wheel:{enabled:!MOB}, drag:{ enabled:false }, pinch:{enabled:MOB}, mode:'x', onZoomComplete:updateScrollbar } } },
       scales:{
         y:{ reverse:true, min:1, max:100, title:{display:true, text:'순위 (위가 1위)'},
             ticks:{ stepSize:10, color:'#8b8b85' }, grid:{ color:'rgba(130,130,125,0.14)' } },
@@ -492,9 +567,21 @@ function init(full){
   document.getElementById('resetzoom').addEventListener('click',()=>{ if(chart.resetZoom) chart.resetZoom(); });
 
   setupScrollbar();
-  setupChartDrag();
+  if(!MOB) setupChartDrag();
+  setupPanelToggle();
   switchTf('daily');
   updateSourceTabs();
+  let wasMobile=isMobile();
+  window.addEventListener('resize', ()=>{ const n=isMobile(); if(n!==wasMobile){ wasMobile=n; location.reload(); } });
+}
+
+function setupPanelToggle(){
+  const btn=document.getElementById('panelToggle'), body=document.getElementById('panelBody');
+  if(!btn||!body) return;
+  btn.addEventListener('click',()=>{
+    const open=body.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
 }
 
 fetch('./data.json').then(r=>{ if(!r.ok) throw new Error('data.json '+r.status); return r.json(); })
