@@ -44,10 +44,10 @@
     opacity:.45; border-radius:7px; cursor:grab; transition:opacity .12s; }
   .chartbar-thumb:hover{ opacity:.62; } .chartbar-thumb:active{ opacity:.78; cursor:grabbing; }
   .viewhint{ font-size:11.5px; color:var(--muted); margin:6px 2px 0; text-align:right; }
-  .panel{ flex:0 0 320px; min-width:0; max-width:320px; border:1px solid var(--line); border-radius:12px;
+  .panel{ flex:0 0 400px; min-width:0; max-width:400px; border:1px solid var(--line); border-radius:12px;
     background:var(--panel); padding:11px; }
   .panel .row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; }
-  .search{ font:inherit; font-size:14px; flex:1; min-width:0; padding:8px 10px; border:1px solid var(--line);
+  .search{ font:inherit; font-size:15px; flex:1; min-width:0; padding:11px 12px; border:1px solid var(--line);
     border-radius:8px; background:var(--bg); color:var(--text); }
   .clearbtn{ font:inherit; font-size:12.5px; padding:8px 10px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; white-space:nowrap; }
@@ -675,10 +675,11 @@ function renderMovers(){
   const nm=aid=>esc((DATA.games[aid]||{}).title||aid)+newBadge(aid);
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,12).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
   let h='<div class="movergrid">';
-  h+=col('신규 진입', entered, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${e.now}위</span><span class="mvd up">신규</span></span>`);
-  h+=col('이탈', exited, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${e.prev}위</span><span class="mvd down">이탈</span></span>`);
-  h+=col('급등', up, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${e.prev}→${e.now}위</span><span class="mvd up">▲${e.d}</span></span>`);
-  h+=col('급락', down, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${e.prev}→${e.now}위</span><span class="mvd down">▼${-e.d}</span></span>`);
+  const ri=v=>Math.round(v);
+  h+=col('신규 진입', entered, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.now)}위</span><span class="mvd up">신규</span></span>`);
+  h+=col('이탈', exited, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}위</span><span class="mvd down">이탈</span></span>`);
+  h+=col('급등', up, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}→${ri(e.now)}위</span><span class="mvd up">▲${ri(e.prev)-ri(e.now)}</span></span>`);
+  h+=col('급락', down, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}→${ri(e.now)}위</span><span class="mvd down">▼${ri(e.now)-ri(e.prev)}</span></span>`);
   h+='</div>';
   wrap.innerHTML=h;
 }
