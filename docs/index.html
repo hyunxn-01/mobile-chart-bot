@@ -210,7 +210,7 @@
     <button class="tab" role="tab" data-tf="yearly" aria-selected="false">년별</button>
   </div>
   <div class="hintrow">
-    <p class="hint" id="charthint"><span class="cic" style="color:var(--muted)">ⓘ</span> <span style="display:inline-block;width:16px;border-top:2px solid var(--muted);vertical-align:middle"></span> 전체 게임 · 오른쪽에서 선택하면 <b>강조</b> · 휠 <b>확대</b> / 드래그 <b>좌우 이동</b> · 위쪽이 1위</p>
+    <p class="hint" id="charthint">회색 선 = 전체 게임 · 오른쪽에서 선택하면 <b>강조</b> · 휠 <b>확대</b> / 드래그 <b>좌우 이동</b></p>
     <button class="resetzoom" id="resetzoom">확대 초기화</button>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
@@ -414,7 +414,7 @@ function renderHistory(){
     wrap.innerHTML='<p class="empty">위 그래프에서 게임을 선택하면, 그 게임의 '+TF_LABEL[activeTf]+' 순위 이력이 여기에 표로 표시됩니다.</p>';
     return;
   }
-  sub.innerHTML = `<span class="ci"><b>${TF_LABEL[activeTf]}</b> 기준 · 탭 바꾸면 같이 변경</span><span class="ci">숫자 = 순위(작을수록 상위)</span><span class="ci"><span style="color:#16a34a">▲</span> 상승</span><span class="ci"><span style="color:#dc2626">▼</span> 하락</span>`;
+  sub.innerHTML = `<span class="ci"><b>${TF_LABEL[activeTf]}</b> 기준 · 탭 바꾸면 같이 변경</span><span class="ci"><span style="color:#16a34a">▲</span> 상승</span><span class="ci"><span style="color:#dc2626">▼</span> 하락</span>`;
   const labels=tf.labels;
   let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th><th class="colorcol" title="그래프 색"></th><th class="avg3m" title="최근 3개월 평균 순위">3개월<br>평균</th>';
   labels.forEach(l=> h+=`<th>${esc(l)}</th>`);
@@ -704,7 +704,7 @@ function init(full){
   applyChart();
 
   const MOB=isMobile();
-  if(MOB){ const hint=document.getElementById('charthint'); if(hint) hint.innerHTML='<span class="cic" style="color:var(--muted)">ⓘ</span> <span style="display:inline-block;width:16px;border-top:2px solid var(--muted);vertical-align:middle"></span> 전체 게임 · 아래에서 선택하면 <b>강조</b> · ＋/－ <b>확대</b> · 막대 끌어 <b>이동</b> · 위쪽이 1위'; }
+  if(MOB){ const hint=document.getElementById('charthint'); if(hint) hint.innerHTML='회색 선 = 전체 게임 · 아래에서 선택하면 <b>강조</b> · ＋/－ <b>확대</b> · 막대 끌어 <b>이동</b>'; }
 
   chart=new Chart(document.getElementById('chart'),{
     type:'line',
