@@ -1,0 +1,902 @@
+[
+  {
+    "rank": 1,
+    "app_id": "com.oakever.meowdoku",
+    "title": "Meowdoku!",
+    "developer": "Oakever Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 2,
+    "app_id": "com.k8games.dreamfurniios",
+    "title": "꿈꾸는 가구점",
+    "developer": "K8GAMES",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 3,
+    "app_id": "com.owlottergames.nekomancer",
+    "title": "네코맨서: 타워 디펜스",
+    "developer": "Owl & Otter",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 4,
+    "app_id": "com.riftsky.mhg.kr.ios",
+    "title": "더 코지 플로리스트",
+    "developer": "RiftSky Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 5,
+    "app_id": "com.superbox.ios.magicSquad",
+    "title": "뿅뿅마법단",
+    "developer": "SUPERBOX. Inc",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 6,
+    "app_id": "com.highbrow.games.dvo",
+    "title": "드래곤빌리지3",
+    "developer": "Highbrow",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 7,
+    "app_id": "com.red.brilliantsort.ios",
+    "title": "Jewel Coloring",
+    "developer": "Ta Ta Game Technology Limited",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 8,
+    "app_id": "com.grandgames.catblockjam",
+    "title": "Block Out! - Color Sort Puzzle",
+    "developer": "Grand Games A.Ş.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 9,
+    "app_id": "com.blockpuzzle.us.ios",
+    "title": "블록 블라스트 (Block Blast)",
+    "developer": "Hungry Studio",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 10,
+    "app_id": "com.nianticlabs.pokemongo",
+    "title": "Pokémon GO",
+    "developer": "Niantic, Inc.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 11,
+    "app_id": "com.gof.global",
+    "title": "WOS: 화이트아웃 서바이벌",
+    "developer": "Century Games Pte. Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 12,
+    "app_id": "com.jsjs.kr.ios",
+    "title": "토이 삼국",
+    "developer": "RHINOS",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 13,
+    "app_id": "com.dreamgames.royalkingdom",
+    "title": "로얄 킹덤 (Royal Kingdom)",
+    "developer": "Dream Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 14,
+    "app_id": "com.grandgames.magicsort",
+    "title": "마법의 정렬 (Magic Sort!)",
+    "developer": "Grand Games A.Ş.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 15,
+    "app_id": "com.brain.crazy.joygame.ios",
+    "title": "Brain Puzzle 3: Crazy Mind",
+    "developer": "SmallStep Dev Team",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 16,
+    "app_id": "com.mymskr.ios",
+    "title": "호드 워: 어벤저의 소환",
+    "developer": "Yunnan Decu Network Technology Co., Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 17,
+    "app_id": "com.tricky.story.brain.puzzle",
+    "title": "Tricky Story 2: Brain Twist",
+    "developer": "Tang Thi Thuy",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 18,
+    "app_id": "com.fatmerge.global",
+    "title": "테이스티 트레블: 합성 게임",
+    "developer": "Century Games Pte. Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 19,
+    "app_id": "com.nexon.ma",
+    "title": "메이플 키우기",
+    "developer": "NEXON Company",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 20,
+    "app_id": "com.run.tower.defense",
+    "title": "킹샷:Kingshot",
+    "developer": "Century Games Pte. Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 21,
+    "app_id": "com.ecffri.arrows",
+    "title": "Arrows – Puzzle Escape",
+    "developer": "Lessmore GmbH",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 22,
+    "app_id": "com.ujoyas.flower",
+    "title": "오늘의 꽃 : 진짜 꽃을 키우는 게임",
+    "developer": "Ujoy Games Limited",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 23,
+    "app_id": "com.roblox.robloxmobile",
+    "title": "로블록스(Roblox)",
+    "developer": "Roblox Corporation",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 24,
+    "app_id": "com.rebirthkr.ios",
+    "title": "밤탈출 - 49일",
+    "developer": "MOREFUN (H.K.) LIMITED",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 25,
+    "app_id": "com.nexon.fmk",
+    "title": "FC 모바일",
+    "developer": "NEXON Company",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 26,
+    "app_id": "group.theorigin.themaxlevelreturner",
+    "title": "나 혼자 만렙 키우기",
+    "developer": "Punchline Games Co., Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 27,
+    "app_id": "com.hkqs.nbaworld2026",
+    "title": "NBA Basketball World 2026",
+    "developer": "Hong Kong Qushang Technology Co., Limited",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 28,
+    "app_id": "com.percent.ios.luckydefense",
+    "title": "운빨존많겜",
+    "developer": "111%",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 29,
+    "app_id": "com.rovio.baba",
+    "title": "앵그리버드 2 (Angry Birds 2)",
+    "developer": "Rovio Entertainment Oyj",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 30,
+    "app_id": "jp.co.goodroid.hyper.busflow",
+    "title": "Bus Traffic Fever!",
+    "developer": "GOODROID,Inc.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 31,
+    "app_id": "com.xman.kr",
+    "title": "X 클래시",
+    "developer": "9z Games(HK)",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 32,
+    "app_id": "com.hidea.cat.magicrecipe",
+    "title": "고양이와 스프: 마법의 레시피",
+    "developer": "NEOWIZ",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 33,
+    "app_id": "jp.pokemon.pokemontcgp",
+    "title": "포켓몬 카드 게임 Pocket",
+    "developer": "The Pokemon Company",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 34,
+    "app_id": "com.kurogame.wutheringwaves.global",
+    "title": "명조:워더링 웨이브 × 사이버펑크 콜라보",
+    "developer": "KURO GAMES",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 35,
+    "app_id": "com.superbox.ios.dropmerge",
+    "title": "멜론 메이커 : 머지",
+    "developer": "SUPERBOX. Inc",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 36,
+    "app_id": "com.supercell.laser",
+    "title": "브롤스타즈",
+    "developer": "Supercell",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 37,
+    "app_id": "com.solitaire.word.associate",
+    "title": "단어 연상 - 단어잇기 퍼즐게임",
+    "developer": "Astrasen Global",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 38,
+    "app_id": "com.hollywood.merge",
+    "title": "할리우드 머지",
+    "developer": "VoyagerOne",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 39,
+    "app_id": "com.supermagic.ios.cooptd",
+    "title": "협타디: 협동 타워 디펜스",
+    "developer": "SuperMagic",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 40,
+    "app_id": "com.mergegame.icookie",
+    "title": "가십하버: 합성 & 스토리 게임",
+    "developer": "Microfun Limited",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 41,
+    "app_id": "com.leap.searchit",
+    "title": "Search It - Hidden Objects",
+    "developer": "LEAP BILISIM TEKNOLOJILERI VE YAZILIM TICARET ANONIM SIRKETI",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 42,
+    "app_id": "com.cle.yulgang",
+    "title": "열혈강호: 화룡전",
+    "developer": "Sesisoft",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 43,
+    "app_id": "com.kiwifun.game.ios.screw.master",
+    "title": "나사 3D 퍼즐: 핀 풀기 게임",
+    "developer": "Kiwi Fun HK Limited",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 44,
+    "app_id": "com.streetcomplete.pixelmagician",
+    "title": "픽셀 법사 키우기 : 방치형 RPG",
+    "developer": "YONGJIN JO",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 45,
+    "app_id": "com.pubg.krmobile",
+    "title": "배틀그라운드",
+    "developer": "KRAFTON Inc",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 46,
+    "app_id": "com.mondayoff.dinomutant",
+    "title": "Dino mutant : T-Rex",
+    "developer": "MondayOFF",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 47,
+    "app_id": "com.oakever.arrows",
+    "title": "Amaze GO! - 화살표 퍼즐",
+    "developer": "Oakever Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 48,
+    "app_id": "com.epicoro.castleclashers",
+    "title": "Castle Busters",
+    "developer": "Voodoo",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 49,
+    "app_id": "com.flow.cannon-ball",
+    "title": "Smash Fest!",
+    "developer": "Flow Games Bilisim Yazilim ve Pazarlama Anonim Sirketi",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 50,
+    "app_id": "com.brain.logic.joygame.ios",
+    "title": "Brain Puzzle 2: Logic Twist",
+    "developer": "SmallStep Dev Team",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 51,
+    "app_id": "com.fty.trickmean2game",
+    "title": "Tricky Mean2",
+    "developer": "FTY LLC.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 52,
+    "app_id": "com.dreamgames.royalmatch",
+    "title": "로얄 매치 (Royal Match)",
+    "developer": "Dream Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 53,
+    "app_id": "com.rummikubfree",
+    "title": "Rummikub",
+    "developer": "Kinkajoo Ltd",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 54,
+    "app_id": "com.fiveminlab.overgeared.hero.backpack.merge",
+    "title": "템빨용사: 픽셀 아이템 머지 RPG",
+    "developer": "5minlab Co., Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 55,
+    "app_id": "com.hitappsgames.wordsolitaire",
+    "title": "솔리테어 - 카드게임 또 워드퍼즐",
+    "developer": "Hitapps Games LTD",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 56,
+    "app_id": "com.shimmer.peachland.kr-ios",
+    "title": "산너머 도원마을",
+    "developer": "Shimmer Joy Technology Co., Limited",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 57,
+    "app_id": "com.easybrain.sudoku",
+    "title": "스도쿠 - 클래식 로직 퍼즐 게임",
+    "developer": "Easybrain Ltd",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 58,
+    "app_id": "soccer.score.star",
+    "title": "사커 슈퍼스타 - 축구",
+    "developer": "Real Free Soccer",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 59,
+    "app_id": "com.com2us.futurecpb.ios.apple.global.normal",
+    "title": "컴투스프로야구V26",
+    "developer": "Com2uS Corp.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 60,
+    "app_id": "com.haoplay.game.ios.duck",
+    "title": "꽥꽥 구조대 - 알 폭격 디펜스",
+    "developer": "HaoPlay Limited",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 61,
+    "app_id": "com.abi.busjam.sortpuzzle",
+    "title": "Bus Escape: Traffic Jam",
+    "developer": "ABI GLOBAL LTD.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 62,
+    "app_id": "com.dino.screwdom",
+    "title": "Screwdom : 나사와 볼트 퍼즐",
+    "developer": "Zego Global Pte Ltd",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 63,
+    "app_id": "com.bubble.buster.rescue",
+    "title": "털실 마스터 - 마법의 정렬 버스주차퍼즐게임",
+    "developer": "Astrasen Global",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 64,
+    "app_id": "com.loomgames.pixelflow",
+    "title": "Pixel Flow!",
+    "developer": "Loom Games Oyun Yazilim ve Pazarlama Anonim Sirketi",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 65,
+    "app_id": "com.nexon.kart",
+    "title": "카트라이더 러쉬플러스",
+    "developer": "NEXON Company",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 66,
+    "app_id": "com.GybeGames.ColorBlockJam",
+    "title": "Color Block Jam",
+    "developer": "Rollic Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 67,
+    "app_id": "jp.konami.pesactionmobile",
+    "title": "eFootball™",
+    "developer": "KONAMI",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 68,
+    "app_id": "com.supercell.rogue",
+    "title": "mo.co",
+    "developer": "Supercell",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 69,
+    "app_id": "com.kiloo.subwaysurfers",
+    "title": "Subway Surfers",
+    "developer": "Sybo Games ApS",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 70,
+    "app_id": "com.playrix.township-ios",
+    "title": "꿈의 마을 (Township)",
+    "developer": "Playrix",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 71,
+    "app_id": "com.nflystudio.InfiniteStaircase",
+    "title": "무한의 계단",
+    "developer": "Neptune Company",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 72,
+    "app_id": "com.crypto.code.master",
+    "title": "Code Busters: Word Puzzle Game",
+    "developer": "Smartronic",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 73,
+    "app_id": "com.mmo.world.legend",
+    "title": "월드 크러쉬 : 히어로 포스",
+    "developer": "BINGCHUAN NETWORK (HONG KONG) COMPANY LIMITED",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 74,
+    "app_id": "com.phs.global.ios",
+    "title": "라스트 어사일럼: 페스트",
+    "developer": "WISENESS GAME ONLINE INTERNATIONAL LTD",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 75,
+    "app_id": "com.cedargames.mysterytown",
+    "title": "미스터리 타운: 합성 게임 (Mystery Town)",
+    "developer": "Cedar Games Studio",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 76,
+    "app_id": "com.amanotes.magictiles",
+    "title": "매직 타일 3™: 리듬 피아노 게임",
+    "developer": "Amanotes Pte. Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 77,
+    "app_id": "com.fty.thejudge",
+    "title": "들여보낼까 말까? - Let Them In?　",
+    "developer": "FTY LLC.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 78,
+    "app_id": "com.superplaystudios.disneysolitairedreams",
+    "title": "Disney Solitaire",
+    "developer": "SuperPlay",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 79,
+    "app_id": "com.battle.shoot.dragon",
+    "title": "세포 특공대 - 전략형 타워 디펜스",
+    "developer": "Snap Brain Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 80,
+    "app_id": "com.chess.iphone",
+    "title": "체스 · 플레이 및 배우기 온라인",
+    "developer": "Chess.com",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 81,
+    "app_id": "com.tricky.story.mind.twist",
+    "title": "Tricky Story",
+    "developer": "Tang Thi Thuy",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 82,
+    "app_id": "com.ansangha.drgomoku",
+    "title": "오목의 달인",
+    "developer": "SUD Inc.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 83,
+    "app_id": "kr.pragmatist.keycap",
+    "title": "키캡(KeyCap) 스트레스 날려버려!",
+    "developer": "ChartQ Inc",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 84,
+    "app_id": "net.gameduo.gv",
+    "title": "캣 히어로 : 방치형 RPG",
+    "developer": "Game Duo Co.,Ltd.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 85,
+    "app_id": "com.amelosinteractive.snake",
+    "title": "스네이크 아이오 - 재미있는 온라인 뱀 전투 게임",
+    "developer": "Kooapps",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 86,
+    "app_id": "com.robtop.geometryjumplite",
+    "title": "Geometry Dash Lite",
+    "developer": "RobTop Games AB",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 87,
+    "app_id": "jp.co.ponos.battlecatskr",
+    "title": "냥코 대전쟁",
+    "developer": "ponos corporation",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 88,
+    "app_id": "kr.yunu.make10",
+    "title": "사과게임 - 화제의 인싸게임",
+    "developer": "JIEUNK",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 89,
+    "app_id": "com.wildcaly.chbaseball.asia",
+    "title": "MLB 클러치 히트 베이스볼 26",
+    "developer": "WILD CALY PTE. LTD.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 90,
+    "app_id": "com.PlayWithUs.BizAndTownRN",
+    "title": "비즈 앤 타운: 회사 경영 시뮬레이션 - 타이쿤 게임",
+    "developer": "Play With Us Inc.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 91,
+    "app_id": "com.com2us.probaseball3d.normal.freefull.apple.global.ios.universal",
+    "title": "컴투스프로야구2026",
+    "developer": "Com2uS Corp.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 92,
+    "app_id": "com.JindoBlu.OfflineGamesIOS",
+    "title": "데이터 필요없는 게임 - 와이파이 필요없는 게임",
+    "developer": "Moreno Maio",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 93,
+    "app_id": "com.innersloth.amongus",
+    "title": "Among Us!",
+    "developer": "InnerSloth LLC",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 94,
+    "app_id": "com.Gaggle.fun.GooseGooseDuck",
+    "title": "Goose Goose Duck",
+    "developer": "Gaggle Studios, Inc.",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 95,
+    "app_id": "com.riotgames.league.teamfighttactics",
+    "title": "전략적 팀 전투: 리그 오브 레전드 전략 게임",
+    "developer": "Riot Games",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 96,
+    "app_id": "com.xgame.asia.kr",
+    "title": "히어로 클래시: 강아지를 지키자",
+    "developer": "9z Games(HK)",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 97,
+    "app_id": "com.featherweightgames.stampede",
+    "title": "로데오 스탬피드: 3D 동물 라이더",
+    "developer": "Featherweight Games Pty Limited",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 98,
+    "app_id": "com.brain.tricky.smallstep.ios",
+    "title": "Brain Puzzle: Tricky Quest",
+    "developer": "SmallStep Dev Team",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 99,
+    "app_id": "com.light.kr",
+    "title": "라스트 라이트",
+    "developer": "BINGCHUAN NETWORK (HONG KONG) COMPANY LIMITED",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  },
+  {
+    "rank": 100,
+    "app_id": "com.sled.surfers.game",
+    "title": "Sled Surfers - 슬로프 어드벤처",
+    "developer": "Crazy Labs",
+    "category": "게임",
+    "platform": "App Store",
+    "chart": "Top Free"
+  }
+]
