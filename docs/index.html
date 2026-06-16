@@ -39,6 +39,9 @@
   .cdot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; display:inline-block; }
   .cchip{ font-size:11px; font-weight:700; border-radius:5px; padding:1px 6px; white-space:nowrap; }
   .cic{ font-size:13px; line-height:1; font-style:normal; }
+  .sub.cap{ gap:4px 9px; }
+  .csep{ color:var(--line); }
+  .cact{ background:rgba(37,99,235,0.13); color:#3b82f6; font-weight:600; border-radius:6px; padding:2px 9px; white-space:nowrap; }
   .banner{ font-size:13px; color:#9a5b00; background:#fff5e6; border:1px solid #f3d9a6;
     padding:8px 12px; border-radius:8px; margin:0 0 12px; }
   @media (prefers-color-scheme: dark){ .banner{ color:#f0c074; background:#2e2616; border-color:#4a3c1d; } }
@@ -116,7 +119,7 @@
   .moveritem{ font-size:12.5px; padding:5px 8px; border:1px solid var(--line); border-radius:7px; background:var(--panel); display:flex; gap:6px; align-items:center; }
   .moveritem .mvg{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .moveritem .mvr{ flex:0 0 auto; color:var(--muted); font-size:11.5px; font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .moveritem .mvd{ flex:0 0 auto; font-size:11px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; padding:1px 6px; border-radius:5px; }
+  .moveritem .mvd{ flex:0 0 auto; min-width:44px; box-sizing:border-box; text-align:center; font-size:11px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; padding:2px 6px; border-radius:5px; }
   .mvd.up{ color:#15803d; background:rgba(22,163,74,.15); } .mvd.down{ color:#b91c1c; background:rgba(220,38,38,.15); }
   @media (max-width:820px){ .movergrid{ grid-template-columns:1fr 1fr; } }
   .pubcontrols{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:0 0 12px; }
@@ -414,7 +417,7 @@ function renderHistory(){
     wrap.innerHTML='<p class="empty">위 그래프에서 게임을 선택하면, 그 게임의 '+TF_LABEL[activeTf]+' 순위 이력이 여기에 표로 표시됩니다.</p>';
     return;
   }
-  sub.innerHTML = `<span class="ci"><b>${TF_LABEL[activeTf]}</b> 기준 · 탭 바꾸면 같이 변경</span><span class="ci"><span style="color:#16a34a">▲</span> 상승</span><span class="ci"><span style="color:#dc2626">▼</span> 하락</span>`;
+  sub.innerHTML = `<span class="ci"><b>${TF_LABEL[activeTf]}</b> 기준 · 탭 바꾸면 같이 변경</span><span class="csep">│</span><span class="ci"><span style="color:#16a34a">▲</span> 상승</span><span class="csep">│</span><span class="ci"><span style="color:#dc2626">▼</span> 하락</span>`;
   const labels=tf.labels;
   let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th><th class="colorcol" title="그래프 색"></th><th class="avg3m" title="최근 3개월 평균 순위">3개월<br>평균</th>';
   labels.forEach(l=> h+=`<th>${esc(l)}</th>`);
@@ -582,7 +585,7 @@ function renderAgg(keyName, period, els, labelName){
   const labels=tf.labels||[], n=labels.length;
   if(!n || !Object.keys(DATA.games).length){ els.sub.textContent=''; els.wrap.innerHTML='<p class="empty">데이터가 쌓이면 표시됩니다.</p>'; return; }
   const startIdx=period?Math.max(0,n-period):0;
-  els.sub.innerHTML=`<span class="ci"><b>${labels[startIdx]||''}</b> ~ <b>${labels[n-1]||''}</b> 기준</span><span class="ci">${labelName}별 게임 수·최고/평균 순위</span><span class="ci">누르면 위 그래프에 강조</span>`;
+  els.sub.innerHTML=`<span class="ci"><b>${labels[startIdx]||''}</b> ~ <b>${labels[n-1]||''}</b> 기준</span><span class="csep">│</span><span class="ci">${labelName}별 게임 수 · 최고/평균 순위</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 행 클릭 → 그래프 강조</span></span>`;
   const full=aggregate(keyName, period);
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
   const q=norm((els.search||{}).value);
@@ -653,7 +656,7 @@ function renderGap(){
   });
   if(!rows.length){ sub.textContent=''; wrap.innerHTML='<p class="empty">두 차트에 함께 든 게임이 없습니다.</p>'; return; }
   rows.sort((a,b)=>b.gap-a.gap);
-  sub.innerHTML=`<span class="ci">함께 든 게임 <b>${rows.length}</b>개</span><span class="ci">갭 = 매출 − 인기 순위</span><span class="ci"><span class="cdot" style="background:var(--accent)"></span> 다운로드 강세·매출 약세</span><span class="ci"><span class="cdot" style="background:#16a34a"></span> 매출 강세·다운로드 약세</span>`;
+  sub.innerHTML=`<span class="ci">함께 든 게임 <b>${rows.length}</b>개</span><span class="csep">│</span><span class="ci">갭 = 매출 − 인기 순위</span><span class="csep">│</span><span class="ci"><span class="cdot" style="background:var(--accent)"></span> 다운로드↑·매출↓ &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출↑·다운로드↓</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 행 클릭 → 그래프 강조</span></span>`;
   let h='<div class="pubscroll"><table class="pubtable"><thead><tr><th class="pname">게임</th><th>매출 순위</th><th>인기 순위</th><th>갭</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const cls=r.gap>0?'gapdl':(r.gap<0?'gaprev':'');
@@ -678,7 +681,7 @@ function renderMovers(){
   }
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
-  sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="ci">급변 = ±3계단↑</span>`;
+  sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci">급변 ±3계단 이상</span>`;
   const nm=aid=>esc((DATA.games[aid]||{}).title||aid)+newBadge(aid);
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,12).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
   let h='<div class="movergrid">';
