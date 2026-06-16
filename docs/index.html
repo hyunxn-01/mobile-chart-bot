@@ -104,7 +104,7 @@
     <button class="tab" role="tab" data-tf="yearly" aria-selected="false">년별</button>
   </div>
   <div class="hintrow">
-    <p class="hint">회색 선이 전체 게임 · 오른쪽에서 선택하면 강조 · 휠/드래그(영역 선택)=확대, 차트 아래 막대를 드래그=구간 이동. (위로 갈수록 높은 순위)</p>
+    <p class="hint">회색 선이 전체 게임 · 오른쪽에서 선택하면 강조 · 마우스 휠=확대/축소, 확대한 상태에서 차트를 드래그=좌우 이동. (위로 갈수록 높은 순위)</p>
     <button class="resetzoom" id="resetzoom">확대 초기화</button>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
@@ -279,6 +279,7 @@ function updateScrollbar(){
   thumb.style.width=Math.max(5,(cmax-cmin)/denom*100)+'%';
   const out=(min<=0 && max>=total-1);
   bar.style.opacity = out ? '0.6' : '1';
+  if(chart.canvas) chart.canvas.style.cursor = out ? 'default' : 'grab';
   if(hint){ const L=chart.data.labels;
     hint.textContent = out ? '전체 보기 · 휠/드래그로 확대, 막대를 끌어 이동' : `${L[Math.round(cmin)]||''} ~ ${L[Math.round(cmax)]||''} 구간 보는 중`; }
 }
@@ -303,6 +304,26 @@ function setupScrollbar(){
     chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar(); });
 }
 
+function setupChartDrag(){
+  const cv=chart.canvas; let dg=null;
+  cv.addEventListener('pointerdown',e=>{
+    const x=chart.scales.x, total=chart.data.labels.length;
+    if(!(x.min>0.001 || x.max<total-1.001)) return;  // 확대 상태에서만 이동
+    dg={px:e.clientX, min:x.min, max:x.max, span:x.max-x.min}; cv.style.cursor='grabbing';
+  });
+  cv.addEventListener('pointermove',e=>{
+    if(!dg) return;
+    const denom=Math.max(1,chart.data.labels.length-1);
+    const plotW=Math.max(1,chart.chartArea.right-chart.chartArea.left);
+    const d=-(e.clientX-dg.px)*(dg.span/plotW);
+    let nmin=dg.min+d, nmax=dg.max+d;
+    if(nmin<0){nmin=0;nmax=dg.span;} if(nmax>denom){nmax=denom;nmin=denom-dg.span;}
+    chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar();
+  });
+  const end=()=>{ if(dg){ dg=null; cv.style.cursor='grab'; } };
+  cv.addEventListener('pointerup',end); cv.addEventListener('pointerleave',end); cv.addEventListener('pointercancel',end);
+}
+
 function init(data){
   DATA=data;
   order=Object.keys(DATA.games).sort((a,b)=> latestDaily(a)-latestDaily(b));
@@ -320,9 +341,7 @@ function init(data){
         tooltip:{ filter:(it)=> it.parsed.y!=null,
           callbacks:{ label:(c)=> `${c.dataset.label} · ${c.parsed.y}위` } },
         zoom:{ pan:{ enabled:false },
-          zoom:{ wheel:{enabled:true},
-            drag:{ enabled:true, backgroundColor:'rgba(37,99,235,0.18)', borderColor:'rgba(37,99,235,0.6)', borderWidth:1 },
-            pinch:{enabled:false}, mode:'x', onZoomComplete:updateScrollbar } } },
+          zoom:{ wheel:{enabled:true}, drag:{ enabled:false }, pinch:{enabled:false}, mode:'x', onZoomComplete:updateScrollbar } } },
       scales:{
         y:{ reverse:true, min:1, max:100, title:{display:true, text:'순위 (위가 1위)'},
             ticks:{ stepSize:10, color:'#8b8b85' }, grid:{ color:'rgba(130,130,125,0.14)' } },
@@ -340,6 +359,7 @@ function init(data){
   document.getElementById('resetzoom').addEventListener('click',()=>{ if(chart.resetZoom) chart.resetZoom(); });
 
   setupScrollbar();
+  setupChartDrag();
   switchTf('daily');
 }
 
