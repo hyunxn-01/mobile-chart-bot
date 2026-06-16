@@ -39,6 +39,10 @@ RECIPIENT_EMAIL = os.environ.get('RECIPIENT_EMAIL')
 # === AI 분석 모델 (변경 시 이 한 줄만 수정) ===
 CLAUDE_MODEL = 'claude-opus-4-7'
 
+# === 대시보드 URL (GitHub Pages 주소) ===
+# 형식: https://<github-사용자명>.github.io/<레포명>/
+DASHBOARD_URL = 'https://hyunxn-01.github.io/mobile-chart-bot/'
+
 DATA_DIR = Path('data')
 DATA_DIR.mkdir(exist_ok=True)
 HISTORY_DIR = DATA_DIR / 'history'
@@ -183,10 +187,10 @@ def compute_simple_changes(previous, current, threshold=10):
     if not previous:
         return {'mode': 'simple', 'new_entries': [], 'dropped': [], 'rank_changes': [],
                 'past_days': 0, 'recent_days': 1, 'comparable': False}
-    
+
     prev_by_id = {item['app_id']: item for item in previous if item['app_id']}
     curr_by_id = {item['app_id']: item for item in current if item['app_id']}
-    
+
     new_entries = [
         {'title': c['title'], 'developer': c['developer'], 'rank': c['rank']}
         for c in current if c['app_id'] and c['app_id'] not in prev_by_id
@@ -214,17 +218,17 @@ def compute_period_changes(past_data, recent_data, threshold=5):
     """이동평균 기반 두 기간 비교. 한쪽이라도 비면 빈 결과 반환."""
     past_avg = compute_average_ranks(past_data)
     recent_avg = compute_average_ranks(recent_data)
-    
+
     base = {
         'mode': 'moving_average',
         'past_days': len(past_data),
         'recent_days': len(recent_data),
     }
-    
+
     if not past_avg or not recent_avg:
         base.update({'new_entries': [], 'dropped': [], 'rank_changes': [], 'comparable': False})
         return base
-    
+
     new_entries = [
         {'title': info['title'], 'developer': info['developer'],
          'avg_rank': round(info['avg_rank'], 1),
@@ -263,14 +267,14 @@ def compute_period_changes(past_data, recent_data, threshold=5):
 def generate_warning(changes, expected_past, expected_recent, past_label, recent_label):
     past_d = changes.get('past_days', 0)
     recent_d = changes.get('recent_days', 0)
-    
+
     if past_d == 0 and recent_d == 0:
         return f"⚠️ 양쪽 기간 모두 데이터 없음 (봇 시작 이전 또는 누락). 비교 불가."
     if past_d == 0:
         return f"⚠️ {past_label} 데이터 없음. 비교 기준 부재 — 변화 분석 불가, {recent_label} 평균만 의미 있음."
     if recent_d == 0:
         return f"⚠️ {recent_label} 데이터 없음. 비교 불가."
-    
+
     warnings = []
     if past_d < expected_past:
         warnings.append(f"{past_label}: {past_d}/{expected_past}일")
@@ -305,10 +309,10 @@ def analyze_weekly(today_dt, current):
     recent_end = today_dt - timedelta(days=1)
     past_start = today_dt - timedelta(days=14)
     past_end = today_dt - timedelta(days=8)
-    
+
     past_data = load_data_in_date_range(past_start, past_end)
     recent_data = load_data_in_date_range(recent_start, recent_end)
-    
+
     changes = compute_period_changes(past_data, recent_data, threshold=5)
     past_label = f"{past_start.strftime('%Y-%m-%d')}~{past_end.strftime('%m-%d')} (전전주)"
     recent_label = f"{recent_start.strftime('%Y-%m-%d')}~{recent_end.strftime('%m-%d')} (전주)"
@@ -325,13 +329,13 @@ def analyze_monthly(today_dt, current):
     last_month_start = datetime(last_month_end.year, last_month_end.month, 1)
     two_months_end = last_month_start - timedelta(days=1)
     two_months_start = datetime(two_months_end.year, two_months_end.month, 1)
-    
+
     past_data = load_data_in_date_range(two_months_start, two_months_end)
     recent_data = load_data_in_date_range(last_month_start, last_month_end)
-    
+
     expected_past = (two_months_end.date() - two_months_start.date()).days + 1
     expected_recent = (last_month_end.date() - last_month_start.date()).days + 1
-    
+
     changes = compute_period_changes(past_data, recent_data, threshold=5)
     past_label = f"{two_months_start.strftime('%Y-%m')} (전전월, {expected_past}일)"
     recent_label = f"{last_month_start.strftime('%Y-%m')} (전월, {expected_recent}일)"
@@ -347,16 +351,16 @@ def analyze_quarterly(today_dt, current):
     curr_year, curr_q = get_quarter(today_dt)
     prior_year, prior_q = get_prior_quarter(curr_year, curr_q)
     two_prior_year, two_prior_q = get_prior_quarter(prior_year, prior_q)
-    
+
     prior_q_start, prior_q_end = get_quarter_range(prior_year, prior_q)
     two_prior_q_start, two_prior_q_end = get_quarter_range(two_prior_year, two_prior_q)
-    
+
     past_data = load_data_in_date_range(two_prior_q_start, two_prior_q_end)
     recent_data = load_data_in_date_range(prior_q_start, prior_q_end)
-    
+
     expected_past = (two_prior_q_end.date() - two_prior_q_start.date()).days + 1
     expected_recent = (prior_q_end.date() - prior_q_start.date()).days + 1
-    
+
     changes = compute_period_changes(past_data, recent_data, threshold=5)
     past_label = f"{two_prior_year} Q{two_prior_q} (전전분기, {expected_past}일)"
     recent_label = f"{prior_year} Q{prior_q} (전분기, {expected_recent}일)"
@@ -372,18 +376,18 @@ def analyze_yearly(today_dt, current):
     curr_year = today_dt.year
     prior_year = curr_year - 1
     two_prior_year = curr_year - 2
-    
+
     prior_start = datetime(prior_year, 1, 1)
     prior_end = datetime(prior_year, 12, 31, 23, 59, 59)
     two_prior_start = datetime(two_prior_year, 1, 1)
     two_prior_end = datetime(two_prior_year, 12, 31, 23, 59, 59)
-    
+
     past_data = load_data_in_date_range(two_prior_start, two_prior_end)
     recent_data = load_data_in_date_range(prior_start, prior_end)
-    
+
     expected_past = (two_prior_end.date() - two_prior_start.date()).days + 1
     expected_recent = (prior_end.date() - prior_start.date()).days + 1
-    
+
     changes = compute_period_changes(past_data, recent_data, threshold=5)
     past_label = f"{two_prior_year}년 (재작년, {expected_past}일)"
     recent_label = f"{prior_year}년 (작년, {expected_recent}일)"
@@ -453,7 +457,7 @@ def generate_daily_summary(current, changes, chart_used):
     if not changes['comparable']:
         return (f"비교 가능한 어제 데이터가 없습니다 (차트: {chart_used}). "
                 f"다음 실행부터 1일 변동 분석이 시작됩니다.")
-    
+
     prompt = f"""한국 App Store 게임 {chart_used} 차트의 1일 변동을 사업PM 관점에서 짧게.
 
 [비교 구간] {changes['period_label']}
@@ -472,7 +476,7 @@ def generate_daily_summary(current, changes, chart_used):
 2. 사업PM 한 줄 인사이트
 
 일간은 노이즈 많으니 진짜 시그널만. 미미하면 "특이사항 없음"이라고 솔직하게."""
-    
+
     result = call_claude_with_retry(prompt, max_tokens=800)
     if result is None:
         return ("⚠️ AI 요약 생성 실패 — Claude API 일시적 과부하(529). "
@@ -498,7 +502,7 @@ def generate_comprehensive_summary(current, analyses, chart_used):
 - 큰 변동: {len(ch.get('rank_changes', []))}개
 상위 변동: {json.dumps(top_changes, ensure_ascii=False)}
 """)
-    
+
     prompt = f"""한국 App Store 게임 {chart_used} 차트의 다중 시간축 변화를 사업PM 관점에서 분석.
 
 [이번 측정 Top 30]
@@ -522,7 +526,7 @@ def generate_comprehensive_summary(current, analyses, chart_used):
 6. 사업PM 액션 포인트
 
 군더더기 없이."""
-    
+
     result = call_claude_with_retry(prompt, max_tokens=2500)
     if result is None:
         return ("⚠️ AI 종합 인사이트 생성 실패 — Claude API 일시적 과부하(529). "
@@ -537,7 +541,7 @@ def generate_comprehensive_summary(current, analyses, chart_used):
 def _write_changes_to_sheet(ws, changes, title):
     is_ma = changes.get('mode') == 'moving_average'
     rank_label = '평균 순위' if is_ma else '순위'
-    
+
     row = 1
     ws.cell(row=row, column=1, value=title).font = Font(bold=True, size=12)
     row += 1
@@ -545,13 +549,13 @@ def _write_changes_to_sheet(ws, changes, title):
         ws.cell(row=row, column=1, value=changes['warning']).font = Font(italic=True, color='C2410C')
         row += 1
     row += 1
-    
+
     if not changes.get('comparable'):
         ws.cell(row=row, column=1, value='비교 불가 (데이터 부족)').font = Font(italic=True, color='888888')
         for col_letter, width in [('A', 35), ('B', 25), ('C', 40)]:
             ws.column_dimensions[col_letter].width = width
         return
-    
+
     ws.cell(row=row, column=1, value='■ 신규 진입').font = Font(bold=True, size=11)
     row += 1
     items = changes.get('new_entries', [])[:30]
@@ -568,7 +572,7 @@ def _write_changes_to_sheet(ws, changes, title):
                 ws.cell(row=row, column=3, value=f"{item['rank']}위 진입")
             row += 1
     row += 2
-    
+
     for label, sort_key, filter_fn in [
         ('■ 큰 폭 상승', lambda x: -x['change'], lambda x: x['change'] > 0),
         ('■ 큰 폭 하락', lambda x: x['change'], lambda x: x['change'] < 0),
@@ -587,7 +591,7 @@ def _write_changes_to_sheet(ws, changes, title):
                 ws.cell(row=row, column=3, value=f"{rank_label} {item['prev_rank']} → {item['curr_rank']} ({arrow}{abs(item['change'])})")
                 row += 1
         row += 2
-    
+
     ws.cell(row=row, column=1, value='■ 차트 이탈').font = Font(bold=True, size=11)
     row += 1
     items = changes.get('dropped', [])[:30]
@@ -603,7 +607,7 @@ def _write_changes_to_sheet(ws, changes, title):
             else:
                 ws.cell(row=row, column=3, value=f"이전 {item['rank']}위에서 이탈")
             row += 1
-    
+
     for col_letter, width in [('A', 35), ('B', 25), ('C', 45)]:
         ws.column_dimensions[col_letter].width = width
 
@@ -612,7 +616,7 @@ def create_comprehensive_excel_report(current, analyses, summary, chart_used):
     today = datetime.now().strftime('%Y%m%d')
     filename = f'mobile_chart_{today}.xlsx'
     wb = Workbook()
-    
+
     ws = wb.active
     ws.title = '요약'
     ws['A1'] = f'한국 App Store 게임 차트 종합 보고서 ({datetime.now().strftime("%Y-%m-%d")})'
@@ -620,7 +624,7 @@ def create_comprehensive_excel_report(current, analyses, summary, chart_used):
     ws.merge_cells('A1:D1')
     ws['A2'] = f'사용 차트: {chart_used}'
     ws['A2'].font = Font(italic=True, size=11)
-    
+
     ws['A4'] = '활성 분석 시간축'
     ws['A4'].font = Font(bold=True, size=12)
     lines = []
@@ -631,14 +635,14 @@ def create_comprehensive_excel_report(current, analyses, summary, chart_used):
     ws['A5'] = "\n".join(lines)
     ws['A5'].alignment = Alignment(wrap_text=True, vertical='top')
     ws.row_dimensions[5].height = max(30, len(analyses) * 30)
-    
+
     ws['A7'] = 'Claude 종합 인사이트'
     ws['A7'].font = Font(bold=True, size=12)
     ws['A8'] = summary
     ws['A8'].alignment = Alignment(wrap_text=True, vertical='top')
     ws.column_dimensions['A'].width = 100
     ws.row_dimensions[8].height = 600
-    
+
     ws2 = wb.create_sheet('이번 차트')
     df = pd.DataFrame(current)
     if not df.empty:
@@ -649,12 +653,12 @@ def create_comprehensive_excel_report(current, analyses, summary, chart_used):
             cell.fill = PatternFill(start_color='DDDDDD', end_color='DDDDDD', fill_type='solid')
         for col_letter, width in [('A', 8), ('B', 30), ('C', 40), ('D', 25), ('E', 20), ('F', 15), ('G', 20)]:
             ws2.column_dimensions[col_letter].width = width
-    
+
     for name, ch in analyses.items():
         ws_t = wb.create_sheet(f'{name}선')
         title = f'■ {name}선 ({ch["period_label"]})'
         _write_changes_to_sheet(ws_t, ch, title)
-    
+
     wb.save(filename)
     return filename
 
@@ -667,29 +671,29 @@ def _build_section_html(name, ch):
     """시간축 한 개의 HTML 섹션."""
     is_ma = ch.get('mode') == 'moving_average'
     rank_label = '평균 순위' if is_ma else '순위'
-    
+
     header = f"<h3 style='margin-top:32px; border-bottom:1px solid #ddd; padding-bottom:6px;'>📊 {name}선</h3>"
     header += f"<p style='color:#666; font-size:13px; margin:8px 0;'>{ch['period_label']}</p>"
     if ch.get('warning'):
         header += f"<p style='color:#C2410C; background:#FEF3F2; padding:8px 12px; border-radius:4px; font-size:13px;'>{ch['warning']}</p>"
-    
+
     if not ch.get('comparable'):
         return header + "<p style='color:#888;'>비교 불가 — 데이터 부족.</p>"
-    
+
     new_html = "".join([
         f"<li>{e['title']} <span style='color:#888'>({e['developer']}, "
         + (f"{rank_label} {e['avg_rank']}, {e['days_in_chart']}/{e['total_days']}일 등장" if is_ma else f"{e['rank']}위 진입")
         + ")</span></li>"
         for e in ch.get('new_entries', [])[:10]
     ]) or "<li style='color:#888'>없음</li>"
-    
+
     dropped_html = "".join([
         f"<li>{e['title']} <span style='color:#888'>("
         + (f"이전 {rank_label} {e['avg_rank']}" if is_ma else f"이전 {e['rank']}위")
         + " → 이탈)</span></li>"
         for e in ch.get('dropped', [])[:10]
     ]) or "<li style='color:#888'>없음</li>"
-    
+
     rank_sorted = sorted(ch.get('rank_changes', []), key=lambda x: -abs(x['change']))[:10]
     changes_html = "".join([
         f"<li>{c['title']} <span style='color:{'#16a34a' if c['change']>0 else '#dc2626'}'>"
@@ -697,7 +701,7 @@ def _build_section_html(name, ch):
         f"({'▲' if c['change']>0 else '▼'}{abs(c['change'])})</span></li>"
         for c in rank_sorted
     ]) or "<li style='color:#888'>없음</li>"
-    
+
     body = f"""
     <p style='margin-top:12px; margin-bottom:4px;'><strong>📈 신규 진입</strong></p>
     <ul style='margin-top:4px;'>{new_html}</ul>
@@ -709,6 +713,19 @@ def _build_section_html(name, ch):
     return header + body
 
 
+def _dashboard_button_html():
+    """모든 메일 상단에 들어가는 대시보드 링크 버튼."""
+    return (
+        f"<p style='margin:16px 0 4px;'>"
+        f"<a href='{DASHBOARD_URL}' "
+        f"style='display:inline-block; background:#2563eb; color:#ffffff; text-decoration:none; "
+        f"padding:11px 20px; border-radius:8px; font-weight:600; font-size:15px;'>"
+        f"📊 인터랙티브 차트 대시보드 열기 →</a></p>"
+        f"<p style='color:#888; font-size:12px; margin:0 0 8px;'>"
+        f"일·주·월·분기·년 시간축 · 100여 개 게임 추이 · 보고 싶은 게임만 선택해 강조</p>"
+    )
+
+
 def build_daily_only_email_html(today, chart_used, current, daily_changes, summary):
     """평일 일간 라이트 본문."""
     section = _build_section_html('1일', daily_changes)
@@ -716,6 +733,7 @@ def build_daily_only_email_html(today, chart_used, current, daily_changes, summa
     <div style="font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; max-width: 700px;">
       <h2>📱 한국 App Store 게임 차트 일간 변동</h2>
       <p><strong>수집일:</strong> {today} | <strong>차트:</strong> {chart_used} ({len(current)}개)</p>
+      {_dashboard_button_html()}
       <hr/>
       {section}
       <h3 style="margin-top:32px;">💡 인사이트</h3>
@@ -729,17 +747,18 @@ def build_daily_only_email_html(today, chart_used, current, daily_changes, summa
 def build_comprehensive_email_html(today, chart_used, current, analyses, summary):
     """종합 모드 본문 (시간축 여러 개)."""
     sections_html = "".join([_build_section_html(name, ch) for name, ch in analyses.items()])
-    
+
     tf_summary = "<ul>"
     for name, ch in analyses.items():
         mark = "✅" if ch.get('comparable') else "⚠️"
         tf_summary += f"<li>{mark} <strong>{name}선</strong> — {ch['period_label']}</li>"
     tf_summary += "</ul>"
-    
+
     return f"""
     <div style="font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; max-width: 800px;">
       <h2>📱 한국 App Store 게임 차트 종합 보고서</h2>
       <p><strong>수집일:</strong> {today} | <strong>차트:</strong> {chart_used} ({len(current)}개)</p>
+      {_dashboard_button_html()}
       <hr/>
       <h3>📋 이번 보고 활성 시간축</h3>
       {tf_summary}
@@ -781,36 +800,36 @@ def send_email_via_gmail(subject, html_body, attachment_path=None):
 
 def main():
     print(f"\n=== 한국 App Store 게임 차트 수집 ({datetime.now()}) ===\n")
-    
+
     missing = [k for k, v in {
         'ANTHROPIC_API_KEY': ANTHROPIC_API_KEY, 'GMAIL_USER': GMAIL_USER,
         'GMAIL_APP_PASSWORD': GMAIL_APP_PASSWORD, 'RECIPIENT_EMAIL': RECIPIENT_EMAIL,
     }.items() if not v]
     if missing:
         raise RuntimeError(f"환경변수 누락: {missing}")
-    
+
     print(f"[INFO] AI 분석 모델: {CLAUDE_MODEL}")
     today_dt = datetime.now()
     active_names = get_active_timeframes(today_dt)
     is_comprehensive = len(active_names) > 1
     mode_label = '종합 (' + ', '.join(active_names) + ')' if is_comprehensive else '일간 (1일선)'
     print(f"[INFO] 리포트 모드: {mode_label}\n")
-    
+
     print("[1/4] App Store 차트 수집...")
     current, chart_used = fetch_apple_chart_kr_games(100)
     if not current:
         raise RuntimeError("모든 차트 수집 실패")
     print(f"      → {len(current)}개 수집, 사용 차트: {chart_used}")
-    
+
     print("[2/4] 활성 시간축 분석...")
     analyses = run_active_analyses(today_dt, current, active_names)
     for name, ch in analyses.items():
         mark = "✅" if ch.get('comparable') else "⚠️"
         warning_info = f" - {ch['warning']}" if ch.get('warning') else ""
         print(f"      · {mark} {name}선: {ch['period_label']}{warning_info}")
-    
+
     today = today_dt.strftime('%Y-%m-%d')
-    
+
     print("[3/4] Claude 요약 생성...")
     if is_comprehensive:
         summary = generate_comprehensive_summary(current, analyses, chart_used)
@@ -819,7 +838,7 @@ def main():
     print("─" * 60)
     print(summary)
     print("─" * 60)
-    
+
     print("[4/4] 메일 발송...")
     if is_comprehensive:
         excel_path = create_comprehensive_excel_report(current, analyses, summary, chart_used)
@@ -830,7 +849,7 @@ def main():
         subject = f'[모바일 게임 차트] 일간 변동 {today} ({chart_used})'
         html_body = build_daily_only_email_html(today, chart_used, current, analyses['1일'], summary)
         send_email_via_gmail(subject, html_body, attachment_path=None)
-    
+
     save_current_data(current)
     print("\n=== 완료 ===\n")
 
