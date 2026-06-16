@@ -61,7 +61,10 @@
   .sw{ width:10px; height:10px; border-radius:3px; flex:0 0 auto; background:#c9c8c2; }
   .gname{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .gdev{ color:var(--muted); font-size:11.5px; }
-  .grank{ flex:0 0 auto; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .grank{ flex:0 0 auto; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .panelnote{ font-size:11px; color:var(--muted); margin:2px 2px 8px; line-height:1.45; }
+  .gitem.out{ opacity:.5; }
+  .gitem.out[aria-pressed="true"]{ opacity:1; }
   .empty{ font-size:13px; color:var(--muted); padding:10px 4px; }
   .histsec{ margin-top:28px; }
   .histsec h2{ font-size:16px; font-weight:600; margin:0 0 4px; }
@@ -122,6 +125,7 @@
         <input class="search" id="search" type="search" placeholder="게임 검색 (이름·개발사)" aria-label="게임 검색">
         <button class="clearbtn" id="clear">전체 해제</button>
       </div>
+      <p class="panelnote">옆 숫자 = 가장 최근 차트(매출) 순위 · 차트에서 빠진 게임은 'N일 전 이탈'로 표시</p>
       <p class="selcount" id="selcount">선택된 게임 없음</p>
       <div class="list" id="list"></div>
     </aside>
@@ -147,6 +151,18 @@ function latestDaily(aid){
   const s=DATA.timeframes.daily.series[aid]||[];
   for(let i=s.length-1;i>=0;i--){ if(s[i]!=null) return s[i]; }
   return 9999;
+}
+function gameStatus(aid){
+  const s=DATA.timeframes.daily.series[aid]||[], L=DATA.timeframes.daily.labels;
+  const latestIdx=s.length-1;
+  let lastIdx=-1, lastRank=9999;
+  for(let i=s.length-1;i>=0;i--){ if(s[i]!=null){ lastIdx=i; lastRank=s[i]; break; } }
+  const inChart = lastIdx===latestIdx && lastIdx>=0;
+  let daysAgo=0;
+  if(!inChart && lastIdx>=0 && L[latestIdx] && L[lastIdx]){
+    daysAgo=Math.max(1, Math.round((new Date(L[latestIdx])-new Date(L[lastIdx]))/86400000));
+  }
+  return { inChart, lastRank, daysAgo, seen: lastIdx>=0 };
 }
 function colorFor(aid){
   const i=selected.indexOf(aid);
@@ -213,12 +229,14 @@ function renderList(){
     const g=DATA.games[aid];
     const sel=selected.includes(aid);
     const c=colorFor(aid);
-    const r=latestDaily(aid);
+    const st=gameStatus(aid);
+    const rankHtml = st.inChart ? `${st.lastRank}위`
+      : st.seen ? `${st.daysAgo}일 전 이탈` : '-';
     const btn=document.createElement('button');
-    btn.className='gitem'; btn.setAttribute('aria-pressed', String(sel));
+    btn.className='gitem'+(st.inChart?'':' out'); btn.setAttribute('aria-pressed', String(sel));
     btn.innerHTML=`<span class="sw" style="background:${c||'#c9c8c2'}"></span>`+
       `<span class="gname">${esc(g.title)} <span class="gdev">${esc(g.developer||'')}</span></span>`+
-      `<span class="grank">${r<9999?r+'위':'-'}</span>`;
+      `<span class="grank">${rankHtml}</span>`;
     btn.addEventListener('click',()=> toggle(aid));
     list.appendChild(btn);
   });
@@ -326,7 +344,12 @@ function setupChartDrag(){
 
 function init(data){
   DATA=data;
-  order=Object.keys(DATA.games).sort((a,b)=> latestDaily(a)-latestDaily(b));
+  order=Object.keys(DATA.games).sort((a,b)=>{
+    const A=gameStatus(a), B=gameStatus(b);
+    if(A.inChart!==B.inChart) return A.inChart ? -1 : 1;   // 현재 차트 게임 먼저
+    if(A.inChart) return A.lastRank-B.lastRank;             // 현재 순위순
+    return A.daysAgo-B.daysAgo || A.lastRank-B.lastRank;    // 이탈: 최근 이탈 먼저
+  });
   const m=document.getElementById('meta');
   const dr=DATA.date_range||[];
   m.innerHTML=`<b>${DATA.chart_used||'차트'}</b> · 수집 <b>${DATA.num_days}</b>일 (${dr[0]||''} ~ ${dr[1]||''}) · 게임 <b>${DATA.num_games}</b>개 · 갱신 ${DATA.generated_at||''}`;
