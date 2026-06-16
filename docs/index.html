@@ -94,6 +94,7 @@
   .pubsec{ margin-top:32px; }
   .pubsec h2{ font-size:16px; font-weight:600; margin:0 0 4px; }
   .pubsec .sub{ font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+  .pubsearch{ width:100%; max-width:320px; margin:0 0 12px; box-sizing:border-box; }
   .pubscroll{ overflow:auto; max-height:520px; border:1px solid var(--line); border-radius:10px; }
   .pubtable{ border-collapse:separate; border-spacing:0; font-size:13px; width:100%; }
   .pubtable th, .pubtable td{ padding:9px 14px; border-bottom:1px solid var(--line); white-space:nowrap;
@@ -219,6 +220,7 @@
   <div class="pubsec" id="pubsec">
     <h2>퍼블리셔별 차트 장악력</h2>
     <p class="sub" id="pubsub"></p>
+    <input class="search pubsearch" id="pubsearch" type="search" placeholder="퍼블리셔·게임 이름 검색" aria-label="퍼블리셔 검색">
     <div id="publishers"></div>
   </div>
 </div>
@@ -478,15 +480,20 @@ function renderPublishers(){
     return;
   }
   sub.textContent=`${pub.as_of||''} 차트 기준 · 한 개발사가 차트에 올린 게임 수와 순위 · 누르면 그 퍼블리셔의 게임이 위 그래프에 강조됩니다.`;
+  const pnorm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
+  const pq=pnorm((document.getElementById('pubsearch')||{}).value);
+  const ranked=pub.list.map((e,i)=>({e, rank:i+1}));
+  const list=pq ? ranked.filter(({e})=> pnorm(e.developer).includes(pq) || e.games.some(g=>pnorm(g.title).includes(pq))) : ranked;
+  if(!list.length){ wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
   let h;
   if(isMobile()){
     h='<div class="pubcards">';
-    pub.list.forEach((e,idx)=>{
+    list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
       const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
       h+=`<div class="pubcard pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
-        `<div class="pubcard-head"><span class="prank">#${idx+1}</span><b>${esc(e.developer)}</b></div>`+
+        `<div class="pubcard-head"><span class="prank">#${rank}</span><b>${esc(e.developer)}</b></div>`+
         `<div class="pubcard-stats">게임 ${e.num_games} · 최고 ${e.best_rank!=null?e.best_rank+'위':'–'} · 평균 ${e.avg_rank!=null?e.avg_rank:'–'}</div>`+
         `<div class="pubcard-games">${chips}</div></div>`;
     });
@@ -494,12 +501,12 @@ function renderPublishers(){
   } else {
     h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+
       '<th>#</th><th class="pname">퍼블리셔</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th><th class="pname">차트 내 게임</th></tr></thead><tbody>';
-    pub.list.forEach((e,idx)=>{
+    list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
       const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
       h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
-        `<td>${idx+1}</td>`+
+        `<td>${rank}</td>`+
         `<td class="pname">${esc(e.developer)}</td>`+
         `<td>${e.num_games}</td>`+
         `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td>`+
@@ -557,6 +564,7 @@ function init(full){
   document.querySelectorAll('.stab').forEach(b=> b.addEventListener('click',()=> selectChart(b.dataset.src)));
   document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click',()=> switchTf(b.dataset.tf)));
   document.getElementById('search').addEventListener('input', renderList);
+  { const ps=document.getElementById('pubsearch'); if(ps) ps.addEventListener('input', renderPublishers); }
   document.getElementById('clear').addEventListener('click',()=>{ selected.length=0; restyle(); });
   document.getElementById('resetzoom').addEventListener('click',()=>{ if(chart.resetZoom) chart.resetZoom(); });
 
