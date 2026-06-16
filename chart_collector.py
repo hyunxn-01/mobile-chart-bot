@@ -78,6 +78,7 @@ def fetch_apple_chart_kr_games(limit=100):
                 {
                     'rank': i + 1,
                     'app_id': e.get('id', {}).get('attributes', {}).get('im:bundleId', ''),
+                    'track_id': e.get('id', {}).get('attributes', {}).get('im:id', ''),
                     'title': e.get('im:name', {}).get('label', ''),
                     'developer': e.get('im:artist', {}).get('label', ''),
                     'category': e.get('category', {}).get('attributes', {}).get('label', ''),
@@ -104,6 +105,7 @@ def fetch_top_free_kr_games(limit=100):
             {
                 'rank': i + 1,
                 'app_id': e.get('id', {}).get('attributes', {}).get('im:bundleId', ''),
+                'track_id': e.get('id', {}).get('attributes', {}).get('im:id', ''),
                 'title': e.get('im:name', {}).get('label', ''),
                 'developer': e.get('im:artist', {}).get('label', ''),
                 'category': e.get('category', {}).get('attributes', {}).get('label', ''),
@@ -117,6 +119,60 @@ def fetch_top_free_kr_games(limit=100):
     except Exception as e:
         print(f"[ERROR] Top Free 수집 실패: {e}")
         return []
+
+
+# 게임 하위 장르(한국 스토어 표기). lookup genres 배열에서 이 중 첫 매칭을 대표 장르로.
+GAME_SUBGENRES = ['롤플레잉', '전략', '시뮬레이션', '액션', '어드벤처', '퍼즐', '캐주얼',
+                  '보드', '카드', '카지노', '스포츠', '레이싱', '아케이드', '가족', '단어', '트리비아', '음악']
+
+
+def _pick_genre(genres):
+    """genres(예: ['게임','롤플레잉','어드벤처'])에서 대표 장르 하나. 게임 하위 장르 우선, 없으면 '게임' 외 첫 값."""
+    if not genres:
+        return '미상'
+    for g in genres:
+        if g in GAME_SUBGENRES:
+            return g
+    for g in genres:
+        if g != '게임':
+            return g
+    return '게임'
+
+
+def fetch_genres(track_ids):
+    """trackId 목록 → {trackId(str): 대표 장르}. iTunes lookup(country=kr)의 genres 사용. 실패 시 가능한 만큼만."""
+    result = {}
+    ids = [str(t) for t in track_ids if t]
+    if not ids:
+        return result
+    for i in range(0, len(ids), 180):
+        chunk = ids[i:i + 180]
+        try:
+            url = f"https://itunes.apple.com/lookup?id={','.join(chunk)}&country=kr"
+            r = requests.get(url, timeout=20, headers={'User-Agent': 'Mozilla/5.0'})
+            r.raise_for_status()
+            for it in r.json().get('results', []):
+                tid = str(it.get('trackId', ''))
+                if tid:
+                    result[tid] = _pick_genre(it.get('genres', []))
+        except Exception as e:
+            print(f"[WARN] 장르 lookup 실패(chunk {i}): {e}")
+    return result
+
+
+def attach_genres(apps):
+    """apps 각 게임에 'genre' 추가. 실패해도 메인 흐름 무영향('미상')."""
+    try:
+        gmap = fetch_genres([a.get('track_id') for a in apps])
+        for a in apps:
+            a['genre'] = gmap.get(str(a.get('track_id')), '미상')
+        kinds = len({a.get('genre') for a in apps})
+        print(f"[OK] 장르 부착: {len(apps)}개 게임 → {kinds}종 장르")
+    except Exception as e:
+        print(f"[WARN] 장르 부착 실패: {e}")
+        for a in apps:
+            a.setdefault('genre', '미상')
+    return apps
 
 
 def save_current_data(data):
@@ -953,6 +1009,7 @@ def main():
     if not current:
         raise RuntimeError("모든 차트 수집 실패")
     print(f"      → {len(current)}개 수집, 사용 차트: {chart_used}")
+    attach_genres(current)
 
     print("[2/4] 전체 시간축 분석...")
     all_analyses = run_active_analyses(today_dt, current, get_active_timeframes(today_dt))
@@ -989,6 +1046,7 @@ def main():
     print("[보조] Top Free(인기) 차트 수집·저장...")
     free = fetch_top_free_kr_games(100)
     if free:
+        attach_genres(free)
         save_free_data(free)
 
     print("\n=== 완료 ===\n")

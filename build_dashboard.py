@@ -87,6 +87,32 @@ def build_publishers(days, dates):
     return {'as_of': latest, 'list': out}
 
 
+def build_genres(days, dates):
+    """가장 최근 차트일 기준 장르별 집계(봇이 lookup으로 붙인 genre 사용). 게임 수 desc, 최고 순위 asc."""
+    if not dates:
+        return {'as_of': None, 'list': []}
+    latest = dates[-1]
+    by = {}
+    for app in days[latest]:
+        g = (app.get('genre') or '').strip() or '미상'
+        r = app.get('rank')
+        e = by.setdefault(g, {'genre': g, 'num_games': 0, 'ranks': [], 'games': []})
+        e['num_games'] += 1
+        if r is not None:
+            e['ranks'].append(r)
+        e['games'].append({'title': app.get('title', ''), 'rank': r, 'app_id': app.get('app_id', '')})
+    out = []
+    for g, e in by.items():
+        ranks = e['ranks']
+        e['best_rank'] = min(ranks) if ranks else None
+        e['avg_rank'] = round(sum(ranks) / len(ranks), 1) if ranks else None
+        e['games'].sort(key=lambda x: (x['rank'] is None, x['rank'] if x['rank'] is not None else 9999))
+        del e['ranks']
+        out.append(e)
+    out.sort(key=lambda e: (-e['num_games'], e['best_rank'] if e['best_rank'] is not None else 9999))
+    return {'as_of': latest, 'list': out}
+
+
 def build_chart(history_dir):
     """한 차트(grossing 또는 free)의 집계 묶음을 만든다."""
     days = load_history(history_dir)
@@ -145,6 +171,7 @@ def build_chart(history_dir):
         'games': games,
         'timeframes': timeframes,
         'publishers': build_publishers(days, dates),
+        'genres': build_genres(days, dates),
     }
 
 
