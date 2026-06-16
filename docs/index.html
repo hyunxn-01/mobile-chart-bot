@@ -664,7 +664,7 @@ function renderMovers(){
     const s=ser[aid]||[]; const now=s[ni], prev=s[pi];
     if(now!=null&&prev==null) entered.push({aid,now});
     else if(now==null&&prev!=null) exited.push({aid,prev});
-    else if(now!=null&&prev!=null){ const d=prev-now; if(d>=3) up.push({aid,now,prev,d}); else if(d<=-3) down.push({aid,now,prev,d}); }
+    else if(now!=null&&prev!=null){ const d=Math.round((prev-now)*10)/10; if(d>=3) up.push({aid,now,prev,d}); else if(d<=-3) down.push({aid,now,prev,d}); }
   }
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
