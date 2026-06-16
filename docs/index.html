@@ -223,6 +223,13 @@
     <input class="search pubsearch" id="pubsearch" type="search" placeholder="퍼블리셔·게임 이름 검색" aria-label="퍼블리셔 검색">
     <div id="publishers"></div>
   </div>
+
+  <div class="pubsec" id="genresec">
+    <h2>장르별 차트 분포</h2>
+    <p class="sub" id="genresub"></p>
+    <input class="search pubsearch" id="genresearch" type="search" placeholder="장르·게임 이름 검색" aria-label="장르 검색">
+    <div id="genres"></div>
+  </div>
 </div>
 
 <script>
@@ -281,6 +288,7 @@ function restyle(){
   renderList();
   renderHistory();
   renderPublishers();
+  renderGenres();
 }
 
 function switchTf(tf){
@@ -448,6 +456,7 @@ function applyChart(){
   });
   if((((DATA.timeframes[activeTf]||{}).labels)||[]).length===0) activeTf='daily';
   renderPublishers();
+  renderGenres();
 }
 
 function updateSourceTabs(){
@@ -468,6 +477,61 @@ function selectChart(key){
   chart.data.datasets=buildDatasets();
   switchTf(activeTf);
   updateSourceTabs();
+}
+
+function renderGenres(){
+  const sub=document.getElementById('genresub');
+  const wrap=document.getElementById('genres');
+  const gd=DATA.genres;
+  if(!gd || !gd.list || !gd.list.length){
+    sub.textContent='';
+    wrap.innerHTML='<p class="empty">장르 데이터가 아직 없습니다 — 봇이 다음 수집부터 장르를 채웁니다.</p>';
+    return;
+  }
+  sub.textContent=`${gd.as_of||''} 차트 기준 · 장르별 게임 수와 순위 · 누르면 그 장르의 게임이 위 그래프에 강조됩니다.`;
+  const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
+  const q=norm((document.getElementById('genresearch')||{}).value);
+  const ranked=gd.list.map((e,i)=>({e, rank:i+1}));
+  const list=q ? ranked.filter(({e})=> norm(e.genre).includes(q) || e.games.some(g=>norm(g.title).includes(q))) : ranked;
+  if(!list.length){ wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
+  let h;
+  if(isMobile()){
+    h='<div class="pubcards">';
+    list.forEach(({e,rank})=>{
+      const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
+      const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
+      const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
+      h+=`<div class="pubcard pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
+        `<div class="pubcard-head"><span class="prank">#${rank}</span><b>${esc(e.genre)}</b></div>`+
+        `<div class="pubcard-stats">게임 ${e.num_games} · 최고 ${e.best_rank!=null?e.best_rank+'위':'–'} · 평균 ${e.avg_rank!=null?e.avg_rank:'–'}</div>`+
+        `<div class="pubcard-games">${chips}</div></div>`;
+    });
+    h+='</div>';
+  } else {
+    h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+
+      '<th>#</th><th class="pname">장르</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th><th class="pname">게임</th></tr></thead><tbody>';
+    list.forEach(({e,rank})=>{
+      const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
+      const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
+      const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
+      h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
+        `<td>${rank}</td><td class="pname">${esc(e.genre)}</td><td>${e.num_games}</td>`+
+        `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td><td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
+        `<td class="pgames">${chips}</td></tr>`;
+    });
+    h+='</tbody></table></div>';
+  }
+  wrap.innerHTML=h;
+  wrap.querySelectorAll('.pubrow').forEach(row=>{
+    row.addEventListener('click',()=>{
+      const aids=(row.dataset.aids||'').split(',').filter(Boolean);
+      if(!aids.length) return;
+      const allSel=aids.every(a=>selected.includes(a));
+      if(allSel){ aids.forEach(a=>{ const i=selected.indexOf(a); if(i>=0) selected.splice(i,1); }); }
+      else { aids.forEach(a=>{ if(!selected.includes(a)) selected.push(a); }); }
+      restyle();
+    });
+  });
 }
 
 function renderPublishers(){
@@ -565,6 +629,7 @@ function init(full){
   document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click',()=> switchTf(b.dataset.tf)));
   document.getElementById('search').addEventListener('input', renderList);
   { const ps=document.getElementById('pubsearch'); if(ps) ps.addEventListener('input', renderPublishers); }
+  { const gs=document.getElementById('genresearch'); if(gs) gs.addEventListener('input', renderGenres); }
   document.getElementById('clear').addEventListener('click',()=>{ selected.length=0; restyle(); });
   document.getElementById('resetzoom').addEventListener('click',()=>{ if(chart.resetZoom) chart.resetZoom(); });
 
