@@ -52,6 +52,19 @@
   .gdev{ color:var(--muted); font-size:11.5px; }
   .grank{ flex:0 0 auto; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
   .empty{ font-size:13px; color:var(--muted); padding:10px 4px; }
+  .histsec{ margin-top:28px; }
+  .histsec h2{ font-size:16px; font-weight:600; margin:0 0 4px; }
+  .histsec .sub{ font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+  .histscroll{ overflow:auto; max-height:460px; border:1px solid var(--line); border-radius:10px; }
+  .histtable{ border-collapse:separate; border-spacing:0; font-size:12.5px; width:max-content; min-width:100%; }
+  .histtable th, .histtable td{ padding:6px 10px; text-align:center; white-space:nowrap;
+    border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }
+  .histtable thead th{ position:sticky; top:0; z-index:1; background:var(--panel); color:var(--muted); font-weight:500; }
+  .histtable .gcol{ text-align:left; position:sticky; left:0; background:var(--bg); font-weight:500; min-width:150px; }
+  .histtable thead .gcol{ z-index:2; background:var(--panel); }
+  .histtable td.up{ color:#16a34a; font-weight:600; }
+  .histtable td.down{ color:#dc2626; }
+  .histtable td.na{ color:var(--muted); }
   @media (max-width:820px){
     .layout{ flex-direction:column; }
     .panel{ flex:1 1 auto; width:100%; }
@@ -91,6 +104,12 @@
       <p class="selcount" id="selcount">선택된 게임 없음</p>
       <div class="list" id="list"></div>
     </aside>
+  </div>
+
+  <div class="histsec" id="histsec">
+    <h2>선택 게임 순위 이력</h2>
+    <p class="sub" id="histsub">위 그래프에서 게임을 선택하면, 그 게임의 시간축별 순위가 여기에 표로 나옵니다.</p>
+    <div id="history"></div>
   </div>
 </div>
 
@@ -135,6 +154,7 @@ function restyle(){
   chart.update();
   renderSelCount();
   renderList();
+  renderHistory();
 }
 
 function switchTf(tf){
@@ -178,6 +198,38 @@ function renderList(){
     btn.addEventListener('click',()=> toggle(aid));
     list.appendChild(btn);
   });
+}
+
+function renderHistory(){
+  const sub=document.getElementById('histsub');
+  const wrap=document.getElementById('history');
+  const tf=DATA.timeframes[activeTf];
+  sub.textContent = `${TF_LABEL[activeTf]} 기준 · 위 시간축 탭을 바꾸면 같이 바뀝니다. 숫자는 순위(작을수록 상위), 초록=상승·빨강=하락.`;
+  if(!selected.length){
+    wrap.innerHTML='<p class="empty">위 그래프에서 게임을 선택하면, 그 게임의 '+TF_LABEL[activeTf]+' 순위 이력이 여기에 표로 표시됩니다.</p>';
+    return;
+  }
+  const labels=tf.labels;
+  let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th>';
+  labels.forEach(l=> h+=`<th>${esc(l)}</th>`);
+  h+='</tr></thead><tbody>';
+  selected.forEach(aid=>{
+    const c=colorFor(aid), s=tf.series[aid]||[];
+    h+=`<tr><td class="gcol"><span class="sw" style="background:${c}"></span>${esc(DATA.games[aid].title)}</td>`;
+    s.forEach((v,i)=>{
+      let cls='na';
+      if(v!=null){
+        cls='';
+        const prev=i>0? s[i-1] : null;
+        if(prev!=null && v<prev) cls='up';
+        else if(prev!=null && v>prev) cls='down';
+      }
+      h+=`<td class="${cls}">${v!=null? v : '–'}</td>`;
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  wrap.innerHTML=h;
 }
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
