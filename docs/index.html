@@ -17,7 +17,7 @@
   body{ margin:0; background:var(--bg); color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
     line-height:1.5; }
-  .wrap{ max-width:1180px; margin:0 auto; padding:20px 18px 40px; }
+  .wrap{ max-width:1560px; margin:0 auto; padding:20px 22px 48px; }
   header h1{ font-size:20px; font-weight:600; margin:0 0 4px; }
   .meta{ font-size:13px; color:var(--muted); margin:0 0 16px; }
   .meta b{ color:var(--text); font-weight:600; }
@@ -33,15 +33,15 @@
   .layout{ display:flex; gap:18px; align-items:flex-start; }
   .chartbox{ flex:1 1 auto; min-width:0; }
   .canvas-wrap{ position:relative; width:100%; height:480px; }
-  .panel{ flex:0 0 290px; border:1px solid var(--line); border-radius:12px;
-    background:var(--panel); padding:12px; }
+  .panel{ flex:0 0 248px; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:11px; }
   .panel .row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; }
   .search{ font:inherit; font-size:14px; flex:1; padding:8px 10px; border:1px solid var(--line);
     border-radius:8px; background:var(--bg); color:var(--text); }
   .clearbtn{ font:inherit; font-size:12.5px; padding:8px 10px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; white-space:nowrap; }
   .selcount{ font-size:12px; color:var(--muted); margin:0 2px 8px; }
-  .list{ max-height:430px; overflow-y:auto; display:flex; flex-direction:column; gap:3px; }
+  .list{ max-height:380px; overflow-y:auto; display:flex; flex-direction:column; gap:3px; }
   .gitem{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; font:inherit;
     font-size:13px; padding:6px 8px; border:1px solid transparent; background:transparent;
     color:var(--text); border-radius:7px; cursor:pointer; }
@@ -55,13 +55,13 @@
   .histsec{ margin-top:28px; }
   .histsec h2{ font-size:16px; font-weight:600; margin:0 0 4px; }
   .histsec .sub{ font-size:12.5px; color:var(--muted); margin:0 0 10px; }
-  .histscroll{ overflow:auto; max-height:460px; border:1px solid var(--line); border-radius:10px; }
+  .histscroll{ overflow:auto; max-height:640px; border:1px solid var(--line); border-radius:10px; }
   .histtable{ border-collapse:separate; border-spacing:0; font-size:12.5px; width:max-content; min-width:100%; }
-  .histtable th, .histtable td{ padding:6px 10px; text-align:center; white-space:nowrap;
+  .histtable th, .histtable td{ padding:8px 16px; text-align:center; white-space:nowrap;
     border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }
   .histtable thead th{ position:sticky; top:0; z-index:1; background:var(--panel); color:var(--muted); font-weight:500; }
   .histtable .gcol{ text-align:left; position:sticky; left:0; z-index:1; background:var(--bg); font-weight:500;
-    width:180px; min-width:180px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    box-sizing:border-box; width:180px; min-width:180px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .histtable thead .gcol{ z-index:3; background:var(--panel); }
   .histtable .colorcol{ position:sticky; left:180px; z-index:1; padding:0; width:16px; min-width:16px; max-width:16px; }
   .histtable thead .colorcol{ z-index:3; background:var(--panel); }
