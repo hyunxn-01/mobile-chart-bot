@@ -230,7 +230,7 @@ function renderHistory(){
   h+='</tr></thead><tbody>';
   selected.forEach(aid=>{
     const c=colorFor(aid), s=tf.series[aid]||[];
-    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}">${esc(DATA.games[aid].title)}</td><td class="colorcol" style="background:${c}"></td>`;
+    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}">${esc(DATA.games[aid].title)}</td><td class="colorcol" style="background-color:${c}"></td>`;
     s.forEach((v,i)=>{
       let cls='na';
       if(v!=null){
