@@ -124,7 +124,7 @@ def build_chart(history_dir):
             aid = app.get('app_id')
             if not aid:
                 continue
-            games[aid] = {'title': app.get('title', ''), 'developer': app.get('developer', '')}
+            games[aid] = {'title': app.get('title', ''), 'developer': app.get('developer', ''), 'genre': app.get('genre', '')}
 
     timeframes = {}
 
