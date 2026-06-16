@@ -39,6 +39,11 @@
   .layout{ display:flex; gap:18px; align-items:flex-start; }
   .chartbox{ flex:1 1 auto; min-width:0; }
   .canvas-wrap{ position:relative; width:100%; height:480px; }
+  .chartbar{ position:relative; height:13px; margin-top:10px; background:var(--chip); border-radius:7px; cursor:pointer; }
+  .chartbar-thumb{ position:absolute; top:0; bottom:0; left:0; width:100%; background:var(--accent);
+    opacity:.45; border-radius:7px; cursor:grab; transition:opacity .12s; }
+  .chartbar-thumb:hover{ opacity:.62; } .chartbar-thumb:active{ opacity:.78; cursor:grabbing; }
+  .viewhint{ font-size:11.5px; color:var(--muted); margin:6px 2px 0; text-align:right; }
   .panel{ flex:0 0 248px; border:1px solid var(--line); border-radius:12px;
     background:var(--panel); padding:11px; }
   .panel .row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; }
@@ -69,8 +74,9 @@
   .histtable .gcol{ text-align:left; position:sticky; left:0; z-index:1; background:var(--bg); font-weight:500;
     box-sizing:border-box; width:180px; min-width:180px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .histtable thead .gcol{ z-index:3; background:var(--panel); }
-  .histtable .colorcol{ position:sticky; left:180px; z-index:1; padding:4px 0; width:16px; min-width:16px; max-width:16px;
-    background-clip:content-box; }
+  .histtable .colorcol{ position:sticky; left:180px; z-index:1; padding:0; width:18px; min-width:18px; max-width:18px;
+    text-align:center; vertical-align:middle; }
+  .histtable .colorcol .cbar{ display:inline-block; width:10px; height:22px; border-radius:5px; vertical-align:middle; }
   .histtable thead .colorcol{ z-index:3; background:var(--panel); }
   .histtable td.up{ color:#16a34a; font-weight:600; }
   .histtable td.down{ color:#dc2626; }
@@ -98,7 +104,7 @@
     <button class="tab" role="tab" data-tf="yearly" aria-selected="false">년별</button>
   </div>
   <div class="hintrow">
-    <p class="hint">회색 선이 전체 게임입니다. 오른쪽에서 게임을 선택하면 강조됩니다 · 마우스 휠=확대/축소, 드래그=좌우 이동(시간축). (위로 갈수록 높은 순위)</p>
+    <p class="hint">회색 선이 전체 게임 · 오른쪽에서 선택하면 강조 · 휠/드래그(영역 선택)=확대, 차트 아래 막대를 드래그=구간 이동. (위로 갈수록 높은 순위)</p>
     <button class="resetzoom" id="resetzoom">확대 초기화</button>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
@@ -108,6 +114,8 @@
       <div class="canvas-wrap">
         <canvas id="chart" role="img" aria-label="모바일 게임 순위 추이 꺾은선 그래프. 위쪽이 1위. 선택한 게임의 선이 강조됩니다."></canvas>
       </div>
+      <div class="chartbar" id="chartbar" title="막대를 드래그하면 보는 구간이 이동합니다"><div class="chartbar-thumb" id="chartthumb"></div></div>
+      <p class="viewhint" id="viewhint">전체 보기</p>
     </div>
     <aside class="panel">
       <div class="row">
@@ -182,6 +190,7 @@ function switchTf(tf){
   } else { banner.style.display='none'; }
   if(chart.resetZoom) chart.resetZoom();
   restyle();
+  updateScrollbar();
 }
 
 function renderSelCount(){
@@ -230,7 +239,7 @@ function renderHistory(){
   h+='</tr></thead><tbody>';
   selected.forEach(aid=>{
     const c=colorFor(aid), s=tf.series[aid]||[];
-    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}">${esc(DATA.games[aid].title)}</td><td class="colorcol" style="background-color:${c}"></td>`;
+    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}">${esc(DATA.games[aid].title)}</td><td class="colorcol"><span class="cbar" style="background-color:${c}"></span></td>`;
     s.forEach((v,i)=>{
       let cls='na';
       if(v!=null){
@@ -255,6 +264,45 @@ function toggle(aid){
   restyle();
 }
 
+function updateScrollbar(){
+  if(!chart) return;
+  const total=chart.data.labels.length;
+  const bar=document.getElementById('chartbar'), thumb=document.getElementById('chartthumb'), hint=document.getElementById('viewhint');
+  if(total<2){ bar.style.display='none'; if(hint) hint.style.display='none'; return; }
+  bar.style.display=''; if(hint) hint.style.display='';
+  const ca=chart.chartArea;
+  if(ca){ bar.style.marginLeft=ca.left+'px'; bar.style.marginRight=(chart.width-ca.right)+'px'; }
+  const x=chart.scales.x;
+  let min=(x.min==null?0:x.min), max=(x.max==null?total-1:x.max);
+  const cmin=Math.max(0,min), cmax=Math.min(total-1,max), denom=Math.max(1,total-1);
+  thumb.style.left=(cmin/denom*100)+'%';
+  thumb.style.width=Math.max(5,(cmax-cmin)/denom*100)+'%';
+  const out=(min<=0 && max>=total-1);
+  bar.style.opacity = out ? '0.6' : '1';
+  if(hint){ const L=chart.data.labels;
+    hint.textContent = out ? '전체 보기 · 휠/드래그로 확대, 막대를 끌어 이동' : `${L[Math.round(cmin)]||''} ~ ${L[Math.round(cmax)]||''} 구간 보는 중`; }
+}
+function setupScrollbar(){
+  const bar=document.getElementById('chartbar'), thumb=document.getElementById('chartthumb');
+  const denom=()=>Math.max(1,chart.data.labels.length-1), tot=()=>chart.data.labels.length;
+  let dr=null;
+  thumb.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation();
+    const x=chart.scales.x; const mn=Math.max(0,x.min==null?0:x.min), mx=Math.min(tot()-1,x.max==null?tot()-1:x.max);
+    dr={px:e.clientX, min:mn, max:mx, span:mx-mn}; try{thumb.setPointerCapture(e.pointerId);}catch(_){}});
+  thumb.addEventListener('pointermove',e=>{ if(!dr) return;
+    const d=((e.clientX-dr.px)/bar.clientWidth)*denom();
+    let nmin=dr.min+d, nmax=dr.max+d;
+    if(nmin<0){nmin=0;nmax=dr.span;} if(nmax>denom()){nmax=denom();nmin=denom()-dr.span;}
+    chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar(); });
+  const end=()=>{dr=null;}; thumb.addEventListener('pointerup',end); thumb.addEventListener('pointercancel',end);
+  bar.addEventListener('pointerdown',e=>{ if(e.target===thumb) return;
+    const x=chart.scales.x; const cmin=Math.max(0,x.min==null?0:x.min), cmax=Math.min(tot()-1,x.max==null?tot()-1:x.max), span=cmax-cmin;
+    const rect=bar.getBoundingClientRect(); const frac=(e.clientX-rect.left)/rect.width;
+    let nmin=frac*denom()-span/2, nmax=nmin+span;
+    if(nmin<0){nmin=0;nmax=span;} if(nmax>denom()){nmax=denom();nmin=denom()-span;}
+    chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar(); });
+}
+
 function init(data){
   DATA=data;
   order=Object.keys(DATA.games).sort((a,b)=> latestDaily(a)-latestDaily(b));
@@ -271,8 +319,10 @@ function init(data){
       plugins:{ legend:{display:false},
         tooltip:{ filter:(it)=> it.parsed.y!=null,
           callbacks:{ label:(c)=> `${c.dataset.label} · ${c.parsed.y}위` } },
-        zoom:{ pan:{ enabled:true, mode:'x' },
-          zoom:{ wheel:{enabled:true}, pinch:{enabled:false}, mode:'x' } } },
+        zoom:{ pan:{ enabled:false },
+          zoom:{ wheel:{enabled:true},
+            drag:{ enabled:true, backgroundColor:'rgba(37,99,235,0.18)', borderColor:'rgba(37,99,235,0.6)', borderWidth:1 },
+            pinch:{enabled:false}, mode:'x', onZoomComplete:updateScrollbar } } },
       scales:{
         y:{ reverse:true, min:1, max:100, title:{display:true, text:'순위 (위가 1위)'},
             ticks:{ stepSize:10, color:'#8b8b85' }, grid:{ color:'rgba(130,130,125,0.14)' } },
@@ -289,6 +339,7 @@ function init(data){
   document.getElementById('clear').addEventListener('click',()=>{ selected.length=0; restyle(); });
   document.getElementById('resetzoom').addEventListener('click',()=>{ if(chart.resetZoom) chart.resetZoom(); });
 
+  setupScrollbar();
   switchTf('daily');
 }
 
