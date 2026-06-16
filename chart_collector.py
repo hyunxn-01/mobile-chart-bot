@@ -154,7 +154,11 @@ def fetch_genres(track_ids):
             for it in r.json().get('results', []):
                 tid = str(it.get('trackId', ''))
                 if tid:
-                    result[tid] = _pick_genre(it.get('genres', []))
+                    result[tid] = {
+                        'genre': _pick_genre(it.get('genres', [])),
+                        'release': (it.get('releaseDate') or '')[:10],
+                        'rating': it.get('averageUserRating'),
+                    }
         except Exception as e:
             print(f"[WARN] 장르 lookup 실패(chunk {i}): {e}")
     return result
@@ -165,7 +169,10 @@ def attach_genres(apps):
     try:
         gmap = fetch_genres([a.get('track_id') for a in apps])
         for a in apps:
-            a['genre'] = gmap.get(str(a.get('track_id')), '미상')
+            m = gmap.get(str(a.get('track_id')), {})
+            a['genre'] = m.get('genre', '미상')
+            a['release'] = m.get('release', '')
+            a['rating'] = m.get('rating')
         kinds = len({a.get('genre') for a in apps})
         print(f"[OK] 장르 부착: {len(apps)}개 게임 → {kinds}종 장르")
     except Exception as e:
