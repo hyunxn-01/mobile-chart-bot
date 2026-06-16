@@ -60,8 +60,11 @@
   .histtable th, .histtable td{ padding:6px 10px; text-align:center; white-space:nowrap;
     border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }
   .histtable thead th{ position:sticky; top:0; z-index:1; background:var(--panel); color:var(--muted); font-weight:500; }
-  .histtable .gcol{ text-align:left; position:sticky; left:0; background:var(--bg); font-weight:500; min-width:150px; }
-  .histtable thead .gcol{ z-index:2; background:var(--panel); }
+  .histtable .gcol{ text-align:left; position:sticky; left:0; z-index:1; background:var(--bg); font-weight:500;
+    width:180px; min-width:180px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .histtable thead .gcol{ z-index:3; background:var(--panel); }
+  .histtable .colorcol{ position:sticky; left:180px; z-index:1; padding:0; width:16px; min-width:16px; max-width:16px; }
+  .histtable thead .colorcol{ z-index:3; background:var(--panel); }
   .histtable td.up{ color:#16a34a; font-weight:600; }
   .histtable td.down{ color:#dc2626; }
   .histtable td.na{ color:var(--muted); }
@@ -210,12 +213,12 @@ function renderHistory(){
     return;
   }
   const labels=tf.labels;
-  let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th>';
+  let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th><th class="colorcol" title="그래프 색"></th>';
   labels.forEach(l=> h+=`<th>${esc(l)}</th>`);
   h+='</tr></thead><tbody>';
   selected.forEach(aid=>{
     const c=colorFor(aid), s=tf.series[aid]||[];
-    h+=`<tr><td class="gcol"><span class="sw" style="background:${c}"></span>${esc(DATA.games[aid].title)}</td>`;
+    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}">${esc(DATA.games[aid].title)}</td><td class="colorcol" style="background:${c}"></td>`;
     s.forEach((v,i)=>{
       let cls='na';
       if(v!=null){
