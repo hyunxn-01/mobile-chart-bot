@@ -99,6 +99,9 @@
   .ptab{ font:inherit; font-size:12.5px; padding:5px 12px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:7px; cursor:pointer; white-space:nowrap; }
   .ptab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
+  .pubcontrols{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:0 0 12px; }
+  .pubcontrols .pubsearch{ margin:0; flex:0 1 300px; max-width:300px; }
+  .pubcontrols .periodtabs{ margin:0 0 0 auto; }
   .pubscroll{ overflow:auto; max-height:520px; border:1px solid var(--line); border-radius:10px; }
   .pubtable{ border-collapse:separate; border-spacing:0; font-size:13px; width:100%; }
   .pubtable th, .pubtable td{ padding:9px 14px; border-bottom:1px solid var(--line); white-space:nowrap;
@@ -224,30 +227,34 @@
   <div class="pubsec" id="pubsec">
     <h2>퍼블리셔별 차트 장악력</h2>
     <p class="sub" id="pubsub"></p>
-    <div class="periodtabs" id="pubperiod" role="tablist" aria-label="퍼블리셔 집계 기간">
-      <button class="ptab" data-days="" aria-selected="true">전체</button>
-      <button class="ptab" data-days="7">1주</button>
-      <button class="ptab" data-days="30">1달</button>
-      <button class="ptab" data-days="90">3개월</button>
-      <button class="ptab" data-days="180">6개월</button>
-      <button class="ptab" data-days="365">1년</button>
+    <div class="pubcontrols">
+      <input class="search pubsearch" id="pubsearch" type="search" placeholder="퍼블리셔·게임 이름 검색" aria-label="퍼블리셔 검색">
+      <div class="periodtabs" id="pubperiod" role="tablist" aria-label="퍼블리셔 집계 기간">
+        <button class="ptab" data-days="" aria-selected="true">전체</button>
+        <button class="ptab" data-days="7">1주</button>
+        <button class="ptab" data-days="30">1달</button>
+        <button class="ptab" data-days="90">3개월</button>
+        <button class="ptab" data-days="180">6개월</button>
+        <button class="ptab" data-days="365">1년</button>
+      </div>
     </div>
-    <input class="search pubsearch" id="pubsearch" type="search" placeholder="퍼블리셔·게임 이름 검색" aria-label="퍼블리셔 검색">
     <div id="publishers"></div>
   </div>
 
   <div class="pubsec" id="genresec">
     <h2>장르별 차트 분포</h2>
     <p class="sub" id="genresub"></p>
-    <div class="periodtabs" id="genreperiod" role="tablist" aria-label="장르 집계 기간">
-      <button class="ptab" data-days="" aria-selected="true">전체</button>
-      <button class="ptab" data-days="7">1주</button>
-      <button class="ptab" data-days="30">1달</button>
-      <button class="ptab" data-days="90">3개월</button>
-      <button class="ptab" data-days="180">6개월</button>
-      <button class="ptab" data-days="365">1년</button>
+    <div class="pubcontrols">
+      <input class="search pubsearch" id="genresearch" type="search" placeholder="장르·게임 이름 검색" aria-label="장르 검색">
+      <div class="periodtabs" id="genreperiod" role="tablist" aria-label="장르 집계 기간">
+        <button class="ptab" data-days="" aria-selected="true">전체</button>
+        <button class="ptab" data-days="7">1주</button>
+        <button class="ptab" data-days="30">1달</button>
+        <button class="ptab" data-days="90">3개월</button>
+        <button class="ptab" data-days="180">6개월</button>
+        <button class="ptab" data-days="365">1년</button>
+      </div>
     </div>
-    <input class="search pubsearch" id="genresearch" type="search" placeholder="장르·게임 이름 검색" aria-label="장르 검색">
     <div id="genres"></div>
   </div>
 </div>
@@ -511,7 +518,9 @@ function aggregate(keyName, periodDays){
     const ranks=[];
     for(let i=startIdx;i<n;i++){ const v=s[i]; if(v!=null) ranks.push(v); }
     if(!ranks.length) continue;
-    let key=String(DATA.games[aid][keyName]||'').trim(); if(!key) key='미상';
+    let key=String(DATA.games[aid][keyName]||'').trim();
+    if(keyName==='genre' && !key) continue;
+    if(!key) key='미상';
     const e=by[key]||(by[key]={key, num_games:0, ranks:[], games:[]});
     e.num_games++;
     for(const r of ranks) e.ranks.push(r);
