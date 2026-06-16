@@ -95,6 +95,10 @@
   .pubsec h2{ font-size:16px; font-weight:600; margin:0 0 4px; }
   .pubsec .sub{ font-size:12.5px; color:var(--muted); margin:0 0 10px; }
   .pubsearch{ width:100%; max-width:320px; margin:0 0 12px; box-sizing:border-box; }
+  .periodtabs{ display:flex; flex-wrap:wrap; gap:5px; margin:0 0 10px; }
+  .ptab{ font:inherit; font-size:12.5px; padding:5px 12px; border:1px solid var(--line);
+    background:var(--bg); color:var(--text); border-radius:7px; cursor:pointer; white-space:nowrap; }
+  .ptab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
   .pubscroll{ overflow:auto; max-height:520px; border:1px solid var(--line); border-radius:10px; }
   .pubtable{ border-collapse:separate; border-spacing:0; font-size:13px; width:100%; }
   .pubtable th, .pubtable td{ padding:9px 14px; border-bottom:1px solid var(--line); white-space:nowrap;
@@ -220,6 +224,14 @@
   <div class="pubsec" id="pubsec">
     <h2>퍼블리셔별 차트 장악력</h2>
     <p class="sub" id="pubsub"></p>
+    <div class="periodtabs" id="pubperiod" role="tablist" aria-label="퍼블리셔 집계 기간">
+      <button class="ptab" data-days="" aria-selected="true">전체</button>
+      <button class="ptab" data-days="7">1주</button>
+      <button class="ptab" data-days="30">1달</button>
+      <button class="ptab" data-days="90">3개월</button>
+      <button class="ptab" data-days="180">6개월</button>
+      <button class="ptab" data-days="365">1년</button>
+    </div>
     <input class="search pubsearch" id="pubsearch" type="search" placeholder="퍼블리셔·게임 이름 검색" aria-label="퍼블리셔 검색">
     <div id="publishers"></div>
   </div>
@@ -227,6 +239,14 @@
   <div class="pubsec" id="genresec">
     <h2>장르별 차트 분포</h2>
     <p class="sub" id="genresub"></p>
+    <div class="periodtabs" id="genreperiod" role="tablist" aria-label="장르 집계 기간">
+      <button class="ptab" data-days="" aria-selected="true">전체</button>
+      <button class="ptab" data-days="7">1주</button>
+      <button class="ptab" data-days="30">1달</button>
+      <button class="ptab" data-days="90">3개월</button>
+      <button class="ptab" data-days="180">6개월</button>
+      <button class="ptab" data-days="365">1년</button>
+    </div>
     <input class="search pubsearch" id="genresearch" type="search" placeholder="장르·게임 이름 검색" aria-label="장르 검색">
     <div id="genres"></div>
   </div>
@@ -479,21 +499,47 @@ function selectChart(key){
   updateSourceTabs();
 }
 
-function renderGenres(){
-  const sub=document.getElementById('genresub');
-  const wrap=document.getElementById('genres');
-  const gd=DATA.genres;
-  if(!gd || !gd.list || !gd.list.length){
-    sub.textContent='';
-    wrap.innerHTML='<p class="empty">장르 데이터가 아직 없습니다 — 봇이 다음 수집부터 장르를 채웁니다.</p>';
-    return;
+let pubPeriod=null, genrePeriod=null;  // 집계 기간(일수). null=전체
+
+function aggregate(keyName, periodDays){
+  const tf=(DATA.timeframes&&DATA.timeframes.daily)||{labels:[],series:{}};
+  const labels=tf.labels||[], n=labels.length;
+  const startIdx = periodDays ? Math.max(0, n-periodDays) : 0;
+  const by={};
+  for(const aid in DATA.games){
+    const s=tf.series[aid]||[];
+    const ranks=[];
+    for(let i=startIdx;i<n;i++){ const v=s[i]; if(v!=null) ranks.push(v); }
+    if(!ranks.length) continue;
+    let key=String(DATA.games[aid][keyName]||'').trim(); if(!key) key='미상';
+    const e=by[key]||(by[key]={key, num_games:0, ranks:[], games:[]});
+    e.num_games++;
+    for(const r of ranks) e.ranks.push(r);
+    e.games.push({title:DATA.games[aid].title, rank:Math.min.apply(null,ranks), app_id:aid});
   }
-  sub.textContent=`${gd.as_of||''} 차트 기준 · 장르별 게임 수와 순위 · 누르면 그 장르의 게임이 위 그래프에 강조됩니다.`;
+  const out=[];
+  for(const k in by){ const e=by[k], rs=e.ranks;
+    e.best_rank = rs.length?Math.min.apply(null,rs):null;
+    e.avg_rank = rs.length?Math.round(rs.reduce((a,b)=>a+b,0)/rs.length*10)/10:null;
+    e.games.sort((a,b)=>a.rank-b.rank);
+    delete e.ranks; out.push(e);
+  }
+  out.sort((a,b)=> b.num_games-a.num_games || ((a.best_rank==null?9999:a.best_rank)-(b.best_rank==null?9999:b.best_rank)));
+  return out;
+}
+
+function renderAgg(keyName, period, els, labelName){
+  const tf=(DATA.timeframes&&DATA.timeframes.daily)||{labels:[]};
+  const labels=tf.labels||[], n=labels.length;
+  if(!n || !Object.keys(DATA.games).length){ els.sub.textContent=''; els.wrap.innerHTML='<p class="empty">데이터가 쌓이면 표시됩니다.</p>'; return; }
+  const startIdx=period?Math.max(0,n-period):0;
+  els.sub.textContent=`${labels[startIdx]||''} ~ ${labels[n-1]||''} 기준 · ${labelName}별 게임 수·최고/평균 순위 · 누르면 그 ${labelName}의 게임이 위 그래프에 강조됩니다.`;
+  const full=aggregate(keyName, period);
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
-  const q=norm((document.getElementById('genresearch')||{}).value);
-  const ranked=gd.list.map((e,i)=>({e, rank:i+1}));
-  const list=q ? ranked.filter(({e})=> norm(e.genre).includes(q) || e.games.some(g=>norm(g.title).includes(q))) : ranked;
-  if(!list.length){ wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
+  const q=norm((els.search||{}).value);
+  const ranked=full.map((e,i)=>({e, rank:i+1}));
+  const list=q? ranked.filter(({e})=> norm(e.key).includes(q) || e.games.some(g=>norm(g.title).includes(q))) : ranked;
+  if(!list.length){ els.wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
   let h;
   if(isMobile()){
     h='<div class="pubcards">';
@@ -502,27 +548,27 @@ function renderGenres(){
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
       const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
       h+=`<div class="pubcard pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
-        `<div class="pubcard-head"><span class="prank">#${rank}</span><b>${esc(e.genre)}</b></div>`+
+        `<div class="pubcard-head"><span class="prank">#${rank}</span><b>${esc(e.key)}</b></div>`+
         `<div class="pubcard-stats">게임 ${e.num_games} · 최고 ${e.best_rank!=null?e.best_rank+'위':'–'} · 평균 ${e.avg_rank!=null?e.avg_rank:'–'}</div>`+
         `<div class="pubcard-games">${chips}</div></div>`;
     });
     h+='</div>';
   } else {
     h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+
-      '<th>#</th><th class="pname">장르</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th><th class="pname">게임</th></tr></thead><tbody>';
+      `<th>#</th><th class="pname">${esc(labelName)}</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th><th class="pname">게임</th></tr></thead><tbody>`;
     list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
       const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
       h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
-        `<td>${rank}</td><td class="pname">${esc(e.genre)}</td><td>${e.num_games}</td>`+
+        `<td>${rank}</td><td class="pname">${esc(e.key)}</td><td>${e.num_games}</td>`+
         `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td><td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
         `<td class="pgames">${chips}</td></tr>`;
     });
     h+='</tbody></table></div>';
   }
-  wrap.innerHTML=h;
-  wrap.querySelectorAll('.pubrow').forEach(row=>{
+  els.wrap.innerHTML=h;
+  els.wrap.querySelectorAll('.pubrow').forEach(row=>{
     row.addEventListener('click',()=>{
       const aids=(row.dataset.aids||'').split(',').filter(Boolean);
       if(!aids.length) return;
@@ -534,62 +580,11 @@ function renderGenres(){
   });
 }
 
+function renderGenres(){
+  renderAgg('genre', genrePeriod, {sub:document.getElementById('genresub'), wrap:document.getElementById('genres'), search:document.getElementById('genresearch')}, '장르');
+}
 function renderPublishers(){
-  const sub=document.getElementById('pubsub');
-  const wrap=document.getElementById('publishers');
-  const pub=DATA.publishers;
-  if(!pub || !pub.list || !pub.list.length){
-    sub.textContent='';
-    wrap.innerHTML='<p class="empty">데이터가 쌓이면 퍼블리셔 집계가 표시됩니다.</p>';
-    return;
-  }
-  sub.textContent=`${pub.as_of||''} 차트 기준 · 한 개발사가 차트에 올린 게임 수와 순위 · 누르면 그 퍼블리셔의 게임이 위 그래프에 강조됩니다.`;
-  const pnorm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
-  const pq=pnorm((document.getElementById('pubsearch')||{}).value);
-  const ranked=pub.list.map((e,i)=>({e, rank:i+1}));
-  const list=pq ? ranked.filter(({e})=> pnorm(e.developer).includes(pq) || e.games.some(g=>pnorm(g.title).includes(pq))) : ranked;
-  if(!list.length){ wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
-  let h;
-  if(isMobile()){
-    h='<div class="pubcards">';
-    list.forEach(({e,rank})=>{
-      const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
-      const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
-      const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
-      h+=`<div class="pubcard pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
-        `<div class="pubcard-head"><span class="prank">#${rank}</span><b>${esc(e.developer)}</b></div>`+
-        `<div class="pubcard-stats">게임 ${e.num_games} · 최고 ${e.best_rank!=null?e.best_rank+'위':'–'} · 평균 ${e.avg_rank!=null?e.avg_rank:'–'}</div>`+
-        `<div class="pubcard-games">${chips}</div></div>`;
-    });
-    h+='</div>';
-  } else {
-    h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+
-      '<th>#</th><th class="pname">퍼블리셔</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th><th class="pname">차트 내 게임</th></tr></thead><tbody>';
-    list.forEach(({e,rank})=>{
-      const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
-      const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
-      const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
-      h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
-        `<td>${rank}</td>`+
-        `<td class="pname">${esc(e.developer)}</td>`+
-        `<td>${e.num_games}</td>`+
-        `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td>`+
-        `<td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
-        `<td class="pgames">${chips}</td></tr>`;
-    });
-    h+='</tbody></table></div>';
-  }
-  wrap.innerHTML=h;
-  wrap.querySelectorAll('.pubrow').forEach(row=>{
-    row.addEventListener('click',()=>{
-      const aids=(row.dataset.aids||'').split(',').filter(Boolean);
-      if(!aids.length) return;
-      const allSel=aids.every(a=>selected.includes(a));
-      if(allSel){ aids.forEach(a=>{ const i=selected.indexOf(a); if(i>=0) selected.splice(i,1); }); }
-      else { aids.forEach(a=>{ if(!selected.includes(a)) selected.push(a); }); }
-      restyle();
-    });
-  });
+  renderAgg('developer', pubPeriod, {sub:document.getElementById('pubsub'), wrap:document.getElementById('publishers'), search:document.getElementById('pubsearch')}, '퍼블리셔');
 }
 
 function init(full){
@@ -630,6 +625,16 @@ function init(full){
   document.getElementById('search').addEventListener('input', renderList);
   { const ps=document.getElementById('pubsearch'); if(ps) ps.addEventListener('input', renderPublishers); }
   { const gs=document.getElementById('genresearch'); if(gs) gs.addEventListener('input', renderGenres); }
+  document.querySelectorAll('#pubperiod .ptab').forEach(b=> b.addEventListener('click',()=>{
+    pubPeriod = b.dataset.days ? parseInt(b.dataset.days,10) : null;
+    document.querySelectorAll('#pubperiod .ptab').forEach(x=> x.setAttribute('aria-selected', String(x===b)));
+    renderPublishers();
+  }));
+  document.querySelectorAll('#genreperiod .ptab').forEach(b=> b.addEventListener('click',()=>{
+    genrePeriod = b.dataset.days ? parseInt(b.dataset.days,10) : null;
+    document.querySelectorAll('#genreperiod .ptab').forEach(x=> x.setAttribute('aria-selected', String(x===b)));
+    renderGenres();
+  }));
   document.getElementById('clear').addEventListener('click',()=>{ selected.length=0; restyle(); });
   document.getElementById('resetzoom').addEventListener('click',()=>{ if(chart.resetZoom) chart.resetZoom(); });
 
@@ -667,7 +672,7 @@ function zoomChart(factor){
   chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar();
 }
 
-fetch('./data.json').then(r=>{ if(!r.ok) throw new Error('data.json '+r.status); return r.json(); })
+fetch('./data.json?_='+Date.now(), {cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error('data.json '+r.status); return r.json(); })
   .then(init)
   .catch(e=>{ document.getElementById('meta').textContent='데이터를 불러오지 못했습니다: '+e.message; });
 </script>
