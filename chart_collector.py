@@ -52,6 +52,8 @@ DATA_DIR = Path('data')
 DATA_DIR.mkdir(exist_ok=True)
 HISTORY_DIR = DATA_DIR / 'history'
 HISTORY_DIR.mkdir(exist_ok=True)
+HISTORY_FREE_DIR = DATA_DIR / 'history_free'   # Top Free(인기) 차트 누적 — 대시보드 보조
+HISTORY_FREE_DIR.mkdir(exist_ok=True)
 
 
 # ============================================================
@@ -91,11 +93,44 @@ def fetch_apple_chart_kr_games(limit=100):
     return [], None
 
 
+def fetch_top_free_kr_games(limit=100):
+    """Top Free(인기/다운로드) 차트 — 대시보드 보조용(획득 지표). 실패해도 메인 흐름엔 영향 없음."""
+    url = f'https://itunes.apple.com/kr/rss/topfreeapplications/limit={limit}/genre=6014/json'
+    try:
+        r = requests.get(url, timeout=15, headers={'User-Agent': 'Mozilla/5.0'})
+        r.raise_for_status()
+        entries = r.json().get('feed', {}).get('entry', [])
+        apps = [
+            {
+                'rank': i + 1,
+                'app_id': e.get('id', {}).get('attributes', {}).get('im:bundleId', ''),
+                'title': e.get('im:name', {}).get('label', ''),
+                'developer': e.get('im:artist', {}).get('label', ''),
+                'category': e.get('category', {}).get('attributes', {}).get('label', ''),
+                'platform': 'App Store',
+                'chart': 'Top Free',
+            }
+            for i, e in enumerate(entries)
+        ]
+        print(f"[OK] Top Free: {len(apps)}개 수집")
+        return apps
+    except Exception as e:
+        print(f"[ERROR] Top Free 수집 실패: {e}")
+        return []
+
+
 def save_current_data(data):
     today = datetime.now().strftime('%Y-%m-%d')
     f = HISTORY_DIR / f'{today}.json'
     f.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
     print(f"[OK] 데이터 저장: {f}")
+
+
+def save_free_data(data):
+    today = datetime.now().strftime('%Y-%m-%d')
+    f = HISTORY_FREE_DIR / f'{today}.json'
+    f.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+    print(f"[OK] Top Free 저장: {f}")
 
 
 def load_data_by_date(date_str):
@@ -950,6 +985,12 @@ def main():
     send_email_via_gmail(subject, html_body, attachment_path=excel_path)
 
     save_current_data(current)
+
+    print("[보조] Top Free(인기) 차트 수집·저장...")
+    free = fetch_top_free_kr_games(100)
+    if free:
+        save_free_data(free)
+
     print("\n=== 완료 ===\n")
 
 
