@@ -161,13 +161,16 @@
   .pubcard-stats{ font-size:12.5px; color:var(--muted); margin:0 0 7px; font-variant-numeric:tabular-nums; }
   .pubcard-games{ display:flex; flex-wrap:wrap; }
   .pubcards{ max-height:330px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:8px; }
-  .chapnav{ position:fixed; left:14px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:13px; z-index:60; }
-  .chapdot{ display:flex; align-items:center; gap:9px; cursor:pointer; text-decoration:none; }
-  .chapdot::before{ content:''; width:9px; height:9px; border-radius:50%; border:1.5px solid var(--muted); flex:0 0 auto; transition:width .15s, height .15s, background .15s, border-color .15s; }
-  .chaplabel{ font-size:12px; color:var(--muted); white-space:nowrap; opacity:0; transform:translateX(-4px); transition:opacity .15s, transform .15s; background:var(--panel); padding:2px 8px; border-radius:6px; border:1px solid var(--line); }
-  .chapdot:hover .chaplabel{ opacity:1; transform:none; }
-  .chapdot.active::before{ background:var(--accent); border-color:var(--accent); width:11px; height:11px; }
-  .chapdot.active .chaplabel{ opacity:1; transform:none; color:var(--text); font-weight:600; }
+  .chapnav{ position:fixed; left:max(16px, calc(50% - 772px)); top:96px; width:132px; display:flex; flex-direction:column; gap:2px; z-index:60; padding:7px; border:1px solid var(--line); border-radius:11px; background:var(--panel); }
+  .chaptitle{ font-size:10.5px; font-weight:600; letter-spacing:.05em; color:var(--muted); padding:3px 9px 6px; }
+  .chapdot{ display:flex; align-items:center; gap:9px; cursor:pointer; text-decoration:none; padding:6px 9px; border-radius:7px; transition:background .12s; }
+  .chapdot::before{ content:''; width:7px; height:7px; border-radius:50%; background:var(--muted); opacity:.45; flex:0 0 auto; transition:all .15s; }
+  .chaplabel{ font-size:12px; color:var(--muted); white-space:nowrap; transition:color .15s; }
+  .chapdot:hover{ background:var(--chip); }
+  .chapdot.active{ background:var(--chip); }
+  .chapdot.active::before{ background:var(--accent); opacity:1; width:8px; height:8px; }
+  .chapdot.active .chaplabel{ color:var(--text); font-weight:600; }
+  @media (min-width:821px){ .wrap{ padding-left:160px; } }
   @media (max-width:820px){ .chapnav{ display:none; } }
   .zoombtns{ display:none; position:absolute; top:8px; right:8px; flex-direction:column; gap:5px; z-index:2; }
   .zoombtns button{ width:36px; height:36px; font-size:20px; line-height:1; border:1px solid var(--line);
@@ -228,6 +231,7 @@
   <div class="banner" id="banner" style="display:none"></div>
 
   <nav class="chapnav" id="chapnav" aria-label="섹션 바로가기">
+    <div class="chaptitle">섹션</div>
     <a class="chapdot active" data-target="chartsec" href="#chartsec"><span class="chaplabel">순위 추이</span></a>
     <a class="chapdot" data-target="histsec" href="#histsec"><span class="chaplabel">순위 이력</span></a>
     <a class="chapdot" data-target="aggsec" href="#aggsec"><span class="chaplabel">퍼블리셔·장르</span></a>
