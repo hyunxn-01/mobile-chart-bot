@@ -129,7 +129,13 @@
   .pubcard-head .prank{ font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
   .pubcard-stats{ font-size:12.5px; color:var(--muted); margin:0 0 7px; font-variant-numeric:tabular-nums; }
   .pubcard-games{ display:flex; flex-wrap:wrap; }
+  .zoombtns{ display:none; position:absolute; top:8px; right:8px; flex-direction:column; gap:5px; z-index:2; }
+  .zoombtns button{ width:36px; height:36px; font-size:20px; line-height:1; border:1px solid var(--line);
+    background:var(--bg); color:var(--text); border-radius:9px; cursor:pointer; opacity:.94;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,.14); }
+  .zoombtns button:active{ background:var(--chip); }
   @media (max-width:820px){
+    .zoombtns{ display:flex; }
     .wrap{ padding:14px 14px 40px; }
     .layout{ flex-direction:column; gap:14px; }
     .panel{ flex:1 1 auto; width:100%; }
@@ -179,6 +185,7 @@
     <div class="chartbox">
       <div class="canvas-wrap">
         <canvas id="chart" role="img" aria-label="모바일 게임 순위 추이 꺾은선 그래프. 위쪽이 1위. 선택한 게임의 선이 강조됩니다."></canvas>
+        <div class="zoombtns" id="zoombtns"><button id="zoomIn" type="button" aria-label="확대">＋</button><button id="zoomOut" type="button" aria-label="축소">－</button></div>
       </div>
       <div class="chartbar" id="chartbar" title="막대를 드래그하면 보는 구간이 이동합니다"><div class="chartbar-thumb" id="chartthumb"></div></div>
       <p class="viewhint" id="viewhint">전체 보기</p>
@@ -344,7 +351,15 @@ function renderHistory(){
     });
     h+='</div>';
     wrap.innerHTML=h;
-    wrap.querySelectorAll('.histcard-row').forEach(r=>{ r.scrollLeft=r.scrollWidth; });
+    const rows=[...wrap.querySelectorAll('.histcard-row')];
+    rows.forEach(r=>{ r.scrollLeft=r.scrollWidth; });
+    let syncing=false;
+    rows.forEach(r=> r.addEventListener('scroll',()=>{
+      if(syncing) return; syncing=true;
+      const sl=r.scrollLeft;
+      rows.forEach(o=>{ if(o!==r) o.scrollLeft=sl; });
+      syncing=false;
+    }));
     return;
   }
   let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th><th class="colorcol" title="그래프 색"></th>';
@@ -540,7 +555,7 @@ function init(full){
   applyChart();
 
   const MOB=isMobile();
-  if(MOB){ const hint=document.querySelector('.hint'); if(hint) hint.textContent='회색 선이 전체 게임 · 아래에서 선택하면 강조 · 두 손가락으로 벌리면 확대, 한 손가락으로 좌우 드래그하면 이동. (위로 갈수록 높은 순위)'; }
+  if(MOB){ const hint=document.querySelector('.hint'); if(hint) hint.textContent='회색 선이 전체 게임 · 아래에서 선택하면 강조 · ＋/－ 버튼으로 확대, 확대한 뒤 드래그하면 좌우 이동. (위로 갈수록 높은 순위)'; }
 
   chart=new Chart(document.getElementById('chart'),{
     type:'line',
@@ -551,8 +566,8 @@ function init(full){
       plugins:{ legend:{display:false},
         tooltip:{ filter:(it)=> it.parsed.y!=null,
           callbacks:{ label:(c)=> `${c.dataset.label} · ${c.parsed.y}위` } },
-        zoom:{ pan:{ enabled:MOB, mode:'x', onPan:updateScrollbar, onPanComplete:updateScrollbar },
-          zoom:{ wheel:{enabled:!MOB}, drag:{ enabled:false }, pinch:{enabled:MOB}, mode:'x', onZoomComplete:updateScrollbar } } },
+        zoom:{ pan:{ enabled:false },
+          zoom:{ wheel:{enabled:!MOB}, drag:{ enabled:false }, pinch:{enabled:false}, mode:'x', onZoomComplete:updateScrollbar } } },
       scales:{
         y:{ reverse:true, min:1, max:100, title:{display:true, text:'순위 (위가 1위)'},
             ticks:{ stepSize:10, color:'#8b8b85' }, grid:{ color:'rgba(130,130,125,0.14)' } },
@@ -567,8 +582,11 @@ function init(full){
   document.getElementById('resetzoom').addEventListener('click',()=>{ if(chart.resetZoom) chart.resetZoom(); });
 
   setupScrollbar();
-  if(!MOB) setupChartDrag();
+  setupChartDrag();
   setupPanelToggle();
+  const zi=document.getElementById('zoomIn'), zo=document.getElementById('zoomOut');
+  if(zi) zi.addEventListener('click',()=>zoomChart(1.5));
+  if(zo) zo.addEventListener('click',()=>zoomChart(1/1.5));
   switchTf('daily');
   updateSourceTabs();
   let wasMobile=isMobile();
@@ -582,6 +600,19 @@ function setupPanelToggle(){
     const open=body.classList.toggle('open');
     btn.setAttribute('aria-expanded', String(open));
   });
+}
+
+function zoomChart(factor){
+  if(!chart) return;
+  const x=chart.scales.x, total=chart.data.labels.length;
+  let min=(x.min==null?0:x.min), max=(x.max==null?total-1:x.max);
+  const center=(min+max)/2; let half=(max-min)/2/factor;
+  if(half<0.5) half=0.5;
+  let nmin=center-half, nmax=center+half;
+  if(nmin<0){ nmax-=nmin; nmin=0; }
+  if(nmax>total-1){ nmin-=(nmax-(total-1)); nmax=total-1; }
+  if(nmin<0) nmin=0;
+  chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar();
 }
 
 fetch('./data.json').then(r=>{ if(!r.ok) throw new Error('data.json '+r.status); return r.json(); })
