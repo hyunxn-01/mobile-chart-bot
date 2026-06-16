@@ -447,8 +447,10 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4):
             if attempt < max_retries:  # 마지막 시도 전까지는 적응형 사고 + 최대 effort
                 kwargs['thinking'] = {'type': 'adaptive'}
                 kwargs['output_config'] = {'effort': THINKING_EFFORT}
-            response = client.messages.create(**kwargs)
-            text = next((b.text for b in response.content
+            # 스트리밍 필수: max effort + 큰 max_tokens는 10분 초과 가능 → stream 사용
+            with client.messages.stream(**kwargs) as stream:
+                final = stream.get_final_message()
+            text = next((b.text for b in final.content
                          if getattr(b, 'type', None) == 'text'), None)
             if text and text.strip():
                 return text
@@ -612,7 +614,9 @@ def attach_insights(analyses, chart_used, cache):
         key = ch.get('period_key', '')
         sig = _insight_signature(ch)
         cached = cache.get(name)
-        if cached and cached.get('key') == key and cached.get('sig') == sig:
+        valid_cache = (cached and cached.get('key') == key and cached.get('sig') == sig
+                       and '⚠️ AI 인사이트' not in cached.get('text', ''))  # 실패 문구는 캐시 무시·재시도
+        if valid_cache:
             ch['insight'] = cached['text']
             ch['insight_cached'] = True
         else:
