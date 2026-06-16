@@ -275,7 +275,7 @@ def compute_average_ranks(window_data_list):
     total_days = len(window_data_list)
     return {
         app_id: {
-            'avg_rank': info['rank_sum'] / info['days'],
+            'avg_rank': round(info['rank_sum'] / info['days'], 1),
             'title': info['title'],
             'developer': info['developer'],
             'days_in_chart': info['days'],
