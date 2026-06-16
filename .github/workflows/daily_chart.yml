@@ -4,24 +4,24 @@ on:
 jobs:
   collect-and-send:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write  # data/history 커밋 위해 필요
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Run chart collector
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -29,11 +29,14 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
         run: python chart_collector.py
-      
+
+      - name: Build dashboard data
+        run: python build_dashboard.py
+
       - name: Commit data for future comparison
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add data/
+          git add data/ docs/
           git diff --staged --quiet || git commit -m "Daily chart data $(date +'%Y-%m-%d')"
           git push
