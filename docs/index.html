@@ -140,7 +140,9 @@
     .layout{ flex-direction:column; gap:14px; }
     .panel{ flex:1 1 auto; width:100%; }
     .canvas-wrap{ height:340px; }
-    .canvas-wrap canvas{ touch-action:none; }
+    .canvas-wrap canvas{ touch-action:pan-y; }
+    .chartbar{ height:20px; touch-action:none; }
+    .chartbar-thumb{ touch-action:none; }
     .srcrow{ flex-wrap:wrap; gap:8px; }
     .tabs{ overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; }
     .tab{ white-space:nowrap; }
@@ -150,6 +152,9 @@
     .panel-body{ display:none; }
     .panel-body.open{ display:block; }
     .list{ max-height:300px; }
+    .histtable th, .histtable td{ padding:6px 9px; font-size:12px; }
+    .histtable .gcol{ width:112px; min-width:112px; max-width:112px; }
+    .histtable .colorcol{ left:112px; }
   }
 </style>
 </head>
@@ -335,33 +340,6 @@ function renderHistory(){
     return;
   }
   const labels=tf.labels;
-  if(isMobile()){
-    const short=l=>/^\d{4}-\d{2}-\d{2}$/.test(l)?l.slice(5):l;
-    let h='<div class="histcards">';
-    selected.forEach(aid=>{
-      const c=colorFor(aid), s=tf.series[aid]||[];
-      h+=`<div class="histcard"><div class="histcard-head"><span class="cbar" style="background-color:${c}"></span><b>${esc(DATA.games[aid].title)}</b></div><div class="histcard-row">`;
-      s.forEach((v,i)=>{
-        let cls='na';
-        if(v!=null){ cls=''; const prev=i>0?s[i-1]:null;
-          if(prev!=null&&v<prev) cls='up'; else if(prev!=null&&v>prev) cls='down'; }
-        h+=`<span class="hcell ${cls}"><i>${esc(short(labels[i]))}</i><b>${v!=null?v:'–'}</b></span>`;
-      });
-      h+='</div></div>';
-    });
-    h+='</div>';
-    wrap.innerHTML=h;
-    const rows=[...wrap.querySelectorAll('.histcard-row')];
-    rows.forEach(r=>{ r.scrollLeft=r.scrollWidth; });
-    let syncing=false;
-    rows.forEach(r=> r.addEventListener('scroll',()=>{
-      if(syncing) return; syncing=true;
-      const sl=r.scrollLeft;
-      rows.forEach(o=>{ if(o!==r) o.scrollLeft=sl; });
-      syncing=false;
-    }));
-    return;
-  }
   let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th><th class="colorcol" title="그래프 색"></th>';
   labels.forEach(l=> h+=`<th>${esc(l)}</th>`);
   h+='</tr></thead><tbody>';
@@ -555,7 +533,7 @@ function init(full){
   applyChart();
 
   const MOB=isMobile();
-  if(MOB){ const hint=document.querySelector('.hint'); if(hint) hint.textContent='회색 선이 전체 게임 · 아래에서 선택하면 강조 · ＋/－ 버튼으로 확대, 확대한 뒤 드래그하면 좌우 이동. (위로 갈수록 높은 순위)'; }
+  if(MOB){ const hint=document.querySelector('.hint'); if(hint) hint.textContent='회색 선이 전체 게임 · 아래에서 선택하면 강조 · ＋/－ 버튼으로 확대, 확대한 뒤 차트 아래 막대를 끌어 좌우 이동. (위로 갈수록 높은 순위)'; }
 
   chart=new Chart(document.getElementById('chart'),{
     type:'line',
@@ -582,7 +560,7 @@ function init(full){
   document.getElementById('resetzoom').addEventListener('click',()=>{ if(chart.resetZoom) chart.resetZoom(); });
 
   setupScrollbar();
-  setupChartDrag();
+  if(!MOB) setupChartDrag();
   setupPanelToggle();
   const zi=document.getElementById('zoomIn'), zo=document.getElementById('zoomOut');
   if(zi) zi.addEventListener('click',()=>zoomChart(1.5));
