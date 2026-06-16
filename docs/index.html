@@ -184,7 +184,7 @@ function restyle(){
   const any=selected.length>0;
   chart.data.datasets.forEach(ds=>{
     const c=colorFor(ds.aid);
-    if(c){ ds.borderColor=c; ds.borderWidth=2.6; ds.pointRadius=(chart.data.labels.length<=2?4:0); ds.pointBackgroundColor=c; ds.order=0; }
+    if(c){ ds.borderColor=c; ds.borderWidth=2.6; ds.pointRadius=2.5; ds.pointHoverRadius=5; ds.pointBackgroundColor=c; ds.order=0; }
     else if(any){ ds.borderColor='rgba(130,130,125,0.12)'; ds.borderWidth=1; ds.pointRadius=0; ds.order=2; }
     else { ds.borderColor='rgba(130,130,125,0.28)'; ds.borderWidth=1; ds.pointRadius=0; ds.order=1; }
   });
