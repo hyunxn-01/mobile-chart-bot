@@ -39,13 +39,13 @@
   .intro>summary::-webkit-details-marker{ display:none; }
   .intro>summary::before{ display:none; }
   .intro[open]>summary::before{ transform:rotate(90deg); }
-  .intro-title{ color:var(--accent); font-weight:700; }
+  .intro-title{ display:inline-block; font-size:11px; font-weight:700; color:#fff; background:var(--accent2); border-radius:6px; padding:3px 9px; }
   .intro-sub{ color:var(--muted); font-weight:400; font-size:12.5px; }
   .intro-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); font-weight:600; flex:0 0 auto; }
   .intro-hint::after{ content:'펼쳐보기 ▾'; }
   .intro[open] .intro-hint::after{ content:'접기 ▴'; }
   .intro-body{ padding:15px 16px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 18px; }
-  .intro-block h3{ font-size:12.5px; font-weight:700; color:var(--accent); margin:0 0 5px; }
+  .intro-block h3{ font-size:12.5px; font-weight:700; color:var(--accent2text); margin:0 0 5px; }
   .intro-block p{ font-size:12.5px; color:var(--muted); line-height:1.65; margin:0; }
   .aibrief{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; overflow:hidden; }
   .aibrief[hidden]{ display:none; }
@@ -56,7 +56,7 @@
   .aibrief-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); display:inline-flex; align-items:center; gap:5px; flex:0 0 auto; }
   .aibrief-caret{ transition:transform .15s; }
   .aibrief.open .aibrief-caret{ transform:rotate(180deg); }
-  .aibrief-body{ display:none; padding:2px 16px 14px; }
+  .aibrief-body{ display:none; padding:14px 16px 14px; }
   .aibrief.open .aibrief-body{ display:block; }
   .aibrief-item{ margin-top:20px; padding-top:18px; border-top:2px solid var(--line); }
   .aibrief-item:first-child{ margin-top:6px; padding-top:0; border-top:0; }
@@ -78,7 +78,7 @@
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
   .tab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
   .tab:disabled{ opacity:.4; cursor:not-allowed; }
-  .hint{ font-size:12.5px; color:var(--muted); margin:10px 0 12px; }
+  .hint{ font-size:12px; color:var(--muted); margin:6px 0 10px; }
   .hintrow{ display:flex; align-items:center; gap:12px; justify-content:space-between; margin:10px 0 12px; }
   .hintrow .hint{ margin:0; }
   .resetzoom{ font:inherit; font-size:12.5px; padding:6px 12px; border:1px solid var(--line);
@@ -98,12 +98,12 @@
   @media (prefers-color-scheme: dark){ .banner{ color:#f0c074; background:#2e2616; border-color:#4a3c1d; } }
   .layout{ display:flex; gap:18px; align-items:flex-start; }
   .chartbox{ flex:1 1 auto; min-width:0; }
-  .canvas-wrap{ position:relative; width:100%; height:480px; }
+  .canvas-wrap{ position:relative; width:100%; height:520px; }
   .chartbar{ position:relative; height:13px; margin-top:10px; background:var(--chip); border-radius:7px; cursor:pointer; }
   .chartbar-thumb{ position:absolute; top:0; bottom:0; left:0; width:100%; background:var(--accent);
     opacity:.45; border-radius:7px; cursor:grab; transition:opacity .12s; }
   .chartbar-thumb:hover{ opacity:.62; } .chartbar-thumb:active{ opacity:.78; cursor:grabbing; }
-  .viewhint{ font-size:11.5px; color:var(--muted); margin:6px 2px 0; text-align:right; }
+  .viewhint{ display:none; }
   .panel{ flex:0 0 440px; min-width:0; max-width:440px; border:1px solid var(--line); border-radius:12px;
     background:var(--panel); padding:11px; }
   .panel .row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; }
@@ -165,7 +165,7 @@
   .ptab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
   .mtab{ font:inherit; font-size:13px; padding:6px 12px; border:1px solid var(--line); background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
   .mtab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
-  td.gapdl{ color:#2563eb; font-weight:600; } td.gaprev{ color:#16a34a; font-weight:600; }
+  td.gapdl{ color:#e07c12; font-weight:600; } td.gaprev{ color:#16a34a; font-weight:600; }
   .movergrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
   .movercol h3{ font-size:13px; margin:0 0 6px; font-weight:600; }
   .moverlist{ display:flex; flex-direction:column; gap:4px; }
@@ -346,7 +346,7 @@
     </div>
   </div>
   <div class="hintrow">
-    <p class="hint cap" id="charthint"><span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">오른쪽에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>좌우 이동</b></span></p>
+    <p class="hint sub cap" id="charthint"><span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">오른쪽에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>좌우 이동</b></span></p>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
 
@@ -805,7 +805,7 @@ function renderGap(){
   });
   if(!rows.length){ sub.textContent=''; wrap.innerHTML='<p class="empty">두 차트에 함께 든 게임이 없습니다.</p>'; return; }
   rows.sort((a,b)=>b.gap-a.gap);
-  sub.innerHTML=`<span class="ci">함께 든 게임 <b>${rows.length}</b>개</span><span class="csep">│</span><span class="ci">갭 = 매출 − 인기 순위</span><span class="csep">│</span><span class="ci"><span class="cdot" style="background:var(--accent)"></span> 다운로드↑·매출↓ &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출↑·다운로드↓</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 행 클릭 → 그래프 강조</span></span>`;
+  sub.innerHTML=`<span class="ci">함께 든 게임 <b>${rows.length}</b>개</span><span class="csep">│</span><span class="ci">갭 = 매출 − 인기 순위</span><span class="csep">│</span><span class="ci"><span class="cdot" style="background:#e07c12"></span> 다운로드↑·매출↓ &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출↑·다운로드↓</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 행 클릭 → 그래프 강조</span></span>`;
   let h='<div class="pubscroll"><table class="pubtable"><thead><tr><th class="pname">게임</th><th>매출 순위</th><th>인기 순위</th><th>갭</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const cls=r.gap>0?'gapdl':(r.gap<0?'gaprev':'');
