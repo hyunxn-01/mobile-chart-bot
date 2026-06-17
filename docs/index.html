@@ -22,6 +22,13 @@
   header h1{ font-size:20px; font-weight:600; margin:0 0 4px; }
   .meta{ font-size:13px; color:var(--muted); margin:0 0 16px; }
   .meta b{ color:var(--text); font-weight:600; }
+  .hbar{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+  .maker{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:8px 14px; }
+  .maker-label{ font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--muted); }
+  .maker-name{ font-size:15px; font-weight:700; color:var(--text); }
+  .maker-mail{ font-size:12px; color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:5px; }
+  .maker-mail:hover{ text-decoration:underline; }
+  .maker-mail svg{ flex:0 0 auto; }
   .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
   .tab{ font:inherit; font-size:14px; padding:7px 14px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
@@ -95,7 +102,8 @@
   .histtable td.up{ color:#16a34a; font-weight:600; }
   .histtable td.down{ color:#dc2626; }
   .histtable td.na{ color:var(--muted); }
-  .srcrow{ display:flex; align-items:center; gap:10px; margin:0 0 12px; }
+  .srcrow{ display:flex; align-items:center; gap:10px; margin:0 0 12px; flex-wrap:wrap; }
+  .srcrow .tabs{ margin:0 0 0 8px; }
   .srclabel{ font-size:12.5px; color:var(--muted); }
   .stabs{ display:inline-flex; gap:4px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:3px; }
   .stab{ font:inherit; font-size:13.5px; padding:7px 16px; border:0; background:transparent; color:var(--muted);
@@ -203,6 +211,7 @@
   .gmsparkt{ font-size:12px; color:var(--muted); margin-bottom:6px; }
   .gmspark svg{ width:100%; height:auto; display:block; }
   .ginfo{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; width:18px; height:18px; border-radius:50%; border:1px solid var(--line); color:var(--muted); font-size:11px; cursor:pointer; margin-right:6px; vertical-align:middle; }
+  .gitem .ginfo{ margin-right:0; }
   .ginfo:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .gdname{ cursor:pointer; position:relative; }
   .gdname:hover{ text-decoration:underline; }
@@ -243,9 +252,16 @@
 <body>
 <div class="gmodal-bg" id="gmodalBg" hidden><div class="gmodal" role="dialog" aria-modal="true" aria-labelledby="gmtitle"><button class="gmclose" id="gmClose" aria-label="닫기">✕</button><div id="gmBody"></div></div></div>
 <div class="wrap">
-  <header>
-    <h1>모바일 게임 차트 대시보드</h1>
-    <p class="meta" id="meta">불러오는 중…</p>
+  <header class="hbar">
+    <div class="htitle">
+      <h1>모바일 게임 차트 대시보드</h1>
+      <p class="meta" id="meta">불러오는 중…</p>
+    </div>
+    <div class="maker">
+      <span class="maker-label">MADE BY</span>
+      <span class="maker-name">김동현</span>
+      <a class="maker-mail" href="mailto:hyunxn_01@naver.com"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>hyunxn_01@naver.com</a>
+    </div>
   </header>
 
   <div class="srcrow">
@@ -254,14 +270,13 @@
       <button class="stab" role="tab" data-src="grossing" aria-selected="true">매출 (Top Grossing)</button>
       <button class="stab" role="tab" data-src="free" aria-selected="false">인기 (Top Free)</button>
     </div>
-  </div>
-
-  <div class="tabs" id="tabs" role="tablist">
-    <button class="tab" role="tab" data-tf="daily" aria-selected="true">일별</button>
-    <button class="tab" role="tab" data-tf="weekly" aria-selected="false">주별</button>
-    <button class="tab" role="tab" data-tf="monthly" aria-selected="false">월별</button>
-    <button class="tab" role="tab" data-tf="quarterly" aria-selected="false">분기별</button>
-    <button class="tab" role="tab" data-tf="yearly" aria-selected="false">년별</button>
+    <div class="tabs" id="tabs" role="tablist">
+      <button class="tab" role="tab" data-tf="daily" aria-selected="true">일별</button>
+      <button class="tab" role="tab" data-tf="weekly" aria-selected="false">주별</button>
+      <button class="tab" role="tab" data-tf="monthly" aria-selected="false">월별</button>
+      <button class="tab" role="tab" data-tf="quarterly" aria-selected="false">분기별</button>
+      <button class="tab" role="tab" data-tf="yearly" aria-selected="false">년별</button>
+    </div>
   </div>
   <div class="hintrow">
     <p class="hint" id="charthint">회색 선 = 전체 게임 · 오른쪽에서 선택하면 <b>강조</b> · 휠 <b>확대</b> / 드래그 <b>좌우 이동</b></p>
@@ -355,8 +370,7 @@
   </div>
 
   <footer class="site-footer">
-    <div class="sf-by">이 대시보드는 <b>김동현</b>이 직접 기획·개발했습니다</div>
-    <div class="sf-sub">데이터 수집 봇 · 집계 · 시각화 전 과정 자체 구축 · <a href="https://github.com/hyunxn-01/mobile-chart-bot" target="_blank" rel="noopener">소스 코드 (GitHub)</a></div>
+    <div class="sf-sub">데이터 수집 봇 · 집계 · 시각화 전 과정 자체 구축</div>
   </footer>
 </div>
 
