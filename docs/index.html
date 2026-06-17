@@ -38,6 +38,15 @@
   .intro-body{ padding:0 16px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 18px; }
   .intro-block h3{ font-size:12.5px; font-weight:700; color:var(--accent); margin:0 0 5px; }
   .intro-block p{ font-size:12.5px; color:var(--muted); line-height:1.65; margin:0; }
+  .aibrief{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:0 0 16px; }
+  .aibrief[hidden]{ display:none; }
+  .aibrief-head{ display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
+  .aibrief-badge{ font-size:11px; font-weight:700; color:#fff; background:var(--accent); border-radius:6px; padding:3px 9px; }
+  .aibrief-date{ font-size:11.5px; color:var(--muted); }
+  .aibrief-item{ margin-top:8px; }
+  .aibrief-period{ font-size:11px; font-weight:700; color:var(--accent); margin-bottom:3px; }
+  .aibrief-text{ font-size:13px; color:var(--text); line-height:1.6; }
+  .aibrief-foot{ margin-top:9px; font-size:11px; color:var(--muted); }
   .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
   .tab{ font:inherit; font-size:14px; padding:7px 14px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
@@ -282,6 +291,8 @@
       <div class="intro-block"><h3>어디에 쓰나</h3><p>경쟁사 동향 모니터링, 장르 진입 타이밍 판단, 벤치마킹 대상 발굴, 신작 런칭 성과 추적 — 사업 의사결정에 매일 쓰는 시장 대시보드입니다.</p></div>
     </div>
   </details>
+
+  <section class="aibrief" id="aibrief" hidden></section>
 
   <div class="srcrow">
     <span class="srclabel">차트 종류</span>
@@ -795,6 +806,15 @@ function renderMovers(){
   wrap.innerHTML=h;
 }
 
+function renderAiBrief(){
+  const el=document.getElementById('aibrief'); if(!el) return;
+  const b=FULL.ai_brief;
+  if(!b || !b.items || !b.items.length){ el.hidden=true; return; }
+  let h='<div class="aibrief-head"><span class="aibrief-badge">AI 시장 브리핑</span><span class="aibrief-date">'+esc(b.generated||'')+(b.chart?(' · '+esc(b.chart)):'')+'</span></div>';
+  h+=b.items.map(it=>'<div class="aibrief-item"><div class="aibrief-period">'+esc(it.name||'')+'선'+(it.period?(' · '+esc(it.period)):'')+'</div><div class="aibrief-text">'+esc(it.text||'').replace(/\n/g,'<br>')+'</div></div>').join('');
+  h+='<div class="aibrief-foot">AI가 매일 자동 생성한 시장 분석이에요.</div>';
+  el.innerHTML=h; el.hidden=false;
+}
 function init(full){
   FULL=full;
   if(!FULL.charts){  // 구 data.json(차트 묶음 없음) 방어: 최상위를 grossing으로 감쌈
@@ -806,6 +826,7 @@ function init(full){
   }
   activeChart='grossing'; DATA=FULL.charts.grossing;
   applyChart();
+  renderAiBrief();
 
   const MOB=isMobile();
   if(MOB){ const hint=document.getElementById('charthint'); if(hint) hint.innerHTML='회색 선 = 전체 게임 · 아래에서 선택하면 <b>강조</b> · ＋/－ <b>확대</b> · 막대 끌어 <b>이동</b>'; }
