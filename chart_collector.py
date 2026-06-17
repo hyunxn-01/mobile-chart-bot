@@ -672,6 +672,7 @@ def save_insight_cache(cache):
 def _insight_signature(ch):
     """해당 시간축 비교 데이터의 지문 — 데이터가 바뀌면 인사이트 재생성."""
     payload = json.dumps({
+        'pv': 'v2-uniform',  # 프롬프트 버전 — 바꾸면 캐시 무효화·전체 재생성
         'new': ch.get('new_entries', []),
         'drop': ch.get('dropped', []),
         'chg': ch.get('rank_changes', []),
@@ -698,10 +699,18 @@ def generate_timeframe_insight(name, ch, chart_used):
 [큰 변동]
 {json.dumps(top_changes, ensure_ascii=False, indent=2)}
 
-한국어로 간결하게(2~4문단):
-1. {name}선에서 가장 주목할 변동 1~2건과 의미(이유 추정 가능하면)
-2. 사업PM 한 줄 인사이트
-노이즈면 솔직하게 "특이사항 없음". 군더더기 없이."""
+아래 **세 개의 소제목을 정확히 이 제목·이 순서로** 써서 한국어로 작성한다(각 1~3문장):
+
+## 핵심 변동
+{name}선에서 가장 주목할 변동 1~2건과 그 의미(이유 추정 가능하면).
+
+## 노이즈 주의
+상시 체류 캐시카우·데이터 누락 등 과대해석 위험 요소. 없으면 "특이사항 없음".
+
+## 사업PM 액션
+실무에 바로 쓸 한 줄 제언.
+
+[형식 규칙] 매 시간축 동일하게 위 세 소제목만 사용한다. 수평선(---)·이모지·다른 소제목은 쓰지 않는다. 굵게(**)는 게임명·수치에만. 군더더기 없이."""
     result = call_claude_with_retry(prompt)
     if result is None:
         return "⚠️ AI 인사이트 생성 일시 실패(과부하). 변화 데이터는 섹션/첨부 엑셀에서 정상 확인 가능합니다."
