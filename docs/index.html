@@ -172,6 +172,34 @@
   .chapdot.active .chaplabel{ color:var(--text); font-weight:600; }
   @media (min-width:821px){ .wrap{ padding-left:160px; } }
   @media (max-width:820px){ .chapnav{ display:none; } }
+  .gmodal-bg{ position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; display:flex; align-items:center; justify-content:center; padding:18px; }
+  .gmodal-bg[hidden]{ display:none; }
+  .gmodal{ position:relative; width:560px; max-width:100%; max-height:90vh; overflow:auto; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:20px 22px; }
+  .gmclose{ position:absolute; top:12px; right:12px; width:30px; height:30px; border:1px solid var(--line); background:var(--bg); color:var(--muted); border-radius:8px; cursor:pointer; font-size:13px; line-height:1; }
+  .gmclose:hover{ background:var(--chip); }
+  .gmhead{ display:flex; align-items:center; gap:14px; margin:2px 34px 16px 0; }
+  .gmicon{ width:60px; height:60px; border-radius:14px; flex:0 0 auto; object-fit:cover; border:1px solid var(--line); }
+  .gmicon-ph{ display:flex; align-items:center; justify-content:center; background:var(--chip); color:var(--muted); font-size:24px; font-weight:700; }
+  .gmtitle{ font-size:19px; font-weight:600; }
+  .gmsub{ font-size:13px; color:var(--muted); margin-top:3px; }
+  .gmgrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
+  .gmstat{ background:var(--panel); border-radius:9px; padding:9px 11px; }
+  .gmstat .gml{ font-size:11px; color:var(--muted); }
+  .gmstat .gmv{ font-size:18px; font-weight:600; margin-top:2px; font-variant-numeric:tabular-nums; }
+  .gmstar{ color:#e0a82e; }
+  .gmgap{ margin-top:12px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:13px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .gmmuted{ color:var(--muted); font-size:12px; }
+  .gmspark{ margin-top:14px; border-top:1px solid var(--line); padding-top:12px; }
+  .gmsparkt{ font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .gmspark svg{ width:100%; height:auto; display:block; }
+  .ginfo{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; width:18px; height:18px; border-radius:50%; border:1px solid var(--line); color:var(--muted); font-size:11px; cursor:pointer; margin-left:6px; vertical-align:middle; }
+  .ginfo:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .gdname{ cursor:pointer; position:relative; }
+  .gdname:hover{ text-decoration:underline; }
+  .gdname::after{ content:'상세보기'; position:absolute; left:0; top:-23px; font-size:10.5px; font-weight:600; background:var(--accent); color:#fff; padding:2px 7px; border-radius:5px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s; z-index:5; }
+  .gdname:hover::after{ opacity:1; }
+  @media (max-width:560px){ .gmgrid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:820px){ .gdname::after{ display:none; } }
   .zoombtns{ display:none; position:absolute; top:8px; right:8px; flex-direction:column; gap:5px; z-index:2; }
   .zoombtns button{ width:36px; height:36px; font-size:20px; line-height:1; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:9px; cursor:pointer; opacity:.94;
@@ -203,6 +231,7 @@
 </style>
 </head>
 <body>
+<div class="gmodal-bg" id="gmodalBg" hidden><div class="gmodal" role="dialog" aria-modal="true" aria-labelledby="gmtitle"><button class="gmclose" id="gmClose" aria-label="닫기">✕</button><div id="gmBody"></div></div></div>
 <div class="wrap">
   <header>
     <h1>모바일 게임 차트 대시보드</h1>
@@ -420,7 +449,8 @@ function renderList(){
     btn.innerHTML=`<span class="sw" style="background:${c||'#c9c8c2'}"></span>`+
       `<span class="gname">${esc(g.title)}${newBadge(aid)} <span class="gdev">${esc(g.developer||'')}</span></span>`+
       (rt?`<span class="grating">${rt}</span>`:'')+
-      `<span class="grank">${rankHtml}</span>`;
+      `<span class="grank">${rankHtml}</span>`+
+      `<span class="ginfo" data-aid="${aid}" title="상세 보기" role="button" aria-label="상세 보기">ⓘ</span>`;
     btn.addEventListener('click',()=> toggle(aid));
     list.appendChild(btn);
   });
@@ -445,7 +475,7 @@ function renderHistory(){
   selected.forEach(aid=>{
     const c=colorFor(aid), s=tf.series[aid]||[];
     const av=avg3m(aid);
-    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}">${esc(DATA.games[aid].title)}${newBadge(aid)}</td><td class="colorcol"><span class="cbar" style="background-color:${c}"></span></td><td class="avg3m">${av!=null?av+'위':'–'}</td>`;
+    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}"><span class="gdname" data-aid="${esc(aid)}">${esc(DATA.games[aid].title)}</span>${newBadge(aid)}</td><td class="colorcol"><span class="cbar" style="background-color:${c}"></span></td><td class="avg3m">${av!=null?av+'위':'–'}</td>`;
     s.forEach((v,i)=>{
       let cls='na';
       if(v!=null){
@@ -629,7 +659,7 @@ function renderAgg(keyName, period, els, labelName){
     list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
-      const chips=e.games.map(g=>`<span class="pubchip">${esc(g.title)}${newBadge(g.app_id)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
+      const chips=e.games.map(g=>`<span class="pubchip"><span class="gdname" data-aid="${esc(g.app_id)}">${esc(g.title)}</span>${newBadge(g.app_id)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
       h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
         `<td>${rank}</td><td class="pname">${esc(e.key)}</td><td>${e.num_games}</td>`+
         `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td><td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
@@ -678,7 +708,7 @@ function renderGap(){
   let h='<div class="pubscroll"><table class="pubtable"><thead><tr><th class="pname">게임</th><th>매출 순위</th><th>인기 순위</th><th>갭</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const cls=r.gap>0?'gapdl':(r.gap<0?'gaprev':'');
-    h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname">${esc(r.title)}${newBadge(r.aid)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
+    h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname">${esc(r.title)}${newBadge(r.aid)} <span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span></td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
   });
   h+='</tbody></table></div>';
   wrap.innerHTML=h;
@@ -700,7 +730,7 @@ function renderMovers(){
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
   sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci">급변 ±3계단 이상</span>`;
-  const nm=aid=>esc((DATA.games[aid]||{}).title||aid)+newBadge(aid);
+  const nm=aid=>'<span class="gdname" data-aid="'+esc(aid)+'">'+esc((DATA.games[aid]||{}).title||aid)+'</span>'+newBadge(aid);
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,12).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
   let h='<div class="movergrid">';
   const ri=v=>Math.round(v);
@@ -800,6 +830,45 @@ function zoomChart(factor){
   if(nmin<0) nmin=0;
   chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar();
 }
+
+function gmLatest(chartKey, aid){ const c=FULL.charts&&FULL.charts[chartKey]; if(!c) return null; const s=((c.timeframes&&c.timeframes.daily&&c.timeframes.daily.series)||{})[aid]||[]; for(let i=s.length-1;i>=0;i--){ if(s[i]!=null) return s[i]; } return null; }
+function gmSpark(series){
+  const n=series.length, vals=[]; for(let i=0;i<n;i++){ if(series[i]!=null) vals.push({i:i,v:series[i]}); }
+  if(vals.length<2) return '<div class="gmmuted" style="padding:6px 0">추이를 그릴 데이터가 아직 부족해요.</div>';
+  const W=500,H=70,pad=6, xs=i=>(pad+(n>1?i/(n-1):0)*(W-2*pad)), ys=v=>(pad+((v-1)/99)*(H-2*pad));
+  let d=''; vals.forEach((o,k)=>{ d+=(k?'L':'M')+xs(o.i).toFixed(1)+' '+ys(o.v).toFixed(1)+' '; });
+  const last=vals[vals.length-1];
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="순위 추이"><path d="'+d+'" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+xs(last.i).toFixed(1)+'" cy="'+ys(last.v).toFixed(1)+'" r="3" fill="var(--accent)"/></svg>';
+}
+function openGameDetail(aid){
+  const g=DATA.games[aid]; if(!g) return;
+  const series=(DATA.timeframes.daily.series[aid]||[]);
+  const pres=series.filter(v=>v!=null);
+  const best=pres.length?Math.min.apply(null,pres):null;
+  const avg=pres.length?Math.round(pres.reduce((a,b)=>a+b,0)/pres.length*10)/10:null;
+  const days=pres.length, a3=avg3m(aid);
+  const gr=gmLatest('grossing',aid), fr=gmLatest('free',aid);
+  const gap=(gr!=null&&fr!=null)?(gr-fr):null;
+  const rt=(g.rating!=null)?(Math.round(g.rating*10)/10):null;
+  const rk=v=>v==null?'–':v+'위';
+  const icon=g.icon?('<img class="gmicon" src="'+esc(g.icon)+'" alt="" referrerpolicy="no-referrer">'):('<div class="gmicon gmicon-ph">'+esc((g.title||'?').slice(0,1))+'</div>');
+  const stat=(l,v)=>'<div class="gmstat"><div class="gml">'+l+'</div><div class="gmv">'+v+'</div></div>';
+  const gapH=(gap==null)?'<span class="gmmuted">두 차트에 모두 들어야 표시돼요</span>':('<span class="cdot" style="background:'+(gap<0?'#16a34a':'var(--accent)')+'"></span> <b>'+(gap<0?'매출 강세':(gap>0?'다운로드 강세':'균형'))+' '+(gap>0?'+':'')+gap+'</b> <span class="gmmuted">매출 '+rk(gr)+' · 인기 '+rk(fr)+'</span>');
+  document.getElementById('gmBody').innerHTML=
+    '<div class="gmhead">'+icon+'<div><div class="gmtitle" id="gmtitle">'+esc(g.title)+newBadge(aid)+'</div><div class="gmsub">'+esc(g.developer||'')+((g.genre&&g.genre!=='미상')?(' · '+esc(g.genre)):'')+'</div></div></div>'+
+    '<div class="gmgrid">'+stat('현재 매출',rk(gr))+stat('현재 인기',rk(fr))+stat('최고 순위',rk(best))+stat('평균 순위',avg!=null?avg+'위':'–')+stat('3개월 평균',a3!=null?a3+'위':'–')+stat('출시일',g.release||'–')+stat('평점',rt!=null?('<span class="gmstar">★</span>'+rt):'–')+stat('차트 머문',days+'일')+'</div>'+
+    '<div class="gmgap">'+gapH+'</div>'+
+    '<div class="gmspark"><div class="gmsparkt">순위 추이</div>'+gmSpark(series)+'</div>';
+  const bg=document.getElementById('gmodalBg'); bg.hidden=false; document.body.style.overflow='hidden';
+}
+(function(){
+  const bg=document.getElementById('gmodalBg'); if(!bg) return;
+  const close=()=>{ bg.hidden=true; document.body.style.overflow=''; };
+  document.getElementById('gmClose').addEventListener('click',close);
+  bg.addEventListener('click',e=>{ if(e.target===bg) close(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!bg.hidden) close(); });
+  document.addEventListener('click',e=>{ const el=e.target.closest&&e.target.closest('.gdname,.ginfo'); if(el&&el.getAttribute('data-aid')){ e.stopPropagation(); e.preventDefault(); openGameDetail(el.getAttribute('data-aid')); } }, true);
+})();
 
 (function(){
   const nav=document.getElementById('chapnav'); if(!nav) return;
