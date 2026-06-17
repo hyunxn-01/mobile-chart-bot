@@ -59,17 +59,17 @@
   .aibrief.open .aibrief-body{ display:block; }
   .aibrief-item{ margin-top:20px; padding-top:18px; border-top:2px solid var(--line); }
   .aibrief-item:first-child{ margin-top:6px; padding-top:0; border-top:0; }
-  .aibrief-period{ display:inline-block; font-size:11.5px; font-weight:800; color:#fff; background:var(--accent); padding:3px 11px; border-radius:6px; margin:0 0 9px; }
-  .aib-h{ font-size:12.5px; font-weight:700; color:var(--text); margin:13px 0 5px; padding-left:9px; border-left:3px solid var(--accent); }
+  .aibrief-period{ display:inline-block; font-size:11.5px; font-weight:800; color:var(--accent); background:var(--chip); padding:3px 11px; border-radius:6px; margin:0 0 9px; }
+  .aib-h{ font-size:12.5px; font-weight:700; color:var(--text); margin:13px 0 5px; padding-left:9px; border-left:3px solid var(--muted); }
   .aib-p{ font-size:12.5px; color:var(--text); line-height:1.65; margin:5px 0; }
   .aib-li{ font-size:12.5px; color:var(--text); line-height:1.6; margin:4px 0 4px 14px; position:relative; }
-  .aib-li::before{ content:'·'; position:absolute; left:-10px; color:var(--accent); }
+  .aib-li::before{ content:'·'; position:absolute; left:-10px; color:var(--muted); }
   .aib-quote{ font-size:12.5px; color:var(--text); line-height:1.6; margin:6px 0; padding:7px 11px; background:var(--chip); border-radius:7px; }
   .aib-hr{ height:1px; background:var(--line); margin:12px 0; border:0; }
   .aibrief-dates{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:2px 0 12px; }
   .aibrief-dlabel{ font-size:11px; color:var(--muted); font-weight:700; margin-right:2px; }
   .aibrief-dnote{ font-size:10.5px; color:var(--muted); }
-  .aibrief-dchip{ font-size:11px; color:var(--muted); background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 10px; cursor:pointer; font-weight:600; }
+  .aibrief-dchip{ font-size:11px; color:var(--muted); background:var(--chip); border:1px solid var(--line); border-radius:6px; padding:3px 10px; cursor:pointer; font-weight:600; }
   .aibrief-dchip.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .aibrief-foot{ margin-top:11px; font-size:11px; color:var(--muted); }
   .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
@@ -127,7 +127,8 @@
   .gitem.out{ opacity:.5; }
   .gitem.out[aria-pressed="true"]{ opacity:1; }
   .empty{ font-size:13px; color:var(--muted); padding:10px 4px; }
-  .histsec{ margin-top:28px; }
+  .sectitle{ font-size:16px; font-weight:600; margin:0 0 4px; }
+  .histsec{ margin-top:32px; }
   .histsec h2{ font-size:16px; font-weight:600; margin:0 0 4px; }
   .histsec .sub{ font-size:12.5px; color:var(--muted); margin:0 0 10px; }
   .histscroll{ overflow:auto; max-height:640px; border:1px solid var(--line); border-radius:10px; }
@@ -328,6 +329,7 @@
     <div class="aibrief-body" id="aibriefBody"></div>
   </section>
 
+  <h2 class="sectitle">순위 추이</h2>
   <div class="srcrow">
     <span class="srclabel">차트 종류</span>
     <div class="stabs" role="tablist" aria-label="차트 종류">
@@ -559,7 +561,7 @@ function renderHistory(){
   const wrap=document.getElementById('history');
   const tf=DATA.timeframes[activeTf];
   if(!selected.length){
-    sub.innerHTML='<span class="ci">위 그래프에서 게임을 선택하면 시간축별 순위가 표로 나옵니다.</span>';
+    sub.innerHTML='';
     wrap.innerHTML='<p class="empty">위 그래프에서 게임을 선택하면, 그 게임의 '+TF_LABEL[activeTf]+' 순위 이력이 여기에 표로 표시됩니다.</p>';
     return;
   }
