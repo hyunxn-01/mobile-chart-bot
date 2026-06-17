@@ -22,11 +22,12 @@
   header h1{ font-size:20px; font-weight:600; margin:0 0 4px; }
   .meta{ font-size:13px; color:var(--muted); margin:0 0 16px; }
   .meta b{ color:var(--text); font-weight:600; }
-  .hbar{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
-  .maker{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:8px 14px; }
-  .maker-label{ font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--muted); }
-  .maker-name{ font-size:15px; font-weight:700; color:var(--text); }
-  .maker-mail{ font-size:12px; color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:5px; }
+  .titlerow{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
+  .titlerow h1{ margin:0; }
+  .maker{ display:inline-flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:5px 12px; font-size:13px; line-height:1; }
+  .maker-name{ font-weight:700; color:var(--text); }
+  .maker .msep{ color:var(--line); }
+  .maker-mail{ color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:5px; }
   .maker-mail:hover{ text-decoration:underline; }
   .maker-mail svg{ flex:0 0 auto; }
   .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
@@ -252,16 +253,12 @@
 <body>
 <div class="gmodal-bg" id="gmodalBg" hidden><div class="gmodal" role="dialog" aria-modal="true" aria-labelledby="gmtitle"><button class="gmclose" id="gmClose" aria-label="닫기">✕</button><div id="gmBody"></div></div></div>
 <div class="wrap">
-  <header class="hbar">
-    <div class="htitle">
+  <header>
+    <div class="titlerow">
       <h1>모바일 게임 차트 대시보드</h1>
-      <p class="meta" id="meta">불러오는 중…</p>
+      <div class="maker"><span class="maker-name">김동현</span><span class="msep">·</span><a class="maker-mail" href="mailto:hyunxn_01@naver.com"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>hyunxn_01@naver.com</a></div>
     </div>
-    <div class="maker">
-      <span class="maker-label">MADE BY</span>
-      <span class="maker-name">김동현</span>
-      <a class="maker-mail" href="mailto:hyunxn_01@naver.com"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>hyunxn_01@naver.com</a>
-    </div>
+    <p class="meta" id="meta">불러오는 중…</p>
   </header>
 
   <div class="srcrow">
@@ -603,7 +600,7 @@ function applyChart(){
   const dr=DATA.date_range||[];
   m.innerHTML=`<b>${DATA.chart_used||'차트'}</b> · 수집 <b>${DATA.num_days}</b>일 (${dr[0]||''} ~ ${dr[1]||''}) · 게임 <b>${DATA.num_games}</b>개 · 갱신 ${FULL.generated_at||''}`;
   document.querySelectorAll('.tab').forEach(b=>{
-    const tf=b.dataset.tf; b.disabled=(((DATA.timeframes[tf]||{}).labels)||[]).length===0;
+    const tf=b.dataset.tf; const _empty=(((DATA.timeframes[tf]||{}).labels)||[]).length===0; b.disabled=_empty; b.title=_empty?('아직 완료된 '+b.textContent.trim()+' 구간이 없어요 — 기간이 쌓이면 자동으로 켜집니다'):'';
   });
   if((((DATA.timeframes[activeTf]||{}).labels)||[]).length===0) activeTf='daily';
   renderAggSection();
