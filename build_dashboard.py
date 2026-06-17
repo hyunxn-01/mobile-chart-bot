@@ -61,6 +61,23 @@ def period_key(date_str, tf):
     return date_str
 
 
+def period_end(key, tf):
+    """기간 키의 마지막 날짜(완료 판정용). datetime 반환."""
+    if tf == 'weekly':
+        return datetime.strptime(key, '%Y-%m-%d') + timedelta(days=6)
+    if tf == 'monthly':
+        y, m = int(key[:4]), int(key[5:7])
+        nxt = datetime(y + 1, 1, 1) if m == 12 else datetime(y, m + 1, 1)
+        return nxt - timedelta(days=1)
+    if tf == 'quarterly':
+        y = int(key[:4]); q = int(key.split('-Q')[1]); em = q * 3
+        nxt = datetime(y + 1, 1, 1) if em == 12 else datetime(y, em + 1, 1)
+        return nxt - timedelta(days=1)
+    if tf == 'yearly':
+        return datetime(int(key), 12, 31)
+    return datetime.strptime(key, '%Y-%m-%d')
+
+
 def build_publishers(days, dates):
     """가장 최근 차트일 기준 개발사별 집계. 등장 게임 수 desc, 최고 순위 asc로 정렬."""
     if not dates:
@@ -143,6 +160,11 @@ def build_chart(history_dir):
         for date_str in dates:
             period_to_dates.setdefault(period_key(date_str, tf), []).append(date_str)
         labels = list(period_to_dates.keys())  # dates가 정렬돼 있어 라벨도 시간순
+        # 진행 중(미완료) 기간 제외: 마지막 기간의 끝날이 최신 수집일보다 미래면 드롭(완료된 기간만 표시)
+        if dates:
+            latest_dt = datetime.strptime(dates[-1], '%Y-%m-%d')
+            while labels and period_end(labels[-1], tf) > latest_dt:
+                labels.pop()
         series = {aid: [None] * len(labels) for aid in games}
         for pi, k in enumerate(labels):
             acc = {}
