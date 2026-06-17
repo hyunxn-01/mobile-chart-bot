@@ -25,10 +25,10 @@
   .titlerow{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
   .titlerow h1{ margin:0; }
   .maker{ display:inline-flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:5px 12px; font-size:13px; line-height:1; }
+  .maker-label{ font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--muted); }
   .maker-name{ font-weight:700; color:var(--text); }
   .maker .msep{ color:var(--line); }
-  .maker-mail{ color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:5px; }
-  .maker-mail:hover{ text-decoration:underline; }
+  .maker-mail{ color:var(--muted); display:inline-flex; align-items:center; gap:5px; }
   .maker-mail svg{ flex:0 0 auto; }
   .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
   .tab{ font:inherit; font-size:14px; padding:7px 14px; border:1px solid var(--line);
@@ -256,7 +256,7 @@
   <header>
     <div class="titlerow">
       <h1>모바일 게임 차트 대시보드</h1>
-      <div class="maker"><span class="maker-name">김동현</span><span class="msep">·</span><a class="maker-mail" href="mailto:hyunxn_01@naver.com"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>hyunxn_01@naver.com</a></div>
+      <div class="maker"><span class="maker-label">MADE BY</span><span class="maker-name">김동현</span><span class="msep">·</span><span class="maker-mail"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>hyunxn_01@naver.com</span></div>
     </div>
     <p class="meta" id="meta">불러오는 중…</p>
   </header>
