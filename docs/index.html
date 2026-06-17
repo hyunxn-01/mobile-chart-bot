@@ -31,22 +31,37 @@
   .maker-mail{ color:var(--muted); display:inline-flex; align-items:center; gap:5px; }
   .maker-mail svg{ flex:0 0 auto; }
   .intro{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; }
-  .intro>summary{ cursor:pointer; padding:12px 16px; font-size:13.5px; font-weight:600; color:var(--text); list-style:none; display:flex; align-items:center; gap:8px; }
+  .intro>summary{ cursor:pointer; padding:12px 16px; font-size:13.5px; font-weight:600; color:var(--text); list-style:none; display:flex; align-items:center; gap:8px; border-radius:12px; }
+  .intro>summary:hover{ background:var(--chip); }
   .intro>summary::-webkit-details-marker{ display:none; }
-  .intro>summary::before{ content:'▸'; color:var(--muted); font-size:12px; transition:transform .15s; }
+  .intro>summary::before{ content:'▸'; color:var(--accent); font-size:12px; transition:transform .15s; flex:0 0 auto; }
   .intro[open]>summary::before{ transform:rotate(90deg); }
+  .intro-title{ color:var(--accent); font-weight:700; }
+  .intro-sub{ color:var(--muted); font-weight:400; font-size:12.5px; }
+  .intro-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); font-weight:600; flex:0 0 auto; }
+  .intro-hint::after{ content:'펼쳐보기 ▾'; }
+  .intro[open] .intro-hint::after{ content:'접기 ▴'; }
   .intro-body{ padding:0 16px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 18px; }
   .intro-block h3{ font-size:12.5px; font-weight:700; color:var(--accent); margin:0 0 5px; }
   .intro-block p{ font-size:12.5px; color:var(--muted); line-height:1.65; margin:0; }
-  .aibrief{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:0 0 16px; }
+  .aibrief{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; overflow:hidden; }
   .aibrief[hidden]{ display:none; }
-  .aibrief-head{ display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
-  .aibrief-badge{ font-size:11px; font-weight:700; color:#fff; background:var(--accent); border-radius:6px; padding:3px 9px; }
+  .aibrief-toggle{ width:100%; display:flex; align-items:center; gap:10px; padding:12px 16px; background:transparent; border:0; cursor:pointer; text-align:left; font:inherit; color:var(--text); flex-wrap:wrap; }
+  .aibrief-toggle:hover{ background:var(--chip); }
+  .aibrief-badge{ font-size:11px; font-weight:700; color:#fff; background:var(--accent); border-radius:6px; padding:3px 9px; flex:0 0 auto; }
   .aibrief-date{ font-size:11.5px; color:var(--muted); }
-  .aibrief-item{ margin-top:8px; }
-  .aibrief-period{ font-size:11px; font-weight:700; color:var(--accent); margin-bottom:3px; }
-  .aibrief-text{ font-size:13px; color:var(--text); line-height:1.6; }
-  .aibrief-foot{ margin-top:9px; font-size:11px; color:var(--muted); }
+  .aibrief-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); display:inline-flex; align-items:center; gap:5px; flex:0 0 auto; }
+  .aibrief-caret{ transition:transform .15s; }
+  .aibrief.open .aibrief-caret{ transform:rotate(180deg); }
+  .aibrief-body{ display:none; padding:2px 16px 14px; }
+  .aibrief.open .aibrief-body{ display:block; }
+  .aibrief-period{ font-size:11px; font-weight:700; color:var(--accent); margin:12px 0 4px; }
+  .aib-h{ font-size:13px; font-weight:700; color:var(--text); margin:11px 0 4px; }
+  .aib-p{ font-size:12.5px; color:var(--text); line-height:1.65; margin:5px 0; }
+  .aib-li{ font-size:12.5px; color:var(--text); line-height:1.6; margin:4px 0 4px 14px; position:relative; }
+  .aib-li::before{ content:'·'; position:absolute; left:-10px; color:var(--accent); }
+  .aib-quote{ font-size:12.5px; color:var(--text); line-height:1.6; margin:6px 0; padding:7px 11px; background:var(--chip); border-radius:7px; }
+  .aibrief-foot{ margin-top:11px; font-size:11px; color:var(--muted); }
   .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
   .tab{ font:inherit; font-size:14px; padding:7px 14px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
@@ -96,7 +111,7 @@
   .gname{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .gdev{ color:var(--muted); font-size:11.5px; }
   .grank{ flex:0 0 auto; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .newbadge{ display:inline-block; font-size:9.5px; font-weight:700; color:#fff; background:#e0455e; border-radius:5px; padding:1px 4px; margin-left:5px; vertical-align:middle; letter-spacing:.3px; }
+  .newbadge{ display:inline-block; font-size:9.5px; font-weight:700; color:#fff; background:#e0455e; border-radius:5px; padding:1px 4px; margin-right:5px; vertical-align:middle; letter-spacing:.3px; }
   .grating{ flex:0 0 auto; font-size:11px; color:#e0a82e; white-space:nowrap; }
   .panelnote{ font-size:11px; color:var(--muted); margin:2px 2px 8px; line-height:1.45; }
   .gitem.out{ opacity:.5; }
@@ -224,8 +239,10 @@
   .gmstat .gmv{ font-size:18px; font-weight:600; margin-top:2px; font-variant-numeric:tabular-nums; }
   .gmstar{ color:#e0a82e; }
   .gmgap{ margin-top:12px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:13px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
-  .gmrev{ margin-top:10px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:13px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .gmrevlabel{ font-size:11px; font-weight:700; color:var(--muted); flex:0 0 auto; }
+  .gmrev{ margin-top:10px; padding:10px 13px; background:var(--accent); color:#fff; border-radius:9px; font-size:13px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .gmrev b{ color:#fff; }
+  .gmrev .gmmuted{ color:rgba(255,255,255,.85); }
+  .gmrevlabel{ font-size:11px; font-weight:700; color:rgba(255,255,255,.92); flex:0 0 auto; }
   .gmdisc{ margin-top:7px; font-size:11px; color:var(--muted); line-height:1.5; }
   .pubtable td.prev{ color:var(--text); font-variant-numeric:tabular-nums; }
   .gmmuted{ color:var(--muted); font-size:12px; }
@@ -283,7 +300,7 @@
   </header>
 
   <details class="intro">
-    <summary>프로젝트 소개 — 왜 만들었고, 무엇을 읽고, 어디에 쓰나</summary>
+    <summary><span class="intro-title">프로젝트 소개</span><span class="intro-sub">왜 만들었고, 무엇을 읽고, 어디에 쓰나</span><span class="intro-hint"></span></summary>
     <div class="intro-body">
       <div class="intro-block"><h3>왜 만들었나</h3><p>게임 사업 PM은 "지금 시장에서 무슨 일이 일어나는가"를 매일 빠르게 파악해야 합니다. 앱스토어 차트는 그날의 스냅샷일 뿐 추세·경쟁 구도·신작 성패가 안 보입니다. 유료 분석툴 없이도 매일 자동으로 시장을 추적·분석하는 도구를 직접 만들었습니다.</p></div>
       <div class="intro-block"><h3>어떻게</h3><p>매일 아침 한국 앱스토어 매출·인기 차트를 자동 수집(GitHub Actions)하고, 순위를 누적해 시간축 추세로 가공합니다. 퍼블리셔·장르 집계, 매출↔인기 갭, 진입·이탈·급변, 추정 매출 점유율을 더하고, AI가 매일 시장을 요약해 메일·대시보드로 전달합니다.</p></div>
@@ -292,7 +309,14 @@
     </div>
   </details>
 
-  <section class="aibrief" id="aibrief" hidden></section>
+  <section class="aibrief" id="aibrief" hidden>
+    <button class="aibrief-toggle" id="aibriefToggle" aria-expanded="false">
+      <span class="aibrief-badge">AI 시장 브리핑</span>
+      <span class="aibrief-date" id="aibriefDate"></span>
+      <span class="aibrief-hint"><span id="aibriefHintText">펼쳐보기</span><span class="aibrief-caret">▾</span></span>
+    </button>
+    <div class="aibrief-body" id="aibriefBody"></div>
+  </section>
 
   <div class="srcrow">
     <span class="srclabel">차트 종류</span>
@@ -510,7 +534,7 @@ function renderList(){
     const rt=ratingStr(aid);
     btn.innerHTML=`<span class="sw" style="background:${c||'#c9c8c2'}"></span>`+
       `<span class="ginfo" data-aid="${aid}" title="상세 보기" role="button" aria-label="상세 보기">ⓘ</span>`+
-      `<span class="gname">${esc(g.title)}${newBadge(aid)} <span class="gdev">${esc(g.developer||'')}</span></span>`+
+      `<span class="gname">${newBadge(aid)}${esc(g.title)} <span class="gdev">${esc(g.developer||'')}</span></span>`+
       (rt?`<span class="grating">${rt}</span>`:'')+
       `<span class="grank">${rankHtml}</span>`;
     btn.addEventListener('click',()=> toggle(aid));
@@ -537,7 +561,7 @@ function renderHistory(){
   selected.forEach(aid=>{
     const c=colorFor(aid), s=tf.series[aid]||[];
     const av=avg3m(aid);
-    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}"><span class="gdname" data-aid="${esc(aid)}">${esc(DATA.games[aid].title)}</span>${newBadge(aid)}</td><td class="colorcol"><span class="cbar" style="background-color:${c}"></span></td><td class="avg3m">${av!=null?av+'위':'–'}</td>`;
+    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}">${newBadge(aid)}<span class="gdname" data-aid="${esc(aid)}">${esc(DATA.games[aid].title)}</span></td><td class="colorcol"><span class="cbar" style="background-color:${c}"></span></td><td class="avg3m">${av!=null?av+'위':'–'}</td>`;
     s.forEach((v,i)=>{
       let cls='na';
       if(v!=null){
@@ -722,7 +746,7 @@ function renderAgg(keyName, period, els, labelName){
     list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
-      const chips=e.games.map(g=>`<span class="pubchip"><span class="gdname" data-aid="${esc(g.app_id)}">${esc(g.title)}</span>${newBadge(g.app_id)}${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
+      const chips=e.games.map(g=>`<span class="pubchip">${newBadge(g.app_id)}<span class="gdname" data-aid="${esc(g.app_id)}">${esc(g.title)}</span>${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
       h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
         `<td>${rank}</td><td class="pname">${esc(e.key)}</td><td>${e.num_games}</td>`+
         `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td><td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
@@ -772,7 +796,7 @@ function renderGap(){
   let h='<div class="pubscroll"><table class="pubtable"><thead><tr><th class="pname">게임</th><th>매출 순위</th><th>인기 순위</th><th>갭</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const cls=r.gap>0?'gapdl':(r.gap<0?'gaprev':'');
-    h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${esc(r.title)}${newBadge(r.aid)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
+    h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${newBadge(r.aid)}${esc(r.title)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
   });
   h+='</tbody></table></div>';
   wrap.innerHTML=h;
@@ -794,7 +818,7 @@ function renderMovers(){
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
   sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci">급변 ±3계단 이상</span>`;
-  const nm=aid=>'<span class="gdname" data-aid="'+esc(aid)+'">'+esc((DATA.games[aid]||{}).title||aid)+'</span>'+newBadge(aid);
+  const nm=aid=>newBadge(aid)+'<span class="gdname" data-aid="'+esc(aid)+'">'+esc((DATA.games[aid]||{}).title||aid)+'</span>';
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,12).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
   let h='<div class="movergrid">';
   const ri=v=>Math.round(v);
@@ -806,14 +830,28 @@ function renderMovers(){
   wrap.innerHTML=h;
 }
 
+function mdLite(raw){
+  return String(raw||'').split('\n').map(line=>{
+    line=line.replace(/\s*[—―–]\s*/g, ', ');
+    const e=esc(line).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    if(/^\s*#{1,3}\s+/.test(line)) return '<div class="aib-h">'+e.replace(/^\s*#{1,3}\s+/,'')+'</div>';
+    if(/^\s*[-•]\s+/.test(line)) return '<div class="aib-li">'+e.replace(/^\s*[-•]\s+/,'')+'</div>';
+    if(/^\s*>\s+/.test(line)) return '<div class="aib-quote">'+e.replace(/^\s*>\s+/,'')+'</div>';
+    if(line.trim()==='') return '';
+    return '<div class="aib-p">'+e+'</div>';
+  }).join('');
+}
 function renderAiBrief(){
   const el=document.getElementById('aibrief'); if(!el) return;
   const b=FULL.ai_brief;
-  if(!b || !b.items || !b.items.length){ el.hidden=true; return; }
-  let h='<div class="aibrief-head"><span class="aibrief-badge">AI 시장 브리핑</span><span class="aibrief-date">'+esc(b.generated||'')+(b.chart?(' · '+esc(b.chart)):'')+'</span></div>';
-  h+=b.items.map(it=>'<div class="aibrief-item"><div class="aibrief-period">'+esc(it.name||'')+'선'+(it.period?(' · '+esc(it.period)):'')+'</div><div class="aibrief-text">'+esc(it.text||'').replace(/\n/g,'<br>')+'</div></div>').join('');
+  const ent = b && b.entries && b.entries.length ? b.entries[0] : b;
+  const items = ent && ent.items;
+  if(!b || !items || !items.length){ el.hidden=true; return; }
+  document.getElementById('aibriefDate').textContent = (ent.generated||'') + (ent.chart?(' · '+ent.chart):'');
+  let h=items.map(it=>'<div class="aibrief-item"><div class="aibrief-period">'+esc(it.name||'')+'선'+(it.period?(' · '+esc(it.period)):'')+'</div>'+mdLite(it.text)+'</div>').join('');
   h+='<div class="aibrief-foot">AI가 매일 자동 생성한 시장 분석이에요.</div>';
-  el.innerHTML=h; el.hidden=false;
+  document.getElementById('aibriefBody').innerHTML=h;
+  el.hidden=false;
 }
 function init(full){
   FULL=full;
@@ -827,6 +865,7 @@ function init(full){
   activeChart='grossing'; DATA=FULL.charts.grossing;
   applyChart();
   renderAiBrief();
+  { const t=document.getElementById('aibriefToggle'); if(t) t.addEventListener('click',()=>{ const s=document.getElementById('aibrief'); const open=s.classList.toggle('open'); t.setAttribute('aria-expanded',String(open)); const ht=document.getElementById('aibriefHintText'); if(ht) ht.textContent=open?'접기':'펼쳐보기'; }); }
 
   const MOB=isMobile();
   if(MOB){ const hint=document.getElementById('charthint'); if(hint) hint.innerHTML='회색 선 = 전체 게임 · 아래에서 선택하면 <b>강조</b> · ＋/－ <b>확대</b> · 막대 끌어 <b>이동</b>'; }
@@ -945,11 +984,11 @@ function openGameDetail(aid){
   const rShare=revShare(aid), rDay=revDaily(aid);
   const revH=(rShare==null)?'<span class="gmmuted">매출 차트에 들어야 추정돼요</span>':('<b>점유율 '+(Math.round(rShare*1000)/10)+'%</b> <span class="gmmuted">· 추정 일매출 ~₩'+wonShort(rDay)+' · 월 ~₩'+wonShort(rDay*30)+'</span>');
   document.getElementById('gmBody').innerHTML=
-    '<div class="gmhead">'+icon+'<div><div class="gmtitle" id="gmtitle">'+esc(g.title)+newBadge(aid)+'</div><div class="gmsub">'+esc(g.developer||'')+((g.genre&&g.genre!=='미상')?(' · '+esc(g.genre)):'')+'</div></div></div>'+
+    '<div class="gmhead">'+icon+'<div><div class="gmtitle" id="gmtitle">'+newBadge(aid)+esc(g.title)+'</div><div class="gmsub">'+esc(g.developer||'')+((g.genre&&g.genre!=='미상')?(' · '+esc(g.genre)):'')+'</div></div></div>'+
     '<div class="gmgrid">'+stat('현재 매출',rk(gr))+stat('현재 인기',rk(fr))+stat('최고 순위',rk(best))+stat('평균 순위',avg!=null?avg+'위':'–')+stat('3개월 평균',a3!=null?a3+'위':'–')+stat('출시일',g.release||'–')+stat('평점',rt!=null?('<span class="gmstar">★</span>'+rt):'–')+stat('차트 머문',days+'일')+'</div>'+
     '<div class="gmgap">'+gapH+'</div>'+
     '<div class="gmrev"><span class="gmrevlabel">추정 매출</span>'+revH+'</div>'+
-    '<div class="gmdisc">* 순위 기반 추정 — 앱마켓 매출의 상위 집중(멱법칙) 분포 가정 + 1위 일매출 ≈ ₩5억 가정. 실제 금액이 아닌 상대 추정치예요.</div>'+
+    '<div class="gmdisc">* 순위 기반 추정치 : 앱마켓 매출의 상위 집중(멱법칙) 분포 가정 + 1위 일매출 약 5억원 가정. 실제 금액이 아닌 상대 추정이에요.</div>'+
     '<div class="gmspark"><div class="gmsparkt">순위 추이</div>'+gmSpark(series)+'</div>';
   const bg=document.getElementById('gmodalBg'); bg.hidden=false; document.body.style.overflow='hidden';
 }
