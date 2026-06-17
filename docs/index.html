@@ -30,6 +30,14 @@
   .maker .msep{ color:var(--line); }
   .maker-mail{ color:var(--muted); display:inline-flex; align-items:center; gap:5px; }
   .maker-mail svg{ flex:0 0 auto; }
+  .intro{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; }
+  .intro>summary{ cursor:pointer; padding:12px 16px; font-size:13.5px; font-weight:600; color:var(--text); list-style:none; display:flex; align-items:center; gap:8px; }
+  .intro>summary::-webkit-details-marker{ display:none; }
+  .intro>summary::before{ content:'▸'; color:var(--muted); font-size:12px; transition:transform .15s; }
+  .intro[open]>summary::before{ transform:rotate(90deg); }
+  .intro-body{ padding:0 16px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 18px; }
+  .intro-block h3{ font-size:12.5px; font-weight:700; color:var(--accent); margin:0 0 5px; }
+  .intro-block p{ font-size:12.5px; color:var(--muted); line-height:1.65; margin:0; }
   .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
   .tab{ font:inherit; font-size:14px; padding:7px 14px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
@@ -207,6 +215,10 @@
   .gmstat .gmv{ font-size:18px; font-weight:600; margin-top:2px; font-variant-numeric:tabular-nums; }
   .gmstar{ color:#e0a82e; }
   .gmgap{ margin-top:12px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:13px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .gmrev{ margin-top:10px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:13px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .gmrevlabel{ font-size:11px; font-weight:700; color:var(--muted); flex:0 0 auto; }
+  .gmdisc{ margin-top:7px; font-size:11px; color:var(--muted); line-height:1.5; }
+  .pubtable td.prev{ color:var(--text); font-variant-numeric:tabular-nums; }
   .gmmuted{ color:var(--muted); font-size:12px; }
   .gmspark{ margin-top:14px; border-top:1px solid var(--line); padding-top:12px; }
   .gmsparkt{ font-size:12px; color:var(--muted); margin-bottom:6px; }
@@ -260,6 +272,16 @@
     </div>
     <p class="meta" id="meta">불러오는 중…</p>
   </header>
+
+  <details class="intro">
+    <summary>프로젝트 소개 — 왜 만들었고, 무엇을 읽고, 어디에 쓰나</summary>
+    <div class="intro-body">
+      <div class="intro-block"><h3>왜 만들었나</h3><p>게임 사업 PM은 "지금 시장에서 무슨 일이 일어나는가"를 매일 빠르게 파악해야 합니다. 앱스토어 차트는 그날의 스냅샷일 뿐 추세·경쟁 구도·신작 성패가 안 보입니다. 유료 분석툴 없이도 매일 자동으로 시장을 추적·분석하는 도구를 직접 만들었습니다.</p></div>
+      <div class="intro-block"><h3>어떻게</h3><p>매일 아침 한국 앱스토어 매출·인기 차트를 자동 수집(GitHub Actions)하고, 순위를 누적해 시간축 추세로 가공합니다. 퍼블리셔·장르 집계, 매출↔인기 갭, 진입·이탈·급변, 추정 매출 점유율을 더하고, AI가 매일 시장을 요약해 메일·대시보드로 전달합니다.</p></div>
+      <div class="intro-block"><h3>무엇을 읽나</h3><p>어떤 퍼블리셔·장르가 매출을 점유하는지, 신작이 정착하는지 이탈하는지, 다운로드 대비 수익화가 약한 게임은 무엇인지, 순위 급변으로 본 이벤트 효과까지 읽을 수 있습니다.</p></div>
+      <div class="intro-block"><h3>어디에 쓰나</h3><p>경쟁사 동향 모니터링, 장르 진입 타이밍 판단, 벤치마킹 대상 발굴, 신작 런칭 성과 추적 — 사업 의사결정에 매일 쓰는 시장 대시보드입니다.</p></div>
+    </div>
+  </details>
 
   <div class="srcrow">
     <span class="srclabel">차트 종류</span>
@@ -664,6 +686,7 @@ function renderAgg(keyName, period, els, labelName){
   const labels=tf.labels||[], n=labels.length;
   if(!n || !Object.keys(DATA.games).length){ els.sub.textContent=''; els.wrap.innerHTML='<p class="empty">데이터가 쌓이면 표시됩니다.</p>'; return; }
   const startIdx=period?Math.max(0,n-period):0;
+  const showRev=(activeChart==='grossing');
   els.sub.innerHTML=`<span class="ci"><b>${labels[startIdx]||''}</b> ~ <b>${labels[n-1]||''}</b> 기준</span><span class="csep">│</span><span class="ci">${labelName}별 게임 수 · 최고/평균 순위</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 행 클릭 → 그래프 강조</span></span>`;
   const full=aggregate(keyName, period);
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
@@ -679,12 +702,12 @@ function renderAgg(keyName, period, els, labelName){
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
       h+=`<div class="pubcard pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
         `<div class="pubcard-head"><span class="prank">#${rank}</span><b>${esc(e.key)}</b></div>`+
-        `<div class="pubcard-stats">게임 ${e.num_games} · 최고 ${e.best_rank!=null?e.best_rank+'위':'–'} · 평균 ${e.avg_rank!=null?e.avg_rank:'–'}</div></div>`;
+        `<div class="pubcard-stats">게임 ${e.num_games} · 최고 ${e.best_rank!=null?e.best_rank+'위':'–'} · 평균 ${e.avg_rank!=null?e.avg_rank:'–'}${showRev?' · 추정 매출 '+(Math.round(e.games.reduce((s,g)=>s+(revShare(g.app_id)||0),0)*1000)/10)+'%':''}</div></div>`;
     });
     h+='</div>';
   } else {
     h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+
-      `<th>#</th><th class="pname">${esc(labelName)}</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th><th class="pname">게임</th></tr></thead><tbody>`;
+      `<th>#</th><th class="pname">${esc(labelName)}</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th>${showRev?'<th>추정 매출</th>':''}<th class="pname">게임</th></tr></thead><tbody>`;
     list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
@@ -692,6 +715,7 @@ function renderAgg(keyName, period, els, labelName){
       h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
         `<td>${rank}</td><td class="pname">${esc(e.key)}</td><td>${e.num_games}</td>`+
         `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td><td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
+        `${showRev?'<td class="prev">'+(Math.round(e.games.reduce((s,g)=>s+(revShare(g.app_id)||0),0)*1000)/10)+'%</td>':''}`+
         `<td class="pgames">${chips}</td></tr>`;
     });
     h+='</tbody></table></div>';
@@ -868,6 +892,21 @@ function gmSpark(series){
   const last=vals[vals.length-1];
   return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="순위 추이"><path d="'+d+'" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+xs(last.i).toFixed(1)+'" cy="'+ys(last.v).toFixed(1)+'" r="3" fill="var(--accent)"/></svg>';
 }
+var REV_ALPHA=1.1, REV_TOP1_DAILY=500000000;  // 멱법칙 지수 / 가정: 매출 1위 일매출 ≈ 5억원
+function revWeight(r){ return (r&&r>0)?Math.pow(r,-REV_ALPHA):0; }
+var _gwCache=null;
+function grossWeights(){ if(_gwCache) return _gwCache;
+  const g=FULL.charts&&FULL.charts.grossing, byAid={}; let tot=0;
+  if(g&&g.timeframes&&g.timeframes.daily){ const tf=g.timeframes.daily, li=(tf.labels||[]).length-1;
+    if(li>=0) for(const aid in tf.series){ const r=tf.series[aid][li]; if(r!=null){ const w=revWeight(r); byAid[aid]=w; tot+=w; } } }
+  _gwCache={tot,byAid}; return _gwCache; }
+function revShare(aid){ const gw=grossWeights(); if(!gw.tot) return null; let w=gw.byAid[aid];
+  if(w==null){ const r=gmLatest('grossing',aid); if(r==null) return null; w=revWeight(r); } return w/gw.tot; }
+function revDaily(aid){ let w=grossWeights().byAid[aid]; if(w==null){ const r=gmLatest('grossing',aid); if(r==null) return null; w=revWeight(r); } return REV_TOP1_DAILY*w; }
+function wonShort(v){ if(v==null) return '–'; v=Math.round(v);
+  if(v>=100000000) return (Math.round(v/10000000)/10)+'억';
+  if(v>=10000) return Math.round(v/10000).toLocaleString()+'만';
+  return v.toLocaleString(); }
 function openGameDetail(aid){
   const g=DATA.games[aid]; if(!g) return;
   const series=(DATA.timeframes.daily.series[aid]||[]);
@@ -882,10 +921,14 @@ function openGameDetail(aid){
   const icon=g.icon?('<img class="gmicon" src="'+esc(g.icon)+'" alt="" referrerpolicy="no-referrer">'):('<div class="gmicon gmicon-ph">'+esc((g.title||'?').slice(0,1))+'</div>');
   const stat=(l,v)=>'<div class="gmstat"><div class="gml">'+l+'</div><div class="gmv">'+v+'</div></div>';
   const gapH=(gap==null)?'<span class="gmmuted">두 차트에 모두 들어야 표시돼요</span>':('<span class="cdot" style="background:'+(gap<0?'#16a34a':'var(--accent)')+'"></span> <b>'+(gap<0?'매출 강세':(gap>0?'다운로드 강세':'균형'))+' '+(gap>0?'+':'')+gap+'</b> <span class="gmmuted">매출 '+rk(gr)+' · 인기 '+rk(fr)+'</span>');
+  const rShare=revShare(aid), rDay=revDaily(aid);
+  const revH=(rShare==null)?'<span class="gmmuted">매출 차트에 들어야 추정돼요</span>':('<b>점유율 '+(Math.round(rShare*1000)/10)+'%</b> <span class="gmmuted">· 추정 일매출 ~₩'+wonShort(rDay)+' · 월 ~₩'+wonShort(rDay*30)+'</span>');
   document.getElementById('gmBody').innerHTML=
     '<div class="gmhead">'+icon+'<div><div class="gmtitle" id="gmtitle">'+esc(g.title)+newBadge(aid)+'</div><div class="gmsub">'+esc(g.developer||'')+((g.genre&&g.genre!=='미상')?(' · '+esc(g.genre)):'')+'</div></div></div>'+
     '<div class="gmgrid">'+stat('현재 매출',rk(gr))+stat('현재 인기',rk(fr))+stat('최고 순위',rk(best))+stat('평균 순위',avg!=null?avg+'위':'–')+stat('3개월 평균',a3!=null?a3+'위':'–')+stat('출시일',g.release||'–')+stat('평점',rt!=null?('<span class="gmstar">★</span>'+rt):'–')+stat('차트 머문',days+'일')+'</div>'+
     '<div class="gmgap">'+gapH+'</div>'+
+    '<div class="gmrev"><span class="gmrevlabel">추정 매출</span>'+revH+'</div>'+
+    '<div class="gmdisc">* 순위 기반 추정 — 앱마켓 매출의 상위 집중(멱법칙) 분포 가정 + 1위 일매출 ≈ ₩5억 가정. 실제 금액이 아닌 상대 추정치예요.</div>'+
     '<div class="gmspark"><div class="gmsparkt">순위 추이</div>'+gmSpark(series)+'</div>';
   const bg=document.getElementById('gmodalBg'); bg.hidden=false; document.body.style.overflow='hidden';
 }
