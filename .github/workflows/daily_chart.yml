@@ -5,6 +5,9 @@ jobs:
   collect-and-send:
     runs-on: ubuntu-latest
 
+    env:
+      TZ: Asia/Seoul  # GitHub 러너는 UTC → datetime.now()가 KST보다 9h 느려 오전 메일 날짜가 전날로 찍힘. KST 고정으로 정정.
+
     permissions:
       contents: write  # data/history 커밋 위해 필요
 
