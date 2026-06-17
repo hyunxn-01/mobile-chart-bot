@@ -1044,6 +1044,19 @@ def main():
     print(combined)
     print("─" * 60)
 
+    # 대시보드용 AI 브리핑 저장(집계 스크립트가 data.json에 포함)
+    try:
+        ai_brief = {
+            'generated': today_dt.strftime('%Y-%m-%d %H:%M'),
+            'chart': chart_used,
+            'items': [{'name': name, 'period': ch.get('period_label', ''), 'text': ch.get('insight', '')}
+                      for name, ch in analyses.items()],
+        }
+        (DATA_DIR / 'ai_brief.json').write_text(json.dumps(ai_brief, ensure_ascii=False, indent=2), encoding='utf-8')
+        print('[OK] AI 브리핑 저장: data/ai_brief.json')
+    except Exception as e:
+        print(f'[WARN] AI 브리핑 저장 실패: {e}')
+
     print("[4/4] 엑셀·메일 발송 (매일 종합)...")
     excel_path = create_comprehensive_excel_report(current, analyses, combined, chart_used)
     subject = f'[모바일 게임 차트] 종합 보고 {today} ({chart_used})'

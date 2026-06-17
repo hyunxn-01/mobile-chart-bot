@@ -216,6 +216,12 @@ def build():
             'free': free,
         },
     }
+    brief_file = Path('data') / 'ai_brief.json'
+    if brief_file.exists():
+        try:
+            out['ai_brief'] = json.loads(brief_file.read_text(encoding='utf-8'))
+        except Exception as e:
+            print(f"[WARN] ai_brief 로드 실패: {e}")
     DOCS_DIR.mkdir(exist_ok=True)
     OUT_FILE.write_text(json.dumps(out, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f"[OK] {OUT_FILE} 생성")
