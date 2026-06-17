@@ -315,7 +315,7 @@
       <div class="intro-block"><h3>왜 만들었나</h3><p>게임 사업 PM은 "지금 시장에서 무슨 일이 일어나는가"를 매일 빠르게 파악해야 합니다. 앱스토어 차트는 그날의 스냅샷일 뿐 추세·경쟁 구도·신작 성패가 안 보입니다. 유료 분석툴 없이도 매일 자동으로 시장을 추적·분석하는 도구를 직접 만들었습니다.</p></div>
       <div class="intro-block"><h3>어떻게</h3><p>매일 아침 한국 앱스토어 매출·인기 차트를 자동 수집(GitHub Actions)하고, 순위를 누적해 시간축 추세로 가공합니다. 퍼블리셔·장르 집계, 매출↔인기 갭, 진입·이탈·급변, 추정 매출 점유율을 더하고, AI가 매일 시장을 요약해 메일·대시보드로 전달합니다.</p></div>
       <div class="intro-block"><h3>무엇을 읽나</h3><p>어떤 퍼블리셔·장르가 매출을 점유하는지, 신작이 정착하는지 이탈하는지, 다운로드 대비 수익화가 약한 게임은 무엇인지, 순위 급변으로 본 이벤트 효과까지 읽을 수 있습니다.</p></div>
-      <div class="intro-block"><h3>어디에 쓰나</h3><p>경쟁사 동향 모니터링, 장르 진입 타이밍 판단, 벤치마킹 대상 발굴, 신작 런칭 성과 추적 — 사업 의사결정에 매일 쓰는 시장 대시보드입니다.</p></div>
+      <div class="intro-block"><h3>어디에 쓰나</h3><p>경쟁사 동향 모니터링, 장르 진입 타이밍 판단, 벤치마킹 대상 발굴, 신작 런칭 성과 추적까지, 사업 의사결정에 매일 쓰는 시장 대시보드입니다.</p></div>
     </div>
   </details>
 
@@ -516,7 +516,7 @@ function switchTf(tf){
 
 function renderSelCount(){
   const el=document.getElementById('selcount');
-  el.textContent = selected.length ? `선택된 게임 ${selected.length}개 — 다시 누르면 해제` : '선택된 게임 없음';
+  el.textContent = selected.length ? `선택된 게임 ${selected.length}개 · 다시 누르면 해제` : '선택된 게임 없음';
   const lbl=document.getElementById('panelToggleLabel');
   if(lbl) lbl.textContent = selected.length ? `게임 검색·선택 · ${selected.length}개` : '게임 검색·선택';
 }
@@ -667,7 +667,7 @@ function applyChart(){
   const dr=DATA.date_range||[];
   m.innerHTML=`<b>${DATA.chart_used||'차트'}</b> · 수집 <b>${DATA.num_days}</b>일 (${dr[0]||''} ~ ${dr[1]||''}) · 게임 <b>${DATA.num_games}</b>개 · 갱신 ${FULL.generated_at||''}`;
   document.querySelectorAll('.tab').forEach(b=>{
-    const tf=b.dataset.tf; const _empty=(((DATA.timeframes[tf]||{}).labels)||[]).length===0; b.disabled=_empty; b.title=_empty?('아직 완료된 '+b.textContent.trim()+' 구간이 없어요 — 기간이 쌓이면 자동으로 켜집니다'):'';
+    const tf=b.dataset.tf; const _empty=(((DATA.timeframes[tf]||{}).labels)||[]).length===0; b.disabled=_empty; b.title=_empty?('아직 완료된 '+b.textContent.trim()+' 구간이 없어요. 기간이 쌓이면 자동으로 켜집니다'):'';
   });
   if((((DATA.timeframes[activeTf]||{}).labels)||[]).length===0) activeTf='daily';
   renderAggSection();
