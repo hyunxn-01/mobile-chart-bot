@@ -31,8 +31,10 @@
   .maker-mail{ color:var(--muted); display:inline-flex; align-items:center; gap:5px; }
   .maker-mail svg{ flex:0 0 auto; }
   .intro{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; }
-  .intro>summary{ cursor:pointer; padding:12px 16px; font-size:13.5px; font-weight:600; color:var(--text); list-style:none; display:flex; align-items:center; gap:8px; border-radius:12px; }
+  .intro>summary{ cursor:pointer; padding:12px 16px; font-size:13.5px; font-weight:600; color:var(--text); list-style:none; display:flex; align-items:center; gap:8px; border-radius:12px; user-select:none; -webkit-user-select:none; }
   .intro>summary:hover{ background:var(--chip); }
+  .intro>summary:focus{ outline:none; }
+  .intro>summary:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
   .intro>summary::-webkit-details-marker{ display:none; }
   .intro>summary::before{ content:'▸'; color:var(--accent); font-size:12px; transition:transform .15s; flex:0 0 auto; }
   .intro[open]>summary::before{ transform:rotate(90deg); }
@@ -41,7 +43,7 @@
   .intro-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); font-weight:600; flex:0 0 auto; }
   .intro-hint::after{ content:'펼쳐보기 ▾'; }
   .intro[open] .intro-hint::after{ content:'접기 ▴'; }
-  .intro-body{ padding:0 16px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 18px; }
+  .intro-body{ padding:15px 16px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 18px; }
   .intro-block h3{ font-size:12.5px; font-weight:700; color:var(--accent); margin:0 0 5px; }
   .intro-block p{ font-size:12.5px; color:var(--muted); line-height:1.65; margin:0; }
   .aibrief{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; overflow:hidden; }
@@ -55,14 +57,18 @@
   .aibrief.open .aibrief-caret{ transform:rotate(180deg); }
   .aibrief-body{ display:none; padding:2px 16px 14px; }
   .aibrief.open .aibrief-body{ display:block; }
-  .aibrief-period{ font-size:11px; font-weight:700; color:var(--accent); margin:12px 0 4px; }
-  .aib-h{ font-size:13px; font-weight:700; color:var(--text); margin:11px 0 4px; }
+  .aibrief-item{ margin-top:20px; padding-top:18px; border-top:2px solid var(--line); }
+  .aibrief-item:first-child{ margin-top:6px; padding-top:0; border-top:0; }
+  .aibrief-period{ display:inline-block; font-size:11.5px; font-weight:800; color:#fff; background:var(--accent); padding:3px 11px; border-radius:6px; margin:0 0 9px; }
+  .aib-h{ font-size:12.5px; font-weight:700; color:var(--text); margin:13px 0 5px; padding-left:9px; border-left:3px solid var(--accent); }
   .aib-p{ font-size:12.5px; color:var(--text); line-height:1.65; margin:5px 0; }
   .aib-li{ font-size:12.5px; color:var(--text); line-height:1.6; margin:4px 0 4px 14px; position:relative; }
   .aib-li::before{ content:'·'; position:absolute; left:-10px; color:var(--accent); }
   .aib-quote{ font-size:12.5px; color:var(--text); line-height:1.6; margin:6px 0; padding:7px 11px; background:var(--chip); border-radius:7px; }
   .aib-hr{ height:1px; background:var(--line); margin:12px 0; border:0; }
-  .aibrief-dates{ display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 10px; }
+  .aibrief-dates{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:2px 0 12px; }
+  .aibrief-dlabel{ font-size:11px; color:var(--muted); font-weight:700; margin-right:2px; }
+  .aibrief-dnote{ font-size:10.5px; color:var(--muted); }
   .aibrief-dchip{ font-size:11px; color:var(--muted); background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 10px; cursor:pointer; font-weight:600; }
   .aibrief-dchip.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .aibrief-foot{ margin-top:11px; font-size:11px; color:var(--muted); }
@@ -857,7 +863,7 @@ function renderAiBrief(){
   if(!items.length){ el.hidden=true; return; }
   document.getElementById('aibriefDate').textContent=(ent.generated||ent.date||'')+(ent.chart?(' · '+ent.chart):'');
   let h='';
-  if(entries.length>1){ h+='<div class="aibrief-dates">'+entries.map((e,i)=>'<button class="aibrief-dchip'+(i===_aibSel?' on':'')+'" data-i="'+i+'">'+esc(e.date||e.generated||('#'+(i+1)))+'</button>').join('')+'</div>'; }
+  h+='<div class="aibrief-dates"><span class="aibrief-dlabel">날짜</span>'+entries.map((e,i)=>'<button class="aibrief-dchip'+(i===_aibSel?' on':'')+'" data-i="'+i+'">'+esc(e.date||e.generated||('#'+(i+1)))+'</button>').join('')+(entries.length<2?'<span class="aibrief-dnote">· 매일 쌓여서 지난 브리핑도 골라볼 수 있어요</span>':'')+'</div>';
   h+=items.map(it=>'<div class="aibrief-item"><div class="aibrief-period">'+esc(it.name||'')+'선'+(it.period?(' · '+esc(it.period)):'')+'</div>'+mdLite(it.text)+'</div>').join('');
   h+='<div class="aibrief-foot">AI가 매일 자동 생성한 시장 분석이에요.</div>';
   const body=document.getElementById('aibriefBody'); body.innerHTML=h;
