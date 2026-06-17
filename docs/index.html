@@ -18,7 +18,7 @@
   body{ margin:0; background:var(--bg); color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
     line-height:1.5; }
-  .wrap{ max-width:1560px; margin:0 auto; padding:20px 22px 48px; }
+  .wrap{ max-width:1560px; margin:0 auto; padding:20px 22px 72px; }
   header h1{ font-size:20px; font-weight:600; margin:0 0 4px; }
   .meta{ font-size:13px; color:var(--muted); margin:0 0 16px; }
   .meta b{ color:var(--text); font-weight:600; }
@@ -172,6 +172,16 @@
   .chapdot.active .chaplabel{ color:var(--text); font-weight:600; }
   @media (min-width:821px){ .wrap{ padding-left:160px; } }
   @media (max-width:820px){ .chapnav{ display:none; } }
+  .navsrc-wrap{ display:flex; gap:3px; margin-top:7px; padding-top:8px; border-top:1px solid var(--line); }
+  .navsrc{ flex:1; font:inherit; font-size:11.5px; font-weight:500; padding:5px 0; border:1px solid var(--line); background:var(--bg); color:var(--muted); border-radius:6px; cursor:pointer; }
+  .navsrc[aria-selected="true"]{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .navsrc:disabled{ opacity:.4; cursor:not-allowed; }
+  .site-footer{ margin-top:56px; padding-top:22px; border-top:1px solid var(--line); text-align:center; color:var(--muted); }
+  .site-footer .sf-by{ font-size:13px; }
+  .site-footer .sf-by b{ color:var(--text); font-weight:600; }
+  .site-footer .sf-sub{ font-size:12px; margin-top:6px; }
+  .site-footer a{ color:var(--accent); text-decoration:none; }
+  .site-footer a:hover{ text-decoration:underline; }
   .gmodal-bg{ position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; display:flex; align-items:center; justify-content:center; padding:18px; }
   .gmodal-bg[hidden]{ display:none; }
   .gmodal{ position:relative; width:560px; max-width:100%; max-height:90vh; overflow:auto; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:20px 22px; }
@@ -192,7 +202,7 @@
   .gmspark{ margin-top:14px; border-top:1px solid var(--line); padding-top:12px; }
   .gmsparkt{ font-size:12px; color:var(--muted); margin-bottom:6px; }
   .gmspark svg{ width:100%; height:auto; display:block; }
-  .ginfo{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; width:18px; height:18px; border-radius:50%; border:1px solid var(--line); color:var(--muted); font-size:11px; cursor:pointer; margin-left:6px; vertical-align:middle; }
+  .ginfo{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; width:18px; height:18px; border-radius:50%; border:1px solid var(--line); color:var(--muted); font-size:11px; cursor:pointer; margin-right:6px; vertical-align:middle; }
   .ginfo:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .gdname{ cursor:pointer; position:relative; }
   .gdname:hover{ text-decoration:underline; }
@@ -255,7 +265,6 @@
   </div>
   <div class="hintrow">
     <p class="hint" id="charthint">회색 선 = 전체 게임 · 오른쪽에서 선택하면 <b>강조</b> · 휠 <b>확대</b> / 드래그 <b>좌우 이동</b></p>
-    <button class="resetzoom" id="resetzoom">확대 초기화</button>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
 
@@ -266,6 +275,10 @@
     <a class="chapdot" data-target="aggsec" href="#aggsec"><span class="chaplabel">퍼블리셔·장르</span></a>
     <a class="chapdot" data-target="gapsec" href="#gapsec"><span class="chaplabel">매출 ↔ 인기 갭</span></a>
     <a class="chapdot" data-target="moversec" href="#moversec"><span class="chaplabel">진입 · 이탈 · 급변</span></a>
+    <div class="navsrc-wrap" role="tablist" aria-label="차트 종류">
+      <button class="navsrc" data-src="grossing" aria-selected="true">매출</button>
+      <button class="navsrc" data-src="free" aria-selected="false">인기</button>
+    </div>
   </nav>
   <div class="layout" id="chartsec">
     <div class="chartbox">
@@ -340,6 +353,11 @@
     </div>
     <div id="moversout"></div>
   </div>
+
+  <footer class="site-footer">
+    <div class="sf-by">이 대시보드는 <b>김동현</b>이 직접 기획·개발했습니다</div>
+    <div class="sf-sub">데이터 수집 봇 · 집계 · 시각화 전 과정 자체 구축 · <a href="https://github.com/hyunxn-01/mobile-chart-bot" target="_blank" rel="noopener">소스 코드 (GitHub)</a></div>
+  </footer>
 </div>
 
 <script>
@@ -447,10 +465,10 @@ function renderList(){
     btn.className='gitem'+(st.inChart?'':' out'); btn.setAttribute('aria-pressed', String(sel));
     const rt=ratingStr(aid);
     btn.innerHTML=`<span class="sw" style="background:${c||'#c9c8c2'}"></span>`+
+      `<span class="ginfo" data-aid="${aid}" title="상세 보기" role="button" aria-label="상세 보기">ⓘ</span>`+
       `<span class="gname">${esc(g.title)}${newBadge(aid)} <span class="gdev">${esc(g.developer||'')}</span></span>`+
       (rt?`<span class="grating">${rt}</span>`:'')+
-      `<span class="grank">${rankHtml}</span>`+
-      `<span class="ginfo" data-aid="${aid}" title="상세 보기" role="button" aria-label="상세 보기">ⓘ</span>`;
+      `<span class="grank">${rankHtml}</span>`;
     btn.addEventListener('click',()=> toggle(aid));
     list.appendChild(btn);
   });
@@ -580,7 +598,7 @@ function applyChart(){
 }
 
 function updateSourceTabs(){
-  document.querySelectorAll('.stab[data-src]').forEach(b=>{
+  document.querySelectorAll('[data-src]').forEach(b=>{
     const src=b.dataset.src, ch=FULL.charts[src];
     b.setAttribute('aria-selected', String(src===activeChart));
     const empty=!ch || ch.num_days===0;
@@ -708,7 +726,7 @@ function renderGap(){
   let h='<div class="pubscroll"><table class="pubtable"><thead><tr><th class="pname">게임</th><th>매출 순위</th><th>인기 순위</th><th>갭</th></tr></thead><tbody>';
   rows.forEach(r=>{
     const cls=r.gap>0?'gapdl':(r.gap<0?'gaprev':'');
-    h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname">${esc(r.title)}${newBadge(r.aid)} <span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span></td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
+    h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${esc(r.title)}${newBadge(r.aid)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
   });
   h+='</tbody></table></div>';
   wrap.innerHTML=h;
@@ -775,7 +793,7 @@ function init(full){
     },
   });
 
-  document.querySelectorAll('.stab[data-src]').forEach(b=> b.addEventListener('click',()=> selectChart(b.dataset.src)));
+  document.querySelectorAll('[data-src]').forEach(b=> b.addEventListener('click',()=> selectChart(b.dataset.src)));
   document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click',()=> switchTf(b.dataset.tf)));
   document.getElementById('search').addEventListener('input', renderList);
   { const as=document.getElementById('aggsearch'); if(as) as.addEventListener('input', renderAggSection); }
@@ -795,7 +813,6 @@ function init(full){
     renderMovers();
   }));
   document.getElementById('clear').addEventListener('click',()=>{ selected.length=0; restyle(); });
-  document.getElementById('resetzoom').addEventListener('click',()=>{ if(chart.resetZoom) chart.resetZoom(); });
 
   setupScrollbar();
   if(!MOB) setupChartDrag();
