@@ -1044,16 +1044,30 @@ def main():
     print(combined)
     print("─" * 60)
 
-    # 대시보드용 AI 브리핑 저장(집계 스크립트가 data.json에 포함)
+    # 대시보드용 AI 브리핑 저장(날짜별 누적 히스토리, 집계 스크립트가 data.json에 포함)
     try:
-        ai_brief = {
+        brief_path = DATA_DIR / 'ai_brief.json'
+        existing = {}
+        if brief_path.exists():
+            try:
+                existing = json.loads(brief_path.read_text(encoding='utf-8'))
+            except Exception:
+                existing = {}
+        entries = existing.get('entries', []) if isinstance(existing, dict) else []
+        today_date = today_dt.strftime('%Y-%m-%d')
+        entry = {
+            'date': today_date,
             'generated': today_dt.strftime('%Y-%m-%d %H:%M'),
             'chart': chart_used,
             'items': [{'name': name, 'period': ch.get('period_label', ''), 'text': ch.get('insight', '')}
                       for name, ch in analyses.items()],
         }
-        (DATA_DIR / 'ai_brief.json').write_text(json.dumps(ai_brief, ensure_ascii=False, indent=2), encoding='utf-8')
-        print('[OK] AI 브리핑 저장: data/ai_brief.json')
+        entries = [e for e in entries if e.get('date') != today_date]
+        entries.insert(0, entry)
+        entries = entries[:30]
+        brief_path.write_text(json.dumps({'updated': entry['generated'], 'entries': entries},
+                                         ensure_ascii=False, indent=2), encoding='utf-8')
+        print(f'[OK] AI 브리핑 저장: data/ai_brief.json (entries={len(entries)})')
     except Exception as e:
         print(f'[WARN] AI 브리핑 저장 실패: {e}')
 
