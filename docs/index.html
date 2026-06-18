@@ -800,6 +800,8 @@ function renderAggSection(){
 }
 
 let moversTf='daily';
+const MOVE_BASE={daily:8,weekly:5,monthly:5,quarterly:5,yearly:5};
+function surgeTH(prev,now,base){ const best=Math.min(prev,now); const m=best<=10?0.5:best<=30?0.75:best<=60?1.0:1.5; return base*m; }
 
 function renderGap(){
   const wrap=document.getElementById('gapout'), sub=document.getElementById('gapsub');
@@ -838,11 +840,11 @@ function renderMovers(){
     const s=ser[aid]||[]; const now=s[ni], prev=s[pi];
     if(now!=null&&prev==null) entered.push({aid,now});
     else if(now==null&&prev!=null) exited.push({aid,prev});
-    else if(now!=null&&prev!=null){ const d=Math.round((prev-now)*10)/10; if(d>=3) up.push({aid,now,prev,d}); else if(d<=-3) down.push({aid,now,prev,d}); }
+    else if(now!=null&&prev!=null){ const d=Math.round((prev-now)*10)/10; const th=surgeTH(prev,now,MOVE_BASE[moversTf]||5); if(d>=th) up.push({aid,now,prev,d}); else if(d<=-th) down.push({aid,now,prev,d}); }
   }
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
-  sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci">급변 ±3계단 이상</span>`;
+  sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci" title="상위권일수록 작은 변동도 급변(순위대 보정) · 기간별 기준(일 8·주월 5계단)">급변 — 순위대·기간 보정</span>`;
   const nm=aid=>newBadge(aid)+'<span class="gdname" data-aid="'+esc(aid)+'">'+esc((DATA.games[aid]||{}).title||aid)+'</span>';
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,12).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
   let h='<div class="movergrid">';
