@@ -73,6 +73,11 @@
   .aibrief-dchip{ font-size:11px; color:var(--muted); background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 10px; cursor:pointer; font-weight:600; }
   .aibrief-dchip.on{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
   .aibrief-foot{ margin-top:11px; font-size:11px; color:var(--muted); }
+  .aib-stats{ display:flex; flex-wrap:wrap; gap:6px; margin:0 0 9px; }
+  .aib-stat{ font-size:11px; color:var(--muted); background:var(--chip); border-radius:6px; padding:3px 9px; }
+  .aib-stat b{ color:var(--text); font-weight:700; }
+  .aibrief-body .gdname{ border-bottom:1px dotted var(--accent2text); }
+  .aibrief-body .gdname:hover{ text-decoration:none; border-bottom-style:solid; }
   .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
   .tab{ font:inherit; font-size:14px; padding:7px 14px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
@@ -855,6 +860,28 @@ function mdLite(raw){
     return '<div class="aib-p">'+e+'</div>';
   }).join('');
 }
+function linkifyGames(root){
+  if(!root || typeof DATA==='undefined' || !DATA.games) return;
+  const map={}, list=[];
+  for(const aid in DATA.games){ const t=(DATA.games[aid].title||'').trim(); if(t.length>=3 && !(t in map)){ map[t]=aid; list.push(t); } }
+  if(!list.length) return;
+  list.sort((a,b)=>b.length-a.length);
+  const rx=new RegExp('('+list.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g');
+  const walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const nodes=[]; while(walker.nextNode()){ const n=walker.currentNode; if(n.parentNode && n.parentNode.closest && n.parentNode.closest('.gdname,.aibrief-period,.aib-stats')) continue; nodes.push(n); }
+  nodes.forEach(node=>{
+    const text=node.nodeValue; rx.lastIndex=0; if(!rx.test(text)) return; rx.lastIndex=0;
+    const frag=document.createDocumentFragment(); let last=0, m;
+    while((m=rx.exec(text))){
+      if(m.index>last) frag.appendChild(document.createTextNode(text.slice(last,m.index)));
+      const sp=document.createElement('span'); sp.className='gdname'; sp.setAttribute('data-aid',map[m[0]]); sp.textContent=m[0];
+      frag.appendChild(sp); last=m.index+m[0].length;
+      if(m.index===rx.lastIndex) rx.lastIndex++;
+    }
+    if(last<text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    node.parentNode.replaceChild(frag, node);
+  });
+}
 var _aibSel=0;
 function renderAiBrief(){
   const el=document.getElementById('aibrief'); if(!el) return;
@@ -867,9 +894,9 @@ function renderAiBrief(){
   document.getElementById('aibriefDate').textContent=(ent.date||(ent.generated||'').split(' ')[0]||'')+(ent.chart?(' · '+ent.chart):'');
   let h='';
   h+='<div class="aibrief-dates"><span class="aibrief-dlabel">날짜</span>'+entries.map((e,i)=>'<button class="aibrief-dchip'+(i===_aibSel?' on':'')+'" data-i="'+i+'">'+esc(e.date||e.generated||('#'+(i+1)))+'</button>').join('')+(entries.length<2?'<span class="aibrief-dnote">· 매일 쌓여서 지난 브리핑도 골라볼 수 있어요</span>':'')+'</div>';
-  h+=items.map(it=>'<div class="aibrief-item"><div class="aibrief-period">'+esc(it.name||'')+'선'+(it.period?(' · '+esc(it.period)):'')+'</div>'+mdLite(it.text)+'</div>').join('');
+  h+=items.map(it=>{ let st=''; if(it.counts){ const c=it.counts; st='<div class="aib-stats"><span class="aib-stat"><b>'+(c.new||0)+'</b> 신규 진입</span><span class="aib-stat"><b>'+(c.drop||0)+'</b> 이탈</span><span class="aib-stat"><b>'+(c.up||0)+'</b> 급등</span><span class="aib-stat"><b>'+(c.down||0)+'</b> 급락</span></div>'; } return '<div class="aibrief-item"><div class="aibrief-period">'+esc(it.name||'')+'선'+(it.period?(' · '+esc(it.period)):'')+'</div>'+st+mdLite(it.text)+'</div>'; }).join('');
   h+='<div class="aibrief-foot">AI가 매일 자동 생성한 시장 분석이에요.</div>';
-  const body=document.getElementById('aibriefBody'); body.innerHTML=h;
+  const body=document.getElementById('aibriefBody'); body.innerHTML=h; linkifyGames(body);
   body.querySelectorAll('.aibrief-dchip').forEach(btn=>btn.addEventListener('click',()=>{ _aibSel=+btn.dataset.i; renderAiBrief(); }));
   el.hidden=false;
 }
