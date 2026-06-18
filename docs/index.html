@@ -268,6 +268,13 @@
   .gmrev .gmmuted{ color:rgba(255,255,255,.85); }
   .gmrevlabel{ font-size:11px; font-weight:700; color:rgba(255,255,255,.92); flex:0 0 auto; }
   .gmdisc{ margin-top:7px; font-size:11px; color:var(--muted); line-height:1.5; }
+  .gmmeta{ margin-top:10px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:12.5px; }
+  .gmmeta-row{ display:flex; gap:8px; align-items:baseline; margin-bottom:4px; }
+  .gmmeta-l{ font-size:11px; font-weight:700; color:var(--muted); flex:0 0 80px; }
+  .gmmeta-row b{ font-variant-numeric:tabular-nums; }
+  .gmmeta-note{ font-size:11px; color:var(--muted); font-weight:400; }
+  .gmmeta-notes{ margin-top:6px; padding-top:7px; border-top:1px solid var(--line); font-size:12px; color:var(--text); line-height:1.55; white-space:pre-line; max-height:104px; overflow:auto; }
+  .gmmeta-notes-l{ font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:3px; }
   .pubtable td.prev{ color:var(--text); font-variant-numeric:tabular-nums; }
   .gmmuted{ color:var(--muted); font-size:12px; }
   .gmspark{ margin-top:14px; border-top:1px solid var(--line); padding-top:12px; }
@@ -1039,12 +1046,18 @@ function openGameDetail(aid){
   const gapH=(gap==null)?'<span class="gmmuted">두 차트에 모두 들어야 표시돼요</span>':('<span class="cdot" style="background:'+(gap<0?'#16a34a':'#e07c12')+'"></span> <b>'+(gap<0?'매출 강세':(gap>0?'다운로드 강세':'균형'))+' '+(gap>0?'+':'')+gap+'</b> <span class="gmmuted">매출 '+rk(gr)+' · 인기 '+rk(fr)+'</span>');
   const rShare=revShare(aid), rDay=revDaily(aid);
   const revH=(rShare==null)?'<span class="gmmuted">매출 차트에 들어야 추정돼요</span>':('<b>점유율 '+(Math.round(rShare*1000)/10)+'%</b> <span class="gmmuted">· 추정 일매출 ~₩'+wonShort(rDay)+' · 월 ~₩'+wonShort(rDay*30)+'</span>');
+  const relDays=g.release?Math.floor((Date.now()-new Date(g.release+'T00:00:00').getTime())/86400000):null;
+  const newish=relDays!=null&&relDays>=0&&relDays<30;
+  const revTxt=(g.ratings!=null)?(Number(g.ratings).toLocaleString()+'개'+(newish?' <span class="gmmeta-note">· 출시 초기·누적 전</span>':'')):'–';
+  const notesH=(g.notes&&g.notes.trim())?('<div class="gmmeta-notes"><span class="gmmeta-notes-l">최근 업데이트 내역</span>'+esc(g.notes)+'</div>'):'';
+  const metaH='<div class="gmmeta"><div class="gmmeta-row"><span class="gmmeta-l">리뷰 수</span> <b>'+revTxt+'</b></div><div class="gmmeta-row"><span class="gmmeta-l">최근 업데이트</span> <b>'+(g.updated?esc(g.updated):'–')+'</b></div>'+notesH+'</div>';
   document.getElementById('gmBody').innerHTML=
     '<div class="gmhead">'+icon+'<div><div class="gmtitle" id="gmtitle">'+newBadge(aid)+esc(g.title)+'</div><div class="gmsub">'+esc(g.developer||'')+((g.genre&&g.genre!=='미상')?(' · '+esc(g.genre)):'')+'</div></div></div>'+
     '<div class="gmgrid">'+stat('현재 매출',rk(gr))+stat('현재 인기',rk(fr))+stat('최고 순위',rk(best))+stat('평균 순위',avg!=null?avg+'위':'–')+stat('3개월 평균',a3!=null?a3+'위':'–')+stat('출시일',g.release||'–')+stat('평점',rt!=null?('<span class="gmstar">★</span>'+rt):'–')+stat('차트 머문',days+'일')+'</div>'+
     '<div class="gmgap">'+gapH+'</div>'+
     '<div class="gmrev"><span class="gmrevlabel">추정 매출</span>'+revH+'</div>'+
     '<div class="gmdisc">* 순위 기반 추정치 : 앱마켓 매출의 상위 집중(멱법칙) 분포 가정 + 1위 일매출 약 5억원 가정. 실제 금액이 아닌 상대 추정이에요.</div>'+
+    metaH+
     '<div class="gmspark"><div class="gmsparkt">순위 추이</div>'+gmSpark(series)+'</div>';
   const bg=document.getElementById('gmodalBg'); bg.hidden=false; document.body.style.overflow='hidden';
 }
