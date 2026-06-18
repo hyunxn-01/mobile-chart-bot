@@ -672,7 +672,7 @@ def save_insight_cache(cache):
 def _insight_signature(ch):
     """해당 시간축 비교 데이터의 지문 — 데이터가 바뀌면 인사이트 재생성."""
     payload = json.dumps({
-        'pv': 'v2-uniform',  # 프롬프트 버전 — 바꾸면 캐시 무효화·전체 재생성
+        'pv': 'v3-sections',  # 프롬프트 버전 — 바꾸면 캐시 무효화·전체 재생성
         'new': ch.get('new_entries', []),
         'drop': ch.get('dropped', []),
         'chg': ch.get('rank_changes', []),
@@ -699,18 +699,27 @@ def generate_timeframe_insight(name, ch, chart_used):
 [큰 변동]
 {json.dumps(top_changes, ensure_ascii=False, indent=2)}
 
-아래 **세 개의 소제목을 정확히 이 제목·이 순서로** 써서 한국어로 작성한다(각 1~3문장):
+아래 **여섯 개의 소제목을 정확히 이 제목·이 순서로** 써서 한국어로 작성한다(각 1~2문장, 핵심만):
 
 ## 핵심 변동
-{name}선에서 가장 주목할 변동 1~2건과 그 의미(이유 추정 가능하면).
+{name}선에서 가장 주목할 변동 1~2건과 의미. 상시 체류 캐시카우·데이터 누락 등 과대해석 위험은 여기서 한 줄로만 짚는다.
 
-## 노이즈 주의
-상시 체류 캐시카우·데이터 누락 등 과대해석 위험 요소. 없으면 "특이사항 없음".
+## 이벤트·업데이트 효과
+순위를 움직인 라이브 이벤트·업데이트·콜라보를 게임명과 함께 추정(근거 약하면 솔직히).
 
-## 사업PM 액션
-실무에 바로 쓸 한 줄 제언.
+## 지속 신호
+일시적 스파이크가 아니라 꾸준히 주목할 흐름. 차트 체류일수(days_in_chart)·연속 상승 등을 근거로 {name}선 기준 지속성을 본다.
 
-[형식 규칙] 매 시간축 동일하게 위 세 소제목만 사용한다. 수평선(---)·이모지·다른 소제목은 쓰지 않는다. 굵게(**)는 게임명·수치에만. 군더더기 없이."""
+## 장르 신호
+신규 진입·급등 게임의 장르(genre) 분포로 어느 장르가 뜨거나 식는지. 뚜렷하지 않으면 솔직히.
+
+## 벤치마크 대상
+오늘 가장 연구할 가치 있는 게임/무브 딱 하나와 그 이유.
+
+## 사업PM 인사이트
+위를 종합한 핵심 통찰 한 줄과 함의.
+
+[형식 규칙] 매 시간축 동일하게 위 여섯 소제목만 사용한다. 수평선(---)·이모지·다른 소제목은 쓰지 않는다. 굵게(**)는 게임명·수치에만. 군더더기 없이."""
     result = call_claude_with_retry(prompt)
     if result is None:
         return "⚠️ AI 인사이트 생성 일시 실패(과부하). 변화 데이터는 섹션/첨부 엑셀에서 정상 확인 가능합니다."
@@ -1039,6 +1048,13 @@ def main():
         mark = "✅" if ch.get('comparable') else "⚠️"
         print(f"      · {mark} {name}선: {ch['period_label']}")
 
+    # 인사이트용: 현재 차트 장르를 비교 항목에 보강(장르 신호 섹션용)
+    genre_map = {it.get('title'): it.get('genre', '미상') for it in current if it.get('title')}
+    for _ch in analyses.values():
+        for _k in ('new_entries', 'dropped', 'rank_changes'):
+            for _it in (_ch.get(_k) or []):
+                _it.setdefault('genre', genre_map.get(_it.get('title'), '미상'))
+
     today = today_dt.strftime('%Y-%m-%d')
 
     print("[3/4] 시간축별 인사이트 (같은 기간이면 캐시 재사용)...")
@@ -1068,7 +1084,11 @@ def main():
             'date': today_date,
             'generated': today_dt.strftime('%Y-%m-%d %H:%M'),
             'chart': chart_used,
-            'items': [{'name': name, 'period': ch.get('period_label', ''), 'text': ch.get('insight', '')}
+            'items': [{'name': name, 'period': ch.get('period_label', ''), 'text': ch.get('insight', ''),
+                       'counts': {'new': len(ch.get('new_entries', []) or []),
+                                  'drop': len(ch.get('dropped', []) or []),
+                                  'up': len([c for c in (ch.get('rank_changes', []) or []) if (c.get('change', 0) or 0) >= 3]),
+                                  'down': len([c for c in (ch.get('rank_changes', []) or []) if (c.get('change', 0) or 0) <= -3])}}
                       for name, ch in analyses.items()],
         }
         entries = [e for e in entries if e.get('date') != today_date]
