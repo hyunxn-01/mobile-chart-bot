@@ -287,6 +287,20 @@ def compute_average_ranks(window_data_list):
     }
 
 
+def _surge_threshold(prev_rank, curr_rank, base):
+    """급변 기준 계단 = 기간 기본값(base) × 위치 보정. 상위권일수록 민감, 하위권은 둔감."""
+    best = min(prev_rank, curr_rank)
+    if best <= 10:
+        m = 0.5
+    elif best <= 30:
+        m = 0.75
+    elif best <= 60:
+        m = 1.0
+    else:
+        m = 1.5
+    return base * m
+
+
 def compute_simple_changes(previous, current, threshold=10):
     """1일선용 단순 두 시점 비교."""
     if not previous:
@@ -310,7 +324,7 @@ def compute_simple_changes(previous, current, threshold=10):
             prev_rank = prev_by_id[app_id]['rank']
             curr_rank = curr['rank']
             diff = prev_rank - curr_rank
-            if abs(diff) >= threshold:
+            if abs(diff) >= _surge_threshold(prev_rank, curr_rank, threshold):
                 rank_changes.append({
                     'title': curr['title'], 'developer': curr['developer'],
                     'prev_rank': prev_rank, 'curr_rank': curr_rank, 'change': diff,
@@ -352,7 +366,7 @@ def compute_period_changes(past_data, recent_data, threshold=5):
             past_r = past_avg[app_id]['avg_rank']
             recent_r = recent_info['avg_rank']
             diff = past_r - recent_r
-            if abs(diff) >= threshold:
+            if abs(diff) >= _surge_threshold(past_r, recent_r, threshold):
                 rank_changes.append({
                     'title': recent_info['title'], 'developer': recent_info['developer'],
                     'prev_rank': round(past_r, 1), 'curr_rank': round(recent_r, 1),
@@ -397,7 +411,7 @@ def generate_warning(changes, expected_past, expected_recent, past_label, recent
 def analyze_daily(today_dt, current):
     """1일선: 어제 vs 오늘."""
     previous, prev_date = find_most_recent_past_data()
-    changes = compute_simple_changes(previous, current, threshold=10)
+    changes = compute_simple_changes(previous, current, threshold=8)
     changes['past_label'] = prev_date if prev_date else '어제 (데이터 없음)'
     changes['recent_label'] = today_dt.strftime('%Y-%m-%d')
     changes['period_label'] = f"{changes['past_label']} → {changes['recent_label']}"
@@ -1087,8 +1101,8 @@ def main():
             'items': [{'name': name, 'period': ch.get('period_label', ''), 'text': ch.get('insight', ''),
                        'counts': {'new': len(ch.get('new_entries', []) or []),
                                   'drop': len(ch.get('dropped', []) or []),
-                                  'up': len([c for c in (ch.get('rank_changes', []) or []) if (c.get('change', 0) or 0) >= 3]),
-                                  'down': len([c for c in (ch.get('rank_changes', []) or []) if (c.get('change', 0) or 0) <= -3])}}
+                                  'up': len([c for c in (ch.get('rank_changes', []) or []) if (c.get('change', 0) or 0) > 0]),
+                                  'down': len([c for c in (ch.get('rank_changes', []) or []) if (c.get('change', 0) or 0) < 0])}}
                       for name, ch in analyses.items()],
         }
         entries = [e for e in entries if e.get('date') != today_date]
