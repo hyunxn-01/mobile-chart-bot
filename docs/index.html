@@ -41,13 +41,14 @@
   .intro[open]>summary::before{ transform:rotate(90deg); }
   .intro-title{ color:var(--accent); font-weight:700; }
   .intro-sub{ color:var(--muted); font-weight:400; font-size:12.5px; }
-  .intro-hint{ margin-left:auto; font-size:11px; font-weight:700; color:#fff; background:var(--accent); border-radius:999px; padding:3px 12px; flex:0 0 auto; white-space:nowrap; animation:introBeckon 1.7s ease-in-out infinite; }
+  .intro-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); font-weight:600; flex:0 0 auto; }
   .intro-hint::after{ content:'펼쳐보기 ▾'; }
-  .intro:hover .intro-hint{ animation:none; }
-  .intro[open] .intro-hint{ background:var(--chip); color:var(--muted); font-weight:600; animation:none; }
   .intro[open] .intro-hint::after{ content:'접기 ▴'; }
-  @keyframes introBeckon{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.07); } }
-  @media (prefers-reduced-motion: reduce){ .intro-hint{ animation:none; } }
+  .intro-clickme{ font-size:11px; font-weight:700; color:#fff; background:var(--accent); border-radius:999px; padding:3px 11px; flex:0 0 auto; white-space:nowrap; letter-spacing:.02em; animation:introBeckon 1.7s ease-in-out infinite; }
+  .intro:hover .intro-clickme{ animation:none; }
+  .intro[open] .intro-clickme{ display:none; }
+  @keyframes introBeckon{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+  @media (prefers-reduced-motion: reduce){ .intro-clickme{ animation:none; } }
   .intro-body{ padding:15px 16px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 18px; }
   .intro-block h3{ font-size:12.5px; font-weight:700; color:var(--accent); margin:0 0 5px; }
   .intro-block p{ font-size:12.5px; color:var(--muted); line-height:1.65; margin:0; }
@@ -323,7 +324,7 @@
   </header>
 
   <details class="intro">
-    <summary><span class="intro-title">프로젝트 소개</span><span class="intro-sub">왜 만들었고, 무엇을 읽고, 어디에 쓰나</span><span class="intro-hint"></span></summary>
+    <summary><span class="intro-title">프로젝트 소개</span><span class="intro-sub">왜 만들었고, 무엇을 읽고, 어디에 쓰나</span><span class="intro-clickme">click me</span><span class="intro-hint"></span></summary>
     <div class="intro-body">
       <div class="intro-block"><h3>왜 만들었나</h3><p>게임 사업 PM은 "지금 시장에서 무슨 일이 일어나는가"를 매일 빠르게 파악해야 합니다. 앱스토어 차트는 그날의 스냅샷일 뿐 추세·경쟁 구도·신작 성패가 안 보입니다. 유료 분석툴 없이도 매일 자동으로 시장을 추적·분석하는 도구를 직접 만들었습니다.</p></div>
       <div class="intro-block"><h3>어떻게</h3><p>매일 아침 한국 앱스토어 매출·인기 차트를 자동 수집(GitHub Actions)하고, 순위를 누적해 시간축 추세로 가공합니다. 퍼블리셔·장르 집계, 매출↔인기 갭, 진입·이탈·급변, 추정 매출 점유율을 더하고, AI가 매일 시장을 요약해 메일·대시보드로 전달합니다.</p></div>
