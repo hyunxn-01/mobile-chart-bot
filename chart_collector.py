@@ -159,6 +159,12 @@ def fetch_genres(track_ids):
                         'release': (it.get('releaseDate') or '')[:10],
                         'rating': it.get('averageUserRating'),
                         'icon': it.get('artworkUrl100', ''),
+                        'updated': (it.get('currentVersionReleaseDate') or '')[:10],
+                        'ratings': it.get('userRatingCount'),
+                        'notes': (it.get('releaseNotes') or '')[:500],
+                        'artist_id': it.get('artistId'),
+                        'cv_rating': it.get('averageUserRatingForCurrentVersion'),
+                        'cv_ratings': it.get('userRatingCountForCurrentVersion'),
                     }
         except Exception as e:
             print(f"[WARN] 장르 lookup 실패(chunk {i}): {e}")
@@ -175,6 +181,12 @@ def attach_genres(apps):
             a['release'] = m.get('release', '')
             a['rating'] = m.get('rating')
             a['icon'] = m.get('icon', '')
+            a['updated'] = m.get('updated', '')
+            a['ratings'] = m.get('ratings')
+            a['notes'] = m.get('notes', '')
+            a['artist_id'] = m.get('artist_id')
+            a['cv_rating'] = m.get('cv_rating')
+            a['cv_ratings'] = m.get('cv_ratings')
         kinds = len({a.get('genre') for a in apps})
         print(f"[OK] 장르 부착: {len(apps)}개 게임 → {kinds}종 장르")
     except Exception as e:
