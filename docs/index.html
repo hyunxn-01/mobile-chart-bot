@@ -1011,26 +1011,25 @@ function gmSpark(series){
   const n=series.length, vals=[]; for(let i=0;i<n;i++){ if(series[i]!=null) vals.push({i:i,v:series[i]}); }
   if(vals.length<2) return '<div class="gmmuted" style="padding:6px 0">추이를 그릴 데이터가 아직 부족해요.</div>';
   const labels=((DATA.timeframes.daily||{}).labels)||[];
-  const W=500,H=104, padX=10, top=15, bot=66;
-  const xs=i=>(padX+(n>1?i/(n-1):0)*(W-2*padX));
+  const W=500,H=98, padX=10, rPad=34, top=13, bot=68;
+  const xs=i=>(padX+(n>1?i/(n-1):0)*(W-padX-rPad));
   const ys=v=>(top+((v-1)/99)*(bot-top));
   let d=''; vals.forEach((o,k)=>{ d+=(k?'L':'M')+xs(o.i).toFixed(1)+' '+ys(o.v).toFixed(1)+' '; });
   const first=vals[0], last=vals[vals.length-1];
   const fx=xs(first.i),fy=ys(first.v),lx=xs(last.i),ly=ys(last.v);
   const area=d+'L'+lx.toFixed(1)+' '+bot+' L'+fx.toFixed(1)+' '+bot+' Z';
+  const gx2=W-rPad; let grid='';
+  [1,50,100].forEach(r=>{ const y=ys(r); grid+='<line x1="'+padX+'" y1="'+y.toFixed(1)+'" x2="'+gx2+'" y2="'+y.toFixed(1)+'" stroke="var(--line)" stroke-width="1"/><text x="'+(gx2+5)+'" y="'+(y+3).toFixed(1)+'" font-size="9" fill="var(--muted)">'+r+'위</text>'; });
   const lblY=y=> y<(top+bot)/2 ? (y+14) : (y-7);
   const md=s=>s?String(s).slice(5):'';
-  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="순위 추이">'+
-    '<line x1="'+padX+'" y1="'+bot+'" x2="'+(W-padX)+'" y2="'+bot+'" stroke="var(--line)" stroke-width="1"/>'+
-    '<text x="'+padX+'" y="11" font-size="9.5" fill="var(--muted)">↑ 상위</text>'+
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="순위 추이">'+grid+
     '<path d="'+area+'" fill="var(--accent)" opacity="0.10"/>'+
     '<path d="'+d+'" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+
     '<circle cx="'+fx.toFixed(1)+'" cy="'+fy.toFixed(1)+'" r="3" fill="var(--muted)"/>'+
     '<circle cx="'+lx.toFixed(1)+'" cy="'+ly.toFixed(1)+'" r="4" fill="var(--accent)"/>'+
-    '<text x="'+(fx+6).toFixed(1)+'" y="'+lblY(fy).toFixed(1)+'" font-size="10.5" fill="var(--muted)">'+first.v+'위</text>'+
     '<text x="'+(lx-6).toFixed(1)+'" y="'+lblY(ly).toFixed(1)+'" font-size="12" font-weight="700" fill="var(--accent)" text-anchor="end">'+last.v+'위</text>'+
     '<text x="'+padX+'" y="'+(bot+18)+'" font-size="10" fill="var(--muted)">'+md(labels[first.i])+'</text>'+
-    '<text x="'+(W-padX)+'" y="'+(bot+18)+'" font-size="10" fill="var(--muted)" text-anchor="end">'+md(labels[last.i])+'</text>'+
+    '<text x="'+gx2+'" y="'+(bot+18)+'" font-size="10" fill="var(--muted)" text-anchor="end">'+md(labels[last.i])+'</text>'+
     '</svg>';
 }
 var REV_ALPHA=1.1, REV_TOP1_DAILY=500000000;  // 멱법칙 지수 / 가정: 매출 1위 일매출 ≈ 5억원
