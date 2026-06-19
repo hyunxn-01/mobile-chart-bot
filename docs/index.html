@@ -1048,8 +1048,9 @@ function renderGenreOpp(){
     s+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="9">'+esc(g.genre)+'</text>'; });
   s+='</svg></div>';
   wrap.innerHTML=s;
-  const opp=gs.map(g=>({genre:g.genre, score:(101-g.avg)/Math.max(1,g.n)})).sort((a,b)=>b.score-a.score).slice(0,3).map(x=>x.genre);
-  if(sub) sub.innerHTML='<span class="ci">버블=장르 · 크기=추정매출 점유 · 위치=경쟁 vs 평균 순위</span><span class="csep">│</span><span class="ci">기회 TOP: <b>'+opp.map(esc).join('</b> · <b>')+'</b></span>';
+  const blue=gs.filter(g=> g.n<=mx && g.avg<=my).sort((a,b)=> a.avg-b.avg);
+  const opp=(blue.length?blue:gs.slice().sort((a,b)=>a.avg-b.avg)).slice(0,3).map(x=>x.genre);
+  if(sub) sub.innerHTML='<span class="ci">버블=장르 · 크기=추정매출 점유 · 위치=경쟁 vs 평균 순위</span><span class="csep">│</span><span class="ci">블루오션: <b>'+opp.map(esc).join('</b> · <b>')+'</b></span>';
 }
 function mdLite(raw){
   const lines=String(raw||'').split('\n');
