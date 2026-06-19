@@ -217,6 +217,13 @@
   .pubtable td.pgames{ text-align:left; white-space:normal; min-width:280px; }
   .pubrow{ cursor:pointer; }
   .pubrow:hover td{ background:var(--chip); }
+  .pubtable th.sortable{ cursor:pointer; user-select:none; }
+  .pubtable th.sortable:hover{ color:var(--text); }
+  .pubtable th .sarr{ opacity:.3; font-size:9px; margin-left:3px; }
+  .pubtable th.sorton{ color:var(--accent); }
+  .pubtable th.sorton .sarr{ opacity:1; }
+  .tblsearch{ margin:2px 0 9px; }
+  .tblsearch .search{ max-width:340px; }
   .pubrow[aria-pressed="true"] td{ background:var(--chip); }
   .pubrow[aria-pressed="true"] td.pname{ color:var(--accent); }
   .pubchip{ display:inline-block; font-size:11.5px; color:var(--muted); background:var(--chip);
@@ -491,6 +498,7 @@
   <div class="pubsec" id="gapsec">
     <h2>매출 ↔ 인기 갭</h2>
     <p class="sub cap" id="gapsub"></p>
+    <div class="row tblsearch"><input class="search" id="gapsearch" type="search" placeholder="게임 검색" aria-label="갭 게임 검색"></div>
     <div id="gapout"></div>
   </div>
 
@@ -504,6 +512,7 @@
       <button class="mtab" data-tf="quarterly" aria-selected="false">분기별</button>
       <button class="mtab" data-tf="yearly" aria-selected="false">년별</button>
     </div>
+    <div class="row tblsearch"><input class="search" id="moverssearch" type="search" placeholder="게임 검색" aria-label="급변 게임 검색"></div>
     <div id="moversout"></div>
   </div>
 
@@ -770,6 +779,8 @@ function selectChart(key){
 }
 
 let aggKind='developer', aggPeriod=null;  // 집계 종류(developer|genre)·기간(일수,null=전체)
+let gapSort={k:'gap',dir:-1}, aggSort={k:'rank',dir:1};
+function sortTh(label,k,state,extra){ const on=state.k===k; const arr=on?(state.dir>0?'▲':'▼'):'↕'; return '<th class="sortable'+(on?' sorton':'')+(extra?' '+extra:'')+'" data-k="'+k+'">'+esc(label)+'<span class="sarr">'+arr+'</span></th>'; }
 
 function aggregate(keyName, periodDays){
   const tf=(DATA.timeframes&&DATA.timeframes.daily)||{labels:[],series:{}};
@@ -811,7 +822,8 @@ function renderAgg(keyName, period, els, labelName){
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
   const q=norm((els.search||{}).value);
   const ranked=full.map((e,i)=>({e, rank:i+1}));
-  const list=q? ranked.filter(({e})=> norm(e.key).includes(q) || e.games.some(g=>norm(g.title).includes(q))) : ranked;
+  const list=q? ranked.filter(({e})=> norm(e.key).includes(q) || e.games.some(g=>norm(g.title).includes(q))) : ranked.slice();
+  if(aggSort.k!=='rank'){ const sk=aggSort.k, sd=aggSort.dir; list.sort((A,B)=>{ if(sk==='key') return sd*String(A.e.key).localeCompare(String(B.e.key),'ko'); if(sk==='rev'){ const ra=A.e.games.reduce((s,g)=>s+(revShare(g.app_id)||0),0), rb=B.e.games.reduce((s,g)=>s+(revShare(g.app_id)||0),0); return sd*(ra-rb); } const va=A.e[sk], vb=B.e[sk]; return sd*((va==null?99999:va)-(vb==null?99999:vb)); }); }
   if(!list.length){ els.wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
   let h;
   if(isMobile()){
@@ -826,7 +838,7 @@ function renderAgg(keyName, period, els, labelName){
     h+='</div>';
   } else {
     h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+
-      `<th>#</th><th class="pname">${esc(labelName)}</th><th>게임 수</th><th>최고 순위</th><th>평균 순위</th>${showRev?'<th>추정 매출</th>':''}<th class="pname">게임</th></tr></thead><tbody>`;
+      '<th>#</th>'+sortTh(labelName,'key',aggSort,'pname')+sortTh('게임 수','num_games',aggSort)+sortTh('최고 순위','best_rank',aggSort)+sortTh('평균 순위','avg_rank',aggSort)+(showRev?sortTh('추정 매출','rev',aggSort):'')+'<th class="pname">게임</th></tr></thead><tbody>';
     list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
@@ -840,6 +852,7 @@ function renderAgg(keyName, period, els, labelName){
     h+='</tbody></table></div>';
   }
   els.wrap.innerHTML=h;
+  els.wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(aggSort.k===kk) aggSort.dir*=-1; else aggSort={k:kk, dir:(kk==='best_rank'||kk==='avg_rank'||kk==='key')?1:-1}; renderAggSection(); }));
   els.wrap.querySelectorAll('.pubrow').forEach(row=>{
     row.addEventListener('click',()=>{
       const aids=(row.dataset.aids||'').split(',').filter(Boolean);
@@ -877,15 +890,22 @@ function renderGap(){
     rows.push({aid,title,gr,fr,gap:gr-fr});
   });
   if(!rows.length){ sub.textContent=''; wrap.innerHTML='<p class="empty">두 차트에 함께 든 게임이 없습니다.</p>'; return; }
-  rows.sort((a,b)=>b.gap-a.gap);
-  sub.innerHTML=`<span class="ci">함께 든 게임 <b>${rows.length}</b>개</span><span class="csep">│</span><span class="ci">갭 = 매출 − 인기 순위</span><span class="csep">│</span><span class="ci"><span class="cdot" style="background:#e07c12"></span> 다운로드↑·매출↓ &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출↑·다운로드↓</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 행 클릭 → 그래프 강조</span></span>`;
-  let h='<div class="pubscroll"><table class="pubtable"><thead><tr><th class="pname">게임</th><th>매출 순위</th><th>인기 순위</th><th>갭</th></tr></thead><tbody>';
-  rows.forEach(r=>{
+  const total=rows.length;
+  const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
+  const q=norm((document.getElementById('gapsearch')||{}).value);
+  let view=q? rows.filter(r=>norm(r.title).includes(q)) : rows.slice();
+  const k=gapSort.k, dir=gapSort.dir;
+  view.sort((a,b)=>{ if(k==='title') return dir*String(a.title).localeCompare(String(b.title),'ko'); return dir*((a[k]||0)-(b[k]||0)); });
+  sub.innerHTML=`<span class="ci">함께 든 게임 <b>${total}</b>개</span><span class="csep">│</span><span class="ci">갭 = 매출 − 인기 순위</span><span class="csep">│</span><span class="ci"><span class="cdot" style="background:#e07c12"></span> 다운로드↑·매출↓ &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출↑·다운로드↓</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 행 클릭 → 그래프 강조</span></span>`;
+  if(!view.length){ wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
+  let h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+sortTh('게임','title',gapSort,'pname')+sortTh('매출 순위','gr',gapSort)+sortTh('인기 순위','fr',gapSort)+sortTh('갭','gap',gapSort)+'</tr></thead><tbody>';
+  view.forEach(r=>{
     const cls=r.gap>0?'gapdl':(r.gap<0?'gaprev':'');
     h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${newBadge(r.aid)}${esc(r.title)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
   });
   h+='</tbody></table></div>';
   wrap.innerHTML=h;
+  wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(gapSort.k===kk) gapSort.dir*=-1; else gapSort={k:kk, dir:(kk==='title'||kk==='gr'||kk==='fr')?1:-1}; renderGap(); }));
   wrap.querySelectorAll('.pubrow').forEach(row=> row.addEventListener('click',()=>{ const aid=row.dataset.aids; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
 }
 
@@ -906,12 +926,15 @@ function renderMovers(){
   sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci" title="상위권일수록 작은 변동도 급변(순위대 보정) · 기간별 기준(일 8·주월 5계단)">급변 — 순위대·기간 보정</span>`;
   const nm=aid=>newBadge(aid)+'<span class="gdname" data-aid="'+esc(aid)+'">'+esc((DATA.games[aid]||{}).title||aid)+'</span>';
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,12).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
+  const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
+  const mq=norm((document.getElementById('moverssearch')||{}).value);
+  const flt=arr=> mq? arr.filter(e=> norm((DATA.games[e.aid]||{}).title).includes(mq)) : arr;
   let h='<div class="movergrid">';
   const ri=v=>Math.round(v);
-  h+=col('신규 진입', entered, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.now)}위</span><span class="mvd up">신규</span></span>`);
-  h+=col('이탈', exited, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}위</span><span class="mvd down">이탈</span></span>`);
-  h+=col('급등', up, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}→${ri(e.now)}위</span><span class="mvd up">▲${ri(e.prev)-ri(e.now)}</span></span>`);
-  h+=col('급락', down, e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}→${ri(e.now)}위</span><span class="mvd down">▼${ri(e.now)-ri(e.prev)}</span></span>`);
+  h+=col('신규 진입', flt(entered), e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.now)}위</span><span class="mvd up">신규</span></span>`);
+  h+=col('이탈', flt(exited), e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}위</span><span class="mvd down">이탈</span></span>`);
+  h+=col('급등', flt(up), e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}→${ri(e.now)}위</span><span class="mvd up">▲${ri(e.prev)-ri(e.now)}</span></span>`);
+  h+=col('급락', flt(down), e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}→${ri(e.now)}위</span><span class="mvd down">▼${ri(e.now)-ri(e.prev)}</span></span>`);
   h+='</div>';
   wrap.innerHTML=h;
 }
@@ -1017,6 +1040,8 @@ function init(full){
   document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click',()=> switchTf(b.dataset.tf)));
   document.getElementById('search').addEventListener('input', renderList);
   { const as=document.getElementById('aggsearch'); if(as) as.addEventListener('input', renderAggSection); }
+  { const gss=document.getElementById('gapsearch'); if(gss) gss.addEventListener('input', renderGap); }
+  { const mss=document.getElementById('moverssearch'); if(mss) mss.addEventListener('input', renderMovers); }
   document.querySelectorAll('#aggperiod .ptab').forEach(b=> b.addEventListener('click',()=>{
     aggPeriod = b.dataset.days ? parseInt(b.dataset.days,10) : null;
     document.querySelectorAll('#aggperiod .ptab').forEach(x=> x.setAttribute('aria-selected', String(x===b)));
