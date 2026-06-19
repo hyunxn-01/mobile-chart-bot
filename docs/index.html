@@ -66,7 +66,10 @@
   .aibrief-item{ margin-top:20px; padding-top:18px; border-top:2px solid var(--line); }
   .aibrief-item:first-child{ margin-top:6px; padding-top:0; border-top:0; }
   .aibrief-period{ display:inline-block; font-size:11.5px; font-weight:800; color:var(--accent2text); background:var(--accent2soft); padding:3px 11px; border-radius:6px; margin:0 0 9px; }
-  .aib-h{ font-size:12.5px; font-weight:700; color:var(--text); margin:13px 0 5px; padding-left:9px; border-left:3px solid var(--accent2text); }
+  .aib-sec{ margin-top:8px; padding:9px 12px 10px; background:var(--bg); border:1px solid var(--line); border-radius:9px; }
+  .aib-sec-key{ background:var(--accent2soft); }
+  .aib-h{ font-size:12.5px; font-weight:800; color:var(--accent2text); margin:0 0 5px; display:flex; align-items:center; gap:7px; }
+  .aib-h::before{ content:''; width:4px; height:13px; background:var(--accent2text); border-radius:2px; flex:0 0 auto; }
   .aib-p{ font-size:12.5px; color:var(--text); line-height:1.65; margin:5px 0; }
   .aib-li{ font-size:12.5px; color:var(--text); line-height:1.6; margin:4px 0 4px 14px; position:relative; }
   .aib-li::before{ content:'·'; position:absolute; left:-10px; color:var(--accent2text); }
@@ -865,16 +868,21 @@ function renderMovers(){
 }
 
 function mdLite(raw){
-  return String(raw||'').split('\n').map(line=>{
-    if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) return '<div class="aib-hr"></div>';
+  const lines=String(raw||'').split('\n');
+  let html='', open=false;
+  const close=()=>{ if(open){ html+='</div>'; open=false; } };
+  for(let line of lines){
+    if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) continue;
     line=line.replace(/\s*[—―–]\s*/g, ', ');
     const e=esc(line).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\+(\d+(?:\.\d+)?)/g,'<span class="aibup">+$1</span>').replace(/(^|[\s(>])([−-])(\d+(?:\.\d+)?)/g,'$1<span class="aibdn">$2$3</span>');
-    if(/^\s*#{1,3}\s+/.test(line)) return '<div class="aib-h">'+e.replace(/^\s*#{1,3}\s+/,'')+'</div>';
-    if(/^\s*[-•]\s+/.test(line)) return '<div class="aib-li">'+e.replace(/^\s*[-•]\s+/,'')+'</div>';
-    if(/^\s*>\s+/.test(line)) return '<div class="aib-quote">'+e.replace(/^\s*>\s+/,'')+'</div>';
-    if(line.trim()==='') return '';
-    return '<div class="aib-p">'+e+'</div>';
-  }).join('');
+    if(/^\s*#{1,3}\s+/.test(line)){ close(); const ht=line.replace(/^\s*#{1,3}\s+/,'').trim(); const key=/사업PM/.test(ht)?' aib-sec-key':''; html+='<div class="aib-sec'+key+'"><div class="aib-h">'+esc(ht)+'</div>'; open=true; }
+    else if(/^\s*[-•]\s+/.test(line)) html+='<div class="aib-li">'+e.replace(/^\s*[-•]\s+/,'')+'</div>';
+    else if(/^\s*>\s+/.test(line)) html+='<div class="aib-quote">'+e.replace(/^\s*>\s+/,'')+'</div>';
+    else if(line.trim()===''){}
+    else html+='<div class="aib-p">'+e+'</div>';
+  }
+  close();
+  return html;
 }
 function linkifyGames(root){
   if(!root || typeof DATA==='undefined' || !DATA.games) return;
