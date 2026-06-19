@@ -67,6 +67,13 @@
   .idg-sai{ fill:var(--accent2text); font-size:9px; opacity:.9; }
   .idg-mono{ font-family:ui-monospace,Menlo,Consolas,monospace; }
   .idg-arr{ fill:var(--muted); font-size:16px; }
+  .autolegend-row{ display:flex; align-items:center; gap:7px 10px; flex-wrap:wrap; margin:-2px 0 10px; }
+  .autolegend-lab{ font-size:11.5px; font-weight:600; color:var(--muted); flex:0 0 auto; }
+  .autolegend{ display:flex; gap:6px; flex-wrap:wrap; }
+  .autolg{ display:inline-flex; align-items:center; gap:5px; background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 9px 3px 7px; font:inherit; font-size:11.5px; color:var(--text); cursor:pointer; line-height:1.2; }
+  .autolg:hover{ border-color:var(--accent); }
+  .autolg-dot{ width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+  .autolg-name{ font-weight:500; }
   .aibrief{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; overflow:hidden; }
   .aibrief[hidden]{ display:none; }
   .aibrief-toggle{ width:100%; display:flex; align-items:center; gap:10px; padding:12px 16px; background:transparent; border:0; cursor:pointer; text-align:left; font:inherit; color:var(--text); flex-wrap:wrap; }
@@ -417,7 +424,11 @@
     </div>
   </div>
   <div class="hintrow">
-    <p class="hint sub cap" id="charthint"><span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">오른쪽에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>좌우 이동</b></span></p>
+    <p class="hint sub cap" id="charthint"><span class="ci"><span class="cdot" style="background:#7aa2f7"></span>색 선 = <b>변동 큰 게임</b>(자동)</span><span class="csep">│</span><span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 = 그 외</span><span class="csep">│</span><span class="ci">오른쪽에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>좌우</b></span></p>
+  </div>
+  <div class="autolegend-row" id="autolegendRow">
+    <span class="autolegend-lab">변동 큰 게임 · 자동 강조</span>
+    <span class="autolegend" id="autolegend"></span>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
 
@@ -558,19 +569,52 @@ function buildDatasets(){
   }));
 }
 
+let AUTO_MV=[];
+const MOVE_MIN={daily:5,weekly:4,monthly:4,quarterly:4,yearly:4};
+function autoMovers(){
+  const tf=DATA.timeframes[activeTf]; if(!tf) return [];
+  const out=[];
+  for(const aid in DATA.games){
+    const s=tf.series[aid]; if(!s) continue;
+    let i2=-1,i1=-1;
+    for(let i=s.length-1;i>=0;i--){ if(s[i]!=null){ if(i2<0) i2=i; else { i1=i; break; } } }
+    if(i1<0||i2<0) continue;
+    const change=s[i1]-s[i2];           // + = 순위 상승(좋아짐)
+    if(Math.abs(change) < (MOVE_MIN[activeTf]||4)) continue;
+    out.push({aid, change});
+  }
+  out.sort((a,b)=> Math.abs(b.change)-Math.abs(a.change));
+  return out.slice(0,6);
+}
+function renderAutoLegend(){
+  const row=document.getElementById('autolegendRow'), box=document.getElementById('autolegend');
+  if(!row||!box) return;
+  if(selected.length || !AUTO_MV.length){ row.style.display='none'; box.innerHTML=''; return; }
+  row.style.display='';
+  box.innerHTML=AUTO_MV.map((m,idx)=>{
+    const c=PALETTE[idx % PALETTE.length], up=m.change>0;
+    return '<button class="autolg" data-aid="'+m.aid+'" title="클릭 → 이 게임만 강조"><span class="autolg-dot" style="background:'+c+'"></span><span class="autolg-name">'+esc(DATA.games[m.aid].title)+'</span><span class="'+(up?'aibup':'aibdn')+'">'+(up?'+':'−')+Math.abs(Math.round(m.change))+'</span></button>';
+  }).join('');
+  box.querySelectorAll('.autolg').forEach(b=> b.addEventListener('click',()=>{ const aid=b.dataset.aid, i=selected.indexOf(aid); if(i<0) selected.push(aid); else selected.splice(i,1); restyle(); }));
+}
 function restyle(){
   const any=selected.length>0;
+  const auto={};
+  if(any){ AUTO_MV=[]; }
+  else { AUTO_MV=autoMovers(); AUTO_MV.forEach((m,idx)=>{ auto[m.aid]=PALETTE[idx % PALETTE.length]; }); }
   chart.data.datasets.forEach(ds=>{
     const c=colorFor(ds.aid);
     if(c){ ds.borderColor=c; ds.borderWidth=2.6; ds.pointRadius=2.5; ds.pointHoverRadius=5; ds.pointBackgroundColor=c; ds.order=0; }
     else if(any){ ds.borderColor='rgba(130,130,125,0.12)'; ds.borderWidth=1; ds.pointRadius=0; ds.order=2; }
-    else { ds.borderColor='rgba(130,130,125,0.28)'; ds.borderWidth=1; ds.pointRadius=0; ds.order=1; }
+    else if(auto[ds.aid]){ ds.borderColor=auto[ds.aid]; ds.borderWidth=2.4; ds.pointRadius=0; ds.pointHoverRadius=5; ds.pointBackgroundColor=auto[ds.aid]; ds.order=0; }
+    else { ds.borderColor='rgba(130,130,125,0.10)'; ds.borderWidth=1; ds.pointRadius=0; ds.order=1; }
   });
   chart.update();
   renderSelCount();
   renderList();
   renderHistory();
   renderAggSection();
+  renderAutoLegend();
 }
 
 function switchTf(tf){
@@ -993,7 +1037,7 @@ function init(full){
   { const t=document.getElementById('aibriefToggle'); if(t) t.addEventListener('click',()=>{ const s=document.getElementById('aibrief'); const open=s.classList.toggle('open'); t.setAttribute('aria-expanded',String(open)); const ht=document.getElementById('aibriefHintText'); if(ht) ht.textContent=open?'접기':'펼쳐보기'; }); }
 
   const MOB=isMobile();
-  if(MOB){ const hint=document.getElementById('charthint'); if(hint) hint.innerHTML='<span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">아래에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">＋/－ <b>확대</b> · 막대 끌어 <b>이동</b></span>'; }
+  if(MOB){ const hint=document.getElementById('charthint'); if(hint) hint.innerHTML='<span class="ci"><span class="cdot" style="background:#7aa2f7"></span>색 선 = <b>변동 큰 게임</b>(자동)</span><span class="csep">│</span><span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 = 그 외</span><span class="csep">│</span><span class="ci">아래에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">＋/－ <b>확대</b></span>'; }
 
   chart=new Chart(document.getElementById('chart'),{
     type:'line',
