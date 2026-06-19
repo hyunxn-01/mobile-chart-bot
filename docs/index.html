@@ -530,14 +530,16 @@
   <div class="pubsec" id="moversec">
     <h2>진입 · 이탈 · 급변</h2>
     <p class="sub cap" id="moversub"></p>
-    <div class="periodtabs" id="moverstf" role="tablist" aria-label="변화 시간축">
-      <button class="mtab" data-tf="daily" aria-selected="true">일별</button>
-      <button class="mtab" data-tf="weekly" aria-selected="false">주별</button>
-      <button class="mtab" data-tf="monthly" aria-selected="false">월별</button>
-      <button class="mtab" data-tf="quarterly" aria-selected="false">분기별</button>
-      <button class="mtab" data-tf="yearly" aria-selected="false">년별</button>
+    <div class="pubcontrols">
+      <input class="search pubsearch" id="moverssearch" type="search" placeholder="게임 검색" aria-label="급변 게임 검색">
+      <div class="periodtabs" id="moverstf" role="tablist" aria-label="변화 시간축">
+        <button class="mtab" data-tf="daily" aria-selected="true">일별</button>
+        <button class="mtab" data-tf="weekly" aria-selected="false">주별</button>
+        <button class="mtab" data-tf="monthly" aria-selected="false">월별</button>
+        <button class="mtab" data-tf="quarterly" aria-selected="false">분기별</button>
+        <button class="mtab" data-tf="yearly" aria-selected="false">년별</button>
+      </div>
     </div>
-    <div class="row tblsearch"><input class="search" id="moverssearch" type="search" placeholder="게임 검색" aria-label="급변 게임 검색"></div>
     <div id="moversout"></div>
   </div>
 
