@@ -224,6 +224,15 @@
   .pubtable th.sorton .sarr{ opacity:1; }
   .tblsearch{ margin:2px 0 9px; }
   .tblsearch .search{ max-width:340px; }
+  .watchgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:10px; }
+  .watchcard{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:11px 13px; cursor:pointer; transition:border-color .12s; }
+  .watchcard:hover{ border-color:var(--accent); }
+  .watchcard-head{ display:flex; align-items:center; gap:7px; margin-bottom:6px; }
+  .watchcard-rank{ font-size:11px; font-weight:700; color:var(--accent); flex:0 0 auto; }
+  .watch-traj{ font-size:12.5px; color:var(--muted); }
+  .watch-traj b{ color:var(--text); font-variant-numeric:tabular-nums; }
+  .watch-meta{ font-size:11px; color:var(--muted); margin-top:5px; display:flex; gap:10px; flex-wrap:wrap; }
+  .watch-up{ color:#16a34a; font-weight:700; }
   .pubrow[aria-pressed="true"] td{ background:var(--chip); }
   .pubrow[aria-pressed="true"] td.pname{ color:var(--accent); }
   .pubchip{ display:inline-block; font-size:11.5px; color:var(--muted); background:var(--chip);
@@ -435,6 +444,7 @@
     <a class="chapdot" data-target="aggsec" href="#aggsec"><span class="chaplabel">퍼블리셔·장르</span></a>
     <a class="chapdot" data-target="gapsec" href="#gapsec"><span class="chaplabel">매출 ↔ 인기 갭</span></a>
     <a class="chapdot" data-target="moversec" href="#moversec"><span class="chaplabel">진입 · 이탈 · 급변</span></a>
+    <a class="chapdot" data-target="watchsec" href="#watchsec"><span class="chaplabel">지속 상승</span></a>
     <div class="navsrc-wrap" role="tablist" aria-label="차트 종류">
       <button class="navsrc" data-src="grossing" aria-selected="true">매출</button>
       <button class="navsrc" data-src="free" aria-selected="false">인기</button>
@@ -514,6 +524,12 @@
     </div>
     <div class="row tblsearch"><input class="search" id="moverssearch" type="search" placeholder="게임 검색" aria-label="급변 게임 검색"></div>
     <div id="moversout"></div>
+  </div>
+
+  <div class="pubsec" id="watchsec">
+    <h2>지속 상승 주목</h2>
+    <p class="sub cap" id="watchsub"></p>
+    <div id="watchout"></div>
   </div>
 
   <footer class="site-footer">
@@ -756,6 +772,7 @@ function applyChart(){
   renderAggSection();
   renderGap();
   renderMovers();
+  renderWatch();
 }
 
 function updateSourceTabs(){
@@ -939,6 +956,37 @@ function renderMovers(){
   wrap.innerHTML=h;
 }
 
+function renderWatch(){
+  const wrap=document.getElementById('watchout'), sub=document.getElementById('watchsub');
+  if(!wrap) return;
+  const d=DATA.timeframes.daily, w=DATA.timeframes.weekly;
+  if(!d || (d.labels||[]).length<4){ if(sub) sub.textContent=''; wrap.innerHTML='<p class="empty">일별 데이터가 4일 이상 쌓이면 지속 상승 신호가 표시됩니다.</p>'; return; }
+  const lastN=(series,aid,N)=>{ const s=series[aid]||[]; const v=[]; for(let i=s.length-1;i>=0 && v.length<N;i--){ if(s[i]!=null) v.unshift(s[i]); } return v; };
+  const out=[];
+  for(const aid in DATA.games){
+    const s=d.series[aid]||[]; if(s[s.length-1]==null) continue;            // 현재 차트에 있어야
+    const dd=lastN(d.series,aid,8); if(dd.length<4) continue;
+    const dStart=dd[0], dEnd=dd[dd.length-1], dImp=dStart-dEnd;             // + = 순위 상승
+    let ups=0,downs=0; for(let i=1;i<dd.length;i++){ const ch=dd[i-1]-dd[i]; if(ch>0) ups++; else if(ch<0) downs++; }
+    const ww=w?lastN(w.series,aid,3):[]; const wHas=ww.length>=2; const wImp=wHas?(ww[0]-ww[ww.length-1]):0;
+    if(dImp>=8 && ups>downs && (!wHas || wImp>=-2)){
+      const score=dImp + Math.max(0,wImp)*0.5 + (ups-downs);
+      out.push({aid,dStart:Math.round(dStart),dEnd:Math.round(dEnd),dImp:Math.round(dImp),ups,downs,days:dd.length,wImp:Math.round(wImp),wHas,score});
+    }
+  }
+  out.sort((a,b)=> b.score-a.score || b.dImp-a.dImp);
+  const top=out.slice(0,8);
+  if(sub) sub.innerHTML='<span class="ci">최근 <b>'+Math.min(8,(d.labels||[]).length)+'</b>일 추세 기준</span><span class="csep">│</span><span class="ci">조건: 누적 <b>▲8계단+</b> · 상승일 우세 · 주간 추세 동반</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 카드 클릭 → 그래프 강조</span></span>';
+  if(!top.length){ wrap.innerHTML='<p class="empty">지금은 지속 상승 신호가 뚜렷한 게임이 없습니다.</p>'; return; }
+  let h='<div class="watchgrid">';
+  top.forEach((r,i)=>{
+    const wk = r.wHas ? (r.wImp>0?'<span class="watch-up">주간 ▲'+r.wImp+'</span>':(r.wImp===0?'<span>주간 유지</span>':'<span>주간 ▼'+Math.abs(r.wImp)+'</span>')) : '';
+    h+='<div class="watchcard" data-aid="'+esc(r.aid)+'"><div class="watchcard-head"><span class="watchcard-rank">#'+(i+1)+'</span>'+newBadge(r.aid)+'<span class="gdname" data-aid="'+esc(r.aid)+'">'+esc((DATA.games[r.aid]||{}).title||r.aid)+'</span></div><div class="watch-traj">'+r.days+'일 전 <b>'+r.dStart+'위</b> → 현재 <b>'+r.dEnd+'위</b> <span class="watch-up">▲'+r.dImp+'</span></div><div class="watch-meta"><span>상승 '+r.ups+'일 · 하락 '+r.downs+'일</span>'+wk+'</div></div>';
+  });
+  h+='</div>';
+  wrap.innerHTML=h;
+  wrap.querySelectorAll('.watchcard').forEach(c=> c.addEventListener('click',()=>{ const aid=c.dataset.aid; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
+}
 function mdLite(raw){
   const lines=String(raw||'').split('\n');
   let html='', open=false;
