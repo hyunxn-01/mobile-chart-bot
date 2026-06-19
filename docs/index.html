@@ -52,6 +52,21 @@
   .intro-body{ padding:15px 16px 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px 18px; }
   .intro-block h3{ font-size:12.5px; font-weight:700; color:var(--accent); margin:0 0 5px; }
   .intro-block p{ font-size:12.5px; color:var(--muted); line-height:1.65; margin:0; }
+  .intro-diagram{ grid-column:1/-1; margin:0 0 4px; }
+  .intro-diagram svg{ width:100%; height:auto; max-width:780px; display:block; margin:0 auto; }
+  .intro-diagram .idg-cap{ text-align:center; font-size:11px; color:var(--muted); margin:7px 0 0; }
+  .idg text{ font-family:system-ui,-apple-system,'Segoe UI',sans-serif; }
+  .idg-frame{ fill:none; stroke:var(--line); stroke-width:1.2; }
+  .idg-pill{ fill:var(--accent); }
+  .idg-box{ fill:var(--panel); stroke:var(--line); stroke-width:1.2; }
+  .idg-ai{ fill:var(--accent2soft); stroke:var(--accent2); stroke-width:1.5; }
+  .idg-pt{ fill:#fff; font-weight:700; font-size:11px; }
+  .idg-t{ fill:var(--text); font-weight:700; font-size:13px; }
+  .idg-tai{ fill:var(--accent2text); font-weight:700; font-size:13px; }
+  .idg-s{ fill:var(--muted); font-size:9px; }
+  .idg-sai{ fill:var(--accent2text); font-size:9px; opacity:.9; }
+  .idg-mono{ font-family:ui-monospace,Menlo,Consolas,monospace; }
+  .idg-arr{ fill:var(--muted); font-size:16px; }
   .aibrief{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; overflow:hidden; }
   .aibrief[hidden]{ display:none; }
   .aibrief-toggle{ width:100%; display:flex; align-items:center; gap:10px; padding:12px 16px; background:transparent; border:0; cursor:pointer; text-align:left; font:inherit; color:var(--text); flex-wrap:wrap; }
@@ -336,6 +351,40 @@
   <details class="intro">
     <summary><span class="intro-title">프로젝트 소개</span><span class="intro-sub">왜 만들었고, 무엇을 읽고, 어디에 쓰나</span><span class="intro-clickme">click me</span><span class="intro-hint"></span></summary>
     <div class="intro-body">
+      <div class="intro-diagram">
+        <svg viewBox="0 0 760 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="데이터 파이프라인: 수집 → 누적 → 집계 → AI 분석 → 출력, 매일 자동 실행">
+          <g class="idg">
+            <rect class="idg-pill" x="2" y="2" width="222" height="21" rx="10.5"/>
+            <text class="idg-pt" x="14" y="16.5">매일 자동 실행 · GitHub Actions</text>
+            <rect class="idg-frame" x="2" y="32" width="756" height="92" rx="12"/>
+            <rect class="idg-box" x="16" y="44" width="124" height="68" rx="9"/>
+            <rect class="idg-box" x="167" y="44" width="124" height="68" rx="9"/>
+            <rect class="idg-box" x="318" y="44" width="124" height="68" rx="9"/>
+            <rect class="idg-ai" x="469" y="44" width="124" height="68" rx="9"/>
+            <rect class="idg-box" x="620" y="44" width="124" height="68" rx="9"/>
+            <text class="idg-t" x="78" y="72" text-anchor="middle">수집</text>
+            <text class="idg-s idg-mono" x="78" y="90" text-anchor="middle">App Store RSS</text>
+            <text class="idg-s" x="78" y="103" text-anchor="middle">iTunes lookup</text>
+            <text class="idg-t" x="229" y="72" text-anchor="middle">누적</text>
+            <text class="idg-s idg-mono" x="229" y="90" text-anchor="middle">data/history</text>
+            <text class="idg-s" x="229" y="103" text-anchor="middle">일별 순위 적재</text>
+            <text class="idg-t" x="380" y="72" text-anchor="middle">집계</text>
+            <text class="idg-s idg-mono" x="380" y="90" text-anchor="middle">build_dashboard</text>
+            <text class="idg-s" x="380" y="103" text-anchor="middle">시간축·갭·매출</text>
+            <text class="idg-tai" x="531" y="72" text-anchor="middle">AI 분석</text>
+            <text class="idg-sai idg-mono" x="531" y="90" text-anchor="middle">Opus 4.8</text>
+            <text class="idg-sai" x="531" y="103" text-anchor="middle">시장 브리핑</text>
+            <text class="idg-t" x="682" y="72" text-anchor="middle">출력</text>
+            <text class="idg-s" x="682" y="90" text-anchor="middle">대시보드</text>
+            <text class="idg-s" x="682" y="103" text-anchor="middle">매일 메일</text>
+            <text class="idg-arr" x="153.5" y="84" text-anchor="middle">→</text>
+            <text class="idg-arr" x="304.5" y="84" text-anchor="middle">→</text>
+            <text class="idg-arr" x="455.5" y="84" text-anchor="middle">→</text>
+            <text class="idg-arr" x="606.5" y="84" text-anchor="middle">→</text>
+          </g>
+        </svg>
+        <p class="idg-cap">코드 푸시 외 수작업 0 — 수집·분석·게시 전 과정 무인 자동화</p>
+      </div>
       <div class="intro-block"><h3>왜 만들었나</h3><p>게임 사업 PM은 "지금 시장에서 무슨 일이 일어나는가"를 매일 빠르게 파악해야 합니다. 앱스토어 차트는 그날의 스냅샷일 뿐 추세·경쟁 구도·신작 성패가 안 보입니다. 유료 분석툴 없이도 매일 자동으로 시장을 추적·분석하는 도구를 직접 만들었습니다.</p></div>
       <div class="intro-block"><h3>어떻게</h3><p>매일 아침 한국 앱스토어 매출·인기 차트를 자동 수집(GitHub Actions)하고, 순위를 누적해 시간축 추세로 가공합니다. 퍼블리셔·장르 집계, 매출↔인기 갭, 진입·이탈·급변, 추정 매출 점유율을 더하고, AI가 매일 시장을 요약해 메일·대시보드로 전달합니다.</p></div>
       <div class="intro-block"><h3>무엇을 읽나</h3><p>어떤 퍼블리셔·장르가 매출을 점유하는지, 신작이 정착하는지 이탈하는지, 다운로드 대비 수익화가 약한 게임은 무엇인지, 순위 급변으로 본 이벤트 효과까지 읽을 수 있습니다.</p></div>
