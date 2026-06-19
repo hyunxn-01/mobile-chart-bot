@@ -1152,8 +1152,9 @@ function init(full){
       plugins:{ legend:{display:false},
         tooltip:{ filter:(it)=> it.parsed.y!=null,
           callbacks:{ label:(c)=> `${c.dataset.label} · ${c.parsed.y}위` } },
-        zoom:{ pan:{ enabled:false },
-          zoom:{ wheel:{enabled:!MOB}, drag:{ enabled:false }, pinch:{enabled:false}, mode:'x', onZoomComplete:updateScrollbar } } },
+        zoom:{ limits:{ x:{ min:'original', max:'original', minRange:3 } },
+          pan:{ enabled:!MOB, mode:'x', threshold:6, onPan:updateScrollbar },
+          zoom:{ wheel:{enabled:!MOB, speed:0.05}, drag:{ enabled:false }, pinch:{enabled:false}, mode:'x', onZoomComplete:updateScrollbar } } },
       scales:{
         y:{ reverse:true, min:1, max:100, title:{display:true, text:'순위 (위가 1위)'},
             ticks:{ stepSize:10, color:'#8b8b85' }, grid:{ color:'rgba(130,130,125,0.14)' } },
@@ -1184,7 +1185,6 @@ function init(full){
   document.getElementById('clear').addEventListener('click',()=>{ selected.length=0; restyle(); });
 
   setupScrollbar();
-  if(!MOB) setupChartDrag();
   setupPanelToggle();
   const zi=document.getElementById('zoomIn'), zo=document.getElementById('zoomOut');
   if(zi) zi.addEventListener('click',()=>zoomChart(1.5));
@@ -1209,7 +1209,7 @@ function zoomChart(factor){
   const x=chart.scales.x, total=chart.data.labels.length;
   let min=(x.min==null?0:x.min), max=(x.max==null?total-1:x.max);
   const center=(min+max)/2; let half=(max-min)/2/factor;
-  if(half<0.5) half=0.5;
+  if(half<1.5) half=1.5;
   let nmin=center-half, nmax=center+half;
   if(nmin<0){ nmax-=nmin; nmin=0; }
   if(nmax>total-1){ nmin-=(nmax-(total-1)); nmax=total-1; }
