@@ -317,6 +317,12 @@
   .gmmeta-note{ font-size:11px; color:var(--muted); font-weight:400; }
   .gmmeta-notes{ margin-top:6px; padding-top:7px; border-top:1px solid var(--line); font-size:12px; color:var(--text); line-height:1.55; white-space:pre-line; max-height:104px; overflow:auto; }
   .gmmeta-notes-l{ font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:3px; }
+  .gmevent{ margin-top:10px; padding:10px 13px; background:rgba(22,163,74,0.10); border:1px solid rgba(22,163,74,0.38); border-radius:9px; font-size:12.5px; color:var(--text); }
+  .gmevent-tag{ font-size:11px; font-weight:700; color:#fff; background:#16a34a; border-radius:5px; padding:2px 7px; margin-right:6px; }
+  .gmevent b{ font-variant-numeric:tabular-nums; }
+  .gmevent-up{ color:#16a34a; font-weight:700; }
+  .gmevent-note{ font-size:11px; color:var(--muted); margin-top:5px; line-height:1.5; }
+  .mv-upd{ display:inline-block; margin-left:4px; font-size:10px; font-weight:700; color:#16a34a; border:1px solid rgba(22,163,74,.45); border-radius:4px; padding:0 4px; vertical-align:middle; cursor:help; }
   .pubtable td.prev{ color:var(--text); font-variant-numeric:tabular-nums; }
   .gmmuted{ color:var(--muted); font-size:12px; }
   .gmspark{ margin-top:14px; border-top:1px solid var(--line); padding-top:12px; }
@@ -962,7 +968,8 @@ function renderMovers(){
   }
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
-  sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci" title="상위권일수록 작은 변동도 급변(순위대 보정) · 기간별 기준(일 8·주월 5계단)">급변 — 순위대·기간 보정</span>`;
+  const anyUpd=up.some(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; });
+  sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci" title="상위권일수록 작은 변동도 급변(순위대 보정) · 기간별 기준(일 8·주월 5계단)">급변 — 순위대·기간 보정</span>`+(anyUpd?`<span class="csep">│</span><span class="ci"><span class="mv-upd">↻</span> 업데이트 동반</span>`:``);
   const nm=aid=>newBadge(aid)+'<span class="gdname" data-aid="'+esc(aid)+'">'+esc((DATA.games[aid]||{}).title||aid)+'</span>';
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,12).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
@@ -972,7 +979,7 @@ function renderMovers(){
   const ri=v=>Math.round(v);
   h+=col('신규 진입', flt(entered), e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.now)}위</span><span class="mvd up">신규</span></span>`);
   h+=col('이탈', flt(exited), e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}위</span><span class="mvd down">이탈</span></span>`);
-  h+=col('급등', flt(up), e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}→${ri(e.now)}위</span><span class="mvd up">▲${ri(e.prev)-ri(e.now)}</span></span>`);
+  h+=col('급등', flt(up), e=>{ const u=updateSurge(e.aid); const ut=(u&&u.daysSince!=null&&u.daysSince<=7)?'<span class="mv-upd" title="'+esc(u.updated)+' 업데이트 동반">↻</span>':''; return `<span class="moveritem"><span class="mvg">${nm(e.aid)}${ut}</span><span class="mvr">${ri(e.prev)}→${ri(e.now)}위</span><span class="mvd up">▲${ri(e.prev)-ri(e.now)}</span></span>`; });
   h+=col('급락', flt(down), e=>`<span class="moveritem"><span class="mvg">${nm(e.aid)}</span><span class="mvr">${ri(e.prev)}→${ri(e.now)}위</span><span class="mvd down">▼${ri(e.now)-ri(e.prev)}</span></span>`);
   h+='</div>';
   wrap.innerHTML=h;
@@ -1247,6 +1254,24 @@ function wonShort(v){ if(v==null) return '–'; v=Math.round(v);
   if(v>=100000000) return (Math.round(v/10000000)/10)+'억';
   if(v>=10000) return Math.round(v/10000).toLocaleString()+'만';
   return v.toLocaleString(); }
+function updateSurge(aid){
+  const g=DATA.games[aid]; if(!g||!g.updated) return null;
+  const d=DATA.timeframes.daily, labels=(d&&d.labels)||[], s=(d&&d.series[aid])||[];
+  if(!labels.length) return null;
+  const upd=g.updated;                                   // YYYY-MM-DD (현재 버전 출시일)
+  if(upd>labels[labels.length-1]) return null;
+  let ui=-1; for(let i=0;i<labels.length;i++){ if(labels[i]>=upd){ ui=i; break; } }
+  if(ui<0) return null;
+  let nowIdx=-1; for(let i=s.length-1;i>=0;i--){ if(s[i]!=null){ nowIdx=i; break; } }
+  if(nowIdx<0) return null;
+  const daysSince=Math.round((new Date(labels[nowIdx]+'T00:00:00')-new Date(upd+'T00:00:00'))/86400000);
+  if(daysSince<0 || daysSince>10) return null;           // 최근 10일 내 업데이트만
+  let preIdx=-1; for(let i=ui-1;i>=0;i--){ if(s[i]!=null){ preIdx=i; break; } }
+  const nowRank=Math.round(s[nowIdx]);
+  if(preIdx<0) return {updated:upd, daysSince, preRank:null, nowRank, delta:null};
+  const preRank=Math.round(s[preIdx]);
+  return {updated:upd, daysSince, preRank, nowRank, delta:preRank-nowRank};   // + = 업데이트 후 상승
+}
 function openGameDetail(aid){
   const g=DATA.games[aid]; if(!g) return;
   const series=(DATA.timeframes.daily.series[aid]||[]);
@@ -1268,12 +1293,15 @@ function openGameDetail(aid){
   const revTxt=(g.ratings!=null)?(Number(g.ratings).toLocaleString()+'개'+(newish?' <span class="gmmeta-note">· 출시 초기·누적 전</span>':'')):'–';
   const notesH=(g.notes&&g.notes.trim())?('<div class="gmmeta-notes"><span class="gmmeta-notes-l">최근 업데이트 내역</span>'+esc(g.notes)+'</div>'):'';
   const metaH='<div class="gmmeta"><div class="gmmeta-row"><span class="gmmeta-l">리뷰 수</span> <b>'+revTxt+'</b></div><div class="gmmeta-row"><span class="gmmeta-l">최근 업데이트</span> <b>'+(g.updated?esc(g.updated):'–')+'</b></div>'+notesH+'</div>';
+  const us=updateSurge(aid);
+  const eventH=(us&&us.delta!=null&&us.delta>=8)?('<div class="gmevent"><span class="gmevent-tag">업데이트 동반 급등</span>'+esc(us.updated)+' 업데이트 후 <b>'+us.preRank+'위 → '+us.nowRank+'위</b> <span class="gmevent-up">▲'+us.delta+'</span><div class="gmevent-note">업데이트 직후 순위가 올랐어요. 업데이트가 상승을 견인했을 가능성이 큽니다(날짜 일치 기반).</div></div>'):'';
   document.getElementById('gmBody').innerHTML=
     '<div class="gmhead">'+icon+'<div><div class="gmtitle" id="gmtitle">'+newBadge(aid)+esc(g.title)+'</div><div class="gmsub">'+esc(g.developer||'')+((g.genre&&g.genre!=='미상')?(' · '+esc(g.genre)):'')+'</div></div></div>'+
     '<div class="gmgrid">'+stat('현재 매출',rk(gr))+stat('현재 인기',rk(fr))+stat('최고 순위',rk(best))+stat('평균 순위',avg!=null?avg+'위':'–')+stat('3개월 평균',a3!=null?a3+'위':'–')+stat('출시일',g.release||'–')+stat('평점',rt!=null?('<span class="gmstar">★</span>'+rt):'–')+stat('차트 머문',days+'일')+'</div>'+
     '<div class="gmgap">'+gapH+'</div>'+
     '<div class="gmrev"><span class="gmrevlabel">추정 매출</span>'+revH+'</div>'+
     '<div class="gmdisc">* 순위 기반 추정치 : 앱마켓 매출의 상위 집중(멱법칙) 분포 가정 + 1위 일매출 약 5억원 가정. 실제 금액이 아닌 상대 추정이에요.</div>'+
+    eventH+
     metaH+
     '<div class="gmspark"><div class="gmsparkt">순위 추이</div>'+gmSpark(series)+'</div>';
   const bg=document.getElementById('gmodalBg'); bg.hidden=false; document.body.style.overflow='hidden';
