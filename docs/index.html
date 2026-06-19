@@ -879,7 +879,12 @@ function mdLite(raw){
 function linkifyGames(root){
   if(!root || typeof DATA==='undefined' || !DATA.games) return;
   const map={}, list=[];
-  for(const aid in DATA.games){ const t=(DATA.games[aid].title||'').trim(); if(t.length>=3 && !(t in map)){ map[t]=aid; list.push(t); } }
+  const addA=(a,aid)=>{ a=(a||'').trim(); if(a.length>=2 && !(a in map)){ map[a]=aid; list.push(a); } };
+  for(const aid in DATA.games){ const t=(DATA.games[aid].title||'').trim(); if(t.length<2) continue;
+    addA(t,aid);
+    [':','：','×','(','（','/'].forEach(c=>{ const i=t.indexOf(c); if(i>=2) addA(t.slice(0,i),aid); });
+    const mx=t.match(/^(.{2,}?)\s[×x\-—–]\s/); if(mx) addA(mx[1],aid);
+  }
   if(!list.length) return;
   list.sort((a,b)=>b.length-a.length);
   const rx=new RegExp('('+list.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g');
