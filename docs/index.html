@@ -233,6 +233,14 @@
   .watch-traj b{ color:var(--text); font-variant-numeric:tabular-nums; }
   .watch-meta{ font-size:11px; color:var(--muted); margin-top:5px; display:flex; gap:10px; flex-wrap:wrap; }
   .watch-up{ color:#16a34a; font-weight:700; }
+  .gop-wrap{ overflow-x:auto; }
+  .gop-wrap svg{ display:block; max-width:790px; width:100%; height:auto; }
+  .gop-line{ stroke:var(--line); }
+  .gop-axis{ fill:var(--muted); }
+  .gop-lab{ fill:var(--text); }
+  .gop-legend{ display:flex; gap:14px; flex-wrap:wrap; margin:8px 0 0; font-size:11px; color:var(--muted); }
+  .gop-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .gop-sw{ width:10px; height:10px; border-radius:50%; flex:0 0 auto; opacity:.7; }
   .pubrow[aria-pressed="true"] td{ background:var(--chip); }
   .pubrow[aria-pressed="true"] td.pname{ color:var(--accent); }
   .pubchip{ display:inline-block; font-size:11.5px; color:var(--muted); background:var(--chip);
@@ -445,6 +453,7 @@
     <a class="chapdot" data-target="gapsec" href="#gapsec"><span class="chaplabel">매출 ↔ 인기 갭</span></a>
     <a class="chapdot" data-target="moversec" href="#moversec"><span class="chaplabel">진입 · 이탈 · 급변</span></a>
     <a class="chapdot" data-target="watchsec" href="#watchsec"><span class="chaplabel">지속 상승</span></a>
+    <a class="chapdot" data-target="gopsec" href="#gopsec"><span class="chaplabel">장르 기회</span></a>
     <div class="navsrc-wrap" role="tablist" aria-label="차트 종류">
       <button class="navsrc" data-src="grossing" aria-selected="true">매출</button>
       <button class="navsrc" data-src="free" aria-selected="false">인기</button>
@@ -530,6 +539,18 @@
     <h2>지속 상승 주목</h2>
     <p class="sub cap" id="watchsub"></p>
     <div id="watchout"></div>
+  </div>
+
+  <div class="pubsec" id="gopsec">
+    <h2>장르 기회 맵</h2>
+    <p class="sub cap" id="gopsub"></p>
+    <div id="gopout"></div>
+    <div class="gop-legend">
+      <span><span class="gop-sw" style="background:#16a34a"></span>블루오션 · 적은 경쟁·좋은 성과</span>
+      <span><span class="gop-sw" style="background:#2563eb"></span>핵심 격전 · 큰 시장·치열</span>
+      <span><span class="gop-sw" style="background:#9b9a92"></span>틈새 · 소수·하위권</span>
+      <span><span class="gop-sw" style="background:#e07c12"></span>포화 · 많은 게임·하위 분산</span>
+    </div>
   </div>
 
   <footer class="site-footer">
@@ -773,6 +794,7 @@ function applyChart(){
   renderGap();
   renderMovers();
   renderWatch();
+  renderGenreOpp();
 }
 
 function updateSourceTabs(){
@@ -986,6 +1008,48 @@ function renderWatch(){
   h+='</div>';
   wrap.innerHTML=h;
   wrap.querySelectorAll('.watchcard').forEach(c=> c.addEventListener('click',()=>{ const aid=c.dataset.aid; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
+}
+function renderGenreOpp(){
+  const wrap=document.getElementById('gopout'), sub=document.getElementById('gopsub');
+  if(!wrap) return;
+  const gl=(DATA.genres&&DATA.genres.list)||[];
+  let gs=gl.filter(g=> g.genre && g.genre!=='미상' && g.avg_rank!=null && g.num_games>=1)
+           .map(g=>({genre:g.genre, n:g.num_games, avg:g.avg_rank, best:g.best_rank, rev:(g.games||[]).reduce((s,x)=>s+(revShare(x.app_id)||0),0)}));
+  if(gs.length<3){ if(sub) sub.textContent=''; wrap.innerHTML='<p class="empty">장르 데이터가 더 쌓이면 기회 맵이 표시됩니다.</p>'; return; }
+  const W=760,H=380,padL=50,padR=120,padT=26,padB=46;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const maxN=Math.max(...gs.map(g=>g.n));
+  const xOf=n=> padL + (maxN<=1?0.5:(n-1)/(maxN-1))*plotW;
+  const yOf=r=> padT + (Math.min(100,Math.max(1,r))-1)/99*plotH;
+  const maxRev=Math.max(0.0001,...gs.map(g=>g.rev));
+  const rOf=v=> 6 + Math.sqrt(v/maxRev)*17;
+  const med=a=>{ const b=a.slice().sort((x,y)=>x-y); const m=Math.floor(b.length/2); return b.length%2?b[m]:(b[m-1]+b[m])/2; };
+  const mx=med(gs.map(g=>g.n)), my=med(gs.map(g=>g.avg));
+  const xM=xOf(mx), yM=yOf(my);
+  const zoneOf=g=>{ const lc=g.n<=mx, gp=g.avg<=my; if(lc&&gp) return '#16a34a'; if(!lc&&gp) return '#2563eb'; if(lc&&!gp) return '#9b9a92'; return '#e07c12'; };
+  const PR=padL+plotW, PB=padT+plotH;
+  let s='<div class="gop-wrap"><svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="장르 기회 맵: 경쟁(게임 수) 대 성과(평균 순위) 버블 차트">';
+  s+='<rect x="'+padL+'" y="'+padT+'" width="'+(xM-padL)+'" height="'+(yM-padT)+'" fill="#16a34a" opacity="0.06"/>';
+  s+='<rect x="'+xM+'" y="'+padT+'" width="'+(PR-xM)+'" height="'+(yM-padT)+'" fill="#2563eb" opacity="0.06"/>';
+  s+='<rect x="'+padL+'" y="'+yM+'" width="'+(xM-padL)+'" height="'+(PB-yM)+'" fill="#9b9a92" opacity="0.05"/>';
+  s+='<rect x="'+xM+'" y="'+yM+'" width="'+(PR-xM)+'" height="'+(PB-yM)+'" fill="#e07c12" opacity="0.06"/>';
+  s+='<line class="gop-line" x1="'+xM+'" y1="'+padT+'" x2="'+xM+'" y2="'+PB+'" stroke-dasharray="4 4"/>';
+  s+='<line class="gop-line" x1="'+padL+'" y1="'+yM+'" x2="'+PR+'" y2="'+yM+'" stroke-dasharray="4 4"/>';
+  s+='<rect class="gop-line" x="'+padL+'" y="'+padT+'" width="'+plotW+'" height="'+plotH+'" fill="none"/>';
+  s+='<text x="'+(padL+7)+'" y="'+(padT+15)+'" font-size="10.5" font-weight="700" fill="#16a34a">블루오션</text>';
+  s+='<text x="'+(PR-7)+'" y="'+(padT+15)+'" text-anchor="end" font-size="10.5" font-weight="700" fill="#2563eb">핵심 격전</text>';
+  s+='<text x="'+(padL+7)+'" y="'+(PB-8)+'" font-size="10.5" font-weight="700" fill="#9b9a92">틈새</text>';
+  s+='<text x="'+(PR-7)+'" y="'+(PB-8)+'" text-anchor="end" font-size="10.5" font-weight="700" fill="#e07c12">포화</text>';
+  s+='<text class="gop-axis" x="'+(padL+plotW/2)+'" y="'+(H-14)+'" text-anchor="middle" font-size="11">경쟁 — 차트 내 게임 수 →</text>';
+  s+='<text class="gop-axis" x="15" y="'+(padT+plotH/2)+'" text-anchor="middle" font-size="11" transform="rotate(-90 15 '+(padT+plotH/2)+')">↑ 평균 순위 (위=상위권)</text>';
+  gs.forEach(g=>{ const cx=xOf(g.n), cy=yOf(g.avg), r=rOf(g.rev), col=zoneOf(g);
+    s+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.5" stroke="'+col+'" stroke-width="1.3"><title>'+esc(g.genre)+' · 게임 '+g.n+'개 · 평균 '+g.avg+'위 · 추정매출 '+(Math.round(g.rev*1000)/10)+'%</title></circle>'; });
+  gs.forEach(g=>{ const cx=xOf(g.n), cy=yOf(g.avg), r=rOf(g.rev);
+    s+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="9">'+esc(g.genre)+'</text>'; });
+  s+='</svg></div>';
+  wrap.innerHTML=s;
+  const opp=gs.map(g=>({genre:g.genre, score:(101-g.avg)/Math.max(1,g.n)})).sort((a,b)=>b.score-a.score).slice(0,3).map(x=>x.genre);
+  if(sub) sub.innerHTML='<span class="ci">버블=장르 · 크기=추정매출 점유 · 위치=경쟁 vs 평균 순위</span><span class="csep">│</span><span class="ci">기회 TOP: <b>'+opp.map(esc).join('</b> · <b>')+'</b></span>';
 }
 function mdLite(raw){
   const lines=String(raw||'').split('\n');
