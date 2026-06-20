@@ -1,8 +1,9 @@
 # 📱 모바일 게임 차트 자동 분석 봇
 
-한국 App Store 게임 차트를 **매일 자동 수집**하고, **다중 시간축(1일/1주/1달/분기/1년) 분석**과 **Claude AI 시장 인사이트**를 거쳐 **이메일 리포트**와 **인터랙티브 웹 대시보드**로 전달하는 봇입니다.
+한국 App Store 게임 차트를 **매일 자동 수집**하고, **다중 시간축(1일/1주/1달/분기/1년) 분석**과 **Claude AI 시장 인사이트**를 거쳐 **이메일 리포트**와 **인터랙티브 웹 대시보드**로 전달하는 봇입니다. 나아가 **10개국 App Store를 횡단하는 '다음 진출 시장 레이더'** 로 확장됩니다.
 
-**🔗 라이브 대시보드:** https://hyunxn-01.github.io/mobile-chart-bot/
+**🔗 라이브 대시보드(한국 단독):** https://hyunxn-01.github.io/mobile-chart-bot/
+**🌐 다국가 시장 × 장르 레이더:** https://hyunxn-01.github.io/mobile-chart-bot/markets.html
 
 ## 핵심 기능
 
@@ -22,6 +23,14 @@ GitHub Pages로 호스팅되는 단일 페이지(`docs/`)입니다. 워크플로
 - **매출/인기 토글**: Top Grossing ↔ Top Free 차트를 한 번에 전환.
 - **퍼블리셔별 차트 장악력**: 최근 차트 기준 개발사별 등장 게임 수·최고/평균 순위 집계. 행을 누르면 그 퍼블리셔의 게임이 그래프에 강조됩니다.
 
+## 다국가 시장 레이더 (`docs/markets.html`)
+
+게임사 관점에서 **'다음 진출 시장'** 을 읽기 위한 다국가 뷰입니다. 비용 0으로 운영하기 위해 **iOS App Store(iTunes RSS)** 만 사용하며, 현재 핵심 10개국(한국·미국·일본·중국·대만·영국·독일·프랑스·캐나다·호주)을 매일 수집합니다.
+
+- **장르 추이 선차트**: 국가를 선택하면 그 시장의 **장르별 상위 게임 수 변화**를 일자별 선으로 보여줍니다. 점에 마우스를 올리면 해당 장르 하나만 표시되고, 값이 겹치는 점들은 자동 분산됩니다. (현지화 장르명이 국가마다 달라 **숫자 genre_id를 한국어로 정규화**해 비교 가능하게 만듭니다.)
+- **시장 인사이트(계층적 AI 브리핑)**: 먼저 **지역 그룹별**(동아시아·북미·오세아니아·서유럽 등) 분석을 생성하고, 그 지역 분석들을 **토대로 글로벌 횡단 헤드라인**을 종합합니다. 한 카드 안에서 `글로벌 / 지역` 탭으로 전환합니다. 비용 절감을 위해 브리핑은 **주간 주기(7일 게이팅)** 로 갱신됩니다.
+- **현재 상위 게임**: 선택 국가의 매출/다운로드 상위 게임을 아이콘·장르와 함께 검색 가능한 목록으로 제공합니다.
+
 ## 빠른 시작
 
 1. `requirements.txt` 의존성 설치
@@ -36,21 +45,30 @@ GitHub Pages로 호스팅되는 단일 페이지(`docs/`)입니다. 워크플로
 
 ```
 mobile-chart-bot/
-├── chart_collector.py          # 메인 로직 (수집·분석·AI 인사이트·이메일)
-├── build_dashboard.py          # data/history* → docs/data.json 집계(매출·인기·퍼블리셔)
+├── chart_collector.py          # 메인 로직 (수집·분석·AI·이메일 + 다국가 수집·지역/글로벌 브리핑)
+├── build_dashboard.py          # 집계: data/history* → docs/data.json, data/charts/* → docs/markets/*
 ├── requirements.txt            # Python 의존성 (anthropic 등)
 ├── README.md                   # 이 파일
 ├── DASHBOARD_SETUP.md          # 대시보드 배포·설정 가이드
 ├── .github/workflows/
 │   └── daily_chart.yml         # GitHub Actions 워크플로 (수집→집계→커밋→발송)
-├── docs/                       # GitHub Pages 대시보드
-│   ├── index.html              # 대시보드 단일 페이지
-│   └── data.json               # 집계 결과(워크플로가 자동 생성)
+├── docs/                       # GitHub Pages
+│   ├── index.html              # 한국 단독 대시보드
+│   ├── markets.html            # 다국가 시장 × 장르 레이더
+│   ├── data.json               # 한국 집계 결과(워크플로가 자동 생성)
+│   └── markets/                # 다국가 집계·브리핑(자동 생성)
+│       ├── index.json          # 수집된 국가 목록
+│       ├── {cc}.json           # 국가별 장르 추이·상위 게임
+│       ├── region_{key}.json   # 지역 그룹별 AI 브리핑
+│       ├── regions_index.json  # 노출할 지역 탭 목록
+│       └── global_brief.json   # 지역 분석을 종합한 글로벌 헤드라인
 └── data/
-    ├── history/                # 매출(Top Grossing) 일별 스냅샷
+    ├── history/                # 한국 매출(Top Grossing) 일별 스냅샷
     │   └── YYYY-MM-DD.json
-    └── history_free/           # 인기(Top Free) 일별 스냅샷
-        └── YYYY-MM-DD.json
+    ├── history_free/           # 한국 인기(Top Free) 일별 스냅샷
+    │   └── YYYY-MM-DD.json
+    └── charts/                 # 다국가 일별 스냅샷
+        └── {cc}/{grossing|free}/YYYY-MM-DD.json
 ```
 
 ## 기술 스택
