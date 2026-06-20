@@ -642,11 +642,12 @@ function buildDatasets(){
 
 function restyle(){
   const any=selected.length>0;
+  const sd=((chart.data.labels||[]).length<2)?2.2:0;  // 데이터 1일뿐이면 선이 안 그려지므로 점으로 표시
   chart.data.datasets.forEach(ds=>{
     const c=colorFor(ds.aid);
     if(c){ ds.borderColor=c; ds.borderWidth=2.6; ds.pointRadius=2.5; ds.pointHoverRadius=5; ds.pointBackgroundColor=c; ds.order=0; }
-    else if(any){ ds.borderColor='rgba(130,130,125,0.12)'; ds.borderWidth=1; ds.pointRadius=0; ds.order=2; }
-    else { ds.borderColor='rgba(130,130,125,0.28)'; ds.borderWidth=1; ds.pointRadius=0; ds.order=1; }
+    else if(any){ ds.borderColor='rgba(130,130,125,0.12)'; ds.borderWidth=1; ds.pointRadius=sd; ds.order=2; }
+    else { ds.borderColor='rgba(130,130,125,0.28)'; ds.borderWidth=1; ds.pointRadius=sd; ds.order=1; }
   });
   chart.update();
   renderSelCount();
@@ -825,10 +826,11 @@ function genreDatasets(){
     const A=gs.genres[a], B=gs.genres[b];
     return (B[B.length-1]||0)-(A[A.length-1]||0);
   });
+  const sd=((gs.labels||[]).length<2)?3:0;  // 1일뿐이면 점으로 표시(선 안 그려짐)
   return names.map((g,i)=>({
     aid:'__genre__'+g, label:g, data:gs.genres[g],
     borderColor:PALETTE[i%PALETTE.length], backgroundColor:'transparent',
-    borderWidth:2.4, pointRadius:0, pointHoverRadius:5, spanGaps:false, tension:0.25,
+    borderWidth:2.4, pointRadius:sd, pointHoverRadius:5, spanGaps:false, tension:0.25,
   }));
 }
 function setChartMode(mode){
