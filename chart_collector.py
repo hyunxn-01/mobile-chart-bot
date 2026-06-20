@@ -39,8 +39,8 @@ RECIPIENT_EMAIL = os.environ.get('RECIPIENT_EMAIL')
 
 # === AI 분석 모델 (변경 시 이 한 줄만 수정) ===
 CLAUDE_MODEL = 'claude-opus-4-8'
-# 게임명 한글 변환용 경량 모델(저비용·캐시). 단순 음차/표기 변환이라 Haiku로 충분.
-TRANSLATE_MODEL = 'claude-haiku-4-5-20251001'
+# 게임명 한글 변환용 모델(저비용·캐시). 음차/표기 변환은 호출이 작고 결과는 캐시돼 비용 미미.
+TRANSLATE_MODEL = 'claude-sonnet-4-6'
 # 적응형 사고 강도: max=작업량 최대(항상 깊게 사고). Opus 4.8은 adaptive 모드만 지원.
 THINKING_EFFORT = 'max'
 # 출력 토큰 상한(사고+응답 합산). 사고가 길어도 응답이 잘리지 않게 넉넉히.
@@ -59,6 +59,7 @@ HISTORY_FREE_DIR.mkdir(exist_ok=True)
 
 # === 다국가 수집(iOS App Store 스토어프런트) ===
 # 1차: T1 코어 10개국. 안정 후 EXTRA를 COUNTRIES에 합쳐 32개국으로 확장.
+# 현재 수집(주요 10개국). 나머지 22개국은 사이트 완성 후 맨 마지막에 확장(저장 메타-분리 #98 후).
 COUNTRIES = ['kr', 'us', 'jp', 'cn', 'tw', 'gb', 'de', 'fr', 'ca', 'au']
 COUNTRIES_EXTRA = ['it', 'es', 'nl', 'ru', 'se', 'sa', 'ae', 'eg', 'tr',
                    'br', 'mx', 'ar', 'co', 'id', 'th', 'vn', 'ph', 'my', 'sg', 'in', 'pk', 'bd']
