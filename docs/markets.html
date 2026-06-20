@@ -388,6 +388,16 @@
   .glegend .gl-item{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text); }
   .glegend .gl-dot{ width:11px; height:11px; border-radius:50%; flex:0 0 auto; }
   .glegend .gl-pct{ color:var(--muted); font-variant-numeric:tabular-nums; }
+  .mkbrief{ margin:18px 0 6px; padding:16px 18px; border:1px solid var(--line); border-radius:14px; background:var(--panel); }
+  .mkbrief-head{ display:flex; align-items:center; gap:10px; margin-bottom:11px; }
+  .mkbrief-badge{ font-size:13px; font-weight:800; color:#fff; background:var(--accent); padding:3px 11px; border-radius:999px; letter-spacing:.01em; }
+  .mkbrief-date{ font-size:12px; color:var(--muted); }
+  .mkbrief-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:13px; }
+  .mkbrief-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:9px; cursor:pointer; transition:all .12s; }
+  .mkbrief-tab:hover{ color:var(--text); border-color:var(--accent); }
+  .mkbrief-tab[aria-selected="true"]{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .mkbrief-body{ font-size:14px; line-height:1.72; }
+  .mkbrief-foot{ margin:12px 0 0; font-size:11.5px; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -450,13 +460,11 @@
     </div>
   </details>
 
-  <section class="aibrief" id="aibrief" hidden>
-    <button class="aibrief-toggle" id="aibriefToggle" aria-expanded="false">
-      <span class="aibrief-badge">AI 시장 브리핑</span>
-      <span class="aibrief-date" id="aibriefDate"></span>
-      <span class="aibrief-hint"><span id="aibriefHintText">펼쳐보기</span><span class="aibrief-caret">▾</span></span>
-    </button>
-    <div class="aibrief-body" id="aibriefBody"></div>
+  <section class="mkbrief" id="mkbrief" hidden>
+    <div class="mkbrief-head"><span class="mkbrief-badge">AI 시장 브리핑</span><span class="mkbrief-date" id="mkbriefDate"></span></div>
+    <div class="mkbrief-tabs" id="mkbriefTabs" role="tablist" aria-label="시장 브리핑 탭"></div>
+    <div class="mkbrief-body" id="mkbriefBody"></div>
+    <p class="mkbrief-foot">AI(Opus)가 주요 시장·지역을 횡단 분석한 요약 — 7일마다 갱신.</p>
   </section>
 
   <h2 class="sectitle" id="secTitleChart">순위 추이</h2>
@@ -834,13 +842,13 @@ function genreDatasets(){
   // 색 배정: 최신일 점유율 큰 순(범례 가독성)
   const li=labels.length-1;
   names.sort((a,b)=> share(b,li)-share(a,li));
-  const sd=(labels.length<2)?4:0;  // 1일뿐이면 선이 안 그려지므로 점으로 표시
+  // 100% 누적 막대: 각 장르가 점유율(%) 세그먼트, 한 칸에 쌓이면 100%
   return names.map((g,i)=>{
     const col=PALETTE[i%PALETTE.length];
-    return { aid:'__genre__'+g, label:g,
+    return { aid:'__genre__'+g, label:g, type:'bar',
       data:gs.genres[g].map((_,idx)=> share(g,idx)),
-      borderColor:col, backgroundColor:col, pointBackgroundColor:col, pointBorderColor:col,
-      fill:false, borderWidth:2.4, pointRadius:sd, pointHoverRadius:5, spanGaps:false, tension:0.25 };
+      backgroundColor:col, borderColor:col, borderWidth:0,
+      barPercentage:0.92, categoryPercentage:0.86, maxBarThickness:120 };
   });
 }
 function renderGenreLegend(){
@@ -874,6 +882,7 @@ function setChartMode(mode){
     const banner=document.getElementById('banner'); if(banner) banner.style.display='none';
     chart.data.labels=genreSeries().labels;
     chart.data.datasets=genreDatasets();
+    chart.options.scales.x.stacked=true; chart.options.scales.y.stacked=true;  // 100% 누적
     y.reverse=false; y.min=0; y.max=100; if(y.title) y.title.text='장르 점유율 (%)'; if(y.ticks){ y.ticks.stepSize=20; y.ticks.callback=(v)=>v+'%'; }
     chart.options.plugins.legend.display=false;  // Chart.js 범례는 generateLabels 충돌 → 아래 HTML 범례로 대체
     chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}%`;
@@ -886,6 +895,7 @@ function setChartMode(mode){
     if(secT) secT.textContent='순위 추이';
     if(hint) hint.textContent='게임별 순위 추이 · 오른쪽에서 게임 선택';
     if(charthint) charthint.innerHTML=CHARTHINT_GAME;
+    chart.options.scales.x.stacked=false; chart.options.scales.y.stacked=false;  // 누적 해제(게임 라인)
     y.reverse=true; y.min=1; y.max=100; if(y.title) y.title.text='순위 (위가 1위)'; if(y.ticks){ y.ticks.stepSize=10; y.ticks.callback=undefined; }
     chart.options.plugins.legend.display=false;
     chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}위`;
@@ -1468,6 +1478,35 @@ function openGameDetail(aid){
 })();
 
 // === 다국가 레이더: 국가 선택 → markets/{cc}.json(= data.json과 동일 구조)을 init() ===
+// ===== AI 시장 브리핑(계층형: 글로벌 + 주요국 + 지역) =====
+let MK_BRIEF_TABS=null, mkBriefSel=null;
+function loadBriefsIndex(){
+  fetch('./markets/briefs_index.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(idx=>{
+    if(!idx||!Array.isArray(idx.tabs)||!idx.tabs.length) return;
+    MK_BRIEF_TABS=[{type:'global',key:'global',name:'글로벌'}].concat(idx.tabs);
+    const el=document.getElementById('mkbriefTabs');
+    if(el){
+      el.innerHTML=MK_BRIEF_TABS.map(t=>'<button class="mkbrief-tab" role="tab" data-bk="'+t.type+':'+t.key+'">'+esc(t.name)+'</button>').join('');
+      el.querySelectorAll('.mkbrief-tab').forEach(b=>b.addEventListener('click',()=>selectBrief(b.dataset.bk)));
+    }
+    const sec=document.getElementById('mkbrief'); if(sec) sec.hidden=false;
+    selectBrief('global:global');
+  }).catch(()=>{});
+}
+function selectBrief(bk){
+  mkBriefSel=bk;
+  document.querySelectorAll('.mkbrief-tab').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.bk===bk)));
+  const i=bk.indexOf(':'), type=bk.slice(0,i), key=bk.slice(i+1);
+  const file = type==='global' ? 'global_brief' : (type==='major' ? 'major_'+key : 'region_'+key);
+  const body=document.getElementById('mkbriefBody'), dt=document.getElementById('mkbriefDate');
+  if(body) body.innerHTML='<p class="empty">불러오는 중…</p>';
+  fetch('./markets/'+file+'.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(b=>{
+    if(!body) return;
+    if(!b||!b.text){ body.innerHTML='<p class="empty">이 시장 브리핑이 아직 없어요. 데이터가 쌓이면 생성됩니다.</p>'; if(dt) dt.textContent=''; return; }
+    body.innerHTML=mdLite(b.text); linkifyGames(body);
+    if(dt) dt.textContent=(String(b.generated||'').split(' ')[0]||'')+(b.basis==='hierarchical'?' · 지역 종합':'');
+  }).catch(()=>{ if(body) body.innerHTML='<p class="empty">브리핑을 불러오지 못했어요.</p>'; });
+}
 const MK_CCN={kr:'한국',us:'미국',jp:'일본',cn:'중국',tw:'대만',gb:'영국',de:'독일',fr:'프랑스',ca:'캐나다',au:'호주',it:'이탈리아',es:'스페인',nl:'네덜란드',ru:'러시아',se:'스웨덴',sa:'사우디',ae:'UAE',eg:'이집트',tr:'터키',br:'브라질',mx:'멕시코',ar:'아르헨티나',co:'콜롬비아',id:'인도네시아',th:'태국',vn:'베트남',ph:'필리핀',my:'말레이시아',sg:'싱가포르',in:'인도',pk:'파키스탄',bd:'방글라데시'};
 let MK_CC=null;
 function loadMarket(cc){
@@ -1487,6 +1526,7 @@ fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'}).then(r=>r.json()
   }
   if(ccs.length) loadMarket(ccs[0]);
 }).catch(e=>{ const m=document.getElementById('meta'); if(m) m.textContent='국가 목록을 불러오지 못했습니다: '+e.message; });
+loadBriefsIndex();  // AI 시장 브리핑(국가 선택과 독립)
 </script>
 </body>
 </html>
