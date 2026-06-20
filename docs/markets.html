@@ -1312,10 +1312,15 @@ function init(full){
   _gwCache=null;          // 국가별 매출 가중치 캐시 리셋(국가 전환 시 오염 방지)
   selected.length=0;      // 국가 바뀌면 선택 초기화
   genreSel.length=0;      // 장르 강조도 초기화
-  // 브리핑: 현재 국가가 주요시장이면 그 시장 브리핑 탭 자동 선택(게임명 칩 클릭=상세 작동), 아니면 현재 브리핑 재렌더
-  { const cc=(typeof MK_CC!=='undefined')?MK_CC:null;
-    const mt=(typeof MK_BRIEF_TABS!=='undefined'&&MK_BRIEF_TABS)?MK_BRIEF_TABS.find(t=>t.type==='major'&&t.key===cc):null;
-    if(mt) selectBrief('major:'+cc);
+  // 브리핑 연동: 선택한 시장에 맞는 브리핑 탭 자동 선택(게임명 칩 클릭=상세 작동)
+  { const k=(typeof MK_CC!=='undefined')?MK_CC:null; let bk=null;
+    const tabs=(typeof MK_BRIEF_TABS!=='undefined')?MK_BRIEF_TABS:null;
+    if(k && tabs){
+      if(typeof MK_REGION_KEYS!=='undefined' && MK_REGION_KEYS.has && MK_REGION_KEYS.has(k) && tabs.some(t=>t.type==='region'&&t.key===k)) bk='region:'+k;            // 지역(합산)
+      else if(tabs.some(t=>t.type==='major'&&t.key===k)) bk='major:'+k;                                                                                                  // 주요시장
+      else { const rg=(typeof MK_CC2REGION!=='undefined')?MK_CC2REGION[k]:null; if(rg && tabs.some(t=>t.type==='region'&&t.key===rg)) bk='region:'+rg; }                  // 개별국가→소속지역
+    }
+    if(bk) selectBrief(bk);
     else if(typeof mkBriefSel!=='undefined' && mkBriefSel) selectBrief(mkBriefSel); }
   // 차트는 항상 게임 모드로 생성됨 → 모드 UI를 게임 베이스라인으로 리셋(이전 국가에서 장르였어도)
   const _wantGenre=(chartMode==='genre');
@@ -1532,6 +1537,7 @@ function openGameDetail(aid){
 // === 다국가 레이더: 국가 선택 → markets/{cc}.json(= data.json과 동일 구조)을 init() ===
 // ===== AI 시장 브리핑(계층형: 글로벌 + 주요국 + 지역) =====
 let MK_BRIEF_TABS=null, mkBriefSel=null;
+let MK_CC2REGION={}, MK_REGION_KEYS=new Set();  // 개별국가→소속지역, 지역키 집합(브리핑 연동용)
 function loadBriefsIndex(){
   fetch('./markets/briefs_index.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(idx=>{
     if(!idx||!Array.isArray(idx.tabs)||!idx.tabs.length) return;
@@ -1583,15 +1589,30 @@ function loadMarket(cc){
     .catch(e=>{ const m=document.getElementById('meta'); if(m) m.textContent='데이터를 불러오지 못했습니다: '+e.message; });
 }
 fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'}).then(r=>r.json()).then(idx=>{
-  const ccs=(idx.countries||[]).map(c=>c.country);
-  ccs.sort((a,b)=> a==='kr'?-1:b==='kr'?1:(MK_CCN[a]||a).localeCompare(MK_CCN[b]||b,'ko'));
   const sel=document.getElementById('countrySel');
+  const opt=(key,label)=>'<option value="'+key+'">'+esc(label)+'</option>';
+  const nm=cc=> MK_CCN[cc]||cc.toUpperCase();
+  let html='', first='kr';
+  const isNew = Array.isArray(idx.majors)||Array.isArray(idx.regions);
+  if(isNew){
+    const majors=idx.majors||[], regions=idx.regions||[], singles=(idx.countries||[]).slice();
+    regions.forEach(r=>{ MK_REGION_KEYS.add(r.key); (r.members||[]).forEach(cc=>{ MK_CC2REGION[cc]=r.key; }); });
+    if(majors.length) html+='<optgroup label="주요 시장">'+majors.map(m=>opt(m.key, nm(m.key))).join('')+'</optgroup>';
+    if(regions.length) html+='<optgroup label="지역 (합산)">'+regions.map(r=>opt(r.key, r.name+' ('+(r.members||[]).length+'개국)')).join('')+'</optgroup>';
+    singles.sort((a,b)=> nm(a.key).localeCompare(nm(b.key),'ko'));
+    if(singles.length) html+='<optgroup label="개별 국가">'+singles.map(c=>opt(c.key, nm(c.key))).join('')+'</optgroup>';
+  } else {                                  // 폴백: 옛 평면 index({countries:[{country}]})
+    const ccs=(idx.countries||[]).map(c=>c.country).sort((a,b)=> a==='kr'?-1:b==='kr'?1:nm(a).localeCompare(nm(b),'ko'));
+    html='<optgroup label="국가">'+ccs.map(cc=>opt(cc, nm(cc))).join('')+'</optgroup>';
+  }
   if(sel){
-    sel.innerHTML=ccs.map(cc=>'<option value="'+cc+'">'+(MK_CCN[cc]||cc.toUpperCase())+'</option>').join('');
-    sel.value=ccs[0]||'kr';
+    sel.innerHTML=html;
+    const hasKr=[...sel.options].some(o=>o.value==='kr');
+    first=hasKr?'kr':((sel.options[0]||{}).value||'kr');
+    sel.value=first;
     sel.addEventListener('change',e=>loadMarket(e.target.value));
   }
-  if(ccs.length) loadMarket(ccs[0]);
+  loadMarket(first);
 }).catch(e=>{ const m=document.getElementById('meta'); if(m) m.textContent='국가 목록을 불러오지 못했습니다: '+e.message; });
 loadBriefsIndex();  // AI 시장 브리핑(국가 선택과 독립)
 </script>
