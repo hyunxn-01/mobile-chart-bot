@@ -506,6 +506,27 @@ def _brief_structured(fp):
         return False
 
 
+def _brief_history(fp, cap=12):
+    """재생성 시 직전 버전을 과거 기록(history)으로 보존. 현재 파일의 {generated,text}를 history 맨 앞에 추가(최대 cap)."""
+    hist = []
+    if fp.exists():
+        try:
+            old = json.loads(fp.read_text(encoding='utf-8'))
+            hist = list(old.get('history') or [])
+            if old.get('text') and old.get('generated'):
+                hist.insert(0, {'date': (old.get('generated') or '')[:10], 'generated': old.get('generated'), 'text': old.get('text')})
+        except Exception:
+            pass
+    # 같은 날짜 중복 제거(최신 우선)
+    seen, out = set(), []
+    for h in hist:
+        d = h.get('date')
+        if d in seen:
+            continue
+        seen.add(d); out.append(h)
+    return out[:cap]
+
+
 def _country_digest(g):
     """국가 매출 차트 1개 → 'TOP5 + 장르분포' 한 줄 다이제스트."""
     from collections import Counter
@@ -547,8 +568,9 @@ def build_major_briefs(collected):
             text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
         except Exception as e:
             print(f'[WARN] {name} 단독 브리핑 생성 실패: {e}'); continue
+        hist = _brief_history(fp)
         fp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                                  'market': name, 'cc': cc, 'localized': True, 'text': text},
+                                  'market': name, 'cc': cc, 'localized': True, 'text': text, 'history': hist},
                                  ensure_ascii=False), encoding='utf-8')
         available.append({'key': cc, 'name': name})
         print(f'[OK] 주요시장 브리핑 저장: major_{cc}.json ({name})')
@@ -607,8 +629,9 @@ def build_regional_briefs(collected):
             text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
         except Exception as e:
             print(f'[WARN] {name} 브리핑 생성 실패: {e}'); continue
+        hist = _brief_history(fp)
         fp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                                  'region': name, 'countries': len(members), 'localized': True, 'text': text},
+                                  'region': name, 'countries': len(members), 'localized': True, 'text': text, 'history': hist},
                                  ensure_ascii=False), encoding='utf-8')
         available.append({'key': key, 'name': name, 'countries': len(members)})
         print(f'[OK] 지역 브리핑 저장: region_{key}.json ({name}, {len(members)}개국)')
@@ -694,9 +717,10 @@ def build_global_brief(collected):
         text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
     except Exception as e:
         print(f'[WARN] 글로벌 브리핑 생성 실패: {e}'); return
+    g_hist = _brief_history(gp)
     gp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
                               'countries': n_countries, 'basis': basis, 'sources': len(sub_briefs),
-                              'localized': True, 'text': text}, ensure_ascii=False), encoding='utf-8')
+                              'localized': True, 'text': text, 'history': g_hist}, ensure_ascii=False), encoding='utf-8')
     print(f'[OK] 글로벌 브리핑 저장: docs/markets/global_brief.json (basis={basis}, sources={len(sub_briefs)})')
 
 
