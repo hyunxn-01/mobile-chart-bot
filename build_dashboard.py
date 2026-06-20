@@ -284,26 +284,137 @@ def build_country(country):
     return out
 
 
+# --- 시장 그룹(브리핑과 동일) + 합산 가중치 ---
+MAJOR_MARKETS = ['kr', 'us', 'jp', 'cn', 'tw']
+REGIONS = {
+    'europe':      ('유럽',           ['gb', 'de', 'fr', 'it', 'es', 'nl', 'ru', 'se']),
+    'na_oceania':  ('북미·오세아니아', ['ca', 'au']),
+    'middle_east': ('중동',           ['sa', 'ae', 'eg', 'tr']),
+    'latam':       ('중남미',         ['br', 'mx', 'ar', 'co']),
+    'sea':         ('동남아',         ['id', 'th', 'vn', 'ph', 'my', 'sg']),
+    'south_asia':  ('남아시아',       ['in', 'pk', 'bd']),
+}
+REV_ALPHA = 1.1   # 매출 멱법칙(프론트 revWeight와 동일)
+DL_ALPHA = 0.8    # 다운로드는 더 완만
+# 국가별 상대 시장규모(미국=100). 지역 합산 시 큰 시장이 더 기여하도록 가중. 공개 매출/다운로드 국가순위 근사.
+MARKET_WEIGHT = {  # 매출(grossing)
+    'us': 100, 'jp': 90, 'cn': 95, 'kr': 45, 'tw': 22, 'gb': 30, 'de': 32, 'fr': 24, 'ca': 20, 'au': 18,
+    'it': 16, 'es': 15, 'nl': 10, 'ru': 14, 'se': 8, 'sa': 12, 'ae': 9, 'eg': 4, 'tr': 7,
+    'br': 14, 'mx': 12, 'ar': 5, 'co': 4, 'id': 10, 'th': 9, 'vn': 7, 'ph': 6, 'my': 7, 'sg': 8, 'in': 12, 'pk': 3, 'bd': 2,
+}
+DL_WEIGHT = {      # 다운로드(free) — 인구·설치 규모 경향
+    'us': 100, 'cn': 120, 'jp': 45, 'kr': 18, 'tw': 10, 'gb': 22, 'de': 28, 'fr': 24, 'ca': 16, 'au': 12,
+    'it': 18, 'es': 18, 'nl': 7, 'ru': 40, 'se': 5, 'sa': 10, 'ae': 6, 'eg': 22, 'tr': 28,
+    'br': 70, 'mx': 45, 'ar': 16, 'co': 16, 'id': 75, 'th': 30, 'vn': 35, 'ph': 35, 'my': 16, 'sg': 5, 'in': 150, 'pk': 30, 'bd': 20,
+}
+
+
+def build_region_days(member_ccs, kind):
+    """멤버국 차트를 점유율 가중 합산 → 지역 단일 차트용 {date:[apps(지역순위)]}.
+    게임별 지역가치 = Σ(국가 시장가중 × rank^-alpha). 그 값으로 지역 순위(1=최상위) 매김."""
+    cc_days, all_dates, meta = {}, set(), {}
+    for cc in member_ccs:
+        d = load_country_charts(cc, kind)
+        if not d:
+            continue
+        for dt in d:
+            for app in d[dt]:
+                app['title'] = app.get('title_kr') or app.get('title', '')
+                app['genre'] = canon_genre(app)
+                if not app.get('app_id'):
+                    app['app_id'] = app.get('track_id')
+                aid = app.get('app_id')
+                if aid and aid not in meta:
+                    meta[aid] = app
+        cc_days[cc] = d
+        all_dates |= set(d.keys())
+    if not cc_days:
+        return {}
+    W = MARKET_WEIGHT if kind == 'grossing' else DL_WEIGHT
+    alpha = REV_ALPHA if kind == 'grossing' else DL_ALPHA
+    region_days = {}
+    for dt in sorted(all_dates):
+        val = {}
+        for cc, d in cc_days.items():
+            apps = d.get(dt)
+            if not apps:
+                continue
+            cw = W.get(cc, 5)
+            for app in apps:
+                aid, r = app.get('app_id'), app.get('rank')
+                if not aid or not r:
+                    continue
+                val[aid] = val.get(aid, 0) + cw * (float(r) ** (-alpha))
+        if not val:
+            continue
+        ordered = sorted(val.items(), key=lambda kv: -kv[1])
+        apps_out = []
+        for i, (aid, v) in enumerate(ordered[:100], start=1):
+            a = dict(meta.get(aid, {}))
+            a['app_id'] = aid
+            a['rank'] = i
+            apps_out.append(a)
+        region_days[dt] = apps_out
+    return region_days
+
+
+def build_region_market(region_key, name, member_ccs):
+    """지역 합산 마켓을 index 구조(charts.{grossing,free}+genre_series)로 생성."""
+    out = {'market': region_key, 'name': name, 'type': 'region', 'members': member_ccs,
+           'generated': datetime.now().strftime('%Y-%m-%d %H:%M'), 'charts': {}}
+    for kind in ('grossing', 'free'):
+        days = build_region_days(member_ccs, kind)
+        if not days:
+            continue
+        ch = build_chart_from_days(days)
+        ch['genre_series'] = build_genre_series(days, sorted(days.keys()))
+        out['charts'][kind] = ch
+    return out
+
+
 def build_markets():
-    """data/charts 하위 전 국가를 docs/markets/{country}.json + index.json 으로 집계."""
+    """전 국가(개별) + 지역(합산) 마켓 → docs/markets/{key}.json + 구조화 index.json."""
     if not CHARTS_DIR.exists():
         print('[INFO] data/charts 없음 — 다국가 집계 건너뜀')
         return
     MARKETS_OUT.mkdir(parents=True, exist_ok=True)
     countries = sorted([d.name for d in CHARTS_DIR.iterdir() if d.is_dir()])
-    index = []
+    have = set()
+    majors, regions_idx, singles = [], [], []
+    # 1) 개별 국가(주요 5 + 나머지)
     for cc in countries:
         co = build_country(cc)
         if not co.get('charts'):
             continue
         (MARKETS_OUT / f'{cc}.json').write_text(
             json.dumps(co, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        have.add(cc)
         g = co['charts'].get('grossing', {})
-        index.append({'country': cc, 'num_days': g.get('num_days', 0), 'num_games': g.get('num_games', 0)})
+        entry = {'key': cc, 'num_days': g.get('num_days', 0), 'num_games': g.get('num_games', 0)}
+        if cc in MAJOR_MARKETS:
+            majors.append({**entry, 'type': 'major'})
+        else:
+            singles.append({**entry, 'type': 'country'})
+    # 2) 지역(합산) — 멤버가 1개국 이상 수집된 지역만
+    for key, (name, ccs) in REGIONS.items():
+        members = [cc for cc in ccs if cc in have]
+        if not members:
+            continue
+        rm = build_region_market(key, name, members)
+        if not rm.get('charts'):
+            continue
+        (MARKETS_OUT / f'{key}.json').write_text(
+            json.dumps(rm, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        g = rm['charts'].get('grossing', {})
+        regions_idx.append({'key': key, 'name': name, 'type': 'region', 'members': members,
+                            'num_days': g.get('num_days', 0), 'num_games': g.get('num_games', 0)})
     (MARKETS_OUT / 'index.json').write_text(
-        json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'), 'countries': index},
+        json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+                    'majors': majors, 'regions': regions_idx, 'countries': singles,
+                    # 하위호환: 옛 프론트가 읽던 평면 리스트도 유지(개별 국가 전체)
+                    'countries_flat': [{'country': e['key']} for e in (majors + singles)]},
                    ensure_ascii=False), encoding='utf-8')
-    print(f"[OK] 다국가 집계: {len(index)}개국 → {MARKETS_OUT}")
+    print(f"[OK] 다국가 집계: 주요 {len(majors)} + 지역 {len(regions_idx)} + 개별 {len(singles)} → {MARKETS_OUT}")
 
 
 def build():
