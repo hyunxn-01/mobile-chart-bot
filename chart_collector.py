@@ -300,38 +300,147 @@ CC_NAME_KR = {'kr': '한국', 'us': '미국', 'jp': '일본', 'cn': '중국', 't
               'th': '태국', 'vn': '베트남', 'ph': '필리핀', 'my': '말레이시아', 'sg': '싱가포르', 'in': '인도',
               'pk': '파키스탄', 'bd': '방글라데시'}
 
+# 지역 그룹(키: (표시명, 소속 국가코드)) — 글로벌 브리핑 하위 탭
+REGIONS = {
+    'east_asia': ('동아시아', ['jp', 'kr', 'cn', 'tw']),
+    'na_oceania': ('북미·오세아니아', ['us', 'ca', 'au']),
+    'west_europe': ('서유럽', ['gb', 'de', 'fr', 'it', 'es', 'nl', 'se']),
+    'middle_east': ('중동', ['sa', 'ae', 'eg', 'tr']),
+    'latam': ('중남미', ['br', 'mx', 'ar', 'co']),
+    'sea': ('동남아', ['id', 'th', 'vn', 'ph', 'my', 'sg']),
+    'south_asia': ('남아시아', ['in', 'pk', 'bd']),
+}
+
+# 브리핑 캐던스: 7일 이내 생성분이 있으면 재생성 스킵(주간 주기·비용 절감)
+BRIEF_CADENCE_DAYS = 7
+
+
+def _brief_fresh(fp, days=BRIEF_CADENCE_DAYS):
+    """브리핑 파일이 days일 이내 생성됐으면 True(재생성 스킵)."""
+    try:
+        if not fp.exists():
+            return False
+        d = json.loads(fp.read_text(encoding='utf-8'))
+        gen = (d.get('generated', '') or '')[:10]
+        if not gen:
+            return False
+        last = datetime.strptime(gen, '%Y-%m-%d')
+        return (datetime.now() - last).days < days
+    except Exception:
+        return False
+
+
+def _country_digest(g):
+    """국가 매출 차트 1개 → 'TOP5 + 장르분포' 한 줄 다이제스트."""
+    from collections import Counter
+    top = ', '.join(f"{a.get('rank')}.{a.get('title')}({a.get('genre', '')})" for a in g[:5])
+    gc = Counter(a.get('genre', '기타') for a in g)
+    genres = ', '.join(f"{k} {v}" for k, v in gc.most_common(6))
+    return f"매출TOP5: {top} | 장르분포(상위100): {genres}"
+
+
+def build_regional_briefs(collected):
+    """지역 그룹별 브리핑 생성(Opus, 주간 게이팅). docs/markets/region_{key}.json + regions_index.json."""
+    if not collected:
+        print('[INFO] 지역 브리핑 스킵(수집 데이터 없음)'); return
+    out_dir = Path('docs') / 'markets'
+    out_dir.mkdir(parents=True, exist_ok=True)
+    available = []
+    for key, (name, ccs) in REGIONS.items():
+        members = [cc for cc in ccs if (collected.get(cc, {}) or {}).get('grossing')]
+        if not members:
+            continue  # 이 지역에 수집된 국가가 아직 없음(탭에 노출 안 함)
+        fp = out_dir / f'region_{key}.json'
+        if _brief_fresh(fp):
+            available.append({'key': key, 'name': name, 'countries': len(members)})
+            print(f'[INFO] {name} 브리핑 스킵(7일 이내 최신)')
+            continue
+        parts = [f"[{CC_NAME_KR.get(cc, cc.upper())}] {_country_digest(collected[cc]['grossing'])}" for cc in members]
+        digest = '\n'.join(parts)
+        prompt = (f"다음은 오늘 App Store 게임 '매출' 차트의 '{name}' 지역 국가별 스냅샷이다.\n\n{digest}\n\n"
+                  f"게임 사업 PM이 '{name}' 시장을 읽는 관점에서 핵심 인사이트 4~5개를 짧은 불릿(-)으로 써라. "
+                  "지역 내 국가 간 공통점·차이, 강세 장르/게임, 진출·현지화 시사점을 다뤄라. "
+                  "굵게(**)는 게임명·장르·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+        try:
+            text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
+        except Exception as e:
+            print(f'[WARN] {name} 브리핑 생성 실패: {e}'); continue
+        fp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+                                  'region': name, 'countries': len(members), 'text': text},
+                                 ensure_ascii=False), encoding='utf-8')
+        available.append({'key': key, 'name': name, 'countries': len(members)})
+        print(f'[OK] 지역 브리핑 저장: region_{key}.json ({name}, {len(members)}개국)')
+    (out_dir / 'regions_index.json').write_text(
+        json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'), 'regions': available},
+                   ensure_ascii=False), encoding='utf-8')
+    print(f'[OK] 지역 인덱스 저장: regions_index.json ({len(available)}개 지역)')
+
 
 def build_global_brief(collected):
-    """수집된 다국가 '매출' 차트로 전 시장 횡단 글로벌 브리핑 생성(Opus). docs/markets/global_brief.json."""
-    from collections import Counter
+    """지역 브리핑들을 토대로 전 시장 횡단 글로벌 헤드라인을 종합 생성(Opus). docs/markets/global_brief.json.
+    계층적: region_*.json(지역 분석)을 입력으로 합성 — 지역 브리핑이 없으면 국가 다이제스트로 폴백."""
     if not collected:
         print('[INFO] 글로벌 브리핑 스킵(수집 데이터 없음)'); return
-    parts = []
-    for cc, kinds in collected.items():
-        g = kinds.get('grossing') or []
-        if not g:
+    out_dir = Path('docs') / 'markets'
+    out_dir.mkdir(parents=True, exist_ok=True)
+    gp = out_dir / 'global_brief.json'
+
+    # 1) 디스크의 지역 브리핑 수집(이번 런에서 갱신됐을 수 있음)
+    region_briefs = []   # [(표시명, text, generated)]
+    newest_region = ''
+    for key, (name, _ccs) in REGIONS.items():
+        rp = out_dir / f'region_{key}.json'
+        if not rp.exists():
             continue
-        top = ', '.join(f"{a.get('rank')}.{a.get('title')}({a.get('genre', '')})" for a in g[:5])
-        gc = Counter(a.get('genre', '기타') for a in g)
-        genres = ', '.join(f"{k} {v}" for k, v in gc.most_common(6))
-        parts.append(f"[{CC_NAME_KR.get(cc, cc.upper())}] 매출TOP5: {top} | 장르분포(상위100): {genres}")
-    if not parts:
-        print('[INFO] 글로벌 브리핑 스킵(매출 데이터 없음)'); return
-    digest = '\n'.join(parts)
-    prompt = (f"다음은 오늘 App Store 게임 '매출' 차트의 국가별 스냅샷이다.\n\n{digest}\n\n"
-              "게임 사업 PM이 '다음 진출 시장'을 읽는 관점에서, 전 시장을 횡단해 주목할 인사이트만 4~5개 짧은 불릿(-)으로 써라. "
-              "반드시 다룰 것: ①여러 시장에서 동시에 강한 게임/장르, ②시장별 장르 색깔 차이(어느 나라가 롤플레잉/캐주얼/전략 중심인지), "
-              "③진출·벤치마크 관점 한 줄. 굵게(**)는 게임명·장르·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+        try:
+            d = json.loads(rp.read_text(encoding='utf-8'))
+        except Exception:
+            continue
+        if d.get('text'):
+            region_briefs.append((d.get('region', name), d['text']))
+            newest_region = max(newest_region, d.get('generated', '') or '')
+
+    # 2) 재생성 판단: 없거나·7일 경과·지역이 글로벌보다 최신이면 재생성
+    cur_gen = ''
+    if gp.exists():
+        try:
+            cur_gen = (json.loads(gp.read_text(encoding='utf-8')).get('generated', '') or '')
+        except Exception:
+            cur_gen = ''
+    stale = not _brief_fresh(gp)
+    regions_newer = bool(newest_region) and newest_region > cur_gen
+    if not (stale or regions_newer):
+        print('[INFO] 글로벌 브리핑 스킵(7일 이내 & 지역 갱신 없음)'); return
+
+    n_countries = sum(1 for cc, k in collected.items() if (k or {}).get('grossing'))
+
+    # 3) 프롬프트: 지역 분석 우선(계층적 합성), 없으면 국가 다이제스트 폴백
+    if region_briefs:
+        body = '\n\n'.join(f"# {nm} 지역 분석\n{tx}" for nm, tx in region_briefs)
+        prompt = (f"다음은 같은 날 App Store 게임 매출 차트를 지역별로 분석한 결과다.\n\n{body}\n\n"
+                  "위 '지역 분석들을 토대로' 종합하여, 게임 사업 PM이 전 세계를 횡단해 읽어야 할 상위 헤드라인 인사이트 4~5개를 짧은 불릿(-)으로 써라. "
+                  "반드시: ①여러 지역에서 동시에 강한 게임/장르(지역을 가로지르는 신호), ②지역 간 장르 색깔 대비(어디가 롤플레잉/캐주얼/전략 중심인지), "
+                  "③'다음 진출 시장'·벤치마크 관점 한 줄. 지역 분석에 없는 사실을 지어내지 말고, 지역을 가로질러 의미가 생기는 지점만 골라라. "
+                  "굵게(**)는 게임명·장르·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+        basis = 'regional'
+    else:
+        parts = [f"[{CC_NAME_KR.get(cc, cc.upper())}] {_country_digest(k['grossing'])}"
+                 for cc, k in collected.items() if (k or {}).get('grossing')]
+        if not parts:
+            print('[INFO] 글로벌 브리핑 스킵(매출 데이터 없음)'); return
+        prompt = ("다음은 오늘 App Store 게임 '매출' 차트의 국가별 스냅샷이다.\n\n" + '\n'.join(parts) + "\n\n"
+                  "게임 사업 PM이 '다음 진출 시장'을 읽는 관점에서, 전 시장을 횡단해 주목할 인사이트만 4~5개 짧은 불릿(-)으로 써라. "
+                  "①여러 시장에서 동시에 강한 게임/장르, ②시장별 장르 색깔 차이, ③진출·벤치마크 한 줄. "
+                  "굵게(**)는 게임명·장르·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+        basis = 'country'
     try:
         text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
     except Exception as e:
         print(f'[WARN] 글로벌 브리핑 생성 실패: {e}'); return
-    out_dir = Path('docs') / 'markets'
-    out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / 'global_brief.json').write_text(
-        json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                    'countries': len(parts), 'text': text}, ensure_ascii=False), encoding='utf-8')
-    print('[OK] 글로벌 브리핑 저장: docs/markets/global_brief.json')
+    gp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+                              'countries': n_countries, 'basis': basis, 'regions': len(region_briefs),
+                              'text': text}, ensure_ascii=False), encoding='utf-8')
+    print(f'[OK] 글로벌 브리핑 저장: docs/markets/global_brief.json (basis={basis}, regions={len(region_briefs)})')
 
 
 def load_data_in_date_range(start_dt, end_dt, today_dt=None, current=None):
@@ -1247,10 +1356,11 @@ def main():
         attach_genres(free)
         save_free_data(free)
 
-    print("[다국가] 전체 국가 iOS 차트 수집·저장 + 글로벌 브리핑...")
+    print("[다국가] 전체 국가 iOS 차트 수집·저장 + 지역/글로벌 브리핑...")
     try:
         collected = collect_all_countries()
-        build_global_brief(collected)
+        build_regional_briefs(collected)   # 지역 분석 먼저
+        build_global_brief(collected)      # 지역 분석을 토대로 글로벌 종합
     except Exception as e:
         print(f"[WARN] 다국가 수집/브리핑 실패: {e}")
 
