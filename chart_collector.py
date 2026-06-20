@@ -527,6 +527,129 @@ def _brief_history(fp, cap=12):
     return out[:cap]
 
 
+# ===== 시간축별(주/월/분기/년) 브리핑: '완료된 축'만 생성(미완성=데이터 부족→생성 안 함) =====
+BRIEF_AXES = [('weekly', '주간'), ('monthly', '월간'), ('quarterly', '분기'), ('yearly', '연간')]
+_AXIS_WIN = {'주간': '최근 주', '월간': '최근 달', '분기': '최근 분기', '연간': '최근 1년'}
+
+
+def _market_axis_digest(market_key, axis_key):
+    """commit된 docs/markets/{key}.json의 해당 시간축(완료구간) 윈도우 다이제스트. 완료구간 없으면 None(=미완성→생성 안 함)."""
+    fp = Path('docs') / 'markets' / f'{market_key}.json'
+    if not fp.exists():
+        return None
+    try:
+        from collections import Counter
+        mj = json.loads(fp.read_text(encoding='utf-8'))
+        g = mj['charts']['grossing']
+        tf = (g.get('timeframes') or {}).get(axis_key) or {}
+        labels = tf.get('labels') or []
+        if not labels:
+            return None
+        series = tf.get('series') or {}
+        games = g.get('games') or {}
+        li = len(labels) - 1
+        rows = []
+        for aid, s in series.items():
+            now = s[li] if li < len(s) else None
+            if now is None:
+                continue
+            prev = next((v for v in s if v is not None), None)
+            meta = games.get(aid) or {}
+            rows.append((now, prev, meta.get('title_kr') or meta.get('title') or aid, meta.get('genre', '')))
+        if not rows:
+            return None
+        rows.sort(key=lambda r: r[0])
+        top = ', '.join(f"{r[0]}.{r[2]}({r[3]})" for r in rows[:5])
+        movers = [(r[2], r[1] - r[0]) for r in rows if r[1] is not None]
+        ris = ', '.join(f"{m[0]}(▲{m[1]})" for m in sorted([m for m in movers if m[1] >= 1], key=lambda m: -m[1])[:3]) or '—'
+        fal = ', '.join(f"{m[0]}(▼{abs(m[1])})" for m in sorted([m for m in movers if m[1] <= -1], key=lambda m: m[1])[:3]) or '—'
+        gc = Counter((r[3] or '기타') for r in rows[:30])
+        genres = ', '.join(f"{k} {v}" for k, v in gc.most_common(6))
+        return f"기간 {labels[0]}~{labels[-1]}({len(labels)}구간) | 매출TOP5: {top} | 급상승: {ris} | 급하락: {fal} | 장르분포(상위30): {genres}"
+    except Exception:
+        return None
+
+
+def _axes_prev(fp):
+    """기존 파일의 axes. 구버전(단일 text)이면 weekly 축으로 이행(이력 보존)."""
+    try:
+        d = json.loads(fp.read_text(encoding='utf-8'))
+    except Exception:
+        return {}
+    ax = dict(d.get('axes') or {})
+    if 'weekly' not in ax and d.get('text'):
+        ax['weekly'] = {'generated': d.get('generated'), 'text': d.get('text'), 'history': d.get('history') or []}
+    return ax
+
+
+def _axis_fresh(o, days=BRIEF_CADENCE_DAYS):
+    try:
+        gen = ((o or {}).get('generated', '') or '')[:10]
+        if not gen:
+            return False
+        return (datetime.now() - datetime.strptime(gen, '%Y-%m-%d')).days < days
+    except Exception:
+        return False
+
+
+def _axis_hist(prev, cap=12):
+    hist = list((prev or {}).get('history') or [])
+    t, g = (prev or {}).get('text'), (prev or {}).get('generated')
+    if t and g:
+        hist.insert(0, {'date': (g or '')[:10], 'generated': g, 'text': t})
+    seen, out = set(), []
+    for h in hist:
+        d = h.get('date')
+        if d in seen:
+            continue
+        seen.add(d)
+        out.append(h)
+    return out[:cap]
+
+
+def _axis_prompt(scope_label, axis_label, digest, is_region):
+    scope = f"'{scope_label}' 지역(여러 나라 합산) 시장" if is_region else f"'{scope_label}' 단일 시장"
+    win = _AXIS_WIN.get(axis_label, axis_label)
+    s_struct = "지역 전체에서 강세 장르·퍼블리셔 점유" if is_region else "강세 장르·퍼블리셔가 매출을 얼마나 쥐는지(점유)"
+    return (f"다음은 App Store 게임 '매출' 차트의 '{scope_label}' {axis_label} 스냅샷·추이다.\n\n"
+            f"[{scope_label} · {axis_label}] {digest}\n\n"
+            f"게임 사업 PM이 {scope}을 '{axis_label}'({win}) 시간축 관점에서 읽도록, 아래 5개 항목을 정확히 이 순서·제목으로 써라. "
+            "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로 써라. 항목 제목은 그대로 둘 것.\n"
+            "## 시장 구조\n## 핵심 게임·플레이어\n## 움직임\n## 장르 기회\n## PM 시사점\n\n"
+            f"각 항목은 '{axis_label}'({win}) 시간축 기준으로 해석 — 시장 구조: {s_struct}. "
+            "핵심 게임·플레이어: 이 기간 매출 상위 게임의 성격·강한 퍼블리셔. "
+            f"움직임: 이 기간({win}) 진입·급상승·급하락 위주(근거 약하면 '- 데이터 누적 중'). "
+            "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. PM 시사점: 진출·벤치마크·현지화 한 줄 결론. "
+            "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+
+
+def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
+    """완료된 시간축만 브리핑 생성. weekly=신선한 스냅샷 digest, 그 외=commit된 market JSON 윈도우. 축별 7일 게이팅·이력 보존."""
+    prev_axes = _axes_prev(fp)
+    now_s = datetime.now().strftime('%Y-%m-%d %H:%M')
+    axes = {}
+    for axis_key, axis_label in BRIEF_AXES:
+        digest = weekly_digest if axis_key == 'weekly' else _market_axis_digest(market_key, axis_key)
+        if not digest:
+            if axis_key in prev_axes:   # 미완성이지만 과거 생성분 있으면 유지
+                axes[axis_key] = prev_axes[axis_key]
+            continue
+        prev = prev_axes.get(axis_key) or {}
+        if _axis_fresh(prev) and '## ' in (prev.get('text') or ''):
+            axes[axis_key] = prev       # 7일 이내 최신 → 재사용(비용 절감)
+            continue
+        try:
+            text = call_claude_with_retry(_axis_prompt(scope_label, axis_label, digest, is_region), max_tokens=MAX_OUTPUT_TOKENS)
+        except Exception as e:
+            print(f'[WARN] {scope_label} {axis_label} 브리핑 실패: {e}')
+            if axis_key in prev_axes:
+                axes[axis_key] = prev_axes[axis_key]
+            continue
+        axes[axis_key] = {'generated': now_s, 'text': text, 'history': _axis_hist(prev)}
+        print(f'[OK] {scope_label} · {axis_label} 브리핑 생성')
+    return axes
+
+
 def _country_digest(g):
     """국가 매출 차트 1개 → 'TOP5 + 장르분포' 한 줄 다이제스트."""
     from collections import Counter
@@ -537,7 +660,7 @@ def _country_digest(g):
 
 
 def build_major_briefs(collected):
-    """주요 시장(개별 국가) 브리핑 생성(Opus, 주간 게이팅). docs/markets/major_{cc}.json. 노출 가능한 [{key,name}] 반환."""
+    """주요 시장(개별 국가) 시간축별 브리핑 생성(완료된 축만, 축별 7일 게이팅). docs/markets/major_{cc}.json. 노출 가능한 [{key,name}] 반환."""
     if not collected:
         return []
     out_dir = Path('docs') / 'markets'
@@ -549,31 +672,18 @@ def build_major_briefs(collected):
             continue  # 아직 수집 안 된 주요국(탭 미노출)
         name = CC_NAME_KR.get(cc, cc.upper())
         fp = out_dir / f'major_{cc}.json'
-        if _brief_fresh(fp) and _brief_localized(fp) and _brief_structured(fp):
-            available.append({'key': cc, 'name': name})
-            print(f'[INFO] {name} 단독 브리핑 스킵(7일 이내 최신)')
+        axes = _build_scope_axes(fp, name, cc, _country_digest(g), is_region=False)
+        if not axes:
+            if fp.exists():
+                available.append({'key': cc, 'name': name})
             continue
-        prompt = (f"다음은 오늘 App Store 게임 '매출' 차트의 '{name}' 시장 스냅샷이다.\n\n"
-                  f"[{name}] {_country_digest(g)}\n\n"
-                  f"게임 사업 PM이 '{name}' 단일 시장을 읽도록, 아래 5개 항목을 정확히 이 순서·제목으로 써라. "
-                  "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로 써라. 항목 제목은 그대로 둘 것.\n"
-                  "## 시장 구조\n## 핵심 게임·플레이어\n## 움직임\n## 장르 기회\n## PM 시사점\n\n"
-                  "각 항목 내용 가이드 — 시장 구조: 강세 장르·퍼블리셔가 매출을 얼마나 쥐는지(점유). "
-                  "핵심 게임·플레이어: 매출 상위 게임의 성격과 강한 퍼블리셔. "
-                  "움직임: 신작 진입·급상승(스냅샷이 1일뿐이라 근거 약하면 '- 데이터 누적 중'으로 짧게). "
-                  "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. "
-                  "PM 시사점: 진출·벤치마크·현지화 관점의 한 줄 결론. "
-                  "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
-        try:
-            text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
-        except Exception as e:
-            print(f'[WARN] {name} 단독 브리핑 생성 실패: {e}'); continue
-        hist = _brief_history(fp)
-        fp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                                  'market': name, 'cc': cc, 'localized': True, 'text': text, 'history': hist},
+        wk = axes.get('weekly') or next((axes[k] for k, _ in BRIEF_AXES if k in axes), {})
+        fp.write_text(json.dumps({'generated': wk.get('generated') or datetime.now().strftime('%Y-%m-%d %H:%M'),
+                                  'market': name, 'cc': cc, 'localized': True, 'axes': axes,
+                                  'text': wk.get('text') or '', 'history': wk.get('history') or []},
                                  ensure_ascii=False), encoding='utf-8')
         available.append({'key': cc, 'name': name})
-        print(f'[OK] 주요시장 브리핑 저장: major_{cc}.json ({name})')
+        print(f'[OK] 주요시장 브리핑 저장: major_{cc}.json ({name}, 축 {list(axes.keys())})')
     return available
 
 
@@ -609,32 +719,18 @@ def build_regional_briefs(collected):
                 except Exception:
                     pass
             continue
-        if _brief_fresh(fp) and _brief_localized(fp) and _brief_structured(fp):
+        weekly_digest = '\n'.join(f"[{CC_NAME_KR.get(cc, cc.upper())}] {_country_digest(collected[cc]['grossing'])}" for cc in members)
+        axes = _build_scope_axes(fp, name, key, weekly_digest, is_region=True)
+        if not axes:
             available.append({'key': key, 'name': name, 'countries': len(members)})
-            print(f'[INFO] {name} 브리핑 스킵(7일 이내 최신)')
             continue
-        parts = [f"[{CC_NAME_KR.get(cc, cc.upper())}] {_country_digest(collected[cc]['grossing'])}" for cc in members]
-        digest = '\n'.join(parts)
-        prompt = (f"다음은 오늘 App Store 게임 '매출' 차트의 '{name}' 지역 국가별 스냅샷이다.\n\n{digest}\n\n"
-                  f"게임 사업 PM이 '{name}' 지역(여러 나라 합산) 시장을 읽도록, 아래 5개 항목을 정확히 이 순서·제목으로 써라. "
-                  "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로. 항목 제목은 그대로 둘 것.\n"
-                  "## 시장 구조\n## 핵심 게임·플레이어\n## 움직임\n## 장르 기회\n## PM 시사점\n\n"
-                  "각 항목 내용 가이드 — 시장 구조: 지역 전체에서 강세 장르·퍼블리셔 점유. "
-                  "핵심 게임·플레이어: 지역 매출 상위 게임·강한 퍼블리셔. "
-                  "움직임: 신작·급상승 및 국가 간 차이(어디서 강하고 어디서 약한지; 근거 약하면 '- 데이터 누적 중'). "
-                  "장르 기회: 경쟁 약한 틈새 또는 포화 장르. "
-                  "PM 시사점: 진출·현지화·벤치마크 한 줄 결론. "
-                  "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
-        try:
-            text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
-        except Exception as e:
-            print(f'[WARN] {name} 브리핑 생성 실패: {e}'); continue
-        hist = _brief_history(fp)
-        fp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                                  'region': name, 'countries': len(members), 'localized': True, 'text': text, 'history': hist},
+        wk = axes.get('weekly') or next((axes[k] for k, _ in BRIEF_AXES if k in axes), {})
+        fp.write_text(json.dumps({'generated': wk.get('generated') or datetime.now().strftime('%Y-%m-%d %H:%M'),
+                                  'region': name, 'countries': len(members), 'localized': True, 'axes': axes,
+                                  'text': wk.get('text') or '', 'history': wk.get('history') or []},
                                  ensure_ascii=False), encoding='utf-8')
         available.append({'key': key, 'name': name, 'countries': len(members)})
-        print(f'[OK] 지역 브리핑 저장: region_{key}.json ({name}, {len(members)}개국)')
+        print(f'[OK] 지역 브리핑 저장: region_{key}.json ({name}, {len(members)}개국, 축 {list(axes.keys())})')
     return available
 
 
@@ -647,81 +743,70 @@ def build_global_brief(collected):
     out_dir.mkdir(parents=True, exist_ok=True)
     gp = out_dir / 'global_brief.json'
 
-    # 1) 디스크의 하위 브리핑 수집(이번 런에서 갱신됐을 수 있음): 주요시장 개별 + 지역
-    sub_briefs = []   # [(라벨, text)]
-    newest_sub = ''
-    for cc in MAJOR_MARKETS:
-        mp = out_dir / f'major_{cc}.json'
-        if not mp.exists():
-            continue
+    def _read(p):
         try:
-            d = json.loads(mp.read_text(encoding='utf-8'))
+            return json.loads(p.read_text(encoding='utf-8'))
         except Exception:
-            continue
-        if d.get('text'):
-            sub_briefs.append((d.get('market', CC_NAME_KR.get(cc, cc)) + ' (주요 단일 시장)', d['text']))
-            newest_sub = max(newest_sub, d.get('generated', '') or '')
-    for key, (name, _ccs) in REGIONS.items():
-        rp = out_dir / f'region_{key}.json'
-        if not rp.exists():
-            continue
-        try:
-            d = json.loads(rp.read_text(encoding='utf-8'))
-        except Exception:
-            continue
-        if d.get('text'):
-            sub_briefs.append((d.get('region', name) + ' (지역)', d['text']))
-            newest_sub = max(newest_sub, d.get('generated', '') or '')
-
-    # 2) 재생성 판단: 없거나·7일 경과·하위 브리핑이 글로벌보다 최신이면 재생성
-    cur_gen = ''
-    if gp.exists():
-        try:
-            cur_gen = (json.loads(gp.read_text(encoding='utf-8')).get('generated', '') or '')
-        except Exception:
-            cur_gen = ''
-    stale = not _brief_fresh(gp)
-    subs_newer = bool(newest_sub) and newest_sub > cur_gen
-    if not (stale or subs_newer or not _brief_localized(gp) or not _brief_structured(gp)):
-        print('[INFO] 글로벌 브리핑 스킵(7일 이내 & 하위 갱신 없음)'); return
+            return None
 
     n_countries = sum(1 for cc, k in collected.items() if (k or {}).get('grossing'))
-
-    # 3) 프롬프트: 주요시장+지역 분석을 토대로 계층적 합성, 없으면 국가 다이제스트 폴백
-    if sub_briefs:
-        body = '\n\n'.join(f"# {label} 분석\n{tx}" for label, tx in sub_briefs)
-        prompt = (f"다음은 같은 날 App Store 게임 매출 차트를, 주요 시장은 개별로·중소규모 시장은 지역으로 묶어 분석한 결과다.\n\n{body}\n\n"
-                  "위 '주요 시장·지역 분석들을 토대로' 종합하여, 게임 사업 PM이 전 세계를 횡단해 읽을 헤드라인을 아래 4개 항목으로 써라. "
+    prev_axes = _axes_prev(gp)
+    now_s = datetime.now().strftime('%Y-%m-%d %H:%M')
+    g_axes = {}
+    total_sources = 0
+    for axis_key, axis_label in BRIEF_AXES:
+        # 같은 시간축의 하위 브리핑(주요·지역) 수집 — 그 축이 있을 때만
+        subs, newest_sub = [], ''
+        for cc in MAJOR_MARKETS:
+            d = _read(out_dir / f'major_{cc}.json')
+            ax = ((d or {}).get('axes') or {}).get(axis_key) if d else None
+            if ax and ax.get('text'):
+                subs.append((d.get('market', CC_NAME_KR.get(cc, cc)) + ' (주요 단일 시장)', ax['text']))
+                newest_sub = max(newest_sub, ax.get('generated', '') or '')
+        for key, (name, _ccs) in REGIONS.items():
+            d = _read(out_dir / f'region_{key}.json')
+            ax = ((d or {}).get('axes') or {}).get(axis_key) if d else None
+            if ax and ax.get('text'):
+                subs.append((d.get('region', name) + ' (지역)', ax['text']))
+                newest_sub = max(newest_sub, ax.get('generated', '') or '')
+        if not subs:
+            if axis_key in prev_axes:   # 이 축 하위 분석이 아직 없으면 과거 종합 유지
+                g_axes[axis_key] = prev_axes[axis_key]
+            continue
+        total_sources = max(total_sources, len(subs))
+        prev = prev_axes.get(axis_key) or {}
+        subs_newer = bool(newest_sub) and newest_sub > ((prev.get('generated') or '')[:16])
+        if _axis_fresh(prev) and '## ' in (prev.get('text') or '') and not subs_newer:
+            g_axes[axis_key] = prev
+            continue
+        win = _AXIS_WIN.get(axis_label, axis_label)
+        body = '\n\n'.join(f"# {label} 분석\n{tx}" for label, tx in subs)
+        prompt = (f"다음은 같은 기간 App Store 게임 매출 차트를, 주요 시장은 개별·중소규모는 지역으로 묶어 '{axis_label}'({win}) 시간축으로 분석한 결과다.\n\n{body}\n\n"
+                  f"위 '{axis_label}' 분석들을 토대로 종합하여, 게임 사업 PM이 전 세계를 횡단해 읽을 '{axis_label}'({win}) 헤드라인을 아래 4개 항목으로 써라. "
                   "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로. 항목 제목은 그대로 둘 것.\n"
                   "## 횡단 신호\n## 시장별 색깔\n## IP·퍼블리셔 동향\n## 진출 전략\n\n"
-                  "각 항목 내용 가이드 — 횡단 신호: 여러 시장/지역에서 동시에 강한 게임·장르(경계를 가로지르는 신호). "
-                  "시장별 색깔: 주요 시장 간·지역 간 장르 색깔 대비(어디가 롤플레잉/캐주얼/전략 중심인지). "
-                  "IP·퍼블리셔 동향: 여러 시장을 관통하는 글로벌 IP·강한 퍼블리셔. "
-                  "진출 전략: '다음 진출 시장'·벤치마크 시장 관점 결론. "
+                  "각 항목 내용 가이드 — 횡단 신호: 여러 시장/지역에서 동시에 강한 게임·장르. "
+                  "시장별 색깔: 주요 시장 간·지역 간 장르 색깔 대비. IP·퍼블리셔 동향: 여러 시장 관통 글로벌 IP·퍼블리셔. "
+                  "진출 전략: 다음 진출·벤치마크 시장 결론. "
                   "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
-        basis = 'hierarchical'
-    else:
-        parts = [f"[{CC_NAME_KR.get(cc, cc.upper())}] {_country_digest(k['grossing'])}"
-                 for cc, k in collected.items() if (k or {}).get('grossing')]
-        if not parts:
-            print('[INFO] 글로벌 브리핑 스킵(매출 데이터 없음)'); return
-        prompt = ("다음은 오늘 App Store 게임 '매출' 차트의 국가별 스냅샷이다.\n\n" + '\n'.join(parts) + "\n\n"
-                  "게임 사업 PM이 전 시장을 횡단해 읽도록, 아래 4개 항목으로 써라. "
-                  "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로. 항목 제목은 그대로 둘 것.\n"
-                  "## 횡단 신호\n## 시장별 색깔\n## IP·퍼블리셔 동향\n## 진출 전략\n\n"
-                  "횡단 신호: 여러 시장에서 동시에 강한 게임·장르. 시장별 색깔: 시장 간 장르 색깔 차이. "
-                  "IP·퍼블리셔 동향: 여러 시장 관통 IP·퍼블리셔. 진출 전략: 다음 진출·벤치마크 시장 결론. "
-                  "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
-        basis = 'country'
-    try:
-        text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
-    except Exception as e:
-        print(f'[WARN] 글로벌 브리핑 생성 실패: {e}'); return
-    g_hist = _brief_history(gp)
-    gp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                              'countries': n_countries, 'basis': basis, 'sources': len(sub_briefs),
-                              'localized': True, 'text': text, 'history': g_hist}, ensure_ascii=False), encoding='utf-8')
-    print(f'[OK] 글로벌 브리핑 저장: docs/markets/global_brief.json (basis={basis}, sources={len(sub_briefs)})')
+        try:
+            text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
+        except Exception as e:
+            print(f'[WARN] 글로벌 {axis_label} 브리핑 생성 실패: {e}')
+            if axis_key in prev_axes:
+                g_axes[axis_key] = prev_axes[axis_key]
+            continue
+        g_axes[axis_key] = {'generated': now_s, 'text': text, 'history': _axis_hist(prev)}
+        print(f'[OK] 글로벌 · {axis_label} 브리핑 생성(sources={len(subs)})')
+    if not g_axes:
+        print('[INFO] 글로벌 브리핑 스킵(하위 분석 없음)'); return
+    wk = g_axes.get('weekly') or next((g_axes[k] for k, _ in BRIEF_AXES if k in g_axes), {})
+    gp.write_text(json.dumps({'generated': wk.get('generated') or now_s,
+                              'countries': n_countries, 'basis': 'hierarchical', 'sources': total_sources,
+                              'localized': True, 'axes': g_axes,
+                              'text': wk.get('text') or '', 'history': wk.get('history') or []},
+                             ensure_ascii=False), encoding='utf-8')
+    print(f'[OK] 글로벌 브리핑 저장: docs/markets/global_brief.json (축 {list(g_axes.keys())}, sources={total_sources})')
 
 
 def load_data_in_date_range(start_dt, end_dt, today_dt=None, current=None):
