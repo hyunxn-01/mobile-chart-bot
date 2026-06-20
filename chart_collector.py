@@ -1581,11 +1581,12 @@ def main():
 
     print("[다국가] 전체 국가 iOS 차트 수집·저장 + 주요시장/지역/글로벌 브리핑...")
     try:
-        collected = collect_all_countries()
-        majors = build_major_briefs(collected)      # 주요 시장 개별 먼저
-        regions = build_regional_briefs(collected)  # 중소규모 지역 묶음
+        collected = collect_all_countries(COUNTRIES + COUNTRIES_EXTRA)  # [임시·1회] 전 32개국 데이터 수집
+        core = {cc: collected[cc] for cc in COUNTRIES if cc in collected}  # 브리핑은 코어 10개국만(비용 억제·신규지역 브리핑 생성 방지)
+        majors = build_major_briefs(core)           # 주요 시장 개별 먼저
+        regions = build_regional_briefs(core)       # 중소규모 지역 묶음
         write_briefs_index(majors, regions)         # 탭 인덱스(주요→지역)
-        build_global_brief(collected)               # 주요+지역을 토대로 글로벌 종합
+        build_global_brief(core)                    # 주요+지역을 토대로 글로벌 종합
         apply_aliases_to_briefs()                   # 브리핑 내 현지어 게임명→한글 치환(무비용)
     except Exception as e:
         print(f"[WARN] 다국가 수집/브리핑 실패: {e}")
