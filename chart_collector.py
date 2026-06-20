@@ -165,7 +165,7 @@ def fetch_genres(track_ids, country='kr'):
                 if tid:
                     result[tid] = {
                         'genre': _pick_genre(it.get('genres', [])),
-                        'genre_ids': [str(g) for g in (it.get('genreIds') or [])],
+                        'genre_ids': ','.join(str(g) for g in (it.get('genreIds') or [])),
                         'primary_genre': it.get('primaryGenreName', ''),
                         'release': (it.get('releaseDate') or '')[:10],
                         'rating': it.get('averageUserRating'),
@@ -189,7 +189,7 @@ def attach_genres(apps, country='kr'):
         for a in apps:
             m = gmap.get(str(a.get('track_id')), {})
             a['genre'] = m.get('genre', '미상')
-            a['genre_ids'] = m.get('genre_ids', [])
+            a['genre_ids'] = m.get('genre_ids', '')
             a['primary_genre'] = m.get('primary_genre', '')
             a['release'] = m.get('release', '')
             a['rating'] = m.get('rating')
