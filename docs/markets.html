@@ -50,6 +50,11 @@
   .empty{ color:var(--muted); font-size:13px; padding:14px 0; }
   .foot{ color:var(--muted); font-size:11.5px; text-align:center; margin-top:28px; }
   .foot a{ color:var(--accent); }
+  .brief-tag{ font-size:11px; font-weight:700; color:#fff; background:var(--accent); border-radius:6px; padding:2px 8px; vertical-align:middle; margin-left:6px; }
+  .brief-body{ font-size:13.5px; line-height:1.7; }
+  .brief-body .bl{ position:relative; padding-left:16px; margin:5px 0; }
+  .brief-body .bl::before{ content:''; position:absolute; left:3px; top:9px; width:5px; height:5px; border-radius:50%; background:var(--accent); }
+  .brief-body b{ color:var(--text); font-weight:700; }
 </style>
 </head>
 <body>
@@ -59,6 +64,12 @@
     <span class="madeby">MADE BY <b>김동현</b></span>
   </header>
   <p class="sub" id="sub">국가별 App Store 게임 차트의 장르 추이 — 다음 진출 시장을 읽는 레이더.</p>
+
+  <div class="card brief" id="briefCard" hidden>
+    <h2>글로벌 인사이트 <span class="brief-tag">전 시장 횡단</span></h2>
+    <p class="hint" id="briefMeta" style="margin:2px 0 10px"></p>
+    <div class="brief-body" id="briefBody"></div>
+  </div>
 
   <div class="controls">
     <span class="ctl-label">국가</span>
@@ -101,6 +112,14 @@ const CC_NAME = {kr:'한국',us:'미국',jp:'일본',cn:'중국',tw:'대만',gb:
   br:'브라질',mx:'멕시코',ar:'아르헨티나',co:'콜롬비아',id:'인도네시아',th:'태국',vn:'베트남',ph:'필리핀',my:'말레이시아',sg:'싱가포르',in:'인도',pk:'파키스탄',bd:'방글라데시'};
 const colorFor = g => GENRE_COLORS[g] || '#9b9a92';
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function mdBrief(raw){
+  return String(raw||'').split('\n').map(line=>{
+    const e = esc(line.replace(/^\s*[-•]\s+/,'').trim()).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    if(!line.trim()) return '';
+    if(/^\s*[-•]\s+/.test(line)) return '<div class="bl">'+e+'</div>';
+    return '<div style="margin:6px 0">'+e+'</div>';
+  }).join('');
+}
 
 let CHART=null, CUR=null, activeChart='grossing', hiddenGenres={}, cache={};
 
@@ -138,9 +157,24 @@ function renderGenreChart(gs){
   const genres = (gs&&gs.genres)||{};
   // 장르를 합계 많은 순으로 정렬
   const order = Object.keys(genres).sort((a,b)=> genres[b].reduce((s,x)=>s+x,0)-genres[a].reduce((s,x)=>s+x,0));
-  const datasets = order.filter(g=>!hiddenGenres[g]).map(g=>({
-    label:g, data:genres[g], borderColor:colorFor(g), backgroundColor:colorFor(g),
-    fill:false, tension:0.25, borderWidth:2, pointRadius:2.5, pointHoverRadius:5, spanGaps:true,
+  const visible = order.filter(g=>!hiddenGenres[g]);
+  // 겹침 방지: 같은 날짜에 값이 같은 장르 점들은 진짜 값 주변으로 살짝 분산(표시만, 툴팁엔 원값)
+  const adj = {}; visible.forEach(g=> adj[g] = (genres[g]||[]).slice());
+  for(let xi=0; xi<labels.length; xi++){
+    const groups = {};
+    visible.forEach(g=>{ const v=(genres[g]||[])[xi]; if(v==null) return; (groups[v]=groups[v]||[]).push(g); });
+    Object.keys(groups).forEach(v=>{
+      const arr = groups[v]; if(arr.length<2) return;
+      const spread = Math.min(0.5, 0.12*(arr.length-1));
+      const step = spread/(arr.length-1);
+      arr.forEach((g,idx)=>{ adj[g][xi] = Number(v) + (idx-(arr.length-1)/2)*step; });
+    });
+  }
+  const pb = cssVar('--card') || '#fff';
+  const datasets = visible.map(g=>({
+    label:g, data:adj[g], _raw:genres[g], borderColor:colorFor(g), backgroundColor:colorFor(g),
+    fill:false, tension:0.25, borderWidth:2, pointRadius:3, pointHoverRadius:6,
+    pointBorderColor:pb, pointBorderWidth:1.5, pointBackgroundColor:colorFor(g), spanGaps:true,
   }));
   const ctx = document.getElementById('genreChart');
   if(CHART) CHART.destroy();
@@ -149,13 +183,16 @@ function renderGenreChart(gs){
     data:{ labels, datasets },
     options:{
       responsive:true, maintainAspectRatio:false, animation:false,
-      interaction:{ mode:'index', intersect:false },
+      interaction:{ mode:'nearest', intersect:false, axis:'xy' },
       plugins:{ legend:{display:false},
-        tooltip:{ callbacks:{ label:(c)=> c.dataset.label+': '+c.parsed.y+'개' } } },
+        tooltip:{ displayColors:true, callbacks:{
+          title:(items)=> items.length? labels[items[0].dataIndex] : '',
+          label:(c)=>{ const raw=(c.dataset._raw||[])[c.dataIndex]; return c.dataset.label+' · '+(raw==null?Math.round(c.parsed.y):raw)+'개'; }
+        } } },
       scales:{
         x:{ ticks:{ color:cssVar('--muted'), maxRotation:0, autoSkip:true, maxTicksLimit:12 }, grid:{ display:false } },
         y:{ beginAtZero:true, title:{ display:true, text:'상위 차트 내 게임 수', color:cssVar('--muted') },
-            ticks:{ color:cssVar('--muted') }, grid:{ color:'rgba(130,130,125,0.14)' } },
+            ticks:{ color:cssVar('--muted'), precision:0 }, grid:{ color:'rgba(130,130,125,0.14)' } },
       },
     },
   });
@@ -207,6 +244,14 @@ fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'})
     if(ccs.length){ sel.value = ccs[0]; loadCountry(ccs[0]); }
   })
   .catch(e=>{ document.getElementById('sub').textContent='데이터를 불러오지 못했습니다: '+e.message; });
+
+fetch('./markets/global_brief.json?_='+Date.now(), {cache:'no-store'})
+  .then(r=> r.ok ? r.json() : null)
+  .then(b=>{ if(!b||!b.text) return;
+    document.getElementById('briefMeta').textContent = (b.generated||'')+' 기준 · '+(b.countries||'')+'개 시장 횡단';
+    document.getElementById('briefBody').innerHTML = mdBrief(b.text);
+    document.getElementById('briefCard').hidden = false;
+  }).catch(()=>{});
 </script>
 </body>
 </html>
