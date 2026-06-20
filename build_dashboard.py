@@ -272,7 +272,10 @@ def build_country(country):
                 if aid and aid not in games:
                     games[aid] = {'title': app.get('title_kr') or app.get('title', ''), 'developer': app.get('developer', ''),
                                   'genre': canon_genre(app), 'icon': app.get('icon', ''),
-                                  'rating': app.get('rating'), 'release': app.get('release', '')}
+                                  'rating': app.get('rating'), 'release': app.get('release', ''),
+                                  'updated': app.get('updated', ''), 'ratings': app.get('ratings'),
+                                  'notes': app.get('notes', ''), 'artist_id': app.get('artist_id'),
+                                  'cv_rating': app.get('cv_rating'), 'cv_ratings': app.get('cv_ratings')}
         daily = {aid: [None] * len(dates) for aid in games}
         for i, dt in enumerate(dates):
             for app in days[dt]:
