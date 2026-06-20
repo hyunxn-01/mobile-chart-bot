@@ -1312,7 +1312,11 @@ function init(full){
   _gwCache=null;          // 국가별 매출 가중치 캐시 리셋(국가 전환 시 오염 방지)
   selected.length=0;      // 국가 바뀌면 선택 초기화
   genreSel.length=0;      // 장르 강조도 초기화
-  if(typeof mkBriefSel!=='undefined' && mkBriefSel) selectBrief(mkBriefSel);  // 브리핑 재렌더 → 현재 국가 게임명으로 칩 활성화
+  // 브리핑: 현재 국가가 주요시장이면 그 시장 브리핑 탭 자동 선택(게임명 칩 클릭=상세 작동), 아니면 현재 브리핑 재렌더
+  { const cc=(typeof MK_CC!=='undefined')?MK_CC:null;
+    const mt=(typeof MK_BRIEF_TABS!=='undefined'&&MK_BRIEF_TABS)?MK_BRIEF_TABS.find(t=>t.type==='major'&&t.key===cc):null;
+    if(mt) selectBrief('major:'+cc);
+    else if(typeof mkBriefSel!=='undefined' && mkBriefSel) selectBrief(mkBriefSel); }
   // 차트는 항상 게임 모드로 생성됨 → 모드 UI를 게임 베이스라인으로 리셋(이전 국가에서 장르였어도)
   const _wantGenre=(chartMode==='genre');
   chartMode='game';
