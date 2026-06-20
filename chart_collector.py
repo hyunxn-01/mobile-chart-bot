@@ -319,23 +319,39 @@ def save_title_aliases(aliases):
 
 def translate_titles_kr(titles):
     """현지어(중/일) 게임명 리스트 → {원문: 한국어명}. 저비용 모델, 캐시 미스만 호출. 실패 시 {}."""
+    dbg = {'model': TRANSLATE_MODEL, 'n_in': len(titles), 'sample_in': list(titles)[:6]}
     if not titles:
+        _write_title_debug(dbg)
         return {}
     listing = '\n'.join(f"- {t}" for t in titles)
     prompt = ("다음은 App Store 게임 제목(중국어 또는 일본어)들이다. 각 제목을 한국 게이머가 부르는 한국어 표기로 바꿔라. "
               "한국 정식 서비스명이 있으면 그 이름을, 없으면 한글 음차로. 뜻 번역이 아니라 '게임 이름'만. "
-              "확실치 않으면 원문을 그대로 값으로 둬라. 출력은 JSON 객체 {\"원문\":\"한국어\"} 하나만, 다른 말 없이.\n\n" + listing)
+              "잘 모르면 한글 음차라도 반드시 한국어로. 출력은 JSON 객체 {\"원문\":\"한국어\"} 하나만, 다른 말 없이.\n\n" + listing)
+    out = {}
     try:
         client = Anthropic(api_key=ANTHROPIC_API_KEY)
         msg = client.messages.create(model=TRANSLATE_MODEL, max_tokens=2000,
                                      messages=[{'role': 'user', 'content': prompt}])
         txt = next((b.text for b in msg.content if getattr(b, 'type', None) == 'text'), '') or ''
+        dbg['raw_out'] = txt[:600]
         s, e = txt.find('{'), txt.rfind('}')
         if s >= 0 and e > s:
-            return {str(k): str(v) for k, v in json.loads(txt[s:e + 1]).items() if v}
+            out = {str(k): str(v) for k, v in json.loads(txt[s:e + 1]).items() if v}
+        dbg['n_out'] = len(out)
     except Exception as ex:
+        dbg['error'] = f"{type(ex).__name__}: {ex}"
         print(f"[WARN] 게임명 번역 실패: {ex}")
-    return {}
+    _write_title_debug(dbg)
+    return out
+
+
+def _write_title_debug(dbg):
+    try:
+        d = Path('docs') / 'markets'
+        d.mkdir(parents=True, exist_ok=True)
+        (d / '_titledebug.json').write_text(json.dumps(dbg, ensure_ascii=False, indent=2), encoding='utf-8')
+    except Exception:
+        pass
 
 
 def localize_titles(collected):
