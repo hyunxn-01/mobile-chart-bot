@@ -318,29 +318,34 @@ def save_title_aliases(aliases):
 
 
 def translate_titles_kr(titles):
-    """현지어(중/일) 게임명 리스트 → {원문: 한국어명}. 저비용 모델, 캐시 미스만 호출. 실패 시 {}."""
-    dbg = {'model': TRANSLATE_MODEL, 'n_in': len(titles), 'sample_in': list(titles)[:6]}
-    if not titles:
-        _write_title_debug(dbg)
-        return {}
-    listing = '\n'.join(f"- {t}" for t in titles)
-    prompt = ("다음은 App Store 게임 제목(중국어 또는 일본어)들이다. 각 제목을 한국 게이머가 부르는 한국어 표기로 바꿔라. "
-              "한국 정식 서비스명이 있으면 그 이름을, 없으면 한글 음차로. 뜻 번역이 아니라 '게임 이름'만. "
-              "잘 모르면 한글 음차라도 반드시 한국어로. 출력은 JSON 객체 {\"원문\":\"한국어\"} 하나만, 다른 말 없이.\n\n" + listing)
+    """현지어(중/일) 게임명 리스트 → {원문: 한국어명}. 50개씩 배치(응답 잘림 방지), 저비용 모델. 실패 배치만 건너뜀."""
     out = {}
-    try:
-        client = Anthropic(api_key=ANTHROPIC_API_KEY)
-        msg = client.messages.create(model=TRANSLATE_MODEL, max_tokens=2000,
-                                     messages=[{'role': 'user', 'content': prompt}])
-        txt = next((b.text for b in msg.content if getattr(b, 'type', None) == 'text'), '') or ''
-        dbg['raw_out'] = txt[:600]
-        s, e = txt.find('{'), txt.rfind('}')
-        if s >= 0 and e > s:
-            out = {str(k): str(v) for k, v in json.loads(txt[s:e + 1]).items() if v}
-        dbg['n_out'] = len(out)
-    except Exception as ex:
-        dbg['error'] = f"{type(ex).__name__}: {ex}"
-        print(f"[WARN] 게임명 번역 실패: {ex}")
+    titles = list(titles)
+    dbg = {'model': TRANSLATE_MODEL, 'n_in': len(titles), 'sample_in': titles[:6], 'batches': 0, 'errors': []}
+    if not titles:
+        _write_title_debug(dbg, '_titledebugx.json')
+        return out
+    client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    BATCH = 50
+    for i in range(0, len(titles), BATCH):
+        chunk = titles[i:i + BATCH]
+        listing = '\n'.join(f"- {t}" for t in chunk)
+        prompt = ("다음은 App Store 게임 제목(중국어 또는 일본어)들이다. 각 제목을 한국 게이머가 부르는 한국어 표기로 바꿔라. "
+                  "한국 정식 서비스명이 있으면 그 이름을, 없으면 한글 음차로. 뜻 번역이 아니라 '게임 이름'만. "
+                  "잘 모르면 한글 음차라도 반드시 한국어로. 출력은 JSON 객체 {\"원문\":\"한국어\"} 하나만, 다른 말 없이.\n\n" + listing)
+        try:
+            msg = client.messages.create(model=TRANSLATE_MODEL, max_tokens=4000,
+                                         messages=[{'role': 'user', 'content': prompt}])
+            txt = next((b.text for b in msg.content if getattr(b, 'type', None) == 'text'), '') or ''
+            s, e = txt.find('{'), txt.rfind('}')
+            if s >= 0 and e > s:
+                out.update({str(k): str(v) for k, v in json.loads(txt[s:e + 1]).items() if v})
+            dbg['batches'] += 1
+        except Exception as ex:
+            dbg['errors'].append(f"{type(ex).__name__}: {ex}")
+            print(f"[WARN] 게임명 번역 배치 실패(i={i}): {ex}")
+        time.sleep(0.3)
+    dbg['n_out'] = len(out)
     _write_title_debug(dbg, '_titledebugx.json')
     return out
 
