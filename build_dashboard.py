@@ -197,6 +197,119 @@ def build_chart(history_dir):
     }
 
 
+# ============================================================
+# 다국가 집계 (Phase 2) — data/charts/{country}/{kind} → docs/markets/{country}.json
+# ============================================================
+
+CHARTS_DIR = Path('data') / 'charts'
+MARKETS_OUT = DOCS_DIR / 'markets'
+
+# Apple 게임 장르 ID(숫자) → 정규 장르(한글). 언어 독립이라 전 국가 통일에 사용.
+GENRE_ID_KR = {
+    '7001': '액션', '7002': '어드벤처', '7003': '캐주얼', '7004': '보드', '7005': '카드',
+    '7006': '카지노', '7007': '주사위', '7008': '교육', '7009': '가족', '7011': '음악',
+    '7012': '퍼즐', '7013': '레이싱', '7014': '롤플레잉', '7015': '시뮬레이션', '7016': '스포츠',
+    '7017': '전략', '7018': '트리비아', '7019': '단어',
+}
+
+
+def canon_genre(app):
+    """genre_ids(숫자 문자열)로 정규 장르. 없으면 현지 genre(한글일 때만) 폴백."""
+    for gid in str(app.get('genre_ids', '')).split(','):
+        g = GENRE_ID_KR.get(gid.strip())
+        if g:
+            return g
+    g = app.get('genre')
+    return g if (g and g not in ('미상', '게임', 'Games')) else '기타'
+
+
+def load_country_charts(country, kind):
+    """data/charts/{country}/{kind}/*.json → {date: [apps]} 날짜순."""
+    d = CHARTS_DIR / country / kind
+    days = {}
+    if not d.exists():
+        return days
+    for f in sorted(d.glob('*.json')):
+        try:
+            datetime.strptime(f.stem, '%Y-%m-%d')
+        except ValueError:
+            continue
+        try:
+            data = json.loads(f.read_text(encoding='utf-8'))
+            if isinstance(data, list):
+                days[f.stem] = data
+        except Exception as e:
+            print(f"[WARN] {f} 로드 실패: {e}")
+    return days
+
+
+def build_genre_series(days, dates):
+    """일별 장르 점유율 시계열(누적영역 차트용): {labels, genres:{genre:[count per date]}}."""
+    all_g = set()
+    per_day = {}
+    for dt in dates:
+        c = {}
+        for app in days[dt]:
+            g = canon_genre(app)
+            c[g] = c.get(g, 0) + 1
+            all_g.add(g)
+        per_day[dt] = c
+    genres = {g: [per_day[dt].get(g, 0) for dt in dates] for g in sorted(all_g)}
+    return {'labels': dates, 'genres': genres}
+
+
+def build_country(country):
+    out = {'country': country, 'charts': {}}
+    for kind in ('grossing', 'free'):
+        days = load_country_charts(country, kind)
+        dates = sorted(days.keys())
+        if not dates:
+            continue
+        games = {}
+        for dt in dates:
+            for app in days[dt]:
+                aid = app.get('app_id') or app.get('track_id')
+                if aid and aid not in games:
+                    games[aid] = {'title': app.get('title', ''), 'developer': app.get('developer', ''),
+                                  'genre': canon_genre(app), 'icon': app.get('icon', ''),
+                                  'rating': app.get('rating'), 'release': app.get('release', '')}
+        daily = {aid: [None] * len(dates) for aid in games}
+        for i, dt in enumerate(dates):
+            for app in days[dt]:
+                aid = app.get('app_id') or app.get('track_id')
+                if aid in daily:
+                    daily[aid][i] = app.get('rank')
+        out['charts'][kind] = {
+            'date_range': [dates[0], dates[-1]], 'num_days': len(dates), 'num_games': len(games),
+            'games': games,
+            'daily': {'labels': dates, 'series': daily},
+            'genre_series': build_genre_series(days, dates),
+        }
+    return out
+
+
+def build_markets():
+    """data/charts 하위 전 국가를 docs/markets/{country}.json + index.json 으로 집계."""
+    if not CHARTS_DIR.exists():
+        print('[INFO] data/charts 없음 — 다국가 집계 건너뜀')
+        return
+    MARKETS_OUT.mkdir(parents=True, exist_ok=True)
+    countries = sorted([d.name for d in CHARTS_DIR.iterdir() if d.is_dir()])
+    index = []
+    for cc in countries:
+        co = build_country(cc)
+        if not co.get('charts'):
+            continue
+        (MARKETS_OUT / f'{cc}.json').write_text(
+            json.dumps(co, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        g = co['charts'].get('grossing', {})
+        index.append({'country': cc, 'num_days': g.get('num_days', 0), 'num_games': g.get('num_games', 0)})
+    (MARKETS_OUT / 'index.json').write_text(
+        json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'), 'countries': index},
+                   ensure_ascii=False), encoding='utf-8')
+    print(f"[OK] 다국가 집계: {len(index)}개국 → {MARKETS_OUT}")
+
+
 def build():
     grossing = build_chart(HISTORY_DIR)
     free = build_chart(HISTORY_FREE_DIR)
@@ -228,6 +341,10 @@ def build():
     print(f"     매출(grossing): {grossing['num_games']}게임 · {grossing['num_days']}일")
     print(f"     인기(free): {free['num_games']}게임 · {free['num_days']}일")
     print(f"     퍼블리셔: 매출 {len(grossing['publishers']['list'])}곳 · 인기 {len(free['publishers']['list'])}곳")
+    try:
+        build_markets()
+    except Exception as e:
+        print(f"[WARN] 다국가 집계 실패: {e}")
     return out
 
 
