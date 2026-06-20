@@ -341,15 +341,15 @@ def translate_titles_kr(titles):
     except Exception as ex:
         dbg['error'] = f"{type(ex).__name__}: {ex}"
         print(f"[WARN] 게임명 번역 실패: {ex}")
-    _write_title_debug(dbg)
+    _write_title_debug(dbg, '_titledebugx.json')
     return out
 
 
-def _write_title_debug(dbg):
+def _write_title_debug(dbg, name='_titledebug.json'):
     try:
         d = Path('docs') / 'markets'
         d.mkdir(parents=True, exist_ok=True)
-        (d / '_titledebug.json').write_text(json.dumps(dbg, ensure_ascii=False, indent=2), encoding='utf-8')
+        (d / name).write_text(json.dumps(dbg, ensure_ascii=False, indent=2), encoding='utf-8')
     except Exception:
         pass
 
@@ -370,22 +370,34 @@ def localize_titles(collected):
                 tid = str(a.get('track_id'))
                 a['title_kr'] = kr_titles.get(tid) or us_titles.get(tid) or a.get('title', '')
     # 여전히 중/일 현지어인 이름 → 캐시 우선, 새 이름만 저비용 모델로 음차
-    aliases = load_title_aliases()
-    pending = sorted({a['title_kr'] for cc in collected for kind in collected[cc]
-                      for a in collected[cc][kind]
-                      if _needs_kr(a.get('title_kr')) and a.get('title_kr') not in aliases})
-    new_map = translate_titles_kr(pending) if pending else {}
-    if new_map:
-        aliases.update({k: v for k, v in new_map.items() if v and v != k})
-        save_title_aliases(aliases)
-    if aliases:
-        for cc in collected:
-            for kind in collected[cc]:
-                for a in collected[cc][kind]:
-                    tk = a.get('title_kr', '')
-                    if _needs_kr(tk) and tk in aliases:
-                        a['title_kr'] = aliases[tk]
-    print(f"[OK] 게임명 현지화: KR {len(kr_titles)} + US {len(us_titles)} + 별칭 {len(aliases)} (신규음차 {len(new_map)}) / 전체 {len(all_ids)}")
+    _dbg = {'n_all_ids': len(all_ids), 'kr': len(kr_titles), 'us': len(us_titles)}
+    try:
+        aliases = load_title_aliases()
+        pending = sorted({a['title_kr'] for cc in collected for kind in collected[cc]
+                          for a in collected[cc][kind]
+                          if _needs_kr(a.get('title_kr')) and a.get('title_kr') not in aliases})
+        _dbg['pending'] = len(pending)
+        _dbg['pending_sample'] = pending[:8]
+        new_map = translate_titles_kr(pending) if pending else {}
+        _dbg['new_map'] = len(new_map)
+        if new_map:
+            aliases.update({k: v for k, v in new_map.items() if v and v != k})
+            save_title_aliases(aliases)
+        applied = 0
+        if aliases:
+            for cc in collected:
+                for kind in collected[cc]:
+                    for a in collected[cc][kind]:
+                        tk = a.get('title_kr', '')
+                        if _needs_kr(tk) and tk in aliases:
+                            a['title_kr'] = aliases[tk]; applied += 1
+        _dbg['aliases_total'] = len(aliases)
+        _dbg['applied'] = applied
+    except Exception as ex:
+        _dbg['error'] = f"{type(ex).__name__}: {ex}"
+        print(f"[WARN] 게임명 별칭 단계 실패: {ex}")
+    _write_title_debug(_dbg)
+    print(f"[OK] 게임명 현지화: KR {len(kr_titles)} + US {len(us_titles)} / 전체 {len(all_ids)}")
 
 
 def apply_aliases_to_briefs(aliases=None):
