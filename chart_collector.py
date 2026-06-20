@@ -265,13 +265,53 @@ def fetch_apple_chart(country, slug, limit=100):
         return []
 
 
+def fetch_titles(track_ids, country='kr'):
+    """trackId 목록 → {trackId(str): trackName}. 해당 country 스토어의 표기명(스토어에 없으면 결과에서 빠짐)."""
+    out = {}
+    ids = [str(t) for t in track_ids if t]
+    if not ids:
+        return out
+    for i in range(0, len(ids), 180):
+        chunk = ids[i:i + 180]
+        try:
+            url = f"https://itunes.apple.com/lookup?id={','.join(chunk)}&country={country}"
+            r = requests.get(url, timeout=20, headers={'User-Agent': 'Mozilla/5.0'})
+            r.raise_for_status()
+            for it in r.json().get('results', []):
+                tid = str(it.get('trackId', ''))
+                nm = it.get('trackName')
+                if tid and nm:
+                    out[tid] = nm
+        except Exception as e:
+            print(f"[WARN] 타이틀 lookup 실패(chunk {i}, {country}): {e}")
+        time.sleep(0.3)
+    return out
+
+
+def localize_titles(collected):
+    """게임명 한국어화: 전 국가 trackId를 모아 KR 스토어명 → 없으면 US(영문) → 그래도 없으면 원래 이름.
+    각 app에 title_kr 부여."""
+    all_ids = sorted({str(a.get('track_id')) for cc in collected for kind in collected[cc]
+                      for a in collected[cc][kind] if a.get('track_id')})
+    if not all_ids:
+        return
+    kr_titles = fetch_titles(all_ids, 'kr')
+    missing = [i for i in all_ids if i not in kr_titles]
+    us_titles = fetch_titles(missing, 'us') if missing else {}
+    for cc in collected:
+        for kind in collected[cc]:
+            for a in collected[cc][kind]:
+                tid = str(a.get('track_id'))
+                a['title_kr'] = kr_titles.get(tid) or us_titles.get(tid) or a.get('title', '')
+    print(f"[OK] 게임명 현지화: KR {len(kr_titles)} + US {len(us_titles)} / 전체 {len(all_ids)}")
+
+
 def collect_all_countries(countries=None, limit=100):
-    """대상 국가별 iOS 매출·다운 차트 + 메타를 data/charts/{country}/{kind}/{date}.json 에 저장.
+    """대상 국가별 iOS 매출·다운 차트 + 메타 + 한국어 게임명을 data/charts/{country}/{kind}/{date}.json 에 저장.
     기존 KR 파이프라인과 독립(추가 수집). 한 국가 실패해도 다음으로 진행."""
     countries = countries or COUNTRIES
     today = datetime.now().strftime('%Y-%m-%d')
     collected = {}
-    ok = 0
     for cc in countries:
         collected[cc] = {}
         for kind, slug in [('grossing', 'topgrossingapplications'), ('free', 'topfreeapplications')]:
@@ -283,12 +323,21 @@ def collect_all_countries(countries=None, limit=100):
             except Exception as e:
                 print(f"[WARN] {cc}/{kind} 장르 부착 실패: {e}")
             collected[cc][kind] = apps
+            time.sleep(0.4)   # iTunes 레이트리밋 배려
+    try:
+        localize_titles(collected)          # title_kr 부여(KR→US→원본)
+    except Exception as e:
+        print(f"[WARN] 게임명 현지화 실패: {e}")
+    ok = 0
+    for cc in collected:
+        for kind in collected[cc]:
+            for a in collected[cc][kind]:
+                a.setdefault('title_kr', a.get('title', ''))
             d = CHARTS_DIR / cc / kind
             d.mkdir(parents=True, exist_ok=True)
-            (d / f'{today}.json').write_text(json.dumps(apps, ensure_ascii=False), encoding='utf-8')
+            (d / f'{today}.json').write_text(json.dumps(collected[cc][kind], ensure_ascii=False), encoding='utf-8')
             ok += 1
-            print(f"[OK] {cc}/{kind}: {len(apps)}개 저장")
-            time.sleep(0.4)   # iTunes 레이트리밋 배려
+            print(f"[OK] {cc}/{kind}: {len(collected[cc][kind])}개 저장")
     print(f"[OK] 다국가 수집 완료: {ok}개(국가×차트) → {CHARTS_DIR}")
     return collected
 
@@ -332,10 +381,18 @@ def _brief_fresh(fp, days=BRIEF_CADENCE_DAYS):
         return False
 
 
+def _brief_localized(fp):
+    """브리핑이 한국어 게임명(title_kr) 기준으로 생성됐는지 마커 확인. 없으면 1회 강제 재생성용 False."""
+    try:
+        return bool(json.loads(fp.read_text(encoding='utf-8')).get('localized'))
+    except Exception:
+        return False
+
+
 def _country_digest(g):
     """국가 매출 차트 1개 → 'TOP5 + 장르분포' 한 줄 다이제스트."""
     from collections import Counter
-    top = ', '.join(f"{a.get('rank')}.{a.get('title')}({a.get('genre', '')})" for a in g[:5])
+    top = ', '.join(f"{a.get('rank')}.{a.get('title_kr') or a.get('title')}({a.get('genre', '')})" for a in g[:5])
     gc = Counter(a.get('genre', '기타') for a in g)
     genres = ', '.join(f"{k} {v}" for k, v in gc.most_common(6))
     return f"매출TOP5: {top} | 장르분포(상위100): {genres}"
@@ -354,7 +411,7 @@ def build_major_briefs(collected):
             continue  # 아직 수집 안 된 주요국(탭 미노출)
         name = CC_NAME_KR.get(cc, cc.upper())
         fp = out_dir / f'major_{cc}.json'
-        if _brief_fresh(fp):
+        if _brief_fresh(fp) and _brief_localized(fp):
             available.append({'key': cc, 'name': name})
             print(f'[INFO] {name} 단독 브리핑 스킵(7일 이내 최신)')
             continue
@@ -368,7 +425,7 @@ def build_major_briefs(collected):
         except Exception as e:
             print(f'[WARN] {name} 단독 브리핑 생성 실패: {e}'); continue
         fp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                                  'market': name, 'cc': cc, 'text': text},
+                                  'market': name, 'cc': cc, 'localized': True, 'text': text},
                                  ensure_ascii=False), encoding='utf-8')
         available.append({'key': cc, 'name': name})
         print(f'[OK] 주요시장 브리핑 저장: major_{cc}.json ({name})')
@@ -400,7 +457,7 @@ def build_regional_briefs(collected):
         if not members:
             continue  # 이 지역에 수집된 국가가 아직 없음(탭에 노출 안 함)
         fp = out_dir / f'region_{key}.json'
-        if _brief_fresh(fp):
+        if _brief_fresh(fp) and _brief_localized(fp):
             available.append({'key': key, 'name': name, 'countries': len(members)})
             print(f'[INFO] {name} 브리핑 스킵(7일 이내 최신)')
             continue
@@ -415,7 +472,7 @@ def build_regional_briefs(collected):
         except Exception as e:
             print(f'[WARN] {name} 브리핑 생성 실패: {e}'); continue
         fp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                                  'region': name, 'countries': len(members), 'text': text},
+                                  'region': name, 'countries': len(members), 'localized': True, 'text': text},
                                  ensure_ascii=False), encoding='utf-8')
         available.append({'key': key, 'name': name, 'countries': len(members)})
         print(f'[OK] 지역 브리핑 저장: region_{key}.json ({name}, {len(members)}개국)')
@@ -466,7 +523,7 @@ def build_global_brief(collected):
             cur_gen = ''
     stale = not _brief_fresh(gp)
     subs_newer = bool(newest_sub) and newest_sub > cur_gen
-    if not (stale or subs_newer):
+    if not (stale or subs_newer or not _brief_localized(gp)):
         print('[INFO] 글로벌 브리핑 스킵(7일 이내 & 하위 갱신 없음)'); return
 
     n_countries = sum(1 for cc, k in collected.items() if (k or {}).get('grossing'))
@@ -496,7 +553,7 @@ def build_global_brief(collected):
         print(f'[WARN] 글로벌 브리핑 생성 실패: {e}'); return
     gp.write_text(json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
                               'countries': n_countries, 'basis': basis, 'sources': len(sub_briefs),
-                              'text': text}, ensure_ascii=False), encoding='utf-8')
+                              'localized': True, 'text': text}, ensure_ascii=False), encoding='utf-8')
     print(f'[OK] 글로벌 브리핑 저장: docs/markets/global_brief.json (basis={basis}, sources={len(sub_briefs)})')
 
 

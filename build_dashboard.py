@@ -270,7 +270,7 @@ def build_country(country):
             for app in days[dt]:
                 aid = app.get('app_id') or app.get('track_id')
                 if aid and aid not in games:
-                    games[aid] = {'title': app.get('title', ''), 'developer': app.get('developer', ''),
+                    games[aid] = {'title': app.get('title_kr') or app.get('title', ''), 'developer': app.get('developer', ''),
                                   'genre': canon_genre(app), 'icon': app.get('icon', ''),
                                   'rating': app.get('rating'), 'release': app.get('release', '')}
         daily = {aid: [None] * len(dates) for aid in games}
