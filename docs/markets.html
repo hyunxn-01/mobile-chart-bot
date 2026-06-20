@@ -59,6 +59,38 @@
   .brief-tabs button{ font:inherit; font-size:12px; font-weight:600; padding:5px 11px; border:1px solid var(--line); border-radius:999px; background:var(--card); color:var(--muted); cursor:pointer; }
   .brief-tabs button[aria-pressed=true]{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .brief-tabs button:hover{ border-color:var(--accent); }
+  .grow{ cursor:pointer; }
+  .grow:hover{ background:var(--panel); }
+  /* 퍼블리셔 */
+  .ptable{ width:100%; border-collapse:collapse; font-size:13px; }
+  .ptable th{ text-align:left; color:var(--muted); font-weight:600; font-size:11.5px; padding:5px 8px; border-bottom:1px solid var(--line); cursor:pointer; white-space:nowrap; }
+  .ptable th .ar{ opacity:.5; font-size:10px; }
+  .ptable th[aria-sort] .ar{ opacity:1; color:var(--accent); }
+  .ptable td{ padding:6px 8px; border-bottom:1px solid var(--line); }
+  .ptable tr{ cursor:pointer; }
+  .ptable tbody tr:hover{ background:var(--panel); }
+  .pdev{ font-weight:600; }
+  .pnum{ text-align:right; font-variant-numeric:tabular-nums; color:var(--muted); }
+  /* 상세 모달 */
+  .modal[hidden]{ display:none; }
+  .modal{ position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; padding:18px; }
+  .modal-bg{ position:absolute; inset:0; background:rgba(0,0,0,.45); }
+  .modal-card{ position:relative; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; width:380px; max-width:100%; max-height:86vh; overflow:auto; box-shadow:0 10px 40px rgba(0,0,0,.3); }
+  .modal-x{ position:absolute; top:10px; right:12px; border:0; background:none; font-size:22px; line-height:1; color:var(--muted); cursor:pointer; }
+  .md-head{ display:flex; gap:12px; align-items:flex-start; margin-bottom:12px; }
+  .md-ico{ width:56px; height:56px; border-radius:13px; flex:none; background:var(--panel); object-fit:cover; }
+  .md-title{ font-weight:700; font-size:15px; line-height:1.3; }
+  .md-dev{ color:var(--muted); font-size:12.5px; margin-top:2px; }
+  .md-tags{ margin-top:6px; display:flex; gap:5px; flex-wrap:wrap; }
+  .md-tag{ font-size:11px; padding:2px 8px; border-radius:999px; background:var(--panel); border:1px solid var(--line); color:var(--muted); }
+  .md-meta{ display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; font-size:12.5px; margin:6px 0 14px; }
+  .md-meta .mk{ color:var(--muted); }
+  .md-meta .mv{ font-weight:600; }
+  .md-sub{ font-size:11.5px; color:var(--muted); margin-bottom:4px; }
+  .md-spark{ margin-bottom:12px; }
+  .md-spark svg{ width:100%; height:80px; }
+  .md-notes{ font-size:12px; color:var(--text); white-space:pre-wrap; line-height:1.6; background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:10px; max-height:140px; overflow:auto; }
+  .md-notes:empty{ display:none; }
 </style>
 </head>
 <body>
@@ -95,6 +127,7 @@
 
   <div class="card">
     <h2>현재 상위 게임</h2>
+    <p class="hint">행을 누르면 상세(평점·업데이트·순위 추이)가 열려요.</p>
     <div class="gl-row">
       <input class="search" id="gameSearch" type="search" placeholder="게임·개발사 검색" aria-label="게임 검색">
       <span class="hint" id="gameCount" style="margin:0"></span>
@@ -102,7 +135,32 @@
     <div class="glist" id="gameList"></div>
   </div>
 
+  <div class="card" id="pubCard">
+    <h2 id="pubTitle">퍼블리셔별 차트 장악력</h2>
+    <p class="hint">이 시장에서 개발사별로 상위 차트에 올린 게임 수·최고/평균 순위. 행을 누르면 그 개발사 게임만 위에서 필터돼요. (헤더 클릭=정렬)</p>
+    <div class="ptable-wrap" style="overflow-x:auto"><table class="ptable" id="pubTable"></table></div>
+  </div>
+
   <p class="foot">데이터 수집 봇 · 집계 · 시각화 전 과정 자체 구축 · <a href="./index.html">한국 단독 대시보드 →</a></p>
+</div>
+
+<div class="modal" id="gameModal" hidden>
+  <div class="modal-bg" id="modalBg"></div>
+  <div class="modal-card">
+    <button class="modal-x" id="modalX" aria-label="닫기">×</button>
+    <div class="md-head">
+      <img class="md-ico" id="mdIco" alt="" referrerpolicy="no-referrer">
+      <div>
+        <div class="md-title" id="mdTitle"></div>
+        <div class="md-dev" id="mdDev"></div>
+        <div class="md-tags" id="mdTags"></div>
+      </div>
+    </div>
+    <div class="md-meta" id="mdMeta"></div>
+    <div class="md-spark"><div class="md-sub" id="mdSparkSub">순위 추이</div><svg id="mdSpark" viewBox="0 0 320 80" preserveAspectRatio="none"></svg></div>
+    <div class="md-sub" id="mdNotesSub" hidden>업데이트 내역</div>
+    <div class="md-notes" id="mdNotes"></div>
+  </div>
 </div>
 
 <script>
@@ -150,6 +208,7 @@ function render(){
   if(!ch){ renderEmpty(); return; }
   renderGenreChart(ch.genre_series);
   renderGameList(ch);
+  renderPublishers(ch);
 }
 
 function renderEmpty(){
@@ -157,7 +216,11 @@ function renderEmpty(){
   document.getElementById('genreLegend').innerHTML='';
   document.getElementById('gameList').innerHTML='<p class="empty">이 국가·차트 데이터가 아직 없어요.</p>';
   document.getElementById('gameCount').textContent='';
+  document.getElementById('pubTable').innerHTML='';
 }
+
+// 현재 차트의 게임별 최신 순위
+function latestRank(ch, aid){ const s=((ch.daily&&ch.daily.series)||{})[aid]||[]; for(let i=s.length-1;i>=0;i--){ if(s[i]!=null) return s[i]; } return null; }
 
 function renderGenreChart(gs){
   const labels = (gs&&gs.labels)||[];
@@ -223,9 +286,73 @@ function renderGameList(ch){
   if(!rows.length){ list.innerHTML='<p class="empty">결과 없음.</p>'; return; }
   list.innerHTML = rows.slice(0,60).map(r=>{
     const ic = r.g.icon ? '<img class="gico" src="'+esc(r.g.icon)+'" alt="" referrerpolicy="no-referrer">' : '<span class="gico"></span>';
-    return '<div class="grow"><span class="grank">'+Math.round(r.rank)+'</span>'+ic+'<span class="gname" title="'+esc(r.g.title)+'">'+esc(r.g.title)+'</span><span class="gtag">'+esc(r.g.genre||'기타')+'</span></div>';
+    return '<div class="grow" data-aid="'+esc(r.aid)+'"><span class="grank">'+Math.round(r.rank)+'</span>'+ic+'<span class="gname" title="'+esc(r.g.title)+'">'+esc(r.g.title)+'</span><span class="gtag">'+esc(r.g.genre||'기타')+'</span></div>';
   }).join('');
 }
+
+// 퍼블리셔별 차트 장악력(현재 시장·차트 기준, 프론트 집계)
+let pubSort={key:'count',dir:-1};
+function renderPublishers(ch){
+  const games = ch.games||{};
+  const by = {};
+  Object.keys(games).forEach(aid=>{
+    const r = latestRank(ch, aid); if(r==null) return;
+    const dev = games[aid].developer || '(미상)';
+    (by[dev] = by[dev] || {dev, count:0, ranks:[]});
+    by[dev].count++; by[dev].ranks.push(r);
+  });
+  let rows = Object.values(by).map(e=>({dev:e.dev, count:e.count, best:Math.min(...e.ranks), avg:e.ranks.reduce((s,x)=>s+x,0)/e.ranks.length}));
+  const k=pubSort.key, d=pubSort.dir;
+  rows.sort((a,b)=> (a[k]<b[k]?-1:a[k]>b[k]?1:0)*d || a.best-b.best);
+  const cols=[['dev','퍼블리셔'],['count','게임수'],['best','최고'],['avg','평균']];
+  const head='<thead><tr>'+cols.map(([k2,lbl])=>'<th data-k="'+k2+'"'+(k===k2?' aria-sort="'+(d<0?'descending':'ascending')+'"':'')+'>'+lbl+' <span class="ar">'+(k===k2?(d<0?'▼':'▲'):'↕')+'</span></th>').join('')+'</tr></thead>';
+  const body='<tbody>'+rows.slice(0,40).map(e=>'<tr data-dev="'+esc(e.dev)+'"><td class="pdev">'+esc(e.dev)+'</td><td class="pnum">'+e.count+'</td><td class="pnum">'+Math.round(e.best)+'</td><td class="pnum">'+e.avg.toFixed(1)+'</td></tr>').join('')+'</tbody>';
+  const t=document.getElementById('pubTable');
+  t.innerHTML=head+body;
+  t.querySelectorAll('th[data-k]').forEach(th=> th.addEventListener('click',()=>{ const k2=th.dataset.k; if(pubSort.key===k2) pubSort.dir*=-1; else pubSort={key:k2,dir:k2==='dev'?1:-1}; renderPublishers(ch); }));
+  t.querySelectorAll('tr[data-dev]').forEach(tr=> tr.addEventListener('click',()=>{ const s=document.getElementById('gameSearch'); s.value=tr.dataset.dev; renderGameList(ch); document.getElementById('gameList').scrollIntoView({behavior:'smooth',block:'center'}); }));
+}
+
+// 게임 상세 모달
+function openGameDetail(aid){
+  const ch=(CUR.charts||{})[activeChart]; if(!ch) return;
+  const g=(ch.games||{})[aid]; if(!g) return;
+  const labels=(ch.daily&&ch.daily.labels)||[]; const series=((ch.daily&&ch.daily.series)||{})[aid]||[];
+  document.getElementById('mdIco').src = g.icon||'';
+  document.getElementById('mdTitle').textContent = g.title||'';
+  document.getElementById('mdDev').textContent = g.developer||'';
+  const tags=[]; if(g.genre) tags.push(g.genre);
+  if(g.rating!=null) tags.push('★ '+Number(g.rating).toFixed(2));
+  document.getElementById('mdTags').innerHTML = tags.map(t=>'<span class="md-tag">'+esc(t)+'</span>').join('');
+  const meta=[];
+  const rv = g.cv_ratings!=null?g.cv_ratings:g.ratings;
+  if(rv!=null) meta.push(['리뷰 수', Number(rv).toLocaleString()+'개'+ (g.release && (Date.now()-Date.parse(g.release))/(864e5) < 30 ? ' (출시 초기)':'')]);
+  if(g.release) meta.push(['출시일', g.release]);
+  if(g.updated) meta.push(['최근 업데이트', g.updated]);
+  const cur=latestRank(ch,aid); if(cur!=null) meta.push(['현재 순위', Math.round(cur)+'위']);
+  document.getElementById('mdMeta').innerHTML = meta.map(([k,v])=>'<div><span class="mk">'+esc(k)+'</span><br><span class="mv">'+esc(v)+'</span></div>').join('');
+  document.getElementById('mdSpark').innerHTML = sparkSvg(labels, series);
+  const notes=document.getElementById('mdNotes'); notes.textContent = g.notes||''; document.getElementById('mdNotesSub').hidden = !(g.notes&&g.notes.trim());
+  document.getElementById('gameModal').hidden=false;
+}
+function sparkSvg(labels, series){
+  const pts=[]; series.forEach((v,i)=>{ if(v!=null) pts.push([i,v]); });
+  if(!pts.length) return '<text x="160" y="44" text-anchor="middle" fill="'+cssVar('--muted')+'" font-size="12">순위 데이터 없음</text>';
+  const W=320,H=80,P=8; const n=Math.max(1,series.length-1);
+  const x=i=> P + (n? i/n:0.5)*(W-2*P);
+  const y=v=> P + (Math.min(100,Math.max(1,v))-1)/99*(H-2*P);   // 1위=위
+  const line=pts.map((p,i)=>(i?'L':'M')+x(p[0]).toFixed(1)+' '+y(p[1]).toFixed(1)).join(' ');
+  const dots=pts.map(p=>'<circle cx="'+x(p[0]).toFixed(1)+'" cy="'+y(p[1]).toFixed(1)+'" r="2.6" fill="'+cssVar('--accent')+'"/>').join('');
+  const ac=cssVar('--accent')||'#2563eb';
+  return '<path d="'+line+'" fill="none" stroke="'+ac+'" stroke-width="2"/>'+dots
+    + '<text x="2" y="12" fill="'+cssVar('--muted')+'" font-size="9">1위</text>'
+    + '<text x="2" y="'+(H-2)+'" fill="'+cssVar('--muted')+'" font-size="9">100위</text>';
+}
+function closeModal(){ document.getElementById('gameModal').hidden=true; }
+document.getElementById('modalBg').addEventListener('click', closeModal);
+document.getElementById('modalX').addEventListener('click', closeModal);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+document.getElementById('gameList').addEventListener('click', e=>{ const row=e.target.closest('.grow[data-aid]'); if(row) openGameDetail(row.dataset.aid); });
 
 function setChart(kind){
   activeChart = kind;
