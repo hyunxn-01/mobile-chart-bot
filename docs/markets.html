@@ -117,8 +117,10 @@ const CC_NAME = {kr:'한국',us:'미국',jp:'일본',cn:'중국',tw:'대만',gb:
   br:'브라질',mx:'멕시코',ar:'아르헨티나',co:'콜롬비아',id:'인도네시아',th:'태국',vn:'베트남',ph:'필리핀',my:'말레이시아',sg:'싱가포르',in:'인도',pk:'파키스탄',bd:'방글라데시'};
 const colorFor = g => GENRE_COLORS[g] || '#9b9a92';
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const GENRE_LABEL_KR = {'ゲーム':'게임','游戏':'게임','遊戲':'게임','ゲーム ':'게임'};
+function cleanLabels(s){ for(const k in GENRE_LABEL_KR){ s = s.split(k).join(GENRE_LABEL_KR[k]); } return s; }
 function mdBrief(raw){
-  return String(raw||'').split('\n').map(line=>{
+  return String(cleanLabels(raw||'')).split('\n').map(line=>{
     const e = esc(line.replace(/^\s*[-•]\s+/,'').trim()).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
     if(!line.trim()) return '';
     if(/^\s*[-•]\s+/.test(line)) return '<div class="bl">'+e+'</div>';
