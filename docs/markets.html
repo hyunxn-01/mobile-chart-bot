@@ -1515,7 +1515,15 @@ function openGameDetail(aid){
   document.getElementById('gmClose').addEventListener('click',close);
   bg.addEventListener('click',e=>{ if(e.target===bg) close(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!bg.hidden) close(); });
-  document.addEventListener('click',e=>{ const el=e.target.closest&&e.target.closest('.gdname,.ginfo'); if(el&&el.getAttribute('data-aid')){ e.stopPropagation(); e.preventDefault(); openGameDetail(el.getAttribute('data-aid')); } }, true);
+  document.addEventListener('click',e=>{ const el=e.target.closest&&e.target.closest('.gdname,.ginfo'); if(el&&el.getAttribute('data-aid')){ e.stopPropagation(); e.preventDefault(); const aid=el.getAttribute('data-aid');
+    const inBrief = el.closest && el.closest('#mkbriefBody');
+    const bm = MK_BRIEF_MARKET;
+    if(inBrief && bm && bm.charts && bm.charts.grossing && bm.charts.grossing.games && bm.charts.grossing.games[aid]){
+      // 브리핑 게임은 그 브리핑 시장 기준으로 상세를 연다(현재 차트 시장을 바꾸지 않음)
+      const sF=FULL, sD=DATA; FULL=bm; DATA=bm.charts.grossing; _gwCache=null;
+      try{ openGameDetail(aid); } finally { FULL=sF; DATA=sD; _gwCache=null; }
+    } else openGameDetail(aid);
+  } }, true);
 })();
 
 (function(){
@@ -1538,6 +1546,7 @@ function openGameDetail(aid){
 // ===== AI 시장 브리핑(계층형: 글로벌 + 주요국 + 지역) =====
 let MK_BRIEF_TABS=null, mkBriefSel=null;
 let MK_CC2REGION={}, MK_REGION_KEYS=new Set();  // 개별국가→소속지역, 지역키 집합(브리핑 연동용)
+let MK_BRIEF_MARKET=null; const MK_MARKET_CACHE={};  // 현재 브리핑의 시장 데이터(그 시장 기준 게임 칩·상세)
 function loadBriefsIndex(){
   fetch('./markets/briefs_index.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(idx=>{
     if(!idx||!Array.isArray(idx.tabs)||!idx.tabs.length) return;
@@ -1570,13 +1579,23 @@ function selectBrief(bk){
   document.querySelectorAll('.mkbrief-tab').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.bk===bk)));
   const i=bk.indexOf(':'), type=bk.slice(0,i), key=bk.slice(i+1);
   const file = type==='global' ? 'global_brief' : (type==='major' ? 'major_'+key : 'region_'+key);
+  const mk = (type==='global') ? null : key;   // 이 브리핑이 가리키는 시장(주요국 cc / 지역키)
   const body=document.getElementById('mkbriefBody'), dt=document.getElementById('mkbriefDate');
   if(body) body.innerHTML='<p class="empty">불러오는 중…</p>';
-  fetch('./markets/'+file+'.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(b=>{
+  const pBrief=fetch('./markets/'+file+'.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
+  const pMkt = mk ? (MK_MARKET_CACHE[mk] ? Promise.resolve(MK_MARKET_CACHE[mk])
+                     : fetch('./markets/'+mk+'.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{ if(j) MK_MARKET_CACHE[mk]=j; return j; }).catch(()=>null))
+                  : Promise.resolve(null);
+  Promise.all([pBrief, pMkt]).then(([b, mkt])=>{
+    if(bk!==mkBriefSel) return;                 // 그 사이 다른 탭 누르면 무시
+    MK_BRIEF_MARKET = mkt;                       // 이 브리핑의 시장 데이터(클릭 상세에 사용)
     if(!body) return;
     if(!b||!b.text){ body.innerHTML='<p class="empty">이 시장 브리핑이 아직 없어요. 데이터가 쌓이면 생성됩니다.</p>'; if(dt) dt.textContent=''; return; }
     body.innerHTML=renderMarketBrief(b.text);
-    try{ if(typeof DATA!=='undefined' && DATA && DATA.games) linkifyGames(body); }catch(_){}  // DATA 로드 전이면 링크는 생략(본문은 항상 표시)
+    // 이 브리핑 시장의 게임 기준으로 칩 생성(현재 차트 시장과 무관)
+    const gsrc = (mkt && mkt.charts && mkt.charts.grossing && mkt.charts.grossing.games) ? mkt.charts.grossing
+               : ((typeof DATA!=='undefined' && DATA && DATA.games) ? DATA : null);
+    if(gsrc){ const sD=DATA; DATA=gsrc; try{ linkifyGames(body); }catch(_){ } finally { DATA=sD; } }
     if(dt) dt.textContent=(String(b.generated||'').split(' ')[0]||'')+(b.basis==='hierarchical'?' · 지역 종합':'');
   }).catch(()=>{ if(body) body.innerHTML='<p class="empty">브리핑을 불러오지 못했어요.</p>'; });
 }
