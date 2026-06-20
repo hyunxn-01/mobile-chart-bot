@@ -384,6 +384,10 @@
   .cmode:hover{ color:var(--text); }
   .cmode[aria-selected="true"]{ background:var(--accent); color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.16); }
   .cmode-hint{ font-size:12.5px; color:var(--muted); }
+  .glegend{ display:flex; flex-wrap:wrap; gap:7px 16px; padding:12px 2px 2px; }
+  .glegend .gl-item{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text); }
+  .glegend .gl-dot{ width:11px; height:11px; border-radius:50%; flex:0 0 auto; }
+  .glegend .gl-pct{ color:var(--muted); font-variant-numeric:tabular-nums; }
 </style>
 </head>
 <body>
@@ -504,6 +508,7 @@
       </div>
       <div class="chartbar" id="chartbar" title="막대를 드래그하면 보는 구간이 이동합니다"><div class="chartbar-thumb" id="chartthumb"></div></div>
       <p class="viewhint" id="viewhint">전체 보기</p>
+      <div class="glegend" id="genreLegend" hidden></div>
     </div>
     <aside class="panel">
       <button class="panel-toggle" id="panelToggle" aria-expanded="false"><span id="panelToggleLabel">게임 검색·선택</span><span class="caret">▾</span></button>
@@ -838,6 +843,17 @@ function genreDatasets(){
       fill:false, borderWidth:2.4, pointRadius:sd, pointHoverRadius:5, spanGaps:false, tension:0.25 };
   });
 }
+function renderGenreLegend(){
+  const el=document.getElementById('genreLegend'); if(!el) return;
+  const ds=(chart&&chart.data&&chart.data.datasets)||[];
+  if(!ds.length){ el.hidden=true; return; }
+  el.innerHTML=ds.map(d=>{
+    const arr=d.data||[]; const last=arr.length?arr[arr.length-1]:null;
+    return '<span class="gl-item"><span class="gl-dot" style="background:'+(d.borderColor||'#888')+'"></span>'+esc(d.label||'')+(last!=null?' <span class="gl-pct">'+last+'%</span>':'')+'</span>';
+  }).join('');
+  el.hidden=false;
+}
+function hideGenreLegend(){ const el=document.getElementById('genreLegend'); if(el) el.hidden=true; }
 function setChartMode(mode){
   if(!chart || mode===chartMode) return;
   if(mode==='genre' && !Object.keys(genreSeries().genres).length) return; // 데이터 없으면 무시
@@ -859,12 +875,11 @@ function setChartMode(mode){
     chart.data.labels=genreSeries().labels;
     chart.data.datasets=genreDatasets();
     y.reverse=false; y.min=0; y.max=100; if(y.title) y.title.text='장르 점유율 (%)'; if(y.ticks){ y.ticks.stepSize=20; y.ticks.callback=(v)=>v+'%'; }
-    chart.options.plugins.legend.display=true;
-    chart.options.plugins.legend.labels=chart.options.plugins.legend.labels||{};
-    chart.options.plugins.legend.labels.usePointStyle=true;  // 범례를 빈 네모 대신 도트로
+    chart.options.plugins.legend.display=false;  // Chart.js 범례는 generateLabels 충돌 → 아래 HTML 범례로 대체
     chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}%`;
     if(chart.resetZoom) chart.resetZoom();
     chart.update(); updateScrollbar();
+    renderGenreLegend();
   } else {
     if(tabsEl) tabsEl.style.display='';
     if(panelEl) panelEl.style.display='';
@@ -873,8 +888,8 @@ function setChartMode(mode){
     if(charthint) charthint.innerHTML=CHARTHINT_GAME;
     y.reverse=true; y.min=1; y.max=100; if(y.title) y.title.text='순위 (위가 1위)'; if(y.ticks){ y.ticks.stepSize=10; y.ticks.callback=undefined; }
     chart.options.plugins.legend.display=false;
-    if(chart.options.plugins.legend.labels) chart.options.plugins.legend.labels.usePointStyle=false;
     chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}위`;
+    hideGenreLegend();
     chart.data.datasets=buildDatasets();
     switchTf(activeTf);
   }
@@ -921,6 +936,7 @@ function selectChart(key){
     chart.data.datasets=genreDatasets();
     if(chart.resetZoom) chart.resetZoom();
     chart.update(); updateScrollbar();
+    renderGenreLegend();
   } else {
     chart.data.datasets=buildDatasets();
     switchTf(activeTf);
@@ -1247,6 +1263,7 @@ function init(full){
     document.querySelectorAll('[data-cmode]').forEach(b=> b.setAttribute('aria-selected', String(b.dataset.cmode==='game')));
     const _st=document.getElementById('secTitleChart'); if(_st) _st.textContent='순위 추이';
     const _h=document.getElementById('cmodeHint'); if(_h) _h.textContent='게임별 순위 추이 · 오른쪽에서 게임 선택'; }
+  hideGenreLegend();
   applyChart();
   renderAiBrief();
 
