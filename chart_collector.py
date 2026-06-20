@@ -39,6 +39,8 @@ RECIPIENT_EMAIL = os.environ.get('RECIPIENT_EMAIL')
 
 # === AI 분석 모델 (변경 시 이 한 줄만 수정) ===
 CLAUDE_MODEL = 'claude-opus-4-8'
+# 게임명 한글 변환용 경량 모델(저비용·캐시). 단순 음차/표기 변환이라 Haiku로 충분.
+TRANSLATE_MODEL = 'claude-haiku-4-5-20251001'
 # 적응형 사고 강도: max=작업량 최대(항상 깊게 사고). Opus 4.8은 adaptive 모드만 지원.
 THINKING_EFFORT = 'max'
 # 출력 토큰 상한(사고+응답 합산). 사고가 길어도 응답이 잘리지 않게 넉넉히.
@@ -288,8 +290,55 @@ def fetch_titles(track_ids, country='kr'):
     return out
 
 
+ALIASES_PATH = DATA_DIR / 'title_aliases.json'
+
+
+def _needs_kr(s):
+    """제목에 중국어 한자/일본어 가나가 있으면(=한국어·영문 아님) 변환 대상."""
+    for ch in str(s or ''):
+        o = ord(ch)
+        if 0x3040 <= o <= 0x30FF or 0x3400 <= o <= 0x9FFF:  # 가나 + CJK 한자
+            return True
+    return False
+
+
+def load_title_aliases():
+    try:
+        return json.loads(ALIASES_PATH.read_text(encoding='utf-8')) if ALIASES_PATH.exists() else {}
+    except Exception:
+        return {}
+
+
+def save_title_aliases(aliases):
+    try:
+        ALIASES_PATH.write_text(json.dumps(aliases, ensure_ascii=False, sort_keys=True, indent=2), encoding='utf-8')
+    except Exception as e:
+        print(f"[WARN] 게임명 별칭 저장 실패: {e}")
+
+
+def translate_titles_kr(titles):
+    """현지어(중/일) 게임명 리스트 → {원문: 한국어명}. 저비용 모델, 캐시 미스만 호출. 실패 시 {}."""
+    if not titles:
+        return {}
+    listing = '\n'.join(f"- {t}" for t in titles)
+    prompt = ("다음은 App Store 게임 제목(중국어 또는 일본어)들이다. 각 제목을 한국 게이머가 부르는 한국어 표기로 바꿔라. "
+              "한국 정식 서비스명이 있으면 그 이름을, 없으면 한글 음차로. 뜻 번역이 아니라 '게임 이름'만. "
+              "확실치 않으면 원문을 그대로 값으로 둬라. 출력은 JSON 객체 {\"원문\":\"한국어\"} 하나만, 다른 말 없이.\n\n" + listing)
+    try:
+        client = Anthropic(api_key=ANTHROPIC_API_KEY)
+        msg = client.messages.create(model=TRANSLATE_MODEL, max_tokens=2000,
+                                     messages=[{'role': 'user', 'content': prompt}])
+        txt = next((b.text for b in msg.content if getattr(b, 'type', None) == 'text'), '') or ''
+        s, e = txt.find('{'), txt.rfind('}')
+        if s >= 0 and e > s:
+            return {str(k): str(v) for k, v in json.loads(txt[s:e + 1]).items() if v}
+    except Exception as ex:
+        print(f"[WARN] 게임명 번역 실패: {ex}")
+    return {}
+
+
 def localize_titles(collected):
-    """게임명 한국어화: 전 국가 trackId를 모아 KR 스토어명 → 없으면 US(영문) → 그래도 없으면 원래 이름.
+    """게임명 한국어화: KR 스토어명 → 없으면 US(영문) → 그래도 현지어(중/일)면 캐시된 별칭 → 없으면 저비용 AI 음차.
     각 app에 title_kr 부여."""
     all_ids = sorted({str(a.get('track_id')) for cc in collected for kind in collected[cc]
                       for a in collected[cc][kind] if a.get('track_id')})
@@ -303,7 +352,57 @@ def localize_titles(collected):
             for a in collected[cc][kind]:
                 tid = str(a.get('track_id'))
                 a['title_kr'] = kr_titles.get(tid) or us_titles.get(tid) or a.get('title', '')
-    print(f"[OK] 게임명 현지화: KR {len(kr_titles)} + US {len(us_titles)} / 전체 {len(all_ids)}")
+    # 여전히 중/일 현지어인 이름 → 캐시 우선, 새 이름만 저비용 모델로 음차
+    aliases = load_title_aliases()
+    pending = sorted({a['title_kr'] for cc in collected for kind in collected[cc]
+                      for a in collected[cc][kind]
+                      if _needs_kr(a.get('title_kr')) and a.get('title_kr') not in aliases})
+    new_map = translate_titles_kr(pending) if pending else {}
+    if new_map:
+        aliases.update({k: v for k, v in new_map.items() if v and v != k})
+        save_title_aliases(aliases)
+    if aliases:
+        for cc in collected:
+            for kind in collected[cc]:
+                for a in collected[cc][kind]:
+                    tk = a.get('title_kr', '')
+                    if _needs_kr(tk) and tk in aliases:
+                        a['title_kr'] = aliases[tk]
+    print(f"[OK] 게임명 현지화: KR {len(kr_titles)} + US {len(us_titles)} + 별칭 {len(aliases)} (신규음차 {len(new_map)}) / 전체 {len(all_ids)}")
+
+
+def apply_aliases_to_briefs(aliases=None):
+    """기존 브리핑(major_*/region_*/global) 텍스트의 현지어 게임명을 한국어 별칭으로 치환.
+    브리핑 재생성(Opus) 없이 문자열 치환만 — 무비용. 매 실행 idempotent."""
+    aliases = aliases if aliases is not None else load_title_aliases()
+    if not aliases:
+        return
+    out_dir = Path('docs') / 'markets'
+    if not out_dir.exists():
+        return
+    items = sorted(((k, v) for k, v in aliases.items() if k and v and k != v), key=lambda kv: -len(kv[0]))
+    skip = {'index.json', 'briefs_index.json', 'regions_index.json'}
+    changed = 0
+    for fp in out_dir.glob('*.json'):
+        if fp.name in skip:
+            continue
+        try:
+            d = json.loads(fp.read_text(encoding='utf-8'))
+        except Exception:
+            continue
+        txt = d.get('text')
+        if not isinstance(txt, str):
+            continue
+        new = txt
+        for k, v in items:
+            if k in new:
+                new = new.replace(k, v)
+        if new != txt:
+            d['text'] = new
+            fp.write_text(json.dumps(d, ensure_ascii=False), encoding='utf-8')
+            changed += 1
+    if changed:
+        print(f"[OK] 브리핑 게임명 한글 치환: {changed}개 파일")
 
 
 def collect_all_countries(countries=None, limit=100):
@@ -1477,6 +1576,7 @@ def main():
         regions = build_regional_briefs(collected)  # 중소규모 지역 묶음
         write_briefs_index(majors, regions)         # 탭 인덱스(주요→지역)
         build_global_brief(collected)               # 주요+지역을 토대로 글로벌 종합
+        apply_aliases_to_briefs()                   # 브리핑 내 현지어 게임명→한글 치환(무비용)
     except Exception as e:
         print(f"[WARN] 다국가 수집/브리핑 실패: {e}")
 
