@@ -55,6 +55,15 @@ HISTORY_DIR.mkdir(exist_ok=True)
 HISTORY_FREE_DIR = DATA_DIR / 'history_free'   # Top Free(인기) 차트 누적 — 대시보드 보조
 HISTORY_FREE_DIR.mkdir(exist_ok=True)
 
+# === 다국가 수집(iOS App Store 스토어프런트) ===
+# 1차: T1 코어 10개국. 안정 후 EXTRA를 COUNTRIES에 합쳐 32개국으로 확장.
+COUNTRIES = ['kr', 'us', 'jp', 'cn', 'tw', 'gb', 'de', 'fr', 'ca', 'au']
+COUNTRIES_EXTRA = ['it', 'es', 'nl', 'ru', 'se', 'sa', 'ae', 'eg', 'tr',
+                   'br', 'mx', 'ar', 'co', 'id', 'th', 'vn', 'ph', 'my', 'sg', 'in', 'pk', 'bd']
+PRIMARY_COUNTRY = 'kr'                 # 기존 일일 메일·AI 브리핑 기준 국가(현행 유지)
+CHARTS_DIR = DATA_DIR / 'charts'       # data/charts/{country}/{grossing|free}/{date}.json
+CHARTS_DIR.mkdir(exist_ok=True)
+
 
 # ============================================================
 # 1. 데이터 수집·저장·로드
@@ -139,8 +148,8 @@ def _pick_genre(genres):
     return '게임'
 
 
-def fetch_genres(track_ids):
-    """trackId 목록 → {trackId(str): 대표 장르}. iTunes lookup(country=kr)의 genres 사용. 실패 시 가능한 만큼만."""
+def fetch_genres(track_ids, country='kr'):
+    """trackId 목록 → {trackId(str): 메타}. iTunes lookup(해당 country)의 genres·genreIds 사용. 실패 시 가능한 만큼만."""
     result = {}
     ids = [str(t) for t in track_ids if t]
     if not ids:
@@ -148,7 +157,7 @@ def fetch_genres(track_ids):
     for i in range(0, len(ids), 180):
         chunk = ids[i:i + 180]
         try:
-            url = f"https://itunes.apple.com/lookup?id={','.join(chunk)}&country=kr"
+            url = f"https://itunes.apple.com/lookup?id={','.join(chunk)}&country={country}"
             r = requests.get(url, timeout=20, headers={'User-Agent': 'Mozilla/5.0'})
             r.raise_for_status()
             for it in r.json().get('results', []):
@@ -156,6 +165,8 @@ def fetch_genres(track_ids):
                 if tid:
                     result[tid] = {
                         'genre': _pick_genre(it.get('genres', [])),
+                        'genre_ids': [str(g) for g in (it.get('genreIds') or [])],
+                        'primary_genre': it.get('primaryGenreName', ''),
                         'release': (it.get('releaseDate') or '')[:10],
                         'rating': it.get('averageUserRating'),
                         'icon': it.get('artworkUrl100', ''),
@@ -171,13 +182,15 @@ def fetch_genres(track_ids):
     return result
 
 
-def attach_genres(apps):
-    """apps 각 게임에 'genre' 추가. 실패해도 메인 흐름 무영향('미상')."""
+def attach_genres(apps, country='kr'):
+    """apps 각 게임에 'genre'·메타 추가. 실패해도 메인 흐름 무영향('미상')."""
     try:
-        gmap = fetch_genres([a.get('track_id') for a in apps])
+        gmap = fetch_genres([a.get('track_id') for a in apps], country)
         for a in apps:
             m = gmap.get(str(a.get('track_id')), {})
             a['genre'] = m.get('genre', '미상')
+            a['genre_ids'] = m.get('genre_ids', [])
+            a['primary_genre'] = m.get('primary_genre', '')
             a['release'] = m.get('release', '')
             a['rating'] = m.get('rating')
             a['icon'] = m.get('icon', '')
@@ -225,6 +238,55 @@ def find_most_recent_past_data():
         return None, None
     f = past[-1]
     return json.loads(f.read_text(encoding='utf-8')), f.stem
+
+
+def fetch_apple_chart(country, slug, limit=100):
+    """임의 국가·차트(slug: topgrossingapplications/topfreeapplications) iOS 게임 차트 수집."""
+    chart_name = 'Top Grossing' if 'grossing' in slug else 'Top Free'
+    url = f'https://itunes.apple.com/{country}/rss/{slug}/limit={limit}/genre=6014/json'
+    try:
+        r = requests.get(url, timeout=15, headers={'User-Agent': 'Mozilla/5.0'})
+        r.raise_for_status()
+        entries = r.json().get('feed', {}).get('entry', [])
+        return [
+            {
+                'rank': i + 1,
+                'app_id': e.get('id', {}).get('attributes', {}).get('im:bundleId', ''),
+                'track_id': e.get('id', {}).get('attributes', {}).get('im:id', ''),
+                'title': e.get('im:name', {}).get('label', ''),
+                'developer': e.get('im:artist', {}).get('label', ''),
+                'platform': 'App Store',
+                'chart': chart_name,
+            }
+            for i, e in enumerate(entries)
+        ]
+    except Exception as e:
+        print(f"[ERROR] {country}/{slug} 수집 실패: {e}")
+        return []
+
+
+def collect_all_countries(countries=None, limit=100):
+    """대상 국가별 iOS 매출·다운 차트 + 메타를 data/charts/{country}/{kind}/{date}.json 에 저장.
+    기존 KR 파이프라인과 독립(추가 수집). 한 국가 실패해도 다음으로 진행."""
+    countries = countries or COUNTRIES
+    today = datetime.now().strftime('%Y-%m-%d')
+    ok = 0
+    for cc in countries:
+        for kind, slug in [('grossing', 'topgrossingapplications'), ('free', 'topfreeapplications')]:
+            apps = fetch_apple_chart(cc, slug, limit)
+            if not apps:
+                continue
+            try:
+                attach_genres(apps, cc)
+            except Exception as e:
+                print(f"[WARN] {cc}/{kind} 장르 부착 실패: {e}")
+            d = CHARTS_DIR / cc / kind
+            d.mkdir(parents=True, exist_ok=True)
+            (d / f'{today}.json').write_text(json.dumps(apps, ensure_ascii=False), encoding='utf-8')
+            ok += 1
+            print(f"[OK] {cc}/{kind}: {len(apps)}개 저장")
+            time.sleep(0.4)   # iTunes 레이트리밋 배려
+    print(f"[OK] 다국가 수집 완료: {ok}개(국가×차트) → {CHARTS_DIR}")
 
 
 def load_data_in_date_range(start_dt, end_dt, today_dt=None, current=None):
@@ -1139,6 +1201,12 @@ def main():
     if free:
         attach_genres(free)
         save_free_data(free)
+
+    print("[다국가] 전체 국가 iOS 차트 수집·저장(추가)...")
+    try:
+        collect_all_countries()
+    except Exception as e:
+        print(f"[WARN] 다국가 수집 실패: {e}")
 
     print("\n=== 완료 ===\n")
 
