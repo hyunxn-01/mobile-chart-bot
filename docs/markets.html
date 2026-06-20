@@ -61,16 +61,28 @@
   .brief-tabs button:hover{ border-color:var(--accent); }
   .grow{ cursor:pointer; }
   .grow:hover{ background:var(--panel); }
+  .gstar{ color:#caa12f; font-size:11.5px; margin-left:7px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .gdelta{ font-size:11px; margin-left:7px; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .gdelta.up{ color:#16a34a; } .gdelta.down{ color:#dc2626; }
+  .gnew{ font-size:9px; font-weight:700; color:#fff; background:#16a34a; border-radius:4px; padding:1px 5px; margin-left:6px; vertical-align:middle; letter-spacing:.3px; }
   /* 퍼블리셔 */
+  .ptable-wrap{ max-height:380px; overflow:auto; border:1px solid var(--line); border-radius:10px; }
   .ptable{ width:100%; border-collapse:collapse; font-size:13px; }
-  .ptable th{ text-align:left; color:var(--muted); font-weight:600; font-size:11.5px; padding:5px 8px; border-bottom:1px solid var(--line); cursor:pointer; white-space:nowrap; }
-  .ptable th .ar{ opacity:.5; font-size:10px; }
+  .ptable th{ position:sticky; top:0; z-index:1; text-align:left; color:var(--muted); font-weight:600; font-size:11.5px; padding:8px 10px; background:var(--card); border-bottom:1px solid var(--line); cursor:pointer; white-space:nowrap; }
+  .ptable th.r{ text-align:right; }
+  .ptable th .ar{ opacity:.45; font-size:10px; }
   .ptable th[aria-sort] .ar{ opacity:1; color:var(--accent); }
-  .ptable td{ padding:6px 8px; border-bottom:1px solid var(--line); }
-  .ptable tr{ cursor:pointer; }
+  .ptable td{ padding:7px 10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .ptable tbody tr:last-child td{ border-bottom:0; }
+  .ptable tbody tr{ cursor:pointer; }
   .ptable tbody tr:hover{ background:var(--panel); }
-  .pdev{ font-weight:600; }
-  .pnum{ text-align:right; font-variant-numeric:tabular-nums; color:var(--muted); }
+  .pdev{ font-weight:600; max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pnum{ text-align:right; font-variant-numeric:tabular-nums; color:var(--muted); white-space:nowrap; }
+  .pcount{ display:flex; align-items:center; gap:8px; justify-content:flex-end; }
+  .pbar{ height:7px; border-radius:4px; background:var(--accent); opacity:.85; min-width:4px; }
+  .pbar-wrap{ flex:1; min-width:42px; max-width:120px; height:7px; background:var(--line); border-radius:4px; overflow:hidden; }
+  .pcount b{ width:20px; text-align:right; color:var(--text); }
+  .psingles{ color:var(--muted); font-size:12px; padding:8px 10px; }
   /* 상세 모달 */
   .modal[hidden]{ display:none; }
   .modal{ position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; padding:18px; }
@@ -138,7 +150,8 @@
   <div class="card" id="pubCard">
     <h2 id="pubTitle">퍼블리셔별 차트 장악력</h2>
     <p class="hint">이 시장에서 개발사별로 상위 차트에 올린 게임 수·최고/평균 순위. 행을 누르면 그 개발사 게임만 위에서 필터돼요. (헤더 클릭=정렬)</p>
-    <div class="ptable-wrap" style="overflow-x:auto"><table class="ptable" id="pubTable"></table></div>
+    <div class="ptable-wrap"><table class="ptable" id="pubTable"></table></div>
+    <p class="hint" id="pubNote" style="margin:8px 0 0"></p>
   </div>
 
   <p class="foot">데이터 수집 봇 · 집계 · 시각화 전 과정 자체 구축 · <a href="./index.html">한국 단독 대시보드 →</a></p>
@@ -285,10 +298,19 @@ function renderGameList(ch){
   const list = document.getElementById('gameList');
   if(!rows.length){ list.innerHTML='<p class="empty">결과 없음.</p>'; return; }
   list.innerHTML = rows.slice(0,60).map(r=>{
-    const ic = r.g.icon ? '<img class="gico" src="'+esc(r.g.icon)+'" alt="" referrerpolicy="no-referrer">' : '<span class="gico"></span>';
-    return '<div class="grow" data-aid="'+esc(r.aid)+'"><span class="grank">'+Math.round(r.rank)+'</span>'+ic+'<span class="gname" title="'+esc(r.g.title)+'">'+esc(r.g.title)+'</span><span class="gtag">'+esc(r.g.genre||'기타')+'</span></div>';
+    const g=r.g;
+    const ic = g.icon ? '<img class="gico" src="'+esc(g.icon)+'" alt="" referrerpolicy="no-referrer">' : '<span class="gico"></span>';
+    const dl = rankDelta(ch, r.aid);
+    const isNew = g.release && (Date.now()-Date.parse(g.release))/864e5 < 30;
+    const star = (g.rating!=null) ? '<span class="gstar">★'+Number(g.rating).toFixed(1)+'</span>' : '';
+    const dz = dl ? '<span class="gdelta '+(dl>0?'up':'down')+'">'+(dl>0?'▲':'▼')+Math.abs(dl)+'</span>' : '';
+    const nb = isNew ? '<span class="gnew">NEW</span>' : '';
+    return '<div class="grow" data-aid="'+esc(r.aid)+'"><span class="grank">'+Math.round(r.rank)+'</span>'+ic+'<span class="gname" title="'+esc(g.title)+'">'+esc(g.title)+nb+'</span><span class="gtag">'+esc(g.genre||'기타')+'</span>'+star+dz+'</div>';
   }).join('');
 }
+
+// 전일 대비 순위 변동(+=상승). 데이터 2일↑일 때만.
+function rankDelta(ch, aid){ const s=((ch.daily&&ch.daily.series)||{})[aid]||[]; const v=[]; for(let i=0;i<s.length;i++){ if(s[i]!=null) v.push(s[i]); } if(v.length<2) return 0; return Math.round(v[v.length-2]-v[v.length-1]); }
 
 // 퍼블리셔별 차트 장악력(현재 시장·차트 기준, 프론트 집계)
 let pubSort={key:'count',dir:-1};
@@ -301,16 +323,25 @@ function renderPublishers(ch){
     (by[dev] = by[dev] || {dev, count:0, ranks:[]});
     by[dev].count++; by[dev].ranks.push(r);
   });
-  let rows = Object.values(by).map(e=>({dev:e.dev, count:e.count, best:Math.min(...e.ranks), avg:e.ranks.reduce((s,x)=>s+x,0)/e.ranks.length}));
+  const all = Object.values(by).map(e=>({dev:e.dev, count:e.count, best:Math.min(...e.ranks), avg:e.ranks.reduce((s,x)=>s+x,0)/e.ranks.length}));
+  const singles = all.filter(e=>e.count<2).length;
+  let rows = all.filter(e=>e.count>=2);          // 장악력 = 2개 이상 올린 개발사
+  if(rows.length < 6) rows = all.slice();         // 데이터 적은 시장은 단독도 포함
   const k=pubSort.key, d=pubSort.dir;
   rows.sort((a,b)=> (a[k]<b[k]?-1:a[k]>b[k]?1:0)*d || a.best-b.best);
-  const cols=[['dev','퍼블리셔'],['count','게임수'],['best','최고'],['avg','평균']];
-  const head='<thead><tr>'+cols.map(([k2,lbl])=>'<th data-k="'+k2+'"'+(k===k2?' aria-sort="'+(d<0?'descending':'ascending')+'"':'')+'>'+lbl+' <span class="ar">'+(k===k2?(d<0?'▼':'▲'):'↕')+'</span></th>').join('')+'</tr></thead>';
-  const body='<tbody>'+rows.slice(0,40).map(e=>'<tr data-dev="'+esc(e.dev)+'"><td class="pdev">'+esc(e.dev)+'</td><td class="pnum">'+e.count+'</td><td class="pnum">'+Math.round(e.best)+'</td><td class="pnum">'+e.avg.toFixed(1)+'</td></tr>').join('')+'</tbody>';
+  const maxC = Math.max(1, ...rows.map(e=>e.count));
+  const cols=[['dev','퍼블리셔',''],['count','게임수','r'],['best','최고','r'],['avg','평균','r']];
+  const head='<thead><tr>'+cols.map(([k2,lbl,cl])=>'<th class="'+cl+'" data-k="'+k2+'"'+(k===k2?' aria-sort="'+(d<0?'descending':'ascending')+'"':'')+'>'+lbl+' <span class="ar">'+(k===k2?(d<0?'▼':'▲'):'↕')+'</span></th>').join('')+'</tr></thead>';
+  const body='<tbody>'+rows.map(e=>{
+    const bar='<span class="pbar-wrap"><span class="pbar" style="width:'+Math.round(e.count/maxC*100)+'%"></span></span>';
+    return '<tr data-dev="'+esc(e.dev)+'"><td class="pdev" title="'+esc(e.dev)+'">'+esc(e.dev)+'</td><td class="pnum"><span class="pcount">'+bar+'<b>'+e.count+'</b></span></td><td class="pnum">'+Math.round(e.best)+'</td><td class="pnum">'+e.avg.toFixed(1)+'</td></tr>';
+  }).join('')+'</tbody>';
   const t=document.getElementById('pubTable');
   t.innerHTML=head+body;
   t.querySelectorAll('th[data-k]').forEach(th=> th.addEventListener('click',()=>{ const k2=th.dataset.k; if(pubSort.key===k2) pubSort.dir*=-1; else pubSort={key:k2,dir:k2==='dev'?1:-1}; renderPublishers(ch); }));
   t.querySelectorAll('tr[data-dev]').forEach(tr=> tr.addEventListener('click',()=>{ const s=document.getElementById('gameSearch'); s.value=tr.dataset.dev; renderGameList(ch); document.getElementById('gameList').scrollIntoView({behavior:'smooth',block:'center'}); }));
+  const note=document.getElementById('pubNote');
+  if(note) note.textContent = singles ? ('그 외 '+singles+'개 개발사가 각 1개씩 진입.') : '';
 }
 
 // 게임 상세 모달
@@ -343,10 +374,10 @@ function sparkSvg(labels, series){
   const y=v=> P + (Math.min(100,Math.max(1,v))-1)/99*(H-2*P);   // 1위=위
   const line=pts.map((p,i)=>(i?'L':'M')+x(p[0]).toFixed(1)+' '+y(p[1]).toFixed(1)).join(' ');
   const dots=pts.map(p=>'<circle cx="'+x(p[0]).toFixed(1)+'" cy="'+y(p[1]).toFixed(1)+'" r="2.6" fill="'+cssVar('--accent')+'"/>').join('');
-  const ac=cssVar('--accent')||'#2563eb';
-  return '<path d="'+line+'" fill="none" stroke="'+ac+'" stroke-width="2"/>'+dots
-    + '<text x="2" y="12" fill="'+cssVar('--muted')+'" font-size="9">1위</text>'
-    + '<text x="2" y="'+(H-2)+'" fill="'+cssVar('--muted')+'" font-size="9">100위</text>';
+  const ac=cssVar('--accent')||'#2563eb'; const mut=cssVar('--muted'); const gl='rgba(130,130,125,0.18)';
+  const grid=[1,50,100].map(v=>'<line x1="'+P+'" x2="'+(W-P)+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+'" stroke="'+gl+'" stroke-width="1"/>').join('');
+  const labels2=[[1,'1위'],[50,'50'],[100,'100']].map(([v,t])=>'<text x="2" y="'+(y(v)+3).toFixed(1)+'" fill="'+mut+'" font-size="8.5">'+t+'</text>').join('');
+  return grid+'<path d="'+line+'" fill="none" stroke="'+ac+'" stroke-width="2"/>'+dots+labels2;
 }
 function closeModal(){ document.getElementById('gameModal').hidden=true; }
 document.getElementById('modalBg').addEventListener('click', closeModal);
