@@ -498,6 +498,14 @@ def _brief_localized(fp):
         return False
 
 
+def _brief_structured(fp):
+    """브리핑이 고정 항목(## 섹션) 구조인지 확인. 옛 무구조 브리핑은 False → 1회 강제 재생성."""
+    try:
+        return '## ' in (json.loads(fp.read_text(encoding='utf-8')).get('text') or '')
+    except Exception:
+        return False
+
+
 def _country_digest(g):
     """국가 매출 차트 1개 → 'TOP5 + 장르분포' 한 줄 다이제스트."""
     from collections import Counter
@@ -520,15 +528,21 @@ def build_major_briefs(collected):
             continue  # 아직 수집 안 된 주요국(탭 미노출)
         name = CC_NAME_KR.get(cc, cc.upper())
         fp = out_dir / f'major_{cc}.json'
-        if _brief_fresh(fp) and _brief_localized(fp):
+        if _brief_fresh(fp) and _brief_localized(fp) and _brief_structured(fp):
             available.append({'key': cc, 'name': name})
             print(f'[INFO] {name} 단독 브리핑 스킵(7일 이내 최신)')
             continue
         prompt = (f"다음은 오늘 App Store 게임 '매출' 차트의 '{name}' 시장 스냅샷이다.\n\n"
                   f"[{name}] {_country_digest(g)}\n\n"
-                  f"게임 사업 PM이 '{name}' 단일 시장을 읽는 관점에서 핵심 인사이트 4~5개를 짧은 불릿(-)으로 써라. "
-                  "강세 장르·매출 상위 게임의 성격, 이 시장만의 색깔(장르 편중·로컬 IP·과금 성향), 진출·벤치마크 시사점을 다뤄라. "
-                  "굵게(**)는 게임명·장르·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+                  f"게임 사업 PM이 '{name}' 단일 시장을 읽도록, 아래 5개 항목을 정확히 이 순서·제목으로 써라. "
+                  "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로 써라. 항목 제목은 그대로 둘 것.\n"
+                  "## 시장 구조\n## 핵심 게임·플레이어\n## 움직임\n## 장르 기회\n## PM 시사점\n\n"
+                  "각 항목 내용 가이드 — 시장 구조: 강세 장르·퍼블리셔가 매출을 얼마나 쥐는지(점유). "
+                  "핵심 게임·플레이어: 매출 상위 게임의 성격과 강한 퍼블리셔. "
+                  "움직임: 신작 진입·급상승(스냅샷이 1일뿐이라 근거 약하면 '- 데이터 누적 중'으로 짧게). "
+                  "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. "
+                  "PM 시사점: 진출·벤치마크·현지화 관점의 한 줄 결론. "
+                  "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
         try:
             text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
         except Exception as e:
@@ -573,16 +587,22 @@ def build_regional_briefs(collected):
                 except Exception:
                     pass
             continue
-        if _brief_fresh(fp) and _brief_localized(fp):
+        if _brief_fresh(fp) and _brief_localized(fp) and _brief_structured(fp):
             available.append({'key': key, 'name': name, 'countries': len(members)})
             print(f'[INFO] {name} 브리핑 스킵(7일 이내 최신)')
             continue
         parts = [f"[{CC_NAME_KR.get(cc, cc.upper())}] {_country_digest(collected[cc]['grossing'])}" for cc in members]
         digest = '\n'.join(parts)
         prompt = (f"다음은 오늘 App Store 게임 '매출' 차트의 '{name}' 지역 국가별 스냅샷이다.\n\n{digest}\n\n"
-                  f"게임 사업 PM이 '{name}' 시장을 읽는 관점에서 핵심 인사이트 4~5개를 짧은 불릿(-)으로 써라. "
-                  "지역 내 국가 간 공통점·차이, 강세 장르/게임, 진출·현지화 시사점을 다뤄라. "
-                  "굵게(**)는 게임명·장르·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+                  f"게임 사업 PM이 '{name}' 지역(여러 나라 합산) 시장을 읽도록, 아래 5개 항목을 정확히 이 순서·제목으로 써라. "
+                  "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로. 항목 제목은 그대로 둘 것.\n"
+                  "## 시장 구조\n## 핵심 게임·플레이어\n## 움직임\n## 장르 기회\n## PM 시사점\n\n"
+                  "각 항목 내용 가이드 — 시장 구조: 지역 전체에서 강세 장르·퍼블리셔 점유. "
+                  "핵심 게임·플레이어: 지역 매출 상위 게임·강한 퍼블리셔. "
+                  "움직임: 신작·급상승 및 국가 간 차이(어디서 강하고 어디서 약한지; 근거 약하면 '- 데이터 누적 중'). "
+                  "장르 기회: 경쟁 약한 틈새 또는 포화 장르. "
+                  "PM 시사점: 진출·현지화·벤치마크 한 줄 결론. "
+                  "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
         try:
             text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
         except Exception as e:
@@ -639,7 +659,7 @@ def build_global_brief(collected):
             cur_gen = ''
     stale = not _brief_fresh(gp)
     subs_newer = bool(newest_sub) and newest_sub > cur_gen
-    if not (stale or subs_newer or not _brief_localized(gp)):
+    if not (stale or subs_newer or not _brief_localized(gp) or not _brief_structured(gp)):
         print('[INFO] 글로벌 브리핑 스킵(7일 이내 & 하위 갱신 없음)'); return
 
     n_countries = sum(1 for cc, k in collected.items() if (k or {}).get('grossing'))
@@ -648,10 +668,14 @@ def build_global_brief(collected):
     if sub_briefs:
         body = '\n\n'.join(f"# {label} 분석\n{tx}" for label, tx in sub_briefs)
         prompt = (f"다음은 같은 날 App Store 게임 매출 차트를, 주요 시장은 개별로·중소규모 시장은 지역으로 묶어 분석한 결과다.\n\n{body}\n\n"
-                  "위 '주요 시장·지역 분석들을 토대로' 종합하여, 게임 사업 PM이 전 세계를 횡단해 읽어야 할 상위 헤드라인 인사이트 4~5개를 짧은 불릿(-)으로 써라. "
-                  "반드시: ①여러 시장/지역에서 동시에 강한 게임/장르(경계를 가로지르는 신호), ②주요 시장 간·지역 간 장르 색깔 대비(어디가 롤플레잉/캐주얼/전략 중심인지), "
-                  "③'다음 진출 시장'·벤치마크 관점 한 줄. 하위 분석에 없는 사실을 지어내지 말고, 시장을 가로질러 의미가 생기는 지점만 골라라. "
-                  "굵게(**)는 게임명·장르·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+                  "위 '주요 시장·지역 분석들을 토대로' 종합하여, 게임 사업 PM이 전 세계를 횡단해 읽을 헤드라인을 아래 4개 항목으로 써라. "
+                  "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로. 항목 제목은 그대로 둘 것.\n"
+                  "## 횡단 신호\n## 시장별 색깔\n## IP·퍼블리셔 동향\n## 진출 전략\n\n"
+                  "각 항목 내용 가이드 — 횡단 신호: 여러 시장/지역에서 동시에 강한 게임·장르(경계를 가로지르는 신호). "
+                  "시장별 색깔: 주요 시장 간·지역 간 장르 색깔 대비(어디가 롤플레잉/캐주얼/전략 중심인지). "
+                  "IP·퍼블리셔 동향: 여러 시장을 관통하는 글로벌 IP·강한 퍼블리셔. "
+                  "진출 전략: '다음 진출 시장'·벤치마크 시장 관점 결론. "
+                  "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
         basis = 'hierarchical'
     else:
         parts = [f"[{CC_NAME_KR.get(cc, cc.upper())}] {_country_digest(k['grossing'])}"
@@ -659,9 +683,12 @@ def build_global_brief(collected):
         if not parts:
             print('[INFO] 글로벌 브리핑 스킵(매출 데이터 없음)'); return
         prompt = ("다음은 오늘 App Store 게임 '매출' 차트의 국가별 스냅샷이다.\n\n" + '\n'.join(parts) + "\n\n"
-                  "게임 사업 PM이 '다음 진출 시장'을 읽는 관점에서, 전 시장을 횡단해 주목할 인사이트만 4~5개 짧은 불릿(-)으로 써라. "
-                  "①여러 시장에서 동시에 강한 게임/장르, ②시장별 장르 색깔 차이, ③진출·벤치마크 한 줄. "
-                  "굵게(**)는 게임명·장르·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+                  "게임 사업 PM이 전 시장을 횡단해 읽도록, 아래 4개 항목으로 써라. "
+                  "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로. 항목 제목은 그대로 둘 것.\n"
+                  "## 횡단 신호\n## 시장별 색깔\n## IP·퍼블리셔 동향\n## 진출 전략\n\n"
+                  "횡단 신호: 여러 시장에서 동시에 강한 게임·장르. 시장별 색깔: 시장 간 장르 색깔 차이. "
+                  "IP·퍼블리셔 동향: 여러 시장 관통 IP·퍼블리셔. 진출 전략: 다음 진출·벤치마크 시장 결론. "
+                  "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
         basis = 'country'
     try:
         text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
