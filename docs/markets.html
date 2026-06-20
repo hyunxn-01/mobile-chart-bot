@@ -1503,7 +1503,8 @@ function selectBrief(bk){
   fetch('./markets/'+file+'.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(b=>{
     if(!body) return;
     if(!b||!b.text){ body.innerHTML='<p class="empty">이 시장 브리핑이 아직 없어요. 데이터가 쌓이면 생성됩니다.</p>'; if(dt) dt.textContent=''; return; }
-    body.innerHTML=mdLite(b.text); linkifyGames(body);
+    body.innerHTML=mdLite(b.text);
+    try{ if(typeof DATA!=='undefined' && DATA && DATA.games) linkifyGames(body); }catch(_){}  // DATA 로드 전이면 링크는 생략(본문은 항상 표시)
     if(dt) dt.textContent=(String(b.generated||'').split(' ')[0]||'')+(b.basis==='hierarchical'?' · 지역 종합':'');
   }).catch(()=>{ if(body) body.innerHTML='<p class="empty">브리핑을 불러오지 못했어요.</p>'; });
 }
