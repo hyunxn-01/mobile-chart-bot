@@ -321,9 +321,7 @@ def translate_titles_kr(titles):
     """현지어(중/일) 게임명 리스트 → {원문: 한국어명}. 50개씩 배치(응답 잘림 방지), 저비용 모델. 실패 배치만 건너뜀."""
     out = {}
     titles = list(titles)
-    dbg = {'model': TRANSLATE_MODEL, 'n_in': len(titles), 'sample_in': titles[:6], 'batches': 0, 'errors': []}
     if not titles:
-        _write_title_debug(dbg, '_titledebugx.json')
         return out
     client = Anthropic(api_key=ANTHROPIC_API_KEY)
     BATCH = 50
@@ -340,23 +338,10 @@ def translate_titles_kr(titles):
             s, e = txt.find('{'), txt.rfind('}')
             if s >= 0 and e > s:
                 out.update({str(k): str(v) for k, v in json.loads(txt[s:e + 1]).items() if v})
-            dbg['batches'] += 1
         except Exception as ex:
-            dbg['errors'].append(f"{type(ex).__name__}: {ex}")
             print(f"[WARN] 게임명 번역 배치 실패(i={i}): {ex}")
         time.sleep(0.3)
-    dbg['n_out'] = len(out)
-    _write_title_debug(dbg, '_titledebugx.json')
     return out
-
-
-def _write_title_debug(dbg, name='_titledebug.json'):
-    try:
-        d = Path('docs') / 'markets'
-        d.mkdir(parents=True, exist_ok=True)
-        (d / name).write_text(json.dumps(dbg, ensure_ascii=False, indent=2), encoding='utf-8')
-    except Exception:
-        pass
 
 
 def localize_titles(collected):
@@ -374,34 +359,25 @@ def localize_titles(collected):
             for a in collected[cc][kind]:
                 tid = str(a.get('track_id'))
                 a['title_kr'] = kr_titles.get(tid) or us_titles.get(tid) or a.get('title', '')
-    # 여전히 중/일 현지어인 이름 → 캐시 우선, 새 이름만 저비용 모델로 음차
-    _dbg = {'n_all_ids': len(all_ids), 'kr': len(kr_titles), 'us': len(us_titles)}
+    # 여전히 중/일 현지어인 이름 → 캐시 우선, 새 이름만 저비용 모델로 음차(배치)
     try:
         aliases = load_title_aliases()
         pending = sorted({a['title_kr'] for cc in collected for kind in collected[cc]
                           for a in collected[cc][kind]
                           if _needs_kr(a.get('title_kr')) and a.get('title_kr') not in aliases})
-        _dbg['pending'] = len(pending)
-        _dbg['pending_sample'] = pending[:8]
         new_map = translate_titles_kr(pending) if pending else {}
-        _dbg['new_map'] = len(new_map)
         if new_map:
             aliases.update({k: v for k, v in new_map.items() if v and v != k})
             save_title_aliases(aliases)
-        applied = 0
         if aliases:
             for cc in collected:
                 for kind in collected[cc]:
                     for a in collected[cc][kind]:
                         tk = a.get('title_kr', '')
                         if _needs_kr(tk) and tk in aliases:
-                            a['title_kr'] = aliases[tk]; applied += 1
-        _dbg['aliases_total'] = len(aliases)
-        _dbg['applied'] = applied
+                            a['title_kr'] = aliases[tk]
     except Exception as ex:
-        _dbg['error'] = f"{type(ex).__name__}: {ex}"
         print(f"[WARN] 게임명 별칭 단계 실패: {ex}")
-    _write_title_debug(_dbg)
     print(f"[OK] 게임명 현지화: KR {len(kr_titles)} + US {len(us_titles)} / 전체 {len(all_ids)}")
 
 
