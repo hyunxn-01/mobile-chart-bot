@@ -55,6 +55,10 @@
   .brief-body .bl{ position:relative; padding-left:16px; margin:5px 0; }
   .brief-body .bl::before{ content:''; position:absolute; left:3px; top:9px; width:5px; height:5px; border-radius:50%; background:var(--accent); }
   .brief-body b{ color:var(--text); font-weight:700; }
+  .brief-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
+  .brief-tabs button{ font:inherit; font-size:12px; font-weight:600; padding:5px 11px; border:1px solid var(--line); border-radius:999px; background:var(--card); color:var(--muted); cursor:pointer; }
+  .brief-tabs button[aria-pressed=true]{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .brief-tabs button:hover{ border-color:var(--accent); }
 </style>
 </head>
 <body>
@@ -66,7 +70,8 @@
   <p class="sub" id="sub">국가별 App Store 게임 차트의 장르 추이 — 다음 진출 시장을 읽는 레이더.</p>
 
   <div class="card brief" id="briefCard" hidden>
-    <h2>글로벌 인사이트 <span class="brief-tag">전 시장 횡단</span></h2>
+    <h2>시장 인사이트 <span class="brief-tag" id="briefTag">전 시장 횡단</span></h2>
+    <div class="brief-tabs" id="briefTabs"></div>
     <p class="hint" id="briefMeta" style="margin:2px 0 10px"></p>
     <div class="brief-body" id="briefBody"></div>
   </div>
@@ -245,13 +250,41 @@ fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'})
   })
   .catch(e=>{ document.getElementById('sub').textContent='데이터를 불러오지 못했습니다: '+e.message; });
 
-fetch('./markets/global_brief.json?_='+Date.now(), {cache:'no-store'})
-  .then(r=> r.ok ? r.json() : null)
-  .then(b=>{ if(!b||!b.text) return;
-    document.getElementById('briefMeta').textContent = (b.generated||'')+' 기준 · '+(b.countries||'')+'개 시장 횡단';
-    document.getElementById('briefBody').innerHTML = mdBrief(b.text);
-    document.getElementById('briefCard').hidden = false;
-  }).catch(()=>{});
+// 시장 인사이트: 글로벌(지역 분석 종합) + 지역 탭. 누르면 같은 카드에서 내용 교체.
+let briefCache={};
+async function getBrief(key){
+  if(briefCache[key]!==undefined) return briefCache[key];
+  const url = key==='global' ? './markets/global_brief.json' : './markets/region_'+key+'.json';
+  try{ const r=await fetch(url+'?_='+Date.now(),{cache:'no-store'}); briefCache[key]= r.ok? await r.json() : null; }
+  catch(e){ briefCache[key]=null; }
+  return briefCache[key];
+}
+async function loadBrief(key){
+  const b = await getBrief(key);
+  const body=document.getElementById('briefBody');
+  document.querySelectorAll('#briefTabs [data-bk]').forEach(t=> t.setAttribute('aria-pressed', String(t.dataset.bk===key)));
+  if(!b||!b.text){ body.innerHTML='<p class="hint">이 시장 브리핑이 아직 없어요.</p>'; document.getElementById('briefMeta').textContent=''; return; }
+  body.innerHTML=mdBrief(b.text);
+  document.getElementById('briefTag').textContent = key==='global' ? '전 시장 횡단' : (b.region||'');
+  document.getElementById('briefMeta').textContent = (b.generated||'')+' 기준 · '
+    + (key==='global' ? (b.countries||'')+'개 시장 횡단'+(b.regions? ' · '+b.regions+'개 지역 종합':'')
+                      : (b.region||'')+' '+(b.countries||'')+'개국');
+}
+async function initBriefs(){
+  const g = await getBrief('global');
+  const hasGlobal = !!(g && g.text);
+  let regions=[];
+  try{ const r=await fetch('./markets/regions_index.json?_='+Date.now(),{cache:'no-store'}); if(r.ok){ regions=(await r.json()).regions||[]; } }catch(e){}
+  if(!hasGlobal && !regions.length) return;
+  const tabs=[];
+  if(hasGlobal) tabs.push({bk:'global', name:'글로벌'});
+  regions.forEach(rg=> tabs.push({bk:rg.key, name:rg.name}));
+  document.getElementById('briefTabs').innerHTML = tabs.map((t,i)=>'<button data-bk="'+esc(t.bk)+'" aria-pressed="'+(i===0)+'">'+esc(t.name)+'</button>').join('');
+  document.querySelectorAll('#briefTabs [data-bk]').forEach(t=> t.addEventListener('click',()=> loadBrief(t.dataset.bk)));
+  document.getElementById('briefCard').hidden=false;
+  loadBrief(tabs[0].bk);
+}
+initBriefs();
 </script>
 </body>
 </html>
