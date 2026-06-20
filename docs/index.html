@@ -24,6 +24,9 @@
   .meta{ font-size:13px; color:var(--muted); margin:0 0 16px; }
   .meta b{ color:var(--text); font-weight:600; }
   .titlerow{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
+  .toradar{ display:inline-flex; align-items:center; gap:6px; background:var(--accent); color:#fff; border:1px solid var(--accent); border-radius:8px; padding:6px 13px; font-size:13px; font-weight:700; text-decoration:none; line-height:1; }
+  .toradar:hover{ filter:brightness(1.08); }
+  .toradar .ra{ font-size:12px; }
   .titlerow h1{ margin:0; }
   .maker{ display:inline-flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:5px 12px; font-size:13px; line-height:1; }
   .maker-label{ font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--muted); }
@@ -379,6 +382,7 @@
     <div class="titlerow">
       <h1>모바일 게임 차트 대시보드</h1>
       <div class="maker"><span class="maker-label">MADE BY</span><span class="maker-name">김동현</span><span class="msep">·</span><span class="maker-mail"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>hyunxn_01@naver.com</span></div>
+      <a class="toradar" href="./markets.html">다국가 시장 × 장르 레이더<span class="ra">→</span></a>
     </div>
     <p class="meta" id="meta">불러오는 중…</p>
   </header>
