@@ -250,39 +250,48 @@ fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'})
   })
   .catch(e=>{ document.getElementById('sub').textContent='데이터를 불러오지 못했습니다: '+e.message; });
 
-// 시장 인사이트: 글로벌(지역 분석 종합) + 지역 탭. 누르면 같은 카드에서 내용 교체.
-let briefCache={};
-async function getBrief(key){
+// 시장 인사이트: 글로벌(주요+지역 종합) + 주요시장 개별 탭 + 지역 탭. 같은 카드에서 교체.
+let briefCache={}, TABMETA={};   // key -> {type,name}
+function briefUrl(key,type){
+  if(type==='global') return './markets/global_brief.json';
+  if(type==='major')  return './markets/major_'+key+'.json';
+  return './markets/region_'+key+'.json';
+}
+async function getBrief(key,type){
   if(briefCache[key]!==undefined) return briefCache[key];
-  const url = key==='global' ? './markets/global_brief.json' : './markets/region_'+key+'.json';
-  try{ const r=await fetch(url+'?_='+Date.now(),{cache:'no-store'}); briefCache[key]= r.ok? await r.json() : null; }
+  try{ const r=await fetch(briefUrl(key,type)+'?_='+Date.now(),{cache:'no-store'}); briefCache[key]= r.ok? await r.json() : null; }
   catch(e){ briefCache[key]=null; }
   return briefCache[key];
 }
 async function loadBrief(key){
-  const b = await getBrief(key);
+  const meta = TABMETA[key]||{type:'region',name:''};
+  const b = await getBrief(key, meta.type);
   const body=document.getElementById('briefBody');
   document.querySelectorAll('#briefTabs [data-bk]').forEach(t=> t.setAttribute('aria-pressed', String(t.dataset.bk===key)));
   if(!b||!b.text){ body.innerHTML='<p class="hint">이 시장 브리핑이 아직 없어요.</p>'; document.getElementById('briefMeta').textContent=''; return; }
   body.innerHTML=mdBrief(b.text);
-  document.getElementById('briefTag').textContent = key==='global' ? '전 시장 횡단' : (b.region||'');
-  document.getElementById('briefMeta').textContent = (b.generated||'')+' 기준 · '
-    + (key==='global' ? (b.countries||'')+'개 시장 횡단'+(b.regions? ' · '+b.regions+'개 지역 종합':'')
-                      : (b.region||'')+' '+(b.countries||'')+'개국');
+  const tag = meta.type==='global' ? '전 시장 횡단' : meta.type==='major' ? '주요 시장' : '지역';
+  document.getElementById('briefTag').textContent = tag;
+  let m = (b.generated||'')+' 기준 · ';
+  if(meta.type==='global') m += (b.countries||'')+'개 시장'+(b.sources? ' · '+b.sources+'개 분석 종합':'');
+  else if(meta.type==='major') m += (b.market||meta.name)+' 단일 시장';
+  else m += (b.region||meta.name)+' '+(b.countries||'')+'개국';
+  document.getElementById('briefMeta').textContent = m;
 }
 async function initBriefs(){
-  const g = await getBrief('global');
+  const g = await getBrief('global','global');
   const hasGlobal = !!(g && g.text);
-  let regions=[];
-  try{ const r=await fetch('./markets/regions_index.json?_='+Date.now(),{cache:'no-store'}); if(r.ok){ regions=(await r.json()).regions||[]; } }catch(e){}
-  if(!hasGlobal && !regions.length) return;
+  let idxTabs=[];
+  try{ const r=await fetch('./markets/briefs_index.json?_='+Date.now(),{cache:'no-store'}); if(r.ok){ idxTabs=(await r.json()).tabs||[]; } }catch(e){}
+  if(!hasGlobal && !idxTabs.length) return;
   const tabs=[];
-  if(hasGlobal) tabs.push({bk:'global', name:'글로벌'});
-  regions.forEach(rg=> tabs.push({bk:rg.key, name:rg.name}));
-  document.getElementById('briefTabs').innerHTML = tabs.map((t,i)=>'<button data-bk="'+esc(t.bk)+'" aria-pressed="'+(i===0)+'">'+esc(t.name)+'</button>').join('');
+  if(hasGlobal) tabs.push({key:'global', name:'글로벌', type:'global'});
+  idxTabs.forEach(t=> tabs.push({key:t.key, name:t.name, type:t.type}));
+  TABMETA = Object.fromEntries(tabs.map(t=>[t.key, {type:t.type, name:t.name}]));
+  document.getElementById('briefTabs').innerHTML = tabs.map((t,i)=>'<button data-bk="'+esc(t.key)+'" aria-pressed="'+(i===0)+'">'+esc(t.name)+'</button>').join('');
   document.querySelectorAll('#briefTabs [data-bk]').forEach(t=> t.addEventListener('click',()=> loadBrief(t.dataset.bk)));
   document.getElementById('briefCard').hidden=false;
-  loadBrief(tabs[0].bk);
+  loadBrief(tabs[0].key);
 }
 initBriefs();
 </script>
