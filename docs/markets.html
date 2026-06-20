@@ -384,8 +384,12 @@
   .cmode:hover{ color:var(--text); }
   .cmode[aria-selected="true"]{ background:var(--accent); color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.16); }
   .cmode-hint{ font-size:12.5px; color:var(--muted); }
-  .glegend{ display:flex; flex-wrap:wrap; gap:7px 16px; padding:12px 2px 2px; }
-  .glegend .gl-item{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text); }
+  .glegend{ display:flex; flex-wrap:wrap; align-items:center; gap:7px 9px; padding:12px 2px 2px; }
+  .glegend .gl-hint{ flex-basis:100%; font-size:11.5px; color:var(--muted); margin-bottom:2px; }
+  .glegend .gl-item{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text); cursor:pointer; background:transparent; border:1px solid var(--line); border-radius:999px; padding:4px 11px; transition:all .12s; }
+  .glegend .gl-item:hover{ border-color:var(--accent); }
+  .glegend .gl-item.on{ border-color:var(--accent); background:var(--chip); font-weight:700; }
+  .glegend .gl-item.off{ opacity:.42; }
   .glegend .gl-dot{ width:11px; height:11px; border-radius:50%; flex:0 0 auto; }
   .glegend .gl-pct{ color:var(--muted); font-variant-numeric:tabular-nums; }
   .mkbrief{ margin:18px 0 6px; padding:16px 18px; border:1px solid var(--line); border-radius:14px; background:var(--panel); }
@@ -398,6 +402,8 @@
   .mkbrief-tab[aria-selected="true"]{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .mkbrief-body{ font-size:14px; line-height:1.72; }
   .mkbrief-foot{ margin:12px 0 0; font-size:11.5px; color:var(--muted); }
+  .mkbrief-body .gdname{ background:var(--chip); color:var(--accent); font-weight:600; border-radius:5px; padding:1px 6px; white-space:nowrap; }
+  .mkbrief-body .gdname:hover{ background:var(--accent); color:#fff; text-decoration:none; }
 </style>
 </head>
 <body>
@@ -830,6 +836,7 @@ function setupChartDrag(){
 // ===== 장르/게임 차트 전환 =====
 let chartMode='game';
 let _wired=false;  // 정적 버튼 이벤트는 1회만 바인딩(국가 전환 시 init 재호출돼도 중복 방지)
+let genreSel=[];   // 장르 차트에서 강조된 장르명(범례 클릭 토글)
 const CHARTHINT_GAME='<span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">오른쪽에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>좌우 이동</b></span>';
 function genreSeries(){ return (DATA && DATA.genre_series) || {labels:[], genres:{}}; }
 function genreDatasets(){
@@ -842,24 +849,39 @@ function genreDatasets(){
   // 색 배정: 최신일 점유율 큰 순(범례 가독성)
   const li=labels.length-1;
   names.sort((a,b)=> share(b,li)-share(a,li));
-  // 100% 누적 막대: 각 장르가 점유율(%) 세그먼트, 한 칸에 쌓이면 100%
+  // 퍼센트 기반 선차트: 기본은 선만(도트 없음), 범례 클릭으로 강조하면 그 장르에 도트 표시(게임 차트와 동일)
+  const any=genreSel.length>0;
   return names.map((g,i)=>{
-    const col=PALETTE[i%PALETTE.length];
-    return { aid:'__genre__'+g, label:g, type:'bar',
+    const col=PALETTE[i%PALETTE.length], on=genreSel.includes(g);
+    const ds={ aid:'__genre__'+g, label:g, type:'line',
       data:gs.genres[g].map((_,idx)=> share(g,idx)),
-      backgroundColor:col, borderColor:col, borderWidth:0,
-      barPercentage:0.92, categoryPercentage:0.86, maxBarThickness:120 };
+      backgroundColor:col, pointBackgroundColor:col, pointBorderColor:col,
+      fill:false, pointHoverRadius:6, spanGaps:false, tension:0.25 };
+    if(on){ ds.borderColor=col; ds.borderWidth=3; ds.pointRadius=3.4; ds.order=0; }
+    else if(any){ ds.borderColor=col+'33'; ds.borderWidth=1.4; ds.pointRadius=0; ds.order=2; }
+    else { ds.borderColor=col; ds.borderWidth=2.4; ds.pointRadius=0; ds.order=1; }
+    return ds;
   });
 }
 function renderGenreLegend(){
   const el=document.getElementById('genreLegend'); if(!el) return;
   const ds=(chart&&chart.data&&chart.data.datasets)||[];
   if(!ds.length){ el.hidden=true; return; }
-  el.innerHTML=ds.map(d=>{
+  const any=genreSel.length>0;
+  el.innerHTML='<span class="gl-hint">장르를 누르면 그 선만 강조·도트 표시</span>'+ds.map(d=>{
+    const g=d.label||''; const on=genreSel.includes(g);
     const arr=d.data||[]; const last=arr.length?arr[arr.length-1]:null;
-    return '<span class="gl-item"><span class="gl-dot" style="background:'+(d.borderColor||'#888')+'"></span>'+esc(d.label||'')+(last!=null?' <span class="gl-pct">'+last+'%</span>':'')+'</span>';
+    const col=d.pointBackgroundColor||d.backgroundColor||'#888';
+    return '<button type="button" class="gl-item'+(on?' on':(any?' off':''))+'" data-genre="'+esc(g)+'" aria-pressed="'+on+'"><span class="gl-dot" style="background:'+col+'"></span>'+esc(g)+(last!=null?' <span class="gl-pct">'+last+'%</span>':'')+'</button>';
   }).join('');
+  el.querySelectorAll('.gl-item').forEach(b=> b.addEventListener('click',()=> toggleGenre(b.dataset.genre)));
   el.hidden=false;
+}
+function toggleGenre(g){
+  const i=genreSel.indexOf(g);
+  if(i>=0) genreSel.splice(i,1); else genreSel.push(g);
+  if(chart){ chart.data.datasets=genreDatasets(); chart.update(); }
+  renderGenreLegend();
 }
 function hideGenreLegend(){ const el=document.getElementById('genreLegend'); if(el) el.hidden=true; }
 function setChartMode(mode){
@@ -882,7 +904,7 @@ function setChartMode(mode){
     const banner=document.getElementById('banner'); if(banner) banner.style.display='none';
     chart.data.labels=genreSeries().labels;
     chart.data.datasets=genreDatasets();
-    chart.options.scales.x.stacked=true; chart.options.scales.y.stacked=true;  // 100% 누적
+    chart.options.scales.x.stacked=false; chart.options.scales.y.stacked=false;  // 선차트(누적 아님)
     y.reverse=false; y.min=0; y.max=100; if(y.title) y.title.text='장르 점유율 (%)'; if(y.ticks){ y.ticks.stepSize=20; y.ticks.callback=(v)=>v+'%'; }
     chart.options.plugins.legend.display=false;  // Chart.js 범례는 generateLabels 충돌 → 아래 HTML 범례로 대체
     chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}%`;
@@ -1265,6 +1287,8 @@ function init(full){
   activeChart='grossing'; DATA=FULL.charts.grossing;
   _gwCache=null;          // 국가별 매출 가중치 캐시 리셋(국가 전환 시 오염 방지)
   selected.length=0;      // 국가 바뀌면 선택 초기화
+  genreSel.length=0;      // 장르 강조도 초기화
+  if(typeof mkBriefSel!=='undefined' && mkBriefSel) selectBrief(mkBriefSel);  // 브리핑 재렌더 → 현재 국가 게임명으로 칩 활성화
   // 차트는 항상 게임 모드로 생성됨 → 모드 UI를 게임 베이스라인으로 리셋(이전 국가에서 장르였어도)
   const _wantGenre=(chartMode==='genre');
   chartMode='game';
