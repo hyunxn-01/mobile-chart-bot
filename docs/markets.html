@@ -821,17 +821,22 @@ const CHARTHINT_GAME='<span class="ci"><span class="cdot" style="background:#9b9
 function genreSeries(){ return (DATA && DATA.genre_series) || {labels:[], genres:{}}; }
 function genreDatasets(){
   const gs=genreSeries();
-  // 최신일 게임 수 많은 장르 순으로 색 배정(범례 가독성)
-  const names=Object.keys(gs.genres).sort((a,b)=>{
-    const A=gs.genres[a], B=gs.genres[b];
-    return (B[B.length-1]||0)-(A[A.length-1]||0);
+  const labels=gs.labels||[];
+  const names=Object.keys(gs.genres);
+  // 일자별 총합 → 점유율(%) 정규화: 같은 날 모든 장르를 더하면 100%
+  const totals=labels.map((_,i)=> names.reduce((s,g)=>s+(gs.genres[g][i]||0),0));
+  const share=(g,i)=> totals[i] ? Math.round((gs.genres[g][i]||0)/totals[i]*1000)/10 : 0;
+  // 색 배정: 최신일 점유율 큰 순(범례 가독성)
+  const li=labels.length-1;
+  names.sort((a,b)=> share(b,li)-share(a,li));
+  const sd=(labels.length<2)?4:0;  // 1일뿐이면 선이 안 그려지므로 점으로 표시
+  return names.map((g,i)=>{
+    const col=PALETTE[i%PALETTE.length];
+    return { aid:'__genre__'+g, label:g,
+      data:gs.genres[g].map((_,idx)=> share(g,idx)),
+      borderColor:col, backgroundColor:col, pointBackgroundColor:col, pointBorderColor:col,
+      fill:false, borderWidth:2.4, pointRadius:sd, pointHoverRadius:5, spanGaps:false, tension:0.25 };
   });
-  const sd=((gs.labels||[]).length<2)?3:0;  // 1일뿐이면 점으로 표시(선 안 그려짐)
-  return names.map((g,i)=>({
-    aid:'__genre__'+g, label:g, data:gs.genres[g],
-    borderColor:PALETTE[i%PALETTE.length], backgroundColor:'transparent',
-    borderWidth:2.4, pointRadius:sd, pointHoverRadius:5, spanGaps:false, tension:0.25,
-  }));
 }
 function setChartMode(mode){
   if(!chart || mode===chartMode) return;
@@ -848,14 +853,16 @@ function setChartMode(mode){
     if(tabsEl) tabsEl.style.display='none';
     if(panelEl) panelEl.style.display='none';
     if(secT) secT.textContent='장르 추이';
-    if(hint) hint.textContent='장르별 차트 진입 게임 수 추이 (매출/인기 전환 가능)';
-    if(charthint) charthint.innerHTML='<span class="ci">선 하나 = 한 장르</span><span class="csep">│</span><span class="ci">값 = 그날 차트에 든 그 장르 게임 수</span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>이동</b></span>';
+    if(hint) hint.textContent='장르별 점유율(%) 추이 · 같은 날 합치면 100% (매출/인기 전환 가능)';
+    if(charthint) charthint.innerHTML='<span class="ci">선 하나 = 한 장르</span><span class="csep">│</span><span class="ci">값 = 그날 차트 내 <b>점유율(%)</b> · 합 100%</span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>이동</b></span>';
     const banner=document.getElementById('banner'); if(banner) banner.style.display='none';
     chart.data.labels=genreSeries().labels;
     chart.data.datasets=genreDatasets();
-    y.reverse=false; y.min=0; y.max=undefined; if(y.title) y.title.text='장르별 게임 수'; if(y.ticks) y.ticks.stepSize=undefined;
+    y.reverse=false; y.min=0; y.max=100; if(y.title) y.title.text='장르 점유율 (%)'; if(y.ticks){ y.ticks.stepSize=20; y.ticks.callback=(v)=>v+'%'; }
     chart.options.plugins.legend.display=true;
-    chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}개`;
+    chart.options.plugins.legend.labels=chart.options.plugins.legend.labels||{};
+    chart.options.plugins.legend.labels.usePointStyle=true;  // 범례를 빈 네모 대신 도트로
+    chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}%`;
     if(chart.resetZoom) chart.resetZoom();
     chart.update(); updateScrollbar();
   } else {
@@ -864,8 +871,9 @@ function setChartMode(mode){
     if(secT) secT.textContent='순위 추이';
     if(hint) hint.textContent='게임별 순위 추이 · 오른쪽에서 게임 선택';
     if(charthint) charthint.innerHTML=CHARTHINT_GAME;
-    y.reverse=true; y.min=1; y.max=100; if(y.title) y.title.text='순위 (위가 1위)'; if(y.ticks) y.ticks.stepSize=10;
+    y.reverse=true; y.min=1; y.max=100; if(y.title) y.title.text='순위 (위가 1위)'; if(y.ticks){ y.ticks.stepSize=10; y.ticks.callback=undefined; }
     chart.options.plugins.legend.display=false;
+    if(chart.options.plugins.legend.labels) chart.options.plugins.legend.labels.usePointStyle=false;
     chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}위`;
     chart.data.datasets=buildDatasets();
     switchTf(activeTf);
