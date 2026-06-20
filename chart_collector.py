@@ -563,9 +563,16 @@ def build_regional_briefs(collected):
     available = []
     for key, (name, ccs) in REGIONS.items():
         members = [cc for cc in ccs if (collected.get(cc, {}) or {}).get('grossing')]
-        if not members:
-            continue  # 이 지역에 수집된 국가가 아직 없음(탭에 노출 안 함)
         fp = out_dir / f'region_{key}.json'
+        if not members:
+            # 이번 수집엔 멤버 없지만 기존 생성분이 있으면 탭 유지(수동 32개국 확장 스냅샷 보존)
+            if fp.exists():
+                try:
+                    prev = json.loads(fp.read_text(encoding='utf-8'))
+                    available.append({'key': key, 'name': name, 'countries': prev.get('countries')})
+                except Exception:
+                    pass
+            continue
         if _brief_fresh(fp) and _brief_localized(fp):
             available.append({'key': key, 'name': name, 'countries': len(members)})
             print(f'[INFO] {name} 브리핑 스킵(7일 이내 최신)')
@@ -1581,9 +1588,9 @@ def main():
 
     print("[다국가] 전체 국가 iOS 차트 수집·저장 + 주요시장/지역/글로벌 브리핑...")
     try:
-        collected = collect_all_countries()         # 일일 자동수집은 코어 10개국(비용·#98 저장최적화 전). 전 32개국은 수동 1회 실행으로 확장됨
+        collected = collect_all_countries(COUNTRIES + COUNTRIES_EXTRA)  # [임시·1회] 전 32개국 수집→전 지역 브리핑 생성(이후 코어10로 복귀, 지역탭은 persist 로직으로 유지)
         majors = build_major_briefs(collected)      # 주요 시장 개별 먼저
-        regions = build_regional_briefs(collected)  # 중소규모 지역 묶음
+        regions = build_regional_briefs(collected)  # 중소규모 지역 묶음(전 지역 생성)
         write_briefs_index(majors, regions)         # 탭 인덱스(주요→지역)
         build_global_brief(collected)               # 주요+지역을 토대로 글로벌 종합
         apply_aliases_to_briefs()                   # 브리핑 내 현지어 게임명→한글 치환(무비용)
