@@ -425,15 +425,11 @@
   .mkcal-d.has:hover{ background:var(--accent2); color:#fff; }
   .mkcal-d.mkcal-empty{ visibility:hidden; }
   .mkcal-note{ margin-top:8px; font-size:10.5px; color:var(--muted); }
-  .mkbrief-tf{ margin-top:14px; padding-top:12px; border-top:1px solid var(--line); }
-  .mkbtf-title{ font-size:12.5px; font-weight:800; color:var(--accent2text); margin-bottom:8px; }
-  .mkbtf-title .mkbtf-sub{ font-weight:500; color:var(--muted); font-size:11px; margin-left:6px; }
-  .mkbtf-row{ display:flex; align-items:center; gap:10px; padding:4px 0; }
-  .mkbtf-l{ flex:0 0 30px; font-size:11.5px; font-weight:800; color:var(--text); }
-  .mkbtf-c{ display:flex; flex-wrap:wrap; gap:5px 12px; font-size:12.5px; }
-  .mkbtf-item .gdname{ background:var(--accent2soft); color:var(--accent2text); border-radius:5px; padding:1px 6px; font-weight:600; }
-  .mkbtf-up{ color:#16a34a; font-weight:700; font-size:11.5px; }
-  .mkbtf-empty{ color:var(--muted); font-size:11.5px; }
+  .mkbrief-axis{ display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 12px; }
+  .mkbax-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12px; font-weight:700; padding:5px 13px; border-radius:999px; cursor:pointer; transition:background .12s,color .12s,border-color .12s; }
+  .mkbax-tab:hover:not([disabled]){ border-color:var(--accent2); color:var(--text); }
+  .mkbax-tab[aria-selected="true"]{ background:var(--accent2); border-color:var(--accent2); color:#fff; }
+  .mkbax-tab[disabled]{ opacity:.4; cursor:not-allowed; }
 </style>
 </head>
 <body>
@@ -504,9 +500,9 @@
       <div class="mkbrief-calpop" id="mkbriefCalPop" hidden></div>
     </div>
     <div class="mkbrief-tabs" id="mkbriefTabs" role="tablist" aria-label="시장 브리핑 탭"></div>
+    <div class="mkbrief-axis" id="mkbriefAxis" role="tablist" aria-label="시간축 탭"></div>
     <div class="mkbrief-body" id="mkbriefBody"></div>
-    <div class="mkbrief-tf" id="mkbriefTf" hidden></div>
-    <p class="mkbrief-foot">AI(Opus)가 주요 시장·지역을 횡단 분석한 요약 — 7일마다 갱신.</p>
+    <p class="mkbrief-foot">AI(Opus)가 주요 시장·지역을 <strong>시간축별(주·월·분기·년)</strong>로 분석 — 기간이 완료된 시간축만 생성되고, 7일마다 갱신.</p>
   </section>
 
   <h2 class="sectitle" id="secTitleChart">순위 추이</h2>
@@ -1578,7 +1574,9 @@ function openGameDetail(aid){
 let MK_BRIEF_TABS=null, mkBriefSel=null;
 let MK_CC2REGION={}, MK_REGION_KEYS=new Set();  // 개별국가→소속지역, 지역키 집합(브리핑 연동용)
 let MK_BRIEF_MARKET=null; const MK_MARKET_CACHE={};  // 현재 브리핑의 시장 데이터(그 시장 기준 게임 칩·상세)
-let MK_BRIEF_JSON=null, MK_CAL_MONTH=null;  // 현재 브리핑 원본(history 포함) · 달력 표시 월
+let MK_BRIEF_JSON=null, MK_CAL_MONTH=null;  // 현재 브리핑 원본(axes 포함) · 달력 표시 월
+let MK_BRIEF_AXIS='weekly';  // 현재 선택된 시간축
+const MK_BRIEF_AXES=[['weekly','주간'],['monthly','월간'],['quarterly','분기'],['yearly','연간']];
 function loadBriefsIndex(){
   fetch('./markets/briefs_index.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(idx=>{
     if(!idx||!Array.isArray(idx.tabs)||!idx.tabs.length) return;
@@ -1622,6 +1620,14 @@ function renderMarketBrief(text){
   if(!cards.length) return '<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>';
   return cards.map(c=>'<div class="aib-sec"><div class="mkb-li">'+inline(c)+'</div></div>').join('');
 }
+// ----- 시간축 객체 접근 -----
+function briefAxisObj(b, axis){
+  if(!b) return null;
+  if(b.axes && b.axes[axis] && b.axes[axis].text) return b.axes[axis];
+  if(!b.axes && axis==='weekly' && b.text!=null) return {generated:b.generated, text:b.text, history:b.history||[]};  // 구버전 호환
+  return null;  // 해당 시간축 없음(미완료)
+}
+function curAxisObj(){ return briefAxisObj(MK_BRIEF_JSON, MK_BRIEF_AXIS); }
 // ----- 과거 기록(달력) -----
 function briefAvailableDates(b){
   if(!b) return [];
@@ -1637,24 +1643,24 @@ function briefTextForDate(b, date){
 }
 function renderBriefCalBtn(){
   const btn=document.getElementById('mkbriefCalBtn'); if(!btn) return;
-  const n=briefAvailableDates(MK_BRIEF_JSON).length;
+  const n=briefAvailableDates(curAxisObj()).length;
   btn.hidden = n<=1;                 // 과거가 없으면(현재만) 버튼 숨김
   btn.textContent='📅 과거 기록'+(n>1?' ('+(n-1)+')':'');
 }
 function selectBriefDate(date){
-  const b=MK_BRIEF_JSON; if(!b) return;
-  const text=briefTextForDate(b,date); if(text==null) return;
+  const o=curAxisObj(); if(!o) return;
+  const text=briefTextForDate(o,date); if(text==null) return;
   const body=document.getElementById('mkbriefBody'), dt=document.getElementById('mkbriefDate');
   if(body){ body.innerHTML=renderMarketBrief(text);
     const gsrc=(MK_BRIEF_MARKET&&MK_BRIEF_MARKET.charts&&MK_BRIEF_MARKET.charts.grossing&&MK_BRIEF_MARKET.charts.grossing.games)?MK_BRIEF_MARKET.charts.grossing:((typeof DATA!=='undefined'&&DATA&&DATA.games)?DATA:null);
     if(gsrc){ const sD=DATA; DATA=gsrc; try{ linkifyGames(body); }catch(_){ } finally { DATA=sD; } } }
-  const cur=String(b.generated||'').slice(0,10);
+  const cur=String(o.generated||'').slice(0,10);
   if(dt) dt.textContent=date+(date!==cur?' · 과거 기록':'');
 }
 function drawBriefCal(){
   const pop=document.getElementById('mkbriefCalPop'); if(!pop||!MK_CAL_MONTH) return;
   const y=MK_CAL_MONTH.y, m=MK_CAL_MONTH.m, pad=n=>String(n).padStart(2,'0');
-  const avail=new Set(briefAvailableDates(MK_BRIEF_JSON));
+  const avail=new Set(briefAvailableDates(curAxisObj()));
   const startDow=new Date(y,m-1,1).getDay(), days=new Date(y,m,0).getDate();
   let cells=''; for(let i=0;i<startDow;i++) cells+='<span class="mkcal-d mkcal-empty"></span>';
   for(let d=1;d<=days;d++){ const ds=y+'-'+pad(m)+'-'+pad(d); const has=avail.has(ds);
@@ -1668,35 +1674,36 @@ function drawBriefCal(){
 function openBriefCal(){
   const pop=document.getElementById('mkbriefCalPop'); if(!pop) return;
   if(!pop.hidden){ pop.hidden=true; return; }
-  const dates=briefAvailableDates(MK_BRIEF_JSON); if(!dates.length) return;
+  const dates=briefAvailableDates(curAxisObj()); if(!dates.length) return;
   const [ly,lm]=dates[0].split('-').map(Number); MK_CAL_MONTH={y:ly,m:lm};
   drawBriefCal(); pop.hidden=false;
 }
-// ----- 시간축 움직임 -----
-function tfTopRisers(td, n){
-  const labels=(td&&td.labels)||[]; if(labels.length<2) return null;   // null = 데이터 누적 중
-  const li=labels.length-1, ris=[];
-  for(const aid in (td.series||{})){ const s=td.series[aid], now=s[li], prev=s[li-1];
-    if(now==null||prev==null) continue; const d=Math.round(prev-now); if(d>=1) ris.push({aid,d,now}); }
-  ris.sort((a,b)=>b.d-a.d); return ris.slice(0,n);
+// ----- 시간축 탭(주/월/분기/년) — 완료된 축만 활성 -----
+function renderBriefAxisTabs(b){
+  const el=document.getElementById('mkbriefAxis'); if(!el) return;
+  el.innerHTML=MK_BRIEF_AXES.map(([k,lab])=>{
+    const on=!!briefAxisObj(b,k);
+    return '<button class="mkbax-tab" type="button" role="tab" data-ax="'+k+'"'+(on?'':' disabled title="데이터 누적 중 — 해당 기간이 완료되면 자동 생성돼요"')+' aria-selected="'+(k===MK_BRIEF_AXIS)+'">'+lab+'</button>';
+  }).join('');
+  el.querySelectorAll('.mkbax-tab:not([disabled])').forEach(btn=>btn.addEventListener('click',()=>selectBriefAxis(btn.dataset.ax)));
 }
-function renderBriefMovers(){
-  const el=document.getElementById('mkbriefTf'); if(!el) return;
-  const m=MK_BRIEF_MARKET;
-  if(!m||!m.charts||!m.charts.grossing||!m.charts.grossing.timeframes){ el.hidden=true; return; }
-  const g=m.charts.grossing, games=g.games||{};
-  const tfs=[['daily','일'],['weekly','주'],['monthly','월'],['quarterly','분기'],['yearly','년']];
-  let rows='';
-  tfs.forEach(([tf,label])=>{
-    const ris=tfTopRisers(g.timeframes[tf],2);
-    let cell;
-    if(ris===null) cell='<span class="mkbtf-empty">데이터 누적 중</span>';
-    else if(!ris.length) cell='<span class="mkbtf-empty">큰 변동 없음</span>';
-    else cell=ris.map(r=>'<span class="mkbtf-item"><span class="gdname" data-aid="'+esc(r.aid)+'">'+esc((games[r.aid]||{}).title||r.aid)+'</span> <span class="mkbtf-up">▲'+r.d+'</span></span>').join('');
-    rows+='<div class="mkbtf-row"><span class="mkbtf-l">'+label+'</span><div class="mkbtf-c">'+cell+'</div></div>';
-  });
-  el.innerHTML='<div class="mkbtf-title">시간축 움직임 <span class="mkbtf-sub">기간별 급상승(순위↑)</span></div>'+rows;
-  el.hidden=false;
+function selectBriefAxis(ax){
+  if(ax===MK_BRIEF_AXIS) return;
+  if(!briefAxisObj(MK_BRIEF_JSON,ax)) return;
+  MK_BRIEF_AXIS=ax;
+  document.querySelectorAll('#mkbriefAxis .mkbax-tab').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.ax===ax)));
+  renderBriefAxis();
+}
+function renderBriefAxis(){
+  const b=MK_BRIEF_JSON, body=document.getElementById('mkbriefBody'), dt=document.getElementById('mkbriefDate');
+  const o=briefAxisObj(b, MK_BRIEF_AXIS);
+  { const cp=document.getElementById('mkbriefCalPop'); if(cp) cp.hidden=true; }
+  renderBriefCalBtn();
+  if(!o||!o.text){ if(body) body.innerHTML='<p class="empty">이 시간축은 아직 데이터가 부족해요. 기간이 완료되면 분석이 자동 생성됩니다.</p>'; if(dt) dt.textContent=''; return; }
+  if(body){ body.innerHTML=renderMarketBrief(o.text);
+    const gsrc=(MK_BRIEF_MARKET&&MK_BRIEF_MARKET.charts&&MK_BRIEF_MARKET.charts.grossing&&MK_BRIEF_MARKET.charts.grossing.games)?MK_BRIEF_MARKET.charts.grossing:((typeof DATA!=='undefined'&&DATA&&DATA.games)?DATA:null);
+    if(gsrc){ const sD=DATA; DATA=gsrc; try{ linkifyGames(body); }catch(_){ } finally { DATA=sD; } } }
+  if(dt) dt.textContent=(String(o.generated||'').split(' ')[0]||'')+(b&&b.basis==='hierarchical'?' · 지역 종합':'');
 }
 function selectBrief(bk){
   mkBriefSel=bk;
@@ -1714,17 +1721,13 @@ function selectBrief(bk){
   Promise.all([pBrief, pMkt]).then(([b, mkt])=>{
     if(bk!==mkBriefSel) return;                 // 그 사이 다른 탭 누르면 무시
     MK_BRIEF_MARKET = mkt;                       // 이 브리핑의 시장 데이터(클릭 상세에 사용)
-    MK_BRIEF_JSON = b;                           // 원본(history 포함) — 달력 과거 기록용
+    MK_BRIEF_JSON = b;                           // 원본(axes·history 포함)
     if(!body) return;
-    renderBriefMovers();                         // 시간축 움직임
-    renderBriefCalBtn();                         // 과거 기록 버튼(history 있으면)
-    if(!b||!b.text){ body.innerHTML='<p class="empty">이 시장 브리핑이 아직 없어요. 데이터가 쌓이면 생성됩니다.</p>'; if(dt) dt.textContent=''; return; }
-    body.innerHTML=renderMarketBrief(b.text);
-    // 이 브리핑 시장의 게임 기준으로 칩 생성(현재 차트 시장과 무관)
-    const gsrc = (mkt && mkt.charts && mkt.charts.grossing && mkt.charts.grossing.games) ? mkt.charts.grossing
-               : ((typeof DATA!=='undefined' && DATA && DATA.games) ? DATA : null);
-    if(gsrc){ const sD=DATA; DATA=gsrc; try{ linkifyGames(body); }catch(_){ } finally { DATA=sD; } }
-    if(dt) dt.textContent=(String(b.generated||'').split(' ')[0]||'')+(b.basis==='hierarchical'?' · 지역 종합':'');
+    const avail = MK_BRIEF_AXES.filter(a=>briefAxisObj(b,a[0]));   // 완료된 시간축만
+    if(!avail.length){ const ax=document.getElementById('mkbriefAxis'); if(ax) ax.innerHTML=''; body.innerHTML='<p class="empty">이 시장 브리핑이 아직 없어요. 데이터가 쌓이면 생성됩니다.</p>'; if(dt) dt.textContent=''; renderBriefCalBtn(); return; }
+    if(!avail.some(a=>a[0]===MK_BRIEF_AXIS)) MK_BRIEF_AXIS=avail[0][0];   // 현재 축이 없으면 첫 사용가능 축으로
+    renderBriefAxisTabs(b);                       // 시간축 탭(완료된 축만 활성)
+    renderBriefAxis();                            // 본문 + 달력 버튼 + 날짜
   }).catch(()=>{ if(body) body.innerHTML='<p class="empty">브리핑을 불러오지 못했어요.</p>'; });
 }
 const MK_CCN={kr:'한국',us:'미국',jp:'일본',cn:'중국',tw:'대만',gb:'영국',de:'독일',fr:'프랑스',ca:'캐나다',au:'호주',it:'이탈리아',es:'스페인',nl:'네덜란드',ru:'러시아',se:'스웨덴',sa:'사우디',ae:'UAE',eg:'이집트',tr:'터키',br:'브라질',mx:'멕시코',ar:'아르헨티나',co:'콜롬비아',id:'인도네시아',th:'태국',vn:'베트남',ph:'필리핀',my:'말레이시아',sg:'싱가포르',in:'인도',pk:'파키스탄',bd:'방글라데시'};
