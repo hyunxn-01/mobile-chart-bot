@@ -839,7 +839,7 @@ function setupChartDrag(){
 }
 
 // ===== 장르/게임 차트 전환 =====
-let chartMode='game';
+let chartMode='genre';   // 처음 뜨는 차트는 장르 차트(init의 _wantGenre 경로로 로드 직후 전환)
 let _wired=false;  // 정적 버튼 이벤트는 1회만 바인딩(국가 전환 시 init 재호출돼도 중복 방지)
 let genreSel=[];   // 장르 차트에서 강조된 장르명(범례 클릭 토글)
 const CHARTHINT_GAME='<span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">오른쪽에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>좌우 이동</b></span>';
