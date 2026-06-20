@@ -72,7 +72,7 @@
 
   <div class="card">
     <h2 id="genreTitle">장르 추이</h2>
-    <p class="hint" id="genreHint">날짜별 상위 차트의 장르 구성 — 어떤 장르가 뜨고 지는지.</p>
+    <p class="hint" id="genreHint">선 = 장르별 상위 게임 수의 일자별 추이 — 어떤 장르가 뜨고 지는지. (범례 클릭 = 끄고 켜기)</p>
     <div class="chart-wrap"><canvas id="genreChart"></canvas></div>
     <div class="glegend" id="genreLegend"></div>
   </div>
@@ -139,13 +139,13 @@ function renderGenreChart(gs){
   // 장르를 합계 많은 순으로 정렬
   const order = Object.keys(genres).sort((a,b)=> genres[b].reduce((s,x)=>s+x,0)-genres[a].reduce((s,x)=>s+x,0));
   const datasets = order.filter(g=>!hiddenGenres[g]).map(g=>({
-    label:g, data:genres[g], backgroundColor:colorFor(g),
-    borderColor:colorFor(g), borderWidth:0, stack:'s', categoryPercentage:0.96, barPercentage:0.98,
+    label:g, data:genres[g], borderColor:colorFor(g), backgroundColor:colorFor(g),
+    fill:false, tension:0.25, borderWidth:2, pointRadius:2.5, pointHoverRadius:5, spanGaps:true,
   }));
   const ctx = document.getElementById('genreChart');
   if(CHART) CHART.destroy();
   CHART = new Chart(ctx, {
-    type:'bar',
+    type:'line',
     data:{ labels, datasets },
     options:{
       responsive:true, maintainAspectRatio:false, animation:false,
@@ -153,8 +153,8 @@ function renderGenreChart(gs){
       plugins:{ legend:{display:false},
         tooltip:{ callbacks:{ label:(c)=> c.dataset.label+': '+c.parsed.y+'개' } } },
       scales:{
-        x:{ stacked:true, ticks:{ color:cssVar('--muted'), maxRotation:0, autoSkip:true, maxTicksLimit:12 }, grid:{ display:false } },
-        y:{ stacked:true, beginAtZero:true, title:{ display:true, text:'상위 차트 내 게임 수', color:cssVar('--muted') },
+        x:{ ticks:{ color:cssVar('--muted'), maxRotation:0, autoSkip:true, maxTicksLimit:12 }, grid:{ display:false } },
+        y:{ beginAtZero:true, title:{ display:true, text:'상위 차트 내 게임 수', color:cssVar('--muted') },
             ticks:{ color:cssVar('--muted') }, grid:{ color:'rgba(130,130,125,0.14)' } },
       },
     },
