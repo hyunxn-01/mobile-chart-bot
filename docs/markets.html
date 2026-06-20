@@ -923,10 +923,10 @@ function setChartMode(mode){
     chart.data.datasets=genreDatasets();
     chart.options.scales.x.stacked=false; chart.options.scales.y.stacked=false;  // 선차트(누적 아님)
     y.reverse=false; if(y.title) y.title.text='장르 점유율 (%)'; if(y.ticks){ y.ticks.callback=(v)=>v+'%'; }
-    applyGenreYAxis();  // 최대 점유율에 맞춰 y축 상한 유동 조정
     chart.options.plugins.legend.display=false;  // Chart.js 범례는 generateLabels 충돌 → 아래 HTML 범례로 대체
     chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}%`;
     if(chart.resetZoom) chart.resetZoom();
+    applyGenreYAxis();  // resetZoom이 원본 max=100을 복원하므로 그 뒤에 유동 상한 적용
     chart.update(); updateScrollbar();
     renderGenreLegend();
   } else {
@@ -984,8 +984,8 @@ function selectChart(key){
   if(chartMode==='genre'){
     chart.data.labels=genreSeries().labels;
     chart.data.datasets=genreDatasets();
-    applyGenreYAxis();
     if(chart.resetZoom) chart.resetZoom();
+    applyGenreYAxis();  // resetZoom 뒤에 유동 상한 적용
     chart.update(); updateScrollbar();
     renderGenreLegend();
   } else {
