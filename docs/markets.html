@@ -36,6 +36,8 @@
   .card h2{ font-size:16px; font-weight:700; margin:0 0 2px; }
   .card .hint{ font-size:12px; color:var(--muted); margin:0 0 12px; }
   .chart-wrap{ position:relative; height:420px; }
+  .chart-head{ display:flex; align-items:center; justify-content:space-between; gap:12px 16px; flex-wrap:wrap; margin-bottom:2px; }
+  .chart-head h2{ margin:0; }
   .glegend{ display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:12px; }
   .glegend span{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--muted); cursor:pointer; }
   .glegend span.off{ opacity:.38; text-decoration:line-through; }
@@ -133,8 +135,18 @@
   </div>
 
   <div class="card">
-    <h2 id="genreTitle">장르 추이</h2>
+    <div class="chart-head">
+      <h2 id="genreTitle">장르 추이</h2>
+      <div class="seg" id="chartModeSeg" role="tablist" aria-label="차트 종류 전환">
+        <button id="modeGenre" aria-pressed="true">장르 차트</button>
+        <button id="modeGame" aria-pressed="false">게임 차트</button>
+      </div>
+    </div>
     <p class="hint" id="genreHint">선 = 장르별 상위 게임 수의 일자별 추이 — 어떤 장르가 뜨고 지는지. (범례 클릭 = 끄고 켜기)</p>
+    <div class="gl-row" id="gameChartSearchRow" hidden>
+      <input class="search" id="gameChartSearch" type="search" placeholder="게임·개발사 검색 → 차트에서 강조" aria-label="게임 차트 검색">
+      <span class="hint" id="gameChartCount" style="margin:0"></span>
+    </div>
     <div class="chart-wrap"><canvas id="genreChart"></canvas></div>
     <div class="glegend" id="genreLegend"></div>
   </div>
@@ -215,16 +227,58 @@ async function loadCountry(cc){
   render();
 }
 
+let chartMode='genre';   // 'genre' | 'game'
 function render(){
   if(!CUR) return;
   const ch = (CUR.charts||{})[activeChart];
   const titleCC = CC_NAME[CUR.country]||CUR.country.toUpperCase();
-  document.getElementById('genreTitle').textContent = titleCC+' · 장르 추이 ('+(activeChart==='grossing'?'매출':'다운로드')+')';
+  const kindLbl = activeChart==='grossing'?'매출':'다운로드';
   if(!ch){ renderEmpty(); return; }
-  renderGenreChart(ch.genre_series);
+  const isGame = chartMode==='game';
+  document.getElementById('genreTitle').textContent = titleCC+' · '+(isGame?'게임 순위 추이':'장르 추이')+' ('+kindLbl+')';
+  document.getElementById('genreHint').textContent = isGame
+    ? '선 = 게임별 순위의 일자별 추이(위=1위). 검색하면 그 게임이 색으로 강조돼요.'
+    : '선 = 장르별 상위 게임 수의 일자별 추이 — 어떤 장르가 뜨고 지는지. (범례 클릭 = 끄고 켜기)';
+  document.getElementById('gameChartSearchRow').hidden = !isGame;
+  document.getElementById('genreLegend').style.display = isGame?'none':'';
+  if(isGame) renderGameChart(ch); else renderGenreChart(ch.genre_series);
   renderGameList(ch);
   renderPublishers(ch);
 }
+
+const GAME_COLORS=['#2563eb','#dc2626','#16a34a','#d97706','#7c3aed','#0891b2','#db2777','#65a30d','#e11d48','#0d9488','#ca8a04','#c026d3'];
+function colorForGame(aid){ let h=0; const s=String(aid); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return GAME_COLORS[h%GAME_COLORS.length]; }
+function renderGameChart(ch){
+  const labels=(ch.daily&&ch.daily.labels)||[];
+  const series=(ch.daily&&ch.daily.series)||{};
+  const games=ch.games||{};
+  const q=(document.getElementById('gameChartSearch').value||'').toLowerCase().replace(/\s+/g,'');
+  const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
+  const aids=Object.keys(series).filter(aid=> (series[aid]||[]).some(v=>v!=null));
+  const matchSet = q ? new Set(aids.filter(aid=> norm((games[aid]||{}).title).includes(q) || norm((games[aid]||{}).developer).includes(q))) : null;
+  document.getElementById('gameChartCount').textContent = q ? (matchSet.size+'개 강조') : (aids.length+'개 게임');
+  const datasets = aids.map(aid=>{
+    const sel = matchSet ? matchSet.has(aid) : false;
+    const c = sel ? colorForGame(aid) : 'rgba(130,130,125,0.20)';
+    return { label:(games[aid]||{}).title||aid, data:(series[aid]||[]).map(v=>v==null?null:v), _aid:aid,
+      borderColor:c, backgroundColor:c, borderWidth: sel?2.4:1, pointRadius: sel?3:1.5, pointHoverRadius:5,
+      tension:0.2, spanGaps:true, order: sel?0:1 };
+  });
+  const ctx=document.getElementById('genreChart');
+  if(CHART) CHART.destroy();
+  CHART=new Chart(ctx,{ type:'line', data:{labels,datasets},
+    options:{ responsive:true, maintainAspectRatio:false, animation:false,
+      interaction:{mode:'nearest',intersect:false,axis:'xy'},
+      plugins:{ legend:{display:false},
+        tooltip:{ callbacks:{ title:(it)=> it.length?labels[it[0].dataIndex]:'', label:(c)=> ((games[c.dataset._aid]||{}).title||'')+' · '+Math.round(c.parsed.y)+'위' } } },
+      scales:{
+        x:{ ticks:{ color:cssVar('--muted'), maxRotation:0, autoSkip:true, maxTicksLimit:12 }, grid:{display:false} },
+        y:{ reverse:true, min:1, suggestedMax:100, title:{display:true,text:'순위 (위 = 1위)',color:cssVar('--muted')}, ticks:{ color:cssVar('--muted'), precision:0 }, grid:{ color:'rgba(130,130,125,0.14)' } }
+      }
+    }
+  });
+}
+function setChartMode(m){ chartMode=m; document.getElementById('modeGenre').setAttribute('aria-pressed',String(m==='genre')); document.getElementById('modeGame').setAttribute('aria-pressed',String(m==='game')); render(); }
 
 function renderEmpty(){
   if(CHART){ CHART.destroy(); CHART=null; }
@@ -397,6 +451,9 @@ function setChart(kind){
 document.getElementById('btnGross').addEventListener('click',()=>setChart('grossing'));
 document.getElementById('btnFree').addEventListener('click',()=>setChart('free'));
 document.getElementById('gameSearch').addEventListener('input',()=>{ if(CUR) renderGameList((CUR.charts||{})[activeChart]||{}); });
+document.getElementById('modeGenre').addEventListener('click',()=>setChartMode('genre'));
+document.getElementById('modeGame').addEventListener('click',()=>setChartMode('game'));
+document.getElementById('gameChartSearch').addEventListener('input',()=>{ if(CUR && chartMode==='game') renderGameChart((CUR.charts||{})[activeChart]||{}); });
 document.getElementById('countrySel').addEventListener('change', e=> loadCountry(e.target.value));
 
 fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'})
