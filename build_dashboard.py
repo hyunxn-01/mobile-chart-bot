@@ -131,8 +131,13 @@ def build_genres(days, dates):
 
 
 def build_chart(history_dir):
-    """한 차트(grossing 또는 free)의 집계 묶음을 만든다."""
-    days = load_history(history_dir)
+    """한 차트(grossing 또는 free)의 집계 묶음을 만든다(디렉터리에서 로드)."""
+    return build_chart_from_days(load_history(history_dir))
+
+
+def build_chart_from_days(days):
+    """한 차트(grossing 또는 free)의 집계 묶음을 days({date:[apps]})에서 만든다.
+    출력 구조 = data.json의 charts[kind]와 동일(timeframes·publishers·genres·games)."""
     dates = sorted(days.keys())
 
     games = {}
@@ -259,35 +264,23 @@ def build_genre_series(days, dates):
 
 
 def build_country(country):
-    out = {'country': country, 'charts': {}}
+    """국가별 집계를 data.json의 charts[kind]와 '동일한 구조'로 생성(index 대시보드 그대로 재사용).
+    + 장르 차트 스왑용 genre_series 동봉. 게임명은 한국어(title_kr), 장르는 표준화(canon_genre)."""
+    out = {'country': country, 'generated': datetime.now().strftime('%Y-%m-%d %H:%M'), 'charts': {}}
     for kind in ('grossing', 'free'):
         days = load_country_charts(country, kind)
-        dates = sorted(days.keys())
-        if not dates:
+        if not days:
             continue
-        games = {}
-        for dt in dates:
+        # 정규화: 한국어 게임명 + 표준 장르(genre_ids 기반) + app_id 보강
+        for dt in days:
             for app in days[dt]:
-                aid = app.get('app_id') or app.get('track_id')
-                if aid and aid not in games:
-                    games[aid] = {'title': app.get('title_kr') or app.get('title', ''), 'developer': app.get('developer', ''),
-                                  'genre': canon_genre(app), 'icon': app.get('icon', ''),
-                                  'rating': app.get('rating'), 'release': app.get('release', ''),
-                                  'updated': app.get('updated', ''), 'ratings': app.get('ratings'),
-                                  'notes': app.get('notes', ''), 'artist_id': app.get('artist_id'),
-                                  'cv_rating': app.get('cv_rating'), 'cv_ratings': app.get('cv_ratings')}
-        daily = {aid: [None] * len(dates) for aid in games}
-        for i, dt in enumerate(dates):
-            for app in days[dt]:
-                aid = app.get('app_id') or app.get('track_id')
-                if aid in daily:
-                    daily[aid][i] = app.get('rank')
-        out['charts'][kind] = {
-            'date_range': [dates[0], dates[-1]], 'num_days': len(dates), 'num_games': len(games),
-            'games': games,
-            'daily': {'labels': dates, 'series': daily},
-            'genre_series': build_genre_series(days, dates),
-        }
+                app['title'] = app.get('title_kr') or app.get('title', '')
+                app['genre'] = canon_genre(app)
+                if not app.get('app_id'):
+                    app['app_id'] = app.get('track_id')
+        ch = build_chart_from_days(days)
+        ch['genre_series'] = build_genre_series(days, sorted(days.keys()))
+        out['charts'][kind] = ch
     return out
 
 
