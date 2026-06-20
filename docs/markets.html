@@ -394,16 +394,21 @@
   .glegend .gl-pct{ color:var(--muted); font-variant-numeric:tabular-nums; }
   .mkbrief{ margin:18px 0 6px; padding:16px 18px; border:1px solid var(--line); border-radius:14px; background:var(--panel); }
   .mkbrief-head{ display:flex; align-items:center; gap:10px; margin-bottom:11px; }
-  .mkbrief-badge{ font-size:13px; font-weight:800; color:#fff; background:var(--accent); padding:3px 11px; border-radius:999px; letter-spacing:.01em; }
+  .mkbrief-badge{ font-size:13px; font-weight:800; color:#fff; background:var(--accent2); padding:3px 11px; border-radius:999px; letter-spacing:.01em; }
   .mkbrief-date{ font-size:12px; color:var(--muted); }
   .mkbrief-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:13px; }
   .mkbrief-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:9px; cursor:pointer; transition:all .12s; }
-  .mkbrief-tab:hover{ color:var(--text); border-color:var(--accent); }
-  .mkbrief-tab[aria-selected="true"]{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .mkbrief-tab:hover{ color:var(--text); border-color:var(--accent2); }
+  .mkbrief-tab[aria-selected="true"]{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
   .mkbrief-body{ font-size:14px; line-height:1.72; }
+  .mkbrief-body .aib-sec{ margin-top:9px; }
+  .mkbrief-body .aib-sec:first-child{ margin-top:0; }
+  .mkbrief-body .mkb-li{ position:relative; padding-left:15px; }
+  .mkbrief-body .mkb-li::before{ content:''; position:absolute; left:2px; top:7px; width:5px; height:5px; border-radius:50%; background:var(--accent2text); }
+  .mkbrief-body strong{ color:var(--accent2text); font-weight:700; }
   .mkbrief-foot{ margin:12px 0 0; font-size:11.5px; color:var(--muted); }
-  .mkbrief-body .gdname{ background:var(--chip); color:var(--accent); font-weight:600; border-radius:5px; padding:1px 6px; white-space:nowrap; }
-  .mkbrief-body .gdname:hover{ background:var(--accent); color:#fff; text-decoration:none; }
+  .mkbrief-body .gdname{ background:var(--accent2soft); color:var(--accent2text); font-weight:600; border-radius:5px; padding:1px 6px; white-space:nowrap; }
+  .mkbrief-body .gdname:hover{ background:var(--accent2); color:#fff; text-decoration:none; }
 </style>
 </head>
 <body>
@@ -1536,6 +1541,20 @@ function loadBriefsIndex(){
     selectBrief('global:global');
   }).catch(()=>{});
 }
+function renderMarketBrief(text){
+  // 시장 브리핑(불릿 텍스트)을 index처럼 세부항목 카드(.aib-sec)로 분리 + 보라 강조
+  const lines=String(text||'').split(/\r?\n/);
+  const cards=[]; let cur=null;
+  lines.forEach(ln=>{ const t=ln.trim(); if(!t) return;
+    const m=t.match(/^[-•*]\s+(.*)$/);
+    if(m){ if(cur!=null) cards.push(cur); cur=m[1]; }
+    else { cur = (cur!=null) ? cur+' '+t : t; }
+  });
+  if(cur!=null) cards.push(cur);
+  const inline=s=> esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  if(!cards.length) return '<div class="aib-sec"><div class="mkb-li">'+inline(text)+'</div></div>';
+  return cards.map(c=>'<div class="aib-sec"><div class="mkb-li">'+inline(c)+'</div></div>').join('');
+}
 function selectBrief(bk){
   mkBriefSel=bk;
   document.querySelectorAll('.mkbrief-tab').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.bk===bk)));
@@ -1546,7 +1565,7 @@ function selectBrief(bk){
   fetch('./markets/'+file+'.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(b=>{
     if(!body) return;
     if(!b||!b.text){ body.innerHTML='<p class="empty">이 시장 브리핑이 아직 없어요. 데이터가 쌓이면 생성됩니다.</p>'; if(dt) dt.textContent=''; return; }
-    body.innerHTML=mdLite(b.text);
+    body.innerHTML=renderMarketBrief(b.text);
     try{ if(typeof DATA!=='undefined' && DATA && DATA.games) linkifyGames(body); }catch(_){}  // DATA 로드 전이면 링크는 생략(본문은 항상 표시)
     if(dt) dt.textContent=(String(b.generated||'').split(' ')[0]||'')+(b.basis==='hierarchical'?' · 지역 종합':'');
   }).catch(()=>{ if(body) body.innerHTML='<p class="empty">브리핑을 불러오지 못했어요.</p>'; });
