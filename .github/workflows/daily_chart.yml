@@ -36,6 +36,11 @@ jobs:
       - name: Build dashboard data
         run: python build_dashboard.py
 
+      - name: Check design invariants (gate)
+        run: |
+          python check_invariants.py --selftest
+          python check_invariants.py docs/markets
+
       - name: Commit data for future comparison
         run: |
           git config --local user.email "action@github.com"
