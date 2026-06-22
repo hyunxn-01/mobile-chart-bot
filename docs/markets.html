@@ -570,10 +570,10 @@
       </div>
       <div class="chartbar" id="chartbar" title="막대를 드래그하면 보는 구간이 이동합니다"><div class="chartbar-thumb" id="chartthumb"></div></div>
       <p class="viewhint" id="viewhint">전체 보기</p>
-      <div class="glegend" id="genreLegend" hidden></div>
     </div>
     <aside class="panel">
       <button class="panel-toggle" id="panelToggle" aria-expanded="false"><span id="panelToggleLabel">게임 검색·선택</span><span class="caret">▾</span></button>
+      <div class="glegend" id="genreLegend" hidden></div>
       <div class="panel-body" id="panelBody">
         <div class="row">
           <input class="search" id="search" type="search" placeholder="게임 검색 (이름·개발사)" aria-label="게임 검색">
@@ -887,6 +887,13 @@ let _wired=false;  // 정적 버튼 이벤트는 1회만 바인딩(국가 전환
 let genreSel=[];   // 장르 차트에서 강조된 장르명(범례 클릭 토글)
 const CHARTHINT_GAME='<span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">오른쪽에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>좌우 이동</b></span>';
 function genreSeries(){ return (DATA && DATA.genre_series) || {labels:[], genres:{}}; }
+const GENRE_ORDER=['롤플레잉','전략','캐주얼','퍼즐','시뮬레이션','액션','어드벤처','스포츠','레이싱','보드','카지노','카드','아케이드','음악','단어','트리비아','교육','가족'];
+function genreColor(name){   // 시장 무관 고정색(장르 이름 기반 — 시장 바뀌어도 동일 장르=동일 색)
+  const i=GENRE_ORDER.indexOf(name);
+  if(i>=0) return PALETTE[i % PALETTE.length];
+  let h=0, s=String(name); for(let k=0;k<s.length;k++) h=(h*31+s.charCodeAt(k))>>>0;
+  return PALETTE[h % PALETTE.length];
+}
 function genreDatasets(){
   const gs=genreSeries();
   const labels=gs.labels||[];
@@ -900,7 +907,7 @@ function genreDatasets(){
   // 퍼센트 기반 선차트: 기본은 선만(도트 없음), 범례 클릭으로 강조하면 그 장르에 도트 표시(게임 차트와 동일)
   const any=genreSel.length>0;
   return names.map((g,i)=>{
-    const col=PALETTE[i%PALETTE.length], on=genreSel.includes(g);
+    const col=genreColor(g), on=genreSel.includes(g);
     const ds={ aid:'__genre__'+g, label:g, type:'line',
       data:gs.genres[g].map((_,idx)=> share(g,idx)),
       backgroundColor:col, pointBackgroundColor:col, pointBorderColor:col,
@@ -949,6 +956,11 @@ function toggleGenre(g){
   renderGenreLegend();
 }
 function hideGenreLegend(){ const el=document.getElementById('genreLegend'); if(el) el.hidden=true; }
+function setPanelMode(mode){   // 오른쪽 패널 내용: 게임=검색·목록, 장르=장르 범례(차트는 항상 왼쪽)
+  const pb=document.getElementById('panelBody'), gl=document.getElementById('genreLegend'), pl=document.getElementById('panelToggleLabel');
+  if(mode==='genre'){ if(pb) pb.style.display='none'; if(gl) gl.hidden=false; if(pl) pl.textContent='장르 선택'; }
+  else { if(pb) pb.style.display=''; if(gl) gl.hidden=true; if(pl) pl.textContent='게임 검색·선택'; }
+}
 function setChartMode(mode){
   if(!chart || mode===chartMode) return;
   if(mode==='genre' && !Object.keys(genreSeries().genres).length) return; // 데이터 없으면 무시
@@ -962,7 +974,7 @@ function setChartMode(mode){
   const y=chart.options.scales.y;
   if(mode==='genre'){
     if(tabsEl) tabsEl.style.display='none';
-    if(panelEl) panelEl.style.display='none';
+    if(panelEl) panelEl.style.display=''; setPanelMode('genre');
     if(secT) secT.textContent='장르 추이'; markSectionMarkets();
     if(hint) hint.textContent='장르별 점유율(%) 추이 · 같은 날 합치면 100% (매출/인기 전환 가능)';
     if(charthint) charthint.innerHTML='<span class="ci">선 하나 = 한 장르</span><span class="csep">│</span><span class="ci">값 = 그날 차트 내 <b>점유율(%)</b> · 합 100%</span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>이동</b></span>';
@@ -979,7 +991,7 @@ function setChartMode(mode){
     renderGenreLegend();
   } else {
     if(tabsEl) tabsEl.style.display='';
-    if(panelEl) panelEl.style.display='';
+    if(panelEl) panelEl.style.display=''; setPanelMode('game');
     if(secT) secT.textContent='순위 추이'; markSectionMarkets();
     if(hint) hint.textContent='게임별 순위 추이 · 오른쪽에서 게임 선택';
     if(charthint) charthint.innerHTML=CHARTHINT_GAME;
@@ -1370,7 +1382,7 @@ function init(full){
   const _wantGenre=(chartMode==='genre');
   chartMode='game';
   { const _t=document.getElementById('tabs'); if(_t) _t.style.display='';
-    const _p=document.querySelector('.panel'); if(_p) _p.style.display='';
+    const _p=document.querySelector('.panel'); if(_p) _p.style.display=''; setPanelMode('game');
     document.querySelectorAll('[data-cmode]').forEach(b=> b.setAttribute('aria-selected', String(b.dataset.cmode==='game')));
     const _st=document.getElementById('secTitleChart'); if(_st) _st.textContent='순위 추이';
     const _h=document.getElementById('cmodeHint'); if(_h) _h.textContent='게임별 순위 추이 · 오른쪽에서 게임 선택'; }
