@@ -410,6 +410,11 @@
   .mkbrief-body .gdname{ background:var(--accent2soft); color:var(--accent2text); font-weight:600; border-radius:5px; padding:1px 6px; white-space:nowrap; }
   .mkbrief-body .gdname:hover{ background:var(--accent2); color:#fff; text-decoration:none; }
   .mkbrief-head{ position:relative; }
+  .mkbrief-collapse{ margin-left:auto; appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px; }
+  .mkbrief-collapse:hover{ border-color:var(--accent2); color:var(--text); }
+  .mkbrief-collapse .caret{ display:inline-block; transition:transform .15s; }
+  .mkbrief.collapsed .mkbrief-collapse .caret{ transform:rotate(180deg); }
+  .mkbrief.collapsed .mkbrief-tabs, .mkbrief.collapsed .mkbrief-axis, .mkbrief.collapsed .mkbrief-body, .mkbrief.collapsed .mkbrief-foot{ display:none; }
   .mkbrief-cal{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:8px; cursor:pointer; }
   .mkbrief-cal:hover{ border-color:var(--accent2); color:var(--text); }
   .mkbrief-calpop{ position:absolute; top:30px; left:0; z-index:30; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px; width:248px; box-shadow:0 8px 28px rgba(0,0,0,.32); }
@@ -498,6 +503,7 @@
       <span class="mkbrief-date" id="mkbriefDate"></span>
       <button class="mkbrief-cal" id="mkbriefCalBtn" type="button" hidden>📅 과거 기록</button>
       <div class="mkbrief-calpop" id="mkbriefCalPop" hidden></div>
+      <button class="mkbrief-collapse" id="mkbriefCollapse" type="button" aria-expanded="true" aria-label="브리핑 접기/펼치기"><span id="mkbriefCollapseLabel">접기</span> <span class="caret">▴</span></button>
     </div>
     <div class="mkbrief-tabs" id="mkbriefTabs" role="tablist" aria-label="시장 브리핑 탭"></div>
     <div class="mkbrief-axis" id="mkbriefAxis" role="tablist" aria-label="시간축 탭"></div>
@@ -1339,8 +1345,9 @@ function init(full){
   _gwCache=null;          // 국가별 매출 가중치 캐시 리셋(국가 전환 시 오염 방지)
   selected.length=0;      // 국가 바뀌면 선택 초기화
   genreSel.length=0;      // 장르 강조도 초기화
-  // 브리핑 연동: 선택한 시장에 맞는 브리핑 탭 자동 선택(게임명 칩 클릭=상세 작동)
-  { const k=(typeof MK_CC!=='undefined')?MK_CC:null; let bk=null;
+  // 브리핑 연동: 첫 로드는 글로벌(횡단 헤드라인) 유지, 사용자가 시장을 바꾸면 그 시장 브리핑으로 연동
+  if(MK_BRIEF_FIRST){ MK_BRIEF_FIRST=false; }
+  else { const k=(typeof MK_CC!=='undefined')?MK_CC:null; let bk=null;
     const tabs=(typeof MK_BRIEF_TABS!=='undefined')?MK_BRIEF_TABS:null;
     if(k && tabs){
       if(typeof MK_REGION_KEYS!=='undefined' && MK_REGION_KEYS.has && MK_REGION_KEYS.has(k) && tabs.some(t=>t.type==='region'&&t.key===k)) bk='region:'+k;            // 지역(합산)
@@ -1571,7 +1578,7 @@ function openGameDetail(aid){
 
 // === 다국가 레이더: 국가 선택 → markets/{cc}.json(= data.json과 동일 구조)을 init() ===
 // ===== AI 시장 브리핑(계층형: 글로벌 + 주요국 + 지역) =====
-let MK_BRIEF_TABS=null, mkBriefSel=null;
+let MK_BRIEF_TABS=null, mkBriefSel=null, MK_BRIEF_FIRST=true;  // 첫 로드는 글로벌 브리핑(횡단) 유지
 let MK_CC2REGION={}, MK_REGION_KEYS=new Set();  // 개별국가→소속지역, 지역키 집합(브리핑 연동용)
 let MK_BRIEF_MARKET=null; const MK_MARKET_CACHE={};  // 현재 브리핑의 시장 데이터(그 시장 기준 게임 칩·상세)
 let MK_BRIEF_JSON=null, MK_CAL_MONTH=null;  // 현재 브리핑 원본(axes 포함) · 달력 표시 월
@@ -1588,6 +1595,7 @@ function loadBriefsIndex(){
     }
     const sec=document.getElementById('mkbrief'); if(sec) sec.hidden=false;
     { const cb=document.getElementById('mkbriefCalBtn'); if(cb && !cb._bound){ cb._bound=1; cb.addEventListener('click',(e)=>{ e.stopPropagation(); openBriefCal(); }); } }
+    { const tg=document.getElementById('mkbriefCollapse'); if(tg && !tg._bound){ tg._bound=1; tg.addEventListener('click',()=>{ const sec=document.getElementById('mkbrief'); const collapsed=sec.classList.toggle('collapsed'); tg.setAttribute('aria-expanded', String(!collapsed)); const lb=document.getElementById('mkbriefCollapseLabel'); if(lb) lb.textContent=collapsed?'펼치기':'접기'; }); } }
     document.addEventListener('click',(e)=>{ const pop=document.getElementById('mkbriefCalPop'); if(pop && !pop.hidden && e.target.closest && !e.target.closest('#mkbriefCalPop') && !e.target.closest('#mkbriefCalBtn')) pop.hidden=true; });
     selectBrief('global:global');
   }).catch(()=>{});
