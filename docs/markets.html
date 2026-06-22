@@ -1592,7 +1592,8 @@ function markSectionMarkets(){
   const sel=document.getElementById('countrySel');
   const nm=(sel&&sel.selectedOptions&&sel.selectedOptions[0])?sel.selectedOptions[0].textContent.trim():'';
   if(!nm) return;
-  document.querySelectorAll('h2.sectitle').forEach(h=>{
+  document.querySelectorAll('h2').forEach(h=>{
+    if(h.closest && h.closest('#mkbrief, #gameModal, .gmodal')) return;  // 섹션 제목만(모달·브리핑 제외)
     let c=h.querySelector('.sec-mkt'); if(!c){ c=document.createElement('span'); c.className='sec-mkt'; h.appendChild(c); }
     c.textContent='📍 '+nm;
   });
