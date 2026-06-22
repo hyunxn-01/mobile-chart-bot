@@ -404,6 +404,22 @@
   .glegend .gl-name{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .glegend .gl-meta{ font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
   .glegend .gl-rev{ color:var(--accent); font-weight:600; }
+  .cmpsec{ margin:20px 0 6px; }
+  .cmp-controls{ display:flex; align-items:center; gap:8px; margin:6px 0 11px; }
+  .cmp-clabel{ font-size:12px; color:var(--muted); }
+  .cmp-metric{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font:inherit; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all .12s; }
+  .cmp-metric:hover{ color:var(--text); border-color:var(--accent); }
+  .cmp-metric.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .cmp-wrap{ overflow:auto; max-height:560px; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
+  .cmp-grid{ display:grid; min-width:max-content; }
+  .cmp-corner,.cmp-mh,.cmp-glabel{ padding:7px 9px; border-bottom:1px solid var(--line); border-right:1px solid var(--line); white-space:nowrap; font-size:12px; }
+  .cmp-mh{ position:sticky; top:0; z-index:2; background:var(--panel); font-weight:700; color:var(--text); text-align:center; }
+  .cmp-glabel{ position:sticky; left:0; z-index:1; background:var(--panel); display:flex; align-items:center; gap:7px; font-weight:600; color:var(--text); }
+  .cmp-corner{ position:sticky; top:0; left:0; z-index:3; background:var(--panel); font-size:11px; color:var(--muted); font-weight:700; }
+  .cmp-dot{ width:9px; height:9px; border-radius:3px; flex:0 0 auto; }
+  .cmp-cell{ appearance:none; margin:0; padding:7px 6px; border:0; border-bottom:1px solid var(--line); border-right:1px solid var(--line); font:inherit; font-size:12px; font-variant-numeric:tabular-nums; text-align:center; color:var(--text); cursor:pointer; min-width:62px; }
+  .cmp-cell:hover{ outline:2px solid var(--accent); outline-offset:-2px; position:relative; z-index:1; }
+  .cmp-empty{ padding:22px 16px; color:var(--muted); font-size:13px; }
   .mkbrief{ margin:0 0 16px; padding:0; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
   .mkbrief>:not(summary){ padding-left:16px; padding-right:16px; }
   .mkbrief-head{ display:flex; align-items:center; gap:8px; margin-bottom:0; }
@@ -563,6 +579,7 @@
     </div>
     <div class="chaptitle">섹션</div>
     <a class="chapdot active" data-target="chartsec" href="#chartsec"><span class="chaplabel">순위 추이</span></a>
+    <a class="chapdot" data-target="cmpsec" href="#cmpsec"><span class="chaplabel">시장 비교</span></a>
     <a class="chapdot" data-target="histsec" href="#histsec"><span class="chaplabel">순위 이력</span></a>
     <a class="chapdot" data-target="aggsec" href="#aggsec"><span class="chaplabel">퍼블리셔·장르</span></a>
     <a class="chapdot" data-target="gapsec" href="#gapsec"><span class="chaplabel">매출 ↔ 인기 갭</span></a>
@@ -599,6 +616,17 @@
       </div>
     </aside>
   </div>
+
+  <section class="cmpsec" id="cmpsec">
+    <h2>시장 비교 · 장르 점유</h2>
+    <p class="sub cap" id="cmpsub"><span class="ci">행=장르 · 열=시장(주요국+지역)</span><span class="csep">│</span><span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b></span><span class="csep">│</span><span class="ci">한 행에서 진하기 차이 = <b>시장별 강·약(블루오션 후보)</b></span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span></p>
+    <div class="cmp-controls">
+      <span class="cmp-clabel">지표</span>
+      <button class="cmp-metric on" type="button" data-metric="rev">추정매출 점유</button>
+      <button class="cmp-metric" type="button" data-metric="pre">차트 점유(게임수)</button>
+    </div>
+    <div class="cmp-wrap"><div class="cmp-grid" id="cmpGrid"></div></div>
+  </section>
 
   <div class="histsec" id="histsec">
     <h2>선택 게임 순위 이력</h2>
@@ -1805,6 +1833,58 @@ function loadMarket(cc){
     .then(init)
     .catch(e=>{ const m=document.getElementById('meta'); if(m) m.textContent='데이터를 불러오지 못했습니다: '+e.message; });
 }
+
+// ===== 시장 비교 히트맵(장르×시장 매트릭스) =====
+let MATRIX=null, cmpMetric='rev';
+function loadMatrix(){
+  fetch('./markets/genre_matrix.json?_='+Date.now(), {cache:'no-store'})
+    .then(r=> r.ok ? r.json() : null).then(m=>{ MATRIX=m; renderCmp(); })
+    .catch(()=>{ MATRIX=null; renderCmp(); });
+}
+function renderCmp(){
+  const el=document.getElementById('cmpGrid'); if(!el) return;
+  const M=MATRIX;
+  if(!M || !Array.isArray(M.markets) || !M.markets.length || !Array.isArray(M.genres) || !M.genres.length){
+    el.style.gridTemplateColumns='1fr';
+    el.innerHTML='<div class="cmp-empty">시장 비교 매트릭스가 곧 생성됩니다 — 다음 자동 갱신 후 표시됩니다.</div>'; return;
+  }
+  const markets=M.markets, genres=M.genres, cells=M.cells||{};
+  let mx=0; markets.forEach(mk=> genres.forEach(g=>{ const c=cells[mk.key]&&cells[mk.key][g]; const v=c?c[cmpMetric]:0; if(v>mx) mx=v; }));
+  mx=mx||1;
+  let h='<div class="cmp-corner">장르＼시장</div>'+markets.map(mk=>'<div class="cmp-mh" title="'+esc(mk.name)+'">'+esc(mk.name)+'</div>').join('');
+  genres.forEach(g=>{
+    h+='<div class="cmp-glabel"><span class="cmp-dot" style="background:'+genreColor(g)+'"></span>'+esc(g)+'</div>';
+    markets.forEach(mk=>{
+      const c=cells[mk.key]&&cells[mk.key][g]; const v=(c&&c[cmpMetric]!=null)?c[cmpMetric]:null;
+      const t=v!=null?Math.min(1, v/mx):0;
+      const bg=v!=null?'rgba(37,99,235,'+(0.06+0.84*t).toFixed(3)+')':'transparent';
+      const tc=t>0.5?'#fff':'var(--text)';
+      const lbl=(cmpMetric==='rev'?'매출 점유':'차트 점유');
+      h+='<button class="cmp-cell" data-mk="'+esc(mk.key)+'" data-g="'+esc(g)+'" style="background:'+bg+';color:'+tc+'" title="'+esc(mk.name)+' · '+esc(g)+' · '+lbl+' '+(v!=null?v+'%':'–')+'">'+(v!=null?v:'')+'</button>';
+    });
+  });
+  el.innerHTML=h;
+  el.style.gridTemplateColumns='132px repeat('+markets.length+',minmax(64px,1fr))';
+  el.querySelectorAll('.cmp-cell').forEach(b=> b.addEventListener('click',()=> cmpJump(b.dataset.mk, b.dataset.g)));
+}
+function cmpJump(mk, g){
+  if(!mk) return;
+  loadMarket(mk);
+  let tries=0; const want=g;
+  const iv=setInterval(()=>{
+    const ready=(MK_CC===mk) && DATA && DATA.genre_series && Object.keys((DATA.genre_series.genres)||{}).length;
+    if(ready){ clearInterval(iv); genreSel=[want]; if(window.setChartMode) setChartMode('genre');
+      const cs=document.getElementById('chartsec'); if(cs) cs.scrollIntoView({behavior:'smooth', block:'start'}); }
+    else if(++tries>40) clearInterval(iv);
+  }, 120);
+}
+document.querySelectorAll('.cmp-metric').forEach(b=> b.addEventListener('click',()=>{
+  cmpMetric=b.dataset.metric;
+  document.querySelectorAll('.cmp-metric').forEach(x=> x.classList.toggle('on', x===b));
+  renderCmp();
+}));
+loadMatrix();
+
 fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'}).then(r=>r.json()).then(idx=>{
   const sel=document.getElementById('countrySel');
   const opt=(key,label)=>'<option value="'+key+'">'+esc(label)+'</option>';
