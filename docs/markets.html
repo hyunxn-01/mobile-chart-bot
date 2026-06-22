@@ -388,13 +388,16 @@
   .cmode:hover{ color:var(--text); }
   .cmode[aria-selected="true"]{ background:var(--accent); color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.16); }
   .cmode-hint{ font-size:12.5px; color:var(--muted); }
-  .glegend{ display:flex; flex-wrap:wrap; align-items:center; gap:7px 9px; padding:12px 2px 2px; }
-  .glegend .gl-hint{ flex-basis:100%; font-size:11.5px; color:var(--muted); margin-bottom:2px; }
-  .glegend .gl-item{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text); cursor:pointer; background:transparent; border:1px solid var(--line); border-radius:999px; padding:4px 11px; transition:all .12s; }
-  .glegend .gl-item:hover{ border-color:var(--accent); }
-  .glegend .gl-item.on{ border-color:var(--accent); background:var(--chip); font-weight:700; }
-  .glegend .gl-item.off{ opacity:.42; }
-  .glegend .gl-dot{ width:11px; height:11px; border-radius:50%; flex:0 0 auto; }
+  .glegend{ display:flex; flex-direction:column; gap:2px; padding:10px 2px 2px; }
+  .glegend .gl-hint{ font-size:11.5px; color:var(--muted); margin:0 2px 5px; }
+  .glegend .gl-item{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; font:inherit; font-size:13px; color:var(--text); cursor:pointer; background:transparent; border:1px solid transparent; border-radius:7px; padding:6px 8px; transition:background .12s, border-color .12s; }
+  .glegend .gl-item:hover{ background:var(--chip); }
+  .glegend .gl-item.on{ border-color:var(--line); background:var(--chip); font-weight:700; }
+  .glegend .gl-item.off{ opacity:.45; }
+  .glegend .gl-dot{ width:10px; height:10px; border-radius:3px; flex:0 0 auto; }
+  .glegend .gl-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .glegend .gl-meta{ flex:0 0 auto; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .glegend .gl-rev{ color:var(--accent); font-weight:600; }
   .glegend .gl-pct{ color:var(--muted); font-variant-numeric:tabular-nums; }
   .mkbrief{ margin:18px 0 6px; padding:16px 18px; border:1px solid var(--line); border-radius:14px; background:var(--panel); }
   .mkbrief-head{ display:flex; align-items:center; gap:10px; margin-bottom:11px; }
@@ -940,11 +943,19 @@ function renderGenreLegend(){
   const ds=(chart&&chart.data&&chart.data.datasets)||[];
   if(!ds.length){ el.hidden=true; return; }
   const any=genreSel.length>0;
-  el.innerHTML='<span class="gl-hint">장르를 누르면 그 선만 강조·도트 표시</span>'+ds.map(d=>{
-    const g=d.label||''; const on=genreSel.includes(g);
-    const arr=d.data||[]; const last=arr.length?arr[arr.length-1]:null;
-    const col=d.pointBackgroundColor||d.backgroundColor||'#888';
-    return '<button type="button" class="gl-item'+(on?' on':(any?' off':''))+'" data-genre="'+esc(g)+'" aria-pressed="'+on+'"><span class="gl-dot" style="background:'+col+'"></span>'+esc(g)+(last!=null?' <span class="gl-pct">'+last+'%</span>':'')+'</button>';
+  // 장르별 게임 수·추정매출 점유(집계 리스트 기준 — 게임 목록처럼 행마다 지표 표시)
+  const gstats={}; ((DATA.genres&&DATA.genres.list)||[]).forEach(g=>{ gstats[g.genre]={n:g.num_games, rev:(g.games||[]).reduce((s,x)=>s+(revShare(x.app_id)||0),0)}; });
+  const rows=ds.map(d=>{ const arr=d.data||[]; const g=d.label||''; return {g, on:genreSel.includes(g), share:(arr.length?arr[arr.length-1]:null), col:d.pointBackgroundColor||d.backgroundColor||'#888'}; })
+    .sort((a,b)=>(b.share||0)-(a.share||0));   // 점유율 높은 순(게임 목록이 순위순인 것과 통일)
+  el.innerHTML='<span class="gl-hint">장르를 누르면 그 선만 강조 · 점유율 높은 순</span>'+rows.map(r=>{
+    const st=gstats[r.g]||{}; const revpct=(st.rev!=null)?Math.round(st.rev*1000)/10:null;
+    return '<button type="button" class="gl-item'+(r.on?' on':(any?' off':''))+'" data-genre="'+esc(r.g)+'" aria-pressed="'+r.on+'">'+
+      '<span class="gl-dot" style="background:'+r.col+'"></span>'+
+      '<span class="gl-name">'+esc(r.g)+'</span>'+
+      (st.n!=null?'<span class="gl-meta gl-games">게임 '+st.n+'</span>':'')+
+      (r.share!=null?'<span class="gl-meta gl-pct">점유 '+r.share+'%</span>':'')+
+      (revpct!=null?'<span class="gl-meta gl-rev">매출 '+revpct+'%</span>':'')+
+      '</button>';
   }).join('');
   el.querySelectorAll('.gl-item').forEach(b=> b.addEventListener('click',()=> toggleGenre(b.dataset.genre)));
   el.hidden=false;
