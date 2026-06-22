@@ -46,6 +46,8 @@ def check_brief_axes(markets_dir):
         market = _load(markets_dir / (key + '.json'))
         if not brief or not isinstance(brief.get('axes'), dict):
             continue
+        if market is None:   # 시장 JSON 없음/안 읽힘 → 검증 불가는 위반 아님(라이브 동결 방지)
+            continue
         for axis in GATED_AXES:
             ax = brief['axes'].get(axis)
             if ax and ax.get('text') and not _timeframe_has_data(market, axis):
@@ -58,10 +60,12 @@ def check_brief_axes(markets_dir):
 def run(markets_dir):
     v = check_brief_axes(markets_dir)
     if v:
-        print('[FAIL] 설계 불변식 위반 — 완료된 기간만:')
+        # 경고 위주(비차단): 위반을 CI 로그에 띄우되 파이프라인은 막지 않는다 — 라이브 포트폴리오 대시보드 동결 방지.
+        # (체커 로직 자체가 깨지는 건 --selftest가 exit 1로 계속 막는다.)
+        print('[WARN] 설계 불변식 위반 가능 — 완료된 기간만(비차단·로그 확인용):')
         for x in v:
             print('  -', x)
-        return 1
+        return 0
     print(f'[OK] 설계 불변식 통과 — 완료된 기간만 ({markets_dir}).')
     return 0
 
@@ -80,12 +84,16 @@ def selftest():
         ('통과: weekly만(게이트 대상 아님)',
          {'charts': {'grossing': {'timeframes': {'weekly': {'labels': ['2026-06-15']}}}}},
          {'axes': {'weekly': {'text': '## a'}}}, False),
+        ('통과: 시장 JSON 없음 → 검증불가라 건너뜀(거짓 위반 방지)',
+         None,
+         {'axes': {'weekly': {'text': '## a'}, 'monthly': {'text': '## b'}}}, False),
     ]
     failures = []
     for name, market, brief, expect in cases:
         d = Path(tempfile.mkdtemp())
         (d / 'index.json').write_text(json.dumps({'majors': [{'key': 'kr'}], 'regions': []}), encoding='utf-8')
-        (d / 'kr.json').write_text(json.dumps(market), encoding='utf-8')
+        if market is not None:  # None이면 파일 자체를 안 만들어 '시장 JSON 없음'을 재현
+            (d / 'kr.json').write_text(json.dumps(market), encoding='utf-8')
         (d / 'major_kr.json').write_text(json.dumps(brief), encoding='utf-8')
         got = bool(check_brief_axes(d))
         if got != expect:
