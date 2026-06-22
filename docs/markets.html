@@ -387,17 +387,22 @@
   .cmode:hover{ color:var(--text); }
   .cmode[aria-selected="true"]{ background:var(--accent); color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.16); }
   .cmode-hint{ font-size:12.5px; color:var(--muted); }
-  .glegend{ display:flex; flex-direction:column; gap:2px; padding:10px 2px 2px; }
-  .glegend .gl-hint{ font-size:11.5px; color:var(--muted); margin:0 2px 5px; }
-  .glegend .gl-item{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; font:inherit; font-size:13px; color:var(--text); cursor:pointer; background:transparent; border:1px solid transparent; border-radius:7px; padding:6px 8px; transition:background .12s, border-color .12s; }
+  .glegend{ display:flex; flex-direction:column; gap:1px; padding:10px 2px 2px; }
+  .glegend .gl-hint{ font-size:11.5px; color:var(--muted); margin:0 2px 6px; }
+  .gl-cols{ display:grid; grid-template-columns:12px 1fr 34px 42px 48px; gap:9px; align-items:center; }
+  .glegend .gl-head{ padding:0 8px 4px; }
+  .glegend .gl-head span{ font-size:11px; color:var(--muted); }
+  .glegend .gl-head .gh-r{ text-align:right; }
+  .glegend .gl-group{ display:flex; align-items:center; gap:7px; margin:9px 2px 3px; font-size:11.5px; font-weight:700; color:var(--muted); }
+  .glegend .gl-group .gg-bar{ width:3px; height:12px; border-radius:2px; background:var(--accent); flex:0 0 auto; }
+  .glegend .gl-item{ width:100%; text-align:left; font:inherit; font-size:13px; color:var(--text); cursor:pointer; background:transparent; border:1px solid transparent; border-radius:7px; padding:5px 8px; transition:background .12s, border-color .12s; }
   .glegend .gl-item:hover{ background:var(--chip); }
   .glegend .gl-item.on{ border-color:var(--line); background:var(--chip); font-weight:700; }
   .glegend .gl-item.off{ opacity:.45; }
-  .glegend .gl-dot{ width:10px; height:10px; border-radius:3px; flex:0 0 auto; }
-  .glegend .gl-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .glegend .gl-meta{ flex:0 0 auto; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .glegend .gl-dot{ width:10px; height:10px; border-radius:3px; }
+  .glegend .gl-name{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .glegend .gl-meta{ font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
   .glegend .gl-rev{ color:var(--accent); font-weight:600; }
-  .glegend .gl-pct{ color:var(--muted); font-variant-numeric:tabular-nums; }
   .mkbrief{ margin:18px 0 6px; padding:16px 18px; border:1px solid var(--line); border-radius:14px; background:var(--panel); }
   .mkbrief-head{ display:flex; align-items:center; gap:10px; margin-bottom:11px; }
   .mkbrief-badge{ font-size:13px; font-weight:800; color:#fff; background:var(--accent2); padding:3px 11px; border-radius:999px; letter-spacing:.01em; }
@@ -942,20 +947,26 @@ function renderGenreLegend(){
   const ds=(chart&&chart.data&&chart.data.datasets)||[];
   if(!ds.length){ el.hidden=true; return; }
   const any=genreSel.length>0;
-  // 장르별 게임 수·추정매출 점유(집계 리스트 기준 — 게임 목록처럼 행마다 지표 표시)
+  // 장르별 게임 수·추정매출 점유(집계 리스트 기준)
   const gstats={}; ((DATA.genres&&DATA.genres.list)||[]).forEach(g=>{ gstats[g.genre]={n:g.num_games, rev:(g.games||[]).reduce((s,x)=>s+(revShare(x.app_id)||0),0)}; });
-  const rows=ds.map(d=>{ const arr=d.data||[]; const g=d.label||''; return {g, on:genreSel.includes(g), share:(arr.length?arr[arr.length-1]:null), col:d.pointBackgroundColor||d.backgroundColor||'#888'}; })
-    .sort((a,b)=>(b.share||0)-(a.share||0));   // 점유율 높은 순(게임 목록이 순위순인 것과 통일)
-  el.innerHTML='<span class="gl-hint">장르를 누르면 그 선만 강조 · 점유율 높은 순</span>'+rows.map(r=>{
-    const st=gstats[r.g]||{}; const revpct=(st.rev!=null)?Math.round(st.rev*1000)/10:null;
-    return '<button type="button" class="gl-item'+(r.on?' on':(any?' off':''))+'" data-genre="'+esc(r.g)+'" aria-pressed="'+r.on+'">'+
+  const rows=ds.map(d=>{ const arr=d.data||[]; const g=d.label||''; const st=gstats[g]||{};
+    return {g, on:genreSel.includes(g), share:(arr.length?arr[arr.length-1]:null), n:(st.n!=null?st.n:null), rev:(st.rev!=null?Math.round(st.rev*1000)/10:null), col:d.pointBackgroundColor||d.backgroundColor||'#888'}; });
+  // 매출 구간별 그룹(주력≥20% · 중간 5–20% · 소형<5%), 그룹 안은 매출 내림차순
+  const tier=r=> (r.rev!=null&&r.rev>=20)?0 : (r.rev!=null&&r.rev>=5)?1 : 2;
+  const groups=[{t:'주력 장르 · 매출 20%+',rows:[]},{t:'중간 장르 · 매출 5–20%',rows:[]},{t:'소형 장르 · 매출 5% 미만',rows:[]}];
+  rows.forEach(r=> groups[tier(r)].rows.push(r));
+  groups.forEach(grp=> grp.rows.sort((a,b)=>(b.rev||0)-(a.rev||0)));
+  const rowHTML=r=> '<button type="button" class="gl-item gl-cols'+(r.on?' on':(any?' off':''))+'" data-genre="'+esc(r.g)+'" aria-pressed="'+r.on+'">'+
       '<span class="gl-dot" style="background:'+r.col+'"></span>'+
       '<span class="gl-name">'+esc(r.g)+'</span>'+
-      (st.n!=null?'<span class="gl-meta gl-games">게임 '+st.n+'</span>':'')+
-      (r.share!=null?'<span class="gl-meta gl-pct">점유 '+r.share+'%</span>':'')+
-      (revpct!=null?'<span class="gl-meta gl-rev">매출 '+revpct+'%</span>':'')+
+      '<span class="gl-meta">'+(r.n!=null?r.n:'–')+'</span>'+
+      '<span class="gl-meta">'+(r.share!=null?r.share+'%':'–')+'</span>'+
+      '<span class="gl-meta gl-rev">'+(r.rev!=null?r.rev+'%':'–')+'</span>'+
       '</button>';
-  }).join('');
+  let html='<span class="gl-hint">장르를 누르면 그 선만 강조 · 매출 구간별 그룹</span>'+
+    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출</span></div>';
+  groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
+  el.innerHTML=html;
   el.querySelectorAll('.gl-item').forEach(b=> b.addEventListener('click',()=> toggleGenre(b.dataset.genre)));
   el.hidden=false;
 }
