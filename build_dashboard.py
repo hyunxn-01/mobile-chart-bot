@@ -372,8 +372,49 @@ def build_region_market(region_key, name, member_ccs):
     return out
 
 
+CC_NAMES = {'kr': '한국', 'us': '미국', 'jp': '일본', 'cn': '중국', 'tw': '대만'}
+
+
+def _market_genre_shares(market_obj):
+    """그 시장 grossing 최신 기준 장르별 {매출 점유%, 게임수 점유%}(미상 제외).
+    매출 점유 = Σ rank^-REV_ALPHA(프론트 revShare와 동일 모델)를 시장 내 정규화."""
+    lst = ((((market_obj or {}).get('charts') or {}).get('grossing') or {}).get('genres') or {}).get('list') or []
+    rows = {}
+    for e in lst:
+        g = (e.get('genre') or '').strip()
+        if not g or g == '미상':
+            continue
+        revw = 0.0
+        for gm in (e.get('games') or []):
+            r = gm.get('rank')
+            if r:
+                revw += float(r) ** (-REV_ALPHA)
+        rows[g] = {'rev_w': revw, 'n': e.get('num_games', 0) or 0}
+    totrev = sum(v['rev_w'] for v in rows.values()) or 1.0
+    totn = sum(v['n'] for v in rows.values()) or 1
+    return {g: {'rev': round(v['rev_w'] / totrev * 1000) / 10,
+                'pre': round(v['n'] / totn * 1000) / 10} for g, v in rows.items()}
+
+
+def build_genre_matrix(built):
+    """주요국+지역 × 장르 매트릭스(매출/게임수 점유%). built={key:(market_obj,name,type)}.
+    열=시장(매출 가중 큰 순), 행=장르(총 매출 점유 desc). 칸 클릭·블루오션 비교용."""
+    cells, gtot, cols = {}, {}, []
+    for key, (obj, name, typ) in built.items():
+        sh = _market_genre_shares(obj)
+        if not sh:
+            continue
+        cells[key] = sh
+        cols.append({'key': key, 'name': name, 'type': typ})
+        for g, v in sh.items():
+            gtot[g] = gtot.get(g, 0) + v['rev']
+    genres = sorted(gtot.keys(), key=lambda g: -gtot[g])
+    return {'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+            'metric_default': 'rev', 'markets': cols, 'genres': genres, 'cells': cells}
+
+
 def build_markets():
-    """전 국가(개별) + 지역(합산) 마켓 → docs/markets/{key}.json + 구조화 index.json."""
+    """전 국가(개별) + 지역(합산) 마켓 → docs/markets/{key}.json + 구조화 index.json + genre_matrix.json."""
     if not CHARTS_DIR.exists():
         print('[INFO] data/charts 없음 — 다국가 집계 건너뜀')
         return
@@ -381,6 +422,7 @@ def build_markets():
     countries = sorted([d.name for d in CHARTS_DIR.iterdir() if d.is_dir()])
     have = set()
     majors, regions_idx, singles = [], [], []
+    built = {}   # 히트맵 매트릭스용: 주요국+지역의 market_obj 보관
     # 1) 개별 국가(주요 5 + 나머지)
     for cc in countries:
         co = build_country(cc)
@@ -393,6 +435,7 @@ def build_markets():
         entry = {'key': cc, 'num_days': g.get('num_days', 0), 'num_games': g.get('num_games', 0)}
         if cc in MAJOR_MARKETS:
             majors.append({**entry, 'type': 'major'})
+            built[cc] = (co, CC_NAMES.get(cc, cc.upper()), 'major')
         else:
             singles.append({**entry, 'type': 'country'})
     # 2) 지역(합산) — 멤버가 1개국 이상 수집된 지역만
@@ -408,13 +451,19 @@ def build_markets():
         g = rm['charts'].get('grossing', {})
         regions_idx.append({'key': key, 'name': name, 'type': 'region', 'members': members,
                             'num_days': g.get('num_days', 0), 'num_games': g.get('num_games', 0)})
+        built[key] = (rm, name, 'region')
     (MARKETS_OUT / 'index.json').write_text(
         json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
                     'majors': majors, 'regions': regions_idx, 'countries': singles,
                     # 하위호환: 옛 프론트가 읽던 평면 리스트도 유지(개별 국가 전체)
                     'countries_flat': [{'country': e['key']} for e in (majors + singles)]},
                    ensure_ascii=False), encoding='utf-8')
-    print(f"[OK] 다국가 집계: 주요 {len(majors)} + 지역 {len(regions_idx)} + 개별 {len(singles)} → {MARKETS_OUT}")
+    # 장르×시장 비교 매트릭스(히트맵용)
+    matrix = build_genre_matrix(built)
+    (MARKETS_OUT / 'genre_matrix.json').write_text(
+        json.dumps(matrix, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    print(f"[OK] 다국가 집계: 주요 {len(majors)} + 지역 {len(regions_idx)} + 개별 {len(singles)}"
+          f" · 매트릭스 {len(matrix['markets'])}시장×{len(matrix['genres'])}장르 → {MARKETS_OUT}")
 
 
 def build():
