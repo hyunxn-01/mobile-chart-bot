@@ -116,18 +116,19 @@ CURATED_APPID = {
 # 애매한 일반어(전략/액션/영웅/war/idle 단독)는 규칙에서 빼고 AI 폴백에 맡긴다(과매칭 방지).
 RULES = [
     # 카지노·슬롯·포커·카드·낚시 (설명문 'win/전략' 때문에 4X로 오분류되던 것)
-    ('카지노', '', ['slot', '슬롯', 'casino', '카지노', 'poker', '포커', 'holdem', '홀덤', 'baccarat', '바카라',
-                   'roulette', '룰렛', 'blackjack', '블랙잭', 'bingo', '빙고', 'solitaire', '솔리테어', 'rummy',
-                   'teen patti', 'spades', '두디주', '斗地主', '麻将', '마작', 'mahjong', 'jackpot', '捕鱼', '부위', 'fishing']),
+    # 카드(솔리테어·러미·스페이드)·마작·낚시는 규칙에서 뺀다 → Opus가 카드/보드로(애매한 경계는 AI에 위임)
+    ('카지노', '', ['slot', '슬롯', 'slots', 'casino', '카지노', 'poker', '포커', 'holdem', '홀덤', 'baccarat', '바카라',
+                   'roulette', '룰렛', 'blackjack', '블랙잭', 'bingo', '빙고', 'jackpot', 'vegas', '슬롯머신', 'teen patti']),
     # 스포츠
     ('스포츠', '', ['soccer', 'football', '축구', 'fifa', 'efootball', '위닝', 'baseball', '야구', 'basketball',
                    '농구', 'nba', 'golf', '골프', 'tennis', '테니스', 'bowling', '볼링', 'cricket', '크리켓']),
     # 레이싱
     ('레이싱', '', ['racing', '레이싱', '카트', 'kart', 'asphalt', '아스팔트', 'drift', '드리프트']),
     # 슈팅
+    # 'shooter/shooting/슈팅' 일반어는 뺀다(버블슈터·아케이드 오매칭) → 명확한 FPS/배틀로얄 브랜드 + fps/sniper만
     ('액션', '슈팅', ['배틀그라운드', 'pubg', '吃鸡', '和平精英', '화평정영', 'call of duty', '콜 오브 듀티', '使命召唤',
-                    'valorant', '발로란트', 'crossfire', '穿越火线', '크로스파이어', 'battlefield', '배틀필드', 'fps',
-                    '슈팅', 'shooter', 'shooting', 'sniper', '스나이퍼', 'war robots', '三角洲', '삼각주', 'delta force', '1945']),
+                    'valorant', '발로란트', 'crossfire', '穿越火线', '크로스파이어', 'battlefield', '배틀필드', ' fps',
+                    'sniper 3d', '스나이퍼', 'war robots', '三角洲', '삼각주', 'delta force', 'free fire', '프리파이어']),
     # MOBA / 오토배틀러
     ('전략', 'MOBA', ['moba', '왕자영요', '王者荣耀', 'penta', '펜타스톰', '전설대결', 'arena of valor', 'wild rift',
                      '와일드리프트', 'mobile legends', '모바일 레전드', '英雄联盟', '金铲铲', '금삽삽', 'auto chess', '오토체스']),
@@ -155,9 +156,10 @@ RULES = [
     # 액션RPG
     ('롤플레잉', '액션RPG', ['action rpg', '액션 rpg', '던전앤파이터', 'dnf', '地下城', '디아블로', 'diablo']),
     # 4X·SLG(제목의 강한 SLG 신호만)
-    ('전략', '4X·SLG', ['kingdom', '킹덤', 'empire', '제국', '삼국', '三国', '3 kingdoms', 'warpath', 'last war', '라스트워',
-                       'top war', 'whiteout', '화이트아웃', 'survival', '서바이벌', 'clash of', '클래시 오브', 'rise of',
-                       'age of', 'civilization', '문명', 'dynasty', '왕조', 'conquer', '정복', '率土', 'evony', 'state of survival']),
+    # 강한 SLG 신호만(survival/dynasty/conquer 등 일반어는 빼서 Opus에 위임)
+    ('전략', '4X·SLG', ['kingdom', '킹덤', 'empire', '제국', '삼국', '3 kingdoms', 'warpath', 'last war', '라스트워',
+                       'top war', 'whiteout', '화이트아웃', 'clash of', '클래시 오브', 'rise of kingdoms', 'age of empires',
+                       'age of origins', 'civilization', '문명', '率土', 'evony', 'state of survival', 'puzzles & survival']),
     # 디펜스
     ('전략', '디펜스', ['tower defense', '타워 디펜스', '타워디펜스', '디펜스', 'defense', 'random dice', '랜덤 디펜스', '塔防']),
 ]
@@ -200,12 +202,13 @@ def ai_classify(items, client, model=AI_MODEL):
     taxo = '\n'.join(f"- {t}: {'/'.join(subs) if subs else '(서브 없음)'}" for t, subs in TAXONOMY.items())
     lines = []
     for i, g in enumerate(items):
-        desc = (g.get('notes') or '')[:220].replace('\n', ' ').replace('\t', ' ')
-        lines.append(f"{i}\t{(g.get('title') or '')[:40]}\t{(g.get('developer') or '')[:30]}\t{desc}")
+        desc = (g.get('notes') or '')[:300].replace('\n', ' ').replace('\t', ' ')
+        lines.append(f"{i}\t{(g.get('title') or '')[:45]}\t{(g.get('developer') or '')[:30]}\t앱스토어:{g.get('api') or '-'}\t{desc}")
     prompt = (
         "다음 모바일 게임들을 아래 택소노미의 (상위장르, 서브장르)로 분류해라. "
-        "업계 통용 기준이며, 서브가 없는 상위장르는 서브를 비워라. 확실치 않으면 가장 근접한 상위장르만.\n\n"
-        f"[택소노미]\n{taxo}\n\n[게임] (인덱스\\t제목\\t개발사\\t설명)\n" + '\n'.join(lines) +
+        "업계 통용 기준이며, 서브가 없는 상위장르는 서브를 비워라. 확실치 않으면 가장 근접한 상위장르만. "
+        "'앱스토어:'는 애플 분류로 참고만 하되(부정확할 수 있음) 실제 게임성으로 판단해라.\n\n"
+        f"[택소노미]\n{taxo}\n\n[게임] (인덱스\\t제목\\t개발사\\t앱스토어장르\\t설명)\n" + '\n'.join(lines) +
         "\n\n[출력] 각 줄 '인덱스|상위|서브'만(서브 없으면 '인덱스|상위|'). 설명·머리말 금지.")
     try:
         msg = client.messages.create(model=model, max_tokens=3000,

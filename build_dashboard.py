@@ -445,9 +445,9 @@ def build_genre_audit(all_games):
             from anthropic import Anthropic
             client = Anthropic(api_key=key)
             done = 0
-            for i in range(0, len(need), 25):
-                batch = need[i:i + 25]
-                items = [{'app_id': r['app_id'], 'title': r['title'],
+            for i in range(0, len(need), 15):
+                batch = need[i:i + 15]
+                items = [{'app_id': r['app_id'], 'title': r['title'], 'api': r['api'],
                           'developer': (all_games.get(r['app_id']) or {}).get('developer', ''),
                           'notes': (all_games.get(r['app_id']) or {}).get('notes', '')} for r in batch]
                 got = gc.ai_classify(items, client)
