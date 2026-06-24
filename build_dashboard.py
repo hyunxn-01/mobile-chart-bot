@@ -222,16 +222,25 @@ GENRE_ID_KR = {
     '7017': '전략', '7018': '트리비아', '7019': '단어',
 }
 
+# 한 게임에 장르ID가 여러 개일 때 '게임 성격'을 더 잘 나타내는 것을 우선(어드벤처·캐주얼·가족은 후순위).
+# 예: 밤탈출 = 어드벤처+롤플레잉 → 롤플레잉. AppMagic 라벨이 없을 때 폴백 품질을 끌어올린다.
+GENRE_PRIORITY = ['7014', '7017', '7015', '7016', '7013', '7006', '7012', '7001',
+                  '7004', '7005', '7019', '7011', '7002', '7003', '7008', '7018', '7009', '7007']
+
 
 def canon_genre(app):
-    """업계표준(AppMagic) 상위장르 최우선 → 없으면 genre_ids(숫자)→정규 장르 → 현지 genre 폴백."""
+    """업계표준(AppMagic) 최우선 → 없으면 Apple genre_ids를 '우선순위'로 정규 장르(핵심 장르 우대)
+    → 현지 genre 폴백."""
     am = AM_CACHE.get(str(app.get('track_id') or ''))
     if am and am.get('top'):
         return am['top']
-    for gid in str(app.get('genre_ids', '')).split(','):
-        g = GENRE_ID_KR.get(gid.strip())
-        if g:
-            return g
+    ids = {x.strip() for x in str(app.get('genre_ids', '')).split(',') if x.strip()}
+    for gid in GENRE_PRIORITY:        # 우선순위대로 — 핵심 장르 우대(어드벤처/캐주얼보다 RPG·전략 등)
+        if gid in ids and GENRE_ID_KR.get(gid):
+            return GENRE_ID_KR[gid]
+    for gid in ids:                   # 우선순위 목록에 없던 매핑이라도 있으면 채택
+        if GENRE_ID_KR.get(gid):
+            return GENRE_ID_KR[gid]
     g = app.get('genre')
     return g if (g and g not in ('미상', '게임', 'Games')) else '기타'
 
@@ -428,64 +437,25 @@ def build_genre_matrix(built):
 
 
 def build_genre_audit(all_games):
-    """전 시장 고유 게임을 분류기로 판정 → 검수표 genre_audit.json.
-    라이브 장르(canon_genre)는 아직 안 바꾼다 — 사용자 검수·수정 후 연결."""
-    try:
-        import genre_classify as gc
-    except Exception as e:
-        print('[WARN] genre_classify 임포트 실패 — 검수표 생략:', e)
-        return
+    """전 시장 고유 게임을 AppMagic 라벨(AM_CACHE)로 정리 → 읽기전용 검수표 genre_audit.json.
+    Opus·자체분류 폐기(AppMagic이 권위). track_id로 AM_CACHE 조회, 없으면 폴백 장르 표기."""
     from collections import Counter
-    import os
     rows = []
     for aid, g in all_games.items():
-        app = {'app_id': aid, 'title_kr': g.get('title'), 'title': g.get('title'),
-               'developer': g.get('developer'), 'notes': g.get('notes'), 'genre': g.get('genre')}
-        top, sub, s = gc.classify(app, g.get('genre', ''))
+        am = AM_CACHE.get(str(g.get('track_id') or '')) or {}
+        if am.get('top'):
+            top, sub, tier, s = am['top'], am.get('sub', ''), am.get('tier', ''), 'appmagic'
+        else:
+            top, sub, tier, s = (g.get('genre') or '기타'), '', '', 'fallback'
         rows.append({'app_id': aid, 'title': g.get('title'), 'api': g.get('genre', ''),
-                     'top': top, 'sub': sub, 'src': s})
-    # --- AI 폴백(Opus): 규칙으로 못 잡은 fallback 게임을 app_id별 1회 분류·캐시(전역 일관) ---
-    cache_file = Path('data') / 'genre_ai_cache.json'
-    cache = {}
-    if cache_file.exists():
-        try:
-            cache = json.loads(cache_file.read_text(encoding='utf-8'))
-        except Exception:
-            cache = {}
-    key = os.environ.get('ANTHROPIC_API_KEY')
-    need = [r for r in rows if r['src'] == 'fallback' and r['app_id'] not in cache]
-    if key and need:
-        try:
-            from anthropic import Anthropic
-            client = Anthropic(api_key=key)
-            done = 0
-            for i in range(0, len(need), 15):
-                batch = need[i:i + 15]
-                items = [{'app_id': r['app_id'], 'title': r['title'], 'api': r['api'],
-                          'developer': (all_games.get(r['app_id']) or {}).get('developer', ''),
-                          'notes': (all_games.get(r['app_id']) or {}).get('notes', '')} for r in batch]
-                got = gc.ai_classify(items, client)
-                for aid2, (top2, sub2) in got.items():
-                    cache[aid2] = {'top': top2, 'sub': sub2}
-                done += len(got)
-            cache_file.parent.mkdir(parents=True, exist_ok=True)
-            cache_file.write_text(json.dumps(cache, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-            print(f"[OK] AI 폴백(Opus): 신규 {done}게임 분류 · 캐시 총 {len(cache)}")
-        except Exception as e:
-            print('[WARN] AI 폴백 단계 실패(규칙 결과로 진행):', e)
-    elif need:
-        print(f"[INFO] AI 키 없음 — fallback {len(need)}게임은 규칙 상위장르만(서브 없음)")
-    for r in rows:
-        c = cache.get(r['app_id'])
-        if c and c.get('top'):
-            r['top'], r['sub'], r['src'] = c['top'], c.get('sub', ''), 'ai'
+                     'top': top, 'sub': sub, 'tier': tier, 'src': s})
     src = Counter(r['src'] for r in rows)
     rows.sort(key=lambda r: (r['top'], r['sub'], r['title'] or ''))
     (MARKETS_OUT / 'genre_audit.json').write_text(
         json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
                     'n': len(rows), 'sources': dict(src), 'rows': rows},
                    ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-    print(f"[OK] 장르 검수표: {len(rows)}게임 · 출처 {dict(src)} → genre_audit.json")
+    print(f"[OK] 장르 검수표(AppMagic): {len(rows)}게임 · 출처 {dict(src)} → genre_audit.json")
 
 
 def build_markets():

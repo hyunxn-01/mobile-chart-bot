@@ -128,20 +128,25 @@ def fetch_one(track_id, session=None, timeout=15):
     return res
 
 
-def label_all(track_ids, cache, sleep=0.2, log=print):
-    """캐시에 없는 trackId만 AppMagic 조회 → cache 채움(in-place). 미발견은 {'miss':1}로 기록(재조회 방지).
-    네트워크 오류는 건너뜀(다음 실행 재시도). 반환: (신규 라벨 수, 미발견 수)."""
+def label_all(track_ids, cache, sleep=1.0, max_new=120, abort_after=6, log=print):
+    """캐시에 없는 trackId만 AppMagic 조회 → cache 채움(in-place). 미발견은 {'miss':1}로 기록.
+    AppMagic은 대량 자동조회를 차단(410 Gone)하므로 '정중하게': 런당 max_new개까지만, 느리게(sleep),
+    연속 abort_after회 실패하면 차단으로 판단해 즉시 중단(다음 실행에서 자연 재개·캐시 영구).
+    → 며칠에 걸쳐 점진적으로 전 게임 라벨 누적. 반환: (신규 라벨 수, 미발견 수)."""
     if requests is None:
         log('[WARN] requests 없음 — AppMagic 라벨 건너뜀')
         return 0, 0
     sess = requests.Session()
     new = miss = 0
-    for tid in track_ids:
-        tid = str(tid or '')
-        if not tid or tid in cache:
-            continue
+    consec_err = 0
+    todo = [str(t) for t in track_ids if str(t or '') and str(t) not in cache]
+    for tid in todo:
+        if new + miss >= max_new:
+            log(f'[INFO] AppMagic 런당 상한({max_new}) 도달 — 나머지 {len(todo) - new - miss}개는 다음 실행에서')
+            break
         try:
             r = fetch_one(tid, sess)
+            consec_err = 0
             if r and r.get('top'):
                 cache[tid] = r
                 new += 1
@@ -149,9 +154,13 @@ def label_all(track_ids, cache, sleep=0.2, log=print):
                 cache[tid] = {'miss': 1}
                 miss += 1
         except Exception as e:
+            consec_err += 1
             log(f'[WARN] AppMagic 조회 실패 {tid}: {e}')
+            if consec_err >= abort_after:
+                log(f'[WARN] 연속 {consec_err}회 실패 — AppMagic 차단(410)으로 판단, 이번 실행 라벨 중단')
+                break
         time.sleep(sleep)
-    log(f'[OK] AppMagic 라벨: 신규 {new} · 미발견 {miss} · 총캐시 {len(cache)}')
+    log(f'[OK] AppMagic 라벨: 신규 {new} · 미발견 {miss} · 남은 미조회 {max(0, len(todo) - new - miss)} · 총캐시 {len(cache)}')
     return new, miss
 
 
