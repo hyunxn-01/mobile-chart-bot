@@ -618,7 +618,7 @@
 
   <section class="cmpsec" id="cmpsec">
     <h2>시장 비교 · 장르 점유</h2>
-    <p class="sub cap" id="cmpsub"><span class="ci">행=장르 · 열=시장(주요국+지역)</span><span class="csep">│</span><span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b></span><span class="csep">│</span><span class="ci">한 행에서 진하기 차이 = <b>시장별 강·약(블루오션 후보)</b></span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span></p>
+    <p class="sub cap" id="cmpsub"><span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b></span><span class="csep">│</span><span class="ci">한 행에서 진하기 차이 = <b>시장별 강·약(블루오션 후보)</b></span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span></p>
     <div class="cmp-controls">
       <span class="cmp-clabel">지표</span>
       <button class="cmp-metric on" type="button" data-metric="rev">추정매출 점유</button>
@@ -1665,7 +1665,7 @@ function markSectionMarkets(){
   const nm=(sel&&sel.selectedOptions&&sel.selectedOptions[0])?sel.selectedOptions[0].textContent.trim():'';
   if(!nm) return;
   document.querySelectorAll('h2').forEach(h=>{
-    if(h.closest && h.closest('#mkbrief, #gameModal, .gmodal')) return;  // 섹션 제목만(모달·브리핑 제외)
+    if(h.closest && h.closest('#mkbrief, #gameModal, .gmodal, #cmpsec')) return;  // 섹션 제목만(모달·브리핑·시장비교 제외 — 후자는 cross-market)
     let c=h.querySelector('.sec-mkt'); if(!c){ c=document.createElement('span'); c.className='sec-mkt'; h.appendChild(c); }
     c.textContent='📍 '+nm;
   });
@@ -1856,7 +1856,7 @@ function renderCmp(){
     markets.forEach(mk=>{
       const c=cells[mk.key]&&cells[mk.key][g]; const v=(c&&c[cmpMetric]!=null)?c[cmpMetric]:null;
       const t=v!=null?Math.min(1, v/mx):0;
-      const bg=v!=null?'rgba(37,99,235,'+(0.06+0.84*t).toFixed(3)+')':'transparent';
+      const bg=v!=null?'rgba(13,148,136,'+(0.06+0.86*t).toFixed(3)+')':'transparent';
       const tc=t>0.5?'#fff':'var(--text)';
       const lbl=(cmpMetric==='rev'?'매출 점유':'차트 점유');
       h+='<button class="cmp-cell" data-mk="'+esc(mk.key)+'" data-g="'+esc(g)+'" style="background:'+bg+';color:'+tc+'" title="'+esc(mk.name)+' · '+esc(g)+' · '+lbl+' '+(v!=null?v+'%':'–')+'">'+(v!=null?v:'')+'</button>';
