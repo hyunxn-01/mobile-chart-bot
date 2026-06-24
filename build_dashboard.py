@@ -413,8 +413,33 @@ def build_genre_matrix(built):
             'metric_default': 'rev', 'markets': cols, 'genres': genres, 'cells': cells}
 
 
+def build_genre_audit(all_games):
+    """전 시장 고유 게임을 분류기로 판정 → 검수표 genre_audit.json.
+    라이브 장르(canon_genre)는 아직 안 바꾼다 — 사용자 검수·수정 후 연결."""
+    try:
+        import genre_classify as gc
+    except Exception as e:
+        print('[WARN] genre_classify 임포트 실패 — 검수표 생략:', e)
+        return
+    from collections import Counter
+    rows, src = [], Counter()
+    for aid, g in all_games.items():
+        app = {'app_id': aid, 'title_kr': g.get('title'), 'title': g.get('title'),
+               'developer': g.get('developer'), 'notes': g.get('notes'), 'genre': g.get('genre')}
+        top, sub, s = gc.classify(app, g.get('genre', ''))
+        src[s] += 1
+        rows.append({'app_id': aid, 'title': g.get('title'), 'api': g.get('genre', ''),
+                     'top': top, 'sub': sub, 'src': s})
+    rows.sort(key=lambda r: (r['top'], r['sub'], r['title'] or ''))
+    (MARKETS_OUT / 'genre_audit.json').write_text(
+        json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+                    'n': len(rows), 'sources': dict(src), 'rows': rows},
+                   ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    print(f"[OK] 장르 검수표: {len(rows)}게임 · 출처 {dict(src)} → genre_audit.json")
+
+
 def build_markets():
-    """전 국가(개별) + 지역(합산) 마켓 → docs/markets/{key}.json + 구조화 index.json + genre_matrix.json."""
+    """전 국가(개별) + 지역(합산) 마켓 → docs/markets/{key}.json + index.json + genre_matrix.json + genre_audit.json."""
     if not CHARTS_DIR.exists():
         print('[INFO] data/charts 없음 — 다국가 집계 건너뜀')
         return
@@ -423,6 +448,7 @@ def build_markets():
     have = set()
     majors, regions_idx, singles = [], [], []
     built = {}   # 히트맵 매트릭스용: 주요국+지역의 market_obj 보관
+    all_games = {}   # 장르 검수표용: 전 시장 고유 게임(app_id → 게임 dict)
     # 1) 개별 국가(주요 5 + 나머지)
     for cc in countries:
         co = build_country(cc)
@@ -431,6 +457,9 @@ def build_markets():
         (MARKETS_OUT / f'{cc}.json').write_text(
             json.dumps(co, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
         have.add(cc)
+        for _aid, _g in ((co.get('charts', {}).get('grossing', {}) or {}).get('games') or {}).items():
+            if _aid not in all_games:
+                all_games[_aid] = _g
         g = co['charts'].get('grossing', {})
         entry = {'key': cc, 'num_days': g.get('num_days', 0), 'num_games': g.get('num_games', 0)}
         if cc in MAJOR_MARKETS:
@@ -464,6 +493,7 @@ def build_markets():
         json.dumps(matrix, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f"[OK] 다국가 집계: 주요 {len(majors)} + 지역 {len(regions_idx)} + 개별 {len(singles)}"
           f" · 매트릭스 {len(matrix['markets'])}시장×{len(matrix['genres'])}장르 → {MARKETS_OUT}")
+    build_genre_audit(all_games)
 
 
 def build():
