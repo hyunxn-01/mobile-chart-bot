@@ -614,6 +614,20 @@ def _axis_hist(prev, cap=12):
     return out[:cap]
 
 
+AXIS_PV = 'v4-industry'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성
+
+# 모든 AI 인사이트 공통 — 현직 게임업계에서 통용되는 용어·관점·표현만 쓰도록 강제(업계인이 한눈에 이해).
+INDUSTRY_VOICE = (
+    "\n\n[작성 원칙 · 매우 중요] 현직 게임 사업/운영/PM 실무자가 한눈에 이해하는, 업계에서 실제로 쓰는 "
+    "용어·관점·표현만 써라. 업계에서 안 쓰거나 지어낸 추상어는 금지(예: '운영형 전략' 같은 말은 실무자가 못 알아본다). "
+    "추상적 분류·개념어를 만들지 말고, 무슨 일이 일어났고 PM이 무슨 판단을 내릴지를 구체적으로 써라. "
+    "실무 어휘 예시(필요할 때만 자연스럽게, 억지 나열 금지): 라이브 서비스·라이브 운영, 콘텐츠 업데이트 주기, "
+    "신작 모멘텀·안착, 흥행·롱런, 매출 순위 방어, BM(수익모델)·과금·가챠·배틀패스, 리텐션, "
+    "UA(유저 확보)·마케팅 드라이브, 트래픽, IP·콜라보, 크로스프로모션, 점유율·경쟁 강도, 포화·틈새, 현지화·퍼블리싱. "
+    "한 문장이라도 실무자가 '이게 무슨 말이지?' 하면 실패다."
+)
+
+
 def _axis_prompt(scope_label, axis_label, digest, is_region):
     scope = f"'{scope_label}' 지역(여러 나라 합산) 시장" if is_region else f"'{scope_label}' 단일 시장"
     win = _AXIS_WIN.get(axis_label, axis_label)
@@ -627,7 +641,7 @@ def _axis_prompt(scope_label, axis_label, digest, is_region):
             "핵심 게임·플레이어: 이 기간 매출 상위 게임의 성격·강한 퍼블리셔. "
             f"움직임: 이 기간({win}) 진입·급상승·급하락 위주(근거 약하면 '- 데이터 누적 중'). "
             "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. PM 시사점: 진출·벤치마크·현지화 한 줄 결론. "
-            "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+            "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + INDUSTRY_VOICE)
 
 
 def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
@@ -642,8 +656,8 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
                 axes[axis_key] = prev_axes[axis_key]
             continue
         prev = prev_axes.get(axis_key) or {}
-        if _axis_fresh(prev) and '## ' in (prev.get('text') or ''):
-            axes[axis_key] = prev       # 7일 이내 최신 → 재사용(비용 절감)
+        if _axis_fresh(prev) and '## ' in (prev.get('text') or '') and prev.get('pv') == AXIS_PV:
+            axes[axis_key] = prev       # 7일 이내 최신 + 같은 프롬프트버전 → 재사용(비용 절감)
             continue
         try:
             text = call_claude_with_retry(_axis_prompt(scope_label, axis_label, digest, is_region), max_tokens=MAX_OUTPUT_TOKENS)
@@ -652,7 +666,7 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
             if axis_key in prev_axes:
                 axes[axis_key] = prev_axes[axis_key]
             continue
-        axes[axis_key] = {'generated': now_s, 'text': text, 'history': _axis_hist(prev)}
+        axes[axis_key] = {'generated': now_s, 'text': text, 'pv': AXIS_PV, 'history': _axis_hist(prev)}
         print(f'[OK] {scope_label} · {axis_label} 브리핑 생성')
     return axes
 
@@ -783,7 +797,7 @@ def build_global_brief(collected):
         total_sources = max(total_sources, len(subs))
         prev = prev_axes.get(axis_key) or {}
         subs_newer = bool(newest_sub) and newest_sub > ((prev.get('generated') or '')[:16])
-        if _axis_fresh(prev) and '## ' in (prev.get('text') or '') and not subs_newer:
+        if _axis_fresh(prev) and '## ' in (prev.get('text') or '') and not subs_newer and prev.get('pv') == AXIS_PV:
             g_axes[axis_key] = prev
             continue
         win = _AXIS_WIN.get(axis_label, axis_label)
@@ -795,7 +809,7 @@ def build_global_brief(collected):
                   "각 항목 내용 가이드 — 횡단 신호: 여러 시장/지역에서 동시에 강한 게임·장르. "
                   "시장별 색깔: 주요 시장 간·지역 간 장르 색깔 대비. IP·퍼블리셔 동향: 여러 시장 관통 글로벌 IP·퍼블리셔. "
                   "진출 전략: 다음 진출·벤치마크 시장 결론. "
-                  "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이.")
+                  "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + INDUSTRY_VOICE)
         try:
             text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
         except Exception as e:
@@ -803,7 +817,7 @@ def build_global_brief(collected):
             if axis_key in prev_axes:
                 g_axes[axis_key] = prev_axes[axis_key]
             continue
-        g_axes[axis_key] = {'generated': now_s, 'text': text, 'history': _axis_hist(prev)}
+        g_axes[axis_key] = {'generated': now_s, 'text': text, 'pv': AXIS_PV, 'history': _axis_hist(prev)}
         print(f'[OK] 글로벌 · {axis_label} 브리핑 생성(sources={len(subs)})')
     if not g_axes:
         print('[INFO] 글로벌 브리핑 스킵(하위 분석 없음)'); return
@@ -1205,7 +1219,7 @@ def generate_daily_summary(current, changes, chart_used):
 1. 가장 주목할 변동 1~2건 (이유 추정 가능하면)
 2. 사업PM 한 줄 인사이트
 
-일간은 노이즈 많으니 진짜 시그널만. 미미하면 "특이사항 없음"이라고 솔직하게."""
+일간은 노이즈 많으니 진짜 시그널만. 미미하면 "특이사항 없음"이라고 솔직하게.""" + INDUSTRY_VOICE
 
     result = call_claude_with_retry(prompt, max_tokens=800)
     if result is None:
@@ -1255,7 +1269,7 @@ def generate_comprehensive_summary(current, analyses, chart_used):
 5. 단기 vs 중장기 비교
 6. 사업PM 액션 포인트
 
-군더더기 없이."""
+군더더기 없이.""" + INDUSTRY_VOICE
 
     result = call_claude_with_retry(prompt, max_tokens=2500)
     if result is None:
@@ -1287,7 +1301,7 @@ def save_insight_cache(cache):
 def _insight_signature(ch):
     """해당 시간축 비교 데이터의 지문 — 데이터가 바뀌면 인사이트 재생성."""
     payload = json.dumps({
-        'pv': 'v3-sections',  # 프롬프트 버전 — 바꾸면 캐시 무효화·전체 재생성
+        'pv': 'v4-industry',  # 프롬프트 버전 — 바꾸면 캐시 무효화·전체 재생성
         'new': ch.get('new_entries', []),
         'drop': ch.get('dropped', []),
         'chg': ch.get('rank_changes', []),
@@ -1334,7 +1348,7 @@ def generate_timeframe_insight(name, ch, chart_used):
 ## 사업PM 인사이트
 위를 종합한 핵심 통찰 한 줄과 함의.
 
-[형식 규칙] 매 시간축 동일하게 위 여섯 소제목만 사용한다. 수평선(---)·이모지·다른 소제목은 쓰지 않는다. 굵게(**)는 게임명·수치에만. 군더더기 없이."""
+[형식 규칙] 매 시간축 동일하게 위 여섯 소제목만 사용한다. 수평선(---)·이모지·다른 소제목은 쓰지 않는다. 굵게(**)는 게임명·수치에만. 군더더기 없이.""" + INDUSTRY_VOICE
     result = call_claude_with_retry(prompt)
     if result is None:
         return "⚠️ AI 인사이트 생성 일시 실패(과부하). 변화 데이터는 섹션/첨부 엑셀에서 정상 확인 가능합니다."
