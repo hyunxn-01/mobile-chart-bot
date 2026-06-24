@@ -422,14 +422,50 @@ def build_genre_audit(all_games):
         print('[WARN] genre_classify 임포트 실패 — 검수표 생략:', e)
         return
     from collections import Counter
-    rows, src = [], Counter()
+    import os
+    rows = []
     for aid, g in all_games.items():
         app = {'app_id': aid, 'title_kr': g.get('title'), 'title': g.get('title'),
                'developer': g.get('developer'), 'notes': g.get('notes'), 'genre': g.get('genre')}
         top, sub, s = gc.classify(app, g.get('genre', ''))
-        src[s] += 1
         rows.append({'app_id': aid, 'title': g.get('title'), 'api': g.get('genre', ''),
                      'top': top, 'sub': sub, 'src': s})
+    # --- AI 폴백(Opus): 규칙으로 못 잡은 fallback 게임을 app_id별 1회 분류·캐시(전역 일관) ---
+    cache_file = Path('data') / 'genre_ai_cache.json'
+    cache = {}
+    if cache_file.exists():
+        try:
+            cache = json.loads(cache_file.read_text(encoding='utf-8'))
+        except Exception:
+            cache = {}
+    key = os.environ.get('ANTHROPIC_API_KEY')
+    need = [r for r in rows if r['src'] == 'fallback' and r['app_id'] not in cache]
+    if key and need:
+        try:
+            from anthropic import Anthropic
+            client = Anthropic(api_key=key)
+            done = 0
+            for i in range(0, len(need), 25):
+                batch = need[i:i + 25]
+                items = [{'app_id': r['app_id'], 'title': r['title'],
+                          'developer': (all_games.get(r['app_id']) or {}).get('developer', ''),
+                          'notes': (all_games.get(r['app_id']) or {}).get('notes', '')} for r in batch]
+                got = gc.ai_classify(items, client)
+                for aid2, (top2, sub2) in got.items():
+                    cache[aid2] = {'top': top2, 'sub': sub2}
+                done += len(got)
+            cache_file.parent.mkdir(parents=True, exist_ok=True)
+            cache_file.write_text(json.dumps(cache, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+            print(f"[OK] AI 폴백(Opus): 신규 {done}게임 분류 · 캐시 총 {len(cache)}")
+        except Exception as e:
+            print('[WARN] AI 폴백 단계 실패(규칙 결과로 진행):', e)
+    elif need:
+        print(f"[INFO] AI 키 없음 — fallback {len(need)}게임은 규칙 상위장르만(서브 없음)")
+    for r in rows:
+        c = cache.get(r['app_id'])
+        if c and c.get('top'):
+            r['top'], r['sub'], r['src'] = c['top'], c.get('sub', ''), 'ai'
+    src = Counter(r['src'] for r in rows)
     rows.sort(key=lambda r: (r['top'], r['sub'], r['title'] or ''))
     (MARKETS_OUT / 'genre_audit.json').write_text(
         json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),

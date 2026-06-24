@@ -112,32 +112,54 @@ CURATED_APPID = {
     'com.netease.party': ('캐주얼', ''), 'com.seayoo.ggd': ('캐주얼', ''),
 }
 
-# 다국어 키워드 규칙(한/영/중). 첫 매치 채택 → 더 특정적인 것을 위에.
+# 키워드 규칙(제목·개발사 기준만 — 마케팅 설명문은 노이즈라 안 봄). 첫 매치 채택 → 특정적인 것 위로.
+# 애매한 일반어(전략/액션/영웅/war/idle 단독)는 규칙에서 빼고 AI 폴백에 맡긴다(과매칭 방지).
 RULES = [
-    ('전략', 'MOBA', ['moba', '왕자영요', '王者荣耀', 'penta', '펜타스톰', 'wild rift', '와일드리프트',
-                      'arena of valor', 'mobile legends', '모바일 레전드', '英雄联盟']),
-    ('액션', '슈팅', ['배틀그라운드', 'pubg', '吃鸡', '和平精英', '화평정영', 'call of duty', '콜 오브 듀티',
-                     '使命召唤', 'valorant', '발로란트', 'crossfire', '穿越火线', '크로스파이어',
-                     'battlefield', '배틀필드', 'fps', '슈팅', 'shooter', '三角洲', '삼각주']),
-    ('롤플레잉', 'MMORPG', ['mmorpg', '오픈월드', 'open world', '开放世界', '리니지', 'lineage', '오딘',
-                          '검은사막', 'black desert', '로한', 'wow', '월드 오브 워크래프트', '天堂', '천하']),
-    ('롤플레잉', '방치형RPG', ['방치', '키우기', 'idle rpg', 'idle', '放置', '挂机', 'afk', '버섯커', '슬라임', 'slime']),
-    ('롤플레잉', '수집형RPG', ['수집형', '영웅 수집', 'gacha', '가챠', '英雄', '니케', 'nikke', '블루 아카이브',
-                          'blue archive', '우마무스메', '명조', 'wuthering', '원신', 'genshin', '붕괴', 'honkai',
-                          '명일방주', 'arknights', '소녀전선']),
-    ('롤플레잉', '액션RPG', ['액션 rpg', 'action rpg', '던전앤파이터', 'dnf', '地下城', '디아블로', 'diablo']),
-    ('전략', '4X·SLG', ['slg', '4x', '전략', 'strategy', '策略', '战争', 'war', '킹덤', 'kingdom', '서바이벌',
-                       'survival', '좀비', 'zombie', '삼국', '三国', '라스트워', '화이트아웃', '문명', 'civilization',
-                       '동맹', 'alliance', '率土', '제국', 'empire']),
-    ('전략', '디펜스', ['디펜스', 'defense', 'tower defense', '타워디펜스', '防御', '塔防']),
-    ('퍼즐', '매치3', ['매치3', 'match-3', 'match 3', '消消乐', '캔디', 'candy', '로얄 매치', 'royal match',
-                     '가든스케이프', 'gardenscape', '홈스케이프', 'homescape', '애니팡', '三消']),
-    ('퍼즐', '머지', ['머지', 'merge', '合成', '合并']),
-    ('퍼즐', '기타퍼즐', ['퍼즐', 'puzzle', '버블', 'bubble', 'block', '블록', '워들', 'wordle']),
-    ('시뮬레이션', '방치형·타이쿤', ['타이쿤', 'tycoon', '경영', '방치', 'idle', '자본주의', '工厂', '餐厅', '레스토랑']),
-    ('시뮬레이션', '팜·샌드박스', ['팜', 'farm', '농장', '샌드박스', 'sandbox', '마인크래프트', 'minecraft',
-                              'roblox', '로블록스', '我的世界', '建造']),
-    ('액션', '기타액션', ['액션', 'action', '동작', '格斗', '대전', 'fighting']),
+    # 카지노·슬롯·포커·카드·낚시 (설명문 'win/전략' 때문에 4X로 오분류되던 것)
+    ('카지노', '', ['slot', '슬롯', 'casino', '카지노', 'poker', '포커', 'holdem', '홀덤', 'baccarat', '바카라',
+                   'roulette', '룰렛', 'blackjack', '블랙잭', 'bingo', '빙고', 'solitaire', '솔리테어', 'rummy',
+                   'teen patti', 'spades', '두디주', '斗地主', '麻将', '마작', 'mahjong', 'jackpot', '捕鱼', '부위', 'fishing']),
+    # 스포츠
+    ('스포츠', '', ['soccer', 'football', '축구', 'fifa', 'efootball', '위닝', 'baseball', '야구', 'basketball',
+                   '농구', 'nba', 'golf', '골프', 'tennis', '테니스', 'bowling', '볼링', 'cricket', '크리켓']),
+    # 레이싱
+    ('레이싱', '', ['racing', '레이싱', '카트', 'kart', 'asphalt', '아스팔트', 'drift', '드리프트']),
+    # 슈팅
+    ('액션', '슈팅', ['배틀그라운드', 'pubg', '吃鸡', '和平精英', '화평정영', 'call of duty', '콜 오브 듀티', '使命召唤',
+                    'valorant', '발로란트', 'crossfire', '穿越火线', '크로스파이어', 'battlefield', '배틀필드', 'fps',
+                    '슈팅', 'shooter', 'shooting', 'sniper', '스나이퍼', 'war robots', '三角洲', '삼각주', 'delta force', '1945']),
+    # MOBA / 오토배틀러
+    ('전략', 'MOBA', ['moba', '왕자영요', '王者荣耀', 'penta', '펜타스톰', '전설대결', 'arena of valor', 'wild rift',
+                     '와일드리프트', 'mobile legends', '모바일 레전드', '英雄联盟', '金铲铲', '금삽삽', 'auto chess', '오토체스']),
+    # 머지
+    ('퍼즐', '머지', ['merge', '머지', '合成', '合并']),
+    # 매치3
+    ('퍼즐', '매치3', ['match', '매치', '消消', '三消', '캔디', 'candy', 'royal match', '로얄 매치', 'gardenscape',
+                     '가든스케이프', 'homescape', '홈스케이프', '애니팡', 'blast', '블라스트', 'bubble', '버블']),
+    # 타이쿤/방치형 비즈니스(시뮬) — RPG보다 먼저
+    ('시뮬레이션', '방치형·타이쿤', ['tycoon', '타이쿤', 'miner', 'mining', '채굴', 'factory', '공장', 'airport', '공항',
+                              'planet', 'restaurant', '레스토랑', 'cafe', '카페', '경영', '商店', '자본주의', 'capitalist']),
+    # 팜/샌드박스(시뮬)
+    ('시뮬레이션', '팜·샌드박스', ['farm', '팜', '농장', 'sandbox', '샌드박스', 'minecraft', '마인크래프트', 'roblox',
+                            '로블록스', '我的世界', 'craft', '크래프트', 'garden', '정원']),
+    # MMORPG(제목 신호)
+    ('롤플레잉', 'MMORPG', ['mmorpg', 'mmo', '오픈월드', 'open world', '开放世界', '리니지', 'lineage', '오딘', 'odin',
+                         '검은사막', 'black desert', '로한', 'rohan', '天堂', '천하', '천녀', '연운', 'maplestory', '메이플',
+                         'traha', 'tera', '아이온', 'aion', 'perfect world', '완미']),
+    # 방치형RPG(idle + RPG 신호만, 단독 idle 금지)
+    ('롤플레잉', '방치형RPG', ['idle rpg', 'idle hero', 'idle legend', 'idle sword', 'afk', '버섯커', 'slime master', '放置']),
+    # 수집형RPG(가챠 신호)
+    ('롤플레잉', '수집형RPG', ['gacha', '가챠', '니케', 'nikke', '블루 아카이브', 'blue archive', '우마무스메', '명일방주',
+                          'arknights', '원신', 'genshin', '명조', 'wuthering', '붕괴', 'honkai', 'star rail', '스타레일',
+                          'zenless', '젠레스', 'fgo', 'seven knights', '세븐나이츠', 'epic seven', '에픽세븐', '소녀전선']),
+    # 액션RPG
+    ('롤플레잉', '액션RPG', ['action rpg', '액션 rpg', '던전앤파이터', 'dnf', '地下城', '디아블로', 'diablo']),
+    # 4X·SLG(제목의 강한 SLG 신호만)
+    ('전략', '4X·SLG', ['kingdom', '킹덤', 'empire', '제국', '삼국', '三国', '3 kingdoms', 'warpath', 'last war', '라스트워',
+                       'top war', 'whiteout', '화이트아웃', 'survival', '서바이벌', 'clash of', '클래시 오브', 'rise of',
+                       'age of', 'civilization', '문명', 'dynasty', '왕조', 'conquer', '정복', '率土', 'evony', 'state of survival']),
+    # 디펜스
+    ('전략', '디펜스', ['tower defense', '타워 디펜스', '타워디펜스', '디펜스', 'defense', 'random dice', '랜덤 디펜스', '塔防']),
 ]
 
 
@@ -154,8 +176,8 @@ def classify(app, api_genre=''):
         if key and key in CURATED:
             top, sub = CURATED[key]
             return top, sub, 'curated'
-    hay = ' '.join([app.get('title', ''), app.get('title_kr', ''), app.get('developer', ''),
-                    (app.get('notes', '') or '')[:500]]).lower()
+    # 키워드는 제목·개발사에서만 찾는다(설명문은 흔한 단어가 많아 과매칭 → 제외).
+    hay = ' '.join([app.get('title', ''), app.get('title_kr', ''), app.get('developer', '')]).lower()
     for top, sub, kws in RULES:
         if any(k.lower() in hay for k in kws):
             return top, sub, 'rule'
@@ -165,6 +187,52 @@ def classify(app, api_genre=''):
     if g in TAXONOMY:
         return g, '', 'fallback'
     return (REMAP.get(g, '캐주얼') or '캐주얼'), '', 'fallback'
+
+
+AI_MODEL = 'claude-opus-4-8'
+
+
+def ai_classify(items, client, model=AI_MODEL):
+    """규칙으로 못 잡은 게임들을 Opus로 배치 분류 → {app_id: (top, sub)}.
+    items: [{app_id,title,developer,notes}]. 택소노미 밖 응답은 버린다. 캐시·게이팅은 호출측."""
+    if not items:
+        return {}
+    taxo = '\n'.join(f"- {t}: {'/'.join(subs) if subs else '(서브 없음)'}" for t, subs in TAXONOMY.items())
+    lines = []
+    for i, g in enumerate(items):
+        desc = (g.get('notes') or '')[:220].replace('\n', ' ').replace('\t', ' ')
+        lines.append(f"{i}\t{(g.get('title') or '')[:40]}\t{(g.get('developer') or '')[:30]}\t{desc}")
+    prompt = (
+        "다음 모바일 게임들을 아래 택소노미의 (상위장르, 서브장르)로 분류해라. "
+        "업계 통용 기준이며, 서브가 없는 상위장르는 서브를 비워라. 확실치 않으면 가장 근접한 상위장르만.\n\n"
+        f"[택소노미]\n{taxo}\n\n[게임] (인덱스\\t제목\\t개발사\\t설명)\n" + '\n'.join(lines) +
+        "\n\n[출력] 각 줄 '인덱스|상위|서브'만(서브 없으면 '인덱스|상위|'). 설명·머리말 금지.")
+    try:
+        msg = client.messages.create(model=model, max_tokens=3000,
+                                     messages=[{'role': 'user', 'content': prompt}])
+        text = ''.join(getattr(b, 'text', '') for b in msg.content)
+    except Exception as e:
+        print('[WARN] AI 분류 호출 실패:', e)
+        return {}
+    res, valid_tops = {}, set(TAXONOMY.keys())
+    for ln in text.splitlines():
+        p = ln.split('|')
+        if len(p) < 2:
+            continue
+        try:
+            idx = int(p[0].strip())
+        except ValueError:
+            continue
+        if not (0 <= idx < len(items)):
+            continue
+        top = p[1].strip()
+        sub = p[2].strip() if len(p) > 2 else ''
+        if top not in valid_tops:
+            continue
+        if sub and sub not in TAXONOMY.get(top, []):
+            sub = ''
+        res[items[idx].get('app_id')] = (top, sub)
+    return res
 
 
 def _selftest():
@@ -184,8 +252,12 @@ def _selftest():
         ({'title_kr': '버섯커 키우기'}, '롤플레잉', ('롤플레잉', '방치형RPG')),
         ({'title': 'Royal Match'}, '게임', ('퍼즐', '매치3')),
         ({'title': 'Monopoly Go!'}, '게임', ('보드', '')),
-        # 미등록 신작 → 키워드 폴백
-        ({'title_kr': '신작', 'notes': '대규모 전쟁 SLG 동맹과 함께 좀비 서바이벌'}, '시뮬레이션', ('전략', '4X·SLG')),
+        # 혼동 교정(제목 기준) — 설명문 안 보므로 오발동 방지
+        ({'title': '88 Fortunes Casino Slots'}, '전략', ('카지노', '')),     # 4X로 오분류되던 카지노
+        ({'title': 'Dream League Soccer 2026'}, '액션', ('스포츠', '')),       # 축구
+        ({'title': 'Idle Miner Tycoon'}, '캐주얼', ('시뮬레이션', '방치형·타이쿤')),  # 방치형RPG 아님
+        ({'title': 'Merge Dragons!'}, '어드벤처', ('퍼즐', '머지')),
+        ({'title': 'Last War: Survival'}, '게임', ('전략', '4X·SLG')),         # 제목 신호로 SLG
     ]
     fails = []
     for app, api, exp in cases:
