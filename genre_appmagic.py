@@ -9,6 +9,7 @@
 - 라벨은 한글 매핑(KOR_*). 미매핑 라벨은 영문 유지(차후 확장).
 - 매칭은 store_application_ids에 trackId가 들어있는 후보를 정확히 고른다(동명 게임 오인 방지).
 """
+import datetime as _dt
 import json
 import re
 import time
@@ -128,25 +129,36 @@ def fetch_one(track_id, session=None, timeout=15):
     return res
 
 
-def label_all(track_ids, cache, sleep=1.0, max_new=120, abort_after=6, log=print):
-    """캐시에 없는 trackId만 AppMagic 조회 → cache 채움(in-place). 미발견은 {'miss':1}로 기록.
-    AppMagic은 대량 자동조회를 차단(410 Gone)하므로 '정중하게': 런당 max_new개까지만, 느리게(sleep),
-    연속 abort_after회 실패하면 차단으로 판단해 즉시 중단(다음 실행에서 자연 재개·캐시 영구).
-    → 며칠에 걸쳐 점진적으로 전 게임 라벨 누적. 반환: (신규 라벨 수, 미발견 수)."""
+def label_all(track_ids, cache, sleep=2.0, max_new=30, abort_after=3, cooldown_h=48, log=print):
+    """캐시에 없는 trackId만 AppMagic을 '아주 정중하게' 조회 → cache 채움(in-place).
+    AppMagic은 대량 자동조회를 차단(410 Gone)하고, 반복하면 영구차단 위험이 있으므로 발자국 최소화:
+      · 런당 max_new개 소량만, 느리게(sleep초)
+      · 연속 abort_after회 실패=차단으로 보고 즉시 중단 + cooldown_h시간 '쿨다운'(그동안 AppMagic 안 두드림)
+      · 쿨다운/캐시는 영구 → 며칠~몇 주에 걸쳐 안전하게 누적. 미발견은 {'miss':1}로 1회만.
+    cache['__meta']['blocked_until']에 쿨다운 만료시각 저장. 반환: (신규 라벨, 미발견)."""
     if requests is None:
         log('[WARN] requests 없음 — AppMagic 라벨 건너뜀')
         return 0, 0
+    meta = cache.get('__meta') or {}
+    now = _dt.datetime.utcnow()
+    bu = meta.get('blocked_until')
+    if bu:
+        try:
+            if now < _dt.datetime.fromisoformat(bu):
+                log(f'[INFO] AppMagic 차단 쿨다운 중(~{bu}Z) — 이번 실행 라벨 건너뜀(영구차단 회피)')
+                return 0, 0
+        except Exception:
+            pass
     sess = requests.Session()
-    new = miss = 0
-    consec_err = 0
-    todo = [str(t) for t in track_ids if str(t or '') and str(t) not in cache]
+    new = miss = consec = 0
+    todo = [str(t) for t in track_ids if str(t or '') and str(t) not in cache and str(t) != '__meta']
     for tid in todo:
         if new + miss >= max_new:
-            log(f'[INFO] AppMagic 런당 상한({max_new}) 도달 — 나머지 {len(todo) - new - miss}개는 다음 실행에서')
+            log(f'[INFO] AppMagic 런당 상한({max_new}) — 나머지 {len(todo) - new - miss}개는 다음 실행에서')
             break
         try:
             r = fetch_one(tid, sess)
-            consec_err = 0
+            consec = 0
             if r and r.get('top'):
                 cache[tid] = r
                 new += 1
@@ -154,13 +166,16 @@ def label_all(track_ids, cache, sleep=1.0, max_new=120, abort_after=6, log=print
                 cache[tid] = {'miss': 1}
                 miss += 1
         except Exception as e:
-            consec_err += 1
+            consec += 1
             log(f'[WARN] AppMagic 조회 실패 {tid}: {e}')
-            if consec_err >= abort_after:
-                log(f'[WARN] 연속 {consec_err}회 실패 — AppMagic 차단(410)으로 판단, 이번 실행 라벨 중단')
+            if consec >= abort_after:
+                until = (now + _dt.timedelta(hours=cooldown_h)).isoformat()
+                meta['blocked_until'] = until
+                cache['__meta'] = meta
+                log(f'[WARN] 연속 {consec}회 실패 — 차단 판단. {cooldown_h}h 쿨다운(~{until}Z) 후 재시도')
                 break
         time.sleep(sleep)
-    log(f'[OK] AppMagic 라벨: 신규 {new} · 미발견 {miss} · 남은 미조회 {max(0, len(todo) - new - miss)} · 총캐시 {len(cache)}')
+    log(f'[OK] AppMagic 라벨: 신규 {new} · 미발견 {miss} · 남은 {max(0, len(todo) - new - miss)} · 캐시 {len([k for k in cache if k != "__meta"])}')
     return new, miss
 
 
