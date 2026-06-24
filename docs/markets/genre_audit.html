@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>장르 분류 검수표</title>
+<style>
+:root{--bg:#fff;--text:#1a1a18;--muted:#6b6a64;--line:#e6e5df;--accent:#2563eb;--chip:#eef1f6;--warn:#fff7ed;--warnb:#fdba74}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a18;--text:#ececea;--muted:#a3a29a;--line:#37362f;--chip:#2c2f36;--warn:#3a2a18;--warnb:#7c5a2e}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,'Malgun Gothic',sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 80px}
+h1{font-size:20px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+.bar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center;z-index:2}
+input,select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)}
+input{flex:1;min-width:160px}
+.stat{color:var(--muted);font-size:12px;margin:8px 2px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 12px}
+.gchip{font-size:11.5px;background:var(--chip);border-radius:999px;padding:3px 10px;cursor:pointer;border:1px solid transparent}
+.gchip.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-weight:600;font-size:11.5px;padding:7px 8px;border-bottom:1px solid var(--line);position:sticky;top:54px;background:var(--bg)}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.gn{font-weight:500}.api{color:var(--muted);font-size:12px}
+.cls{font-weight:600}.sub2{color:var(--muted);font-weight:400}
+.src{font-size:11px;color:var(--muted)}
+.changed td{background:var(--warn)}
+.src-ai{color:var(--accent);font-weight:700}
+.empty{color:var(--muted);padding:30px 8px}
+</style></head><body><div class="wrap">
+<h1>장르 분류 검수표</h1>
+<p class="sub">규칙·큐레이트·Opus로 분류한 전 시장 게임. <b>노란 행</b>=앱스토어 장르에서 교정된 것. AI=Opus 판정.</p>
+<div class="bar">
+  <input id="q" placeholder="게임명 검색…">
+  <select id="topSel"><option value="">전체 상위장르</option></select>
+  <select id="srcSel"><option value="">전체 출처</option><option value="ai">AI(Opus)</option><option value="curated">큐레이트</option><option value="rule">규칙</option><option value="remap">리맵</option></select>
+  <label style="font-size:12px;color:var(--muted)"><input type="checkbox" id="onlyChg" style="vertical-align:-2px"> 교정된 것만</label>
+</div>
+<div class="stat" id="stat"></div>
+<div class="chips" id="chips"></div>
+<table><thead><tr><th>게임</th><th>앱스토어 장르</th><th>분류(상위/서브)</th><th>출처</th></tr></thead><tbody id="tb"></tbody></table>
+</div><script>
+let ROWS=[],TOP='',SRC='',Q='',CHG=false;
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+fetch('./genre_audit.json?_='+Date.now()).then(r=>r.json()).then(d=>{
+  ROWS=d.rows||[];
+  document.getElementById('stat').textContent='총 '+(d.n||ROWS.length)+'개 · 출처 '+JSON.stringify(d.sources||{})+' · 생성 '+(d.generated||'');
+  const tops=[...new Set(ROWS.map(r=>r.top))].sort();
+  const ts=document.getElementById('topSel'); tops.forEach(t=>{const o=document.createElement('option');o.value=o.textContent=t;ts.appendChild(o);});
+  const cnt={}; ROWS.forEach(r=>cnt[r.top]=(cnt[r.top]||0)+1);
+  document.getElementById('chips').innerHTML=tops.map(t=>'<span class="gchip" data-t="'+esc(t)+'">'+esc(t)+' '+cnt[t]+'</span>').join('');
+  document.querySelectorAll('.gchip').forEach(c=>c.onclick=()=>{TOP=TOP===c.dataset.t?'':c.dataset.t; ts.value=TOP; render();});
+  render();
+});
+function render(){
+  let rs=ROWS.filter(r=>(!TOP||r.top===TOP)&&(!SRC||r.src===SRC)&&(!CHG||(r.api&&r.api!==r.top))&&(!Q||(r.title||'').toLowerCase().includes(Q)));
+  rs.sort((a,b)=>(a.top+'/'+(a.sub||'')).localeCompare(b.top+'/'+(b.sub||''),'ko')||(a.title||'').localeCompare(b.title||'','ko'));
+  document.querySelectorAll('.gchip').forEach(c=>c.classList.toggle('on',c.dataset.t===TOP));
+  const tb=document.getElementById('tb');
+  if(!rs.length){tb.innerHTML='<tr><td colspan="4" class="empty">결과 없음</td></tr>';return;}
+  tb.innerHTML=rs.map(r=>{const chg=r.api&&r.api!==r.top;
+    return '<tr class="'+(chg?'changed':'')+'"><td class="gn">'+esc(r.title)+'</td><td class="api">'+esc(r.api||'-')+'</td>'+
+      '<td class="cls">'+esc(r.top)+(r.sub?' <span class="sub2">/ '+esc(r.sub)+'</span>':'')+'</td>'+
+      '<td class="src '+(r.src==='ai'?'src-ai':'')+'">'+esc(r.src)+'</td></tr>';}).join('');
+}
+document.getElementById('q').oninput=e=>{Q=e.target.value.toLowerCase();render();};
+document.getElementById('topSel').onchange=e=>{TOP=e.target.value;render();};
+document.getElementById('srcSel').onchange=e=>{SRC=e.target.value;render();};
+document.getElementById('onlyChg').onchange=e=>{CHG=e.target.checked;render();};
+</script></body></html>
