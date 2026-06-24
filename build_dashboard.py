@@ -25,6 +25,11 @@ OUT_FILE = DOCS_DIR / 'data.json'
 
 AVG_TIMEFRAMES = ['weekly', 'monthly', 'quarterly', 'yearly']
 
+# AppMagic 업계표준 장르 라벨(trackId → {top, sub, tier, ...}). 게임당 1회 조회·영구 캐시.
+# canon_genre가 최우선 참조 → 점유율·히트맵·범례·기회맵이 전부 AppMagic 기준이 된다.
+AM_CACHE_PATH = Path('data') / 'genre_appmagic.json'
+AM_CACHE = {}
+
 
 def load_history(history_dir):
     """{YYYY-MM-DD: [app, ...]} 날짜순. 잘못된/없는 파일은 건너뛴다. 디렉터리가 없으면 빈 dict."""
@@ -146,7 +151,7 @@ def build_chart_from_days(days):
             aid = app.get('app_id')
             if not aid:
                 continue
-            games[aid] = {'title': app.get('title', ''), 'developer': app.get('developer', ''), 'genre': app.get('genre', ''), 'release': app.get('release', ''), 'rating': app.get('rating'), 'icon': app.get('icon', ''), 'updated': app.get('updated', ''), 'ratings': app.get('ratings'), 'notes': app.get('notes', ''), 'artist_id': app.get('artist_id'), 'cv_rating': app.get('cv_rating'), 'cv_ratings': app.get('cv_ratings')}
+            games[aid] = {'title': app.get('title', ''), 'developer': app.get('developer', ''), 'genre': app.get('genre', ''), 'sub': app.get('am_sub', ''), 'tier': app.get('am_tier', ''), 'release': app.get('release', ''), 'rating': app.get('rating'), 'icon': app.get('icon', ''), 'updated': app.get('updated', ''), 'ratings': app.get('ratings'), 'notes': app.get('notes', ''), 'artist_id': app.get('artist_id'), 'cv_rating': app.get('cv_rating'), 'cv_ratings': app.get('cv_ratings'), 'track_id': app.get('track_id', ''), 'version': app.get('version', '')}
 
     timeframes = {}
 
@@ -219,7 +224,10 @@ GENRE_ID_KR = {
 
 
 def canon_genre(app):
-    """genre_ids(숫자 문자열)로 정규 장르. 없으면 현지 genre(한글일 때만) 폴백."""
+    """업계표준(AppMagic) 상위장르 최우선 → 없으면 genre_ids(숫자)→정규 장르 → 현지 genre 폴백."""
+    am = AM_CACHE.get(str(app.get('track_id') or ''))
+    if am and am.get('top'):
+        return am['top']
     for gid in str(app.get('genre_ids', '')).split(','):
         g = GENRE_ID_KR.get(gid.strip())
         if g:
@@ -276,6 +284,9 @@ def build_country(country):
             for app in days[dt]:
                 app['title'] = app.get('title_kr') or app.get('title', '')
                 app['genre'] = canon_genre(app)
+                _am = AM_CACHE.get(str(app.get('track_id') or '')) or {}
+                app['am_sub'] = _am.get('sub', '')
+                app['am_tier'] = _am.get('tier', '')
                 if not app.get('app_id'):
                     app['app_id'] = app.get('track_id')
         ch = build_chart_from_days(days)
@@ -321,6 +332,9 @@ def build_region_days(member_ccs, kind):
             for app in d[dt]:
                 app['title'] = app.get('title_kr') or app.get('title', '')
                 app['genre'] = canon_genre(app)
+                _am = AM_CACHE.get(str(app.get('track_id') or '')) or {}
+                app['am_sub'] = _am.get('sub', '')
+                app['am_tier'] = _am.get('tier', '')
                 if not app.get('app_id'):
                     app['app_id'] = app.get('track_id')
                 aid = app.get('app_id')
@@ -481,6 +495,26 @@ def build_markets():
         return
     MARKETS_OUT.mkdir(parents=True, exist_ok=True)
     countries = sorted([d.name for d in CHARTS_DIR.iterdir() if d.is_dir()])
+    # AppMagic 업계표준 장르 라벨: 신규 trackId만 조회해 캐시 채움(canon_genre가 참조하기 전에).
+    try:
+        AM_CACHE.clear()
+        AM_CACHE.update(json.loads(AM_CACHE_PATH.read_text(encoding='utf-8')))
+    except Exception:
+        pass
+    try:
+        import genre_appmagic as gam
+        _tids = set()
+        for cc in countries:
+            for kind in ('grossing', 'free'):
+                for _apps in load_country_charts(cc, kind).values():
+                    for _a in _apps:
+                        if _a.get('track_id'):
+                            _tids.add(str(_a.get('track_id')))
+        gam.label_all(sorted(_tids), AM_CACHE)
+        AM_CACHE_PATH.write_text(
+            json.dumps(AM_CACHE, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    except Exception as e:
+        print('[WARN] AppMagic 라벨 단계 실패(폴백 장르로 진행):', e)
     have = set()
     majors, regions_idx, singles = [], [], []
     built = {}   # 히트맵 매트릭스용: 주요국+지역의 market_obj 보관

@@ -15,11 +15,11 @@ import re
 
 # 상위장르 → 서브장르(빈 리스트 = 평면, 세분 안 함)
 TAXONOMY = {
-    '롤플레잉': ['MMORPG', '수집형RPG', '방치형RPG', '액션RPG'],
+    '롤플레잉': ['MMORPG', '수집형RPG', '방치형RPG', '액션RPG', '로그라이크'],
     '전략':    ['4X·SLG', 'MOBA', '디펜스'],
     '퍼즐':    ['매치3', '머지', '기타퍼즐'],
     '시뮬레이션': ['방치형·타이쿤', '팜·샌드박스'],
-    '액션':    ['슈팅', '기타액션'],
+    '액션':    ['슈팅', '로그라이크', '기타액션'],
     '캐주얼': [], '어드벤처': [], '스포츠': [], '레이싱': [],
     '보드': [], '카드': [], '카지노': [],
 }
@@ -110,6 +110,10 @@ CURATED_APPID = {
     'com.tencent.tmgp.cod': ('액션', '슈팅'), 'com.tencent.tmgp.cf': ('액션', '슈팅'),
     'com.miHoYo.Yuanshen': ('롤플레잉', '수집형RPG'), 'com.miHoYo.Nap': ('롤플레잉', '수집형RPG'),
     'com.netease.party': ('캐주얼', ''), 'com.seayoo.ggd': ('캐주얼', ''),
+    # 밤탈출-49일 — AppMagic(업계표준): RPG›Roguelike›Action Roguelike. 애플 '어드벤처'·Opus '수집형RPG' 오분류 교정.
+    # iOS 번들·구글 패키지·애플 숫자ID 모두 등록(시장·스토어 무관 동일 결과).
+    'com.rebirthkr.ios': ('롤플레잉', '로그라이크'), 'com.rebirthkr.gp': ('롤플레잉', '로그라이크'),
+    '6760175759': ('롤플레잉', '로그라이크'),
 }
 
 # 키워드 규칙(제목·개발사 기준만 — 마케팅 설명문은 노이즈라 안 봄). 첫 매치 채택 → 특정적인 것 위로.
@@ -261,6 +265,7 @@ def _selftest():
         ({'title': 'Idle Miner Tycoon'}, '캐주얼', ('시뮬레이션', '방치형·타이쿤')),  # 방치형RPG 아님
         ({'title': 'Merge Dragons!'}, '어드벤처', ('퍼즐', '머지')),
         ({'title': 'Last War: Survival'}, '게임', ('전략', '4X·SLG')),         # 제목 신호로 SLG
+        ({'app_id': 'com.rebirthkr.ios', 'title': '밤탈출 - 49일'}, '어드벤처', ('롤플레잉', '로그라이크')),  # AppMagic=로그라이크(app_id 고정)
     ]
     fails = []
     for app, api, exp in cases:
