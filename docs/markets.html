@@ -930,6 +930,7 @@ const CHARTHINT_GAME='<span class="ci"><span class="cdot" style="background:#9b9
 function genreSeries(){ return (DATA && DATA.genre_series) || {labels:[], genres:{}}; }
 const GENRE_ORDER=['롤플레잉','전략','캐주얼','퍼즐','시뮬레이션','액션','어드벤처','스포츠','레이싱','보드','카지노','카드','아케이드','음악','단어','트리비아','교육','가족'];
 function genreColor(name){   // 시장 무관 고정색(장르 이름 기반 — 시장 바뀌어도 동일 장르=동일 색)
+  if(name==='장르 없음') return '#9aa0a6';   // 미분류(AppMagic 장르 없음)는 중립 회색
   const i=GENRE_ORDER.indexOf(name);
   if(i>=0) return PALETTE[i % PALETTE.length];
   let h=0, s=String(name); for(let k=0;k<s.length;k++) h=(h*31+s.charCodeAt(k))>>>0;
@@ -944,7 +945,7 @@ function genreDatasets(){
   const share=(g,i)=> totals[i] ? Math.round((gs.genres[g][i]||0)/totals[i]*1000)/10 : 0;
   // 색 배정: 최신일 점유율 큰 순(범례 가독성)
   const li=labels.length-1;
-  names.sort((a,b)=> share(b,li)-share(a,li));
+  names.sort((a,b)=> a==='장르 없음'?1 : b==='장르 없음'?-1 : share(b,li)-share(a,li));   // '장르 없음'은 항상 맨 뒤(스택 끝)
   // 퍼센트 기반 선차트: 기본은 선만(도트 없음), 범례 클릭으로 강조하면 그 장르에 도트 표시(게임 차트와 동일)
   const any=genreSel.length>0;
   return names.map((g,i)=>{
@@ -986,10 +987,10 @@ function renderGenreLegend(){
   const rows=ds.map(d=>{ const arr=d.data||[]; const g=d.label||''; const st=gstats[g]||{};
     return {g, on:genreSel.includes(g), share:(arr.length?arr[arr.length-1]:null), n:(st.n!=null?st.n:null), rev:(st.rev!=null?Math.round(st.rev*1000)/10:null), col:d.pointBackgroundColor||d.backgroundColor||'#888'}; });
   // 매출 구간별 그룹(주력≥20% · 중간 5–20% · 소형<5%), 그룹 안은 매출 내림차순
-  const tier=r=> (r.rev!=null&&r.rev>=20)?0 : (r.rev!=null&&r.rev>=5)?1 : 2;
+  const tier=r=> r.g==='장르 없음' ? 2 : (r.rev!=null&&r.rev>=20)?0 : (r.rev!=null&&r.rev>=5)?1 : 2;   // '장르 없음'은 항상 소형 그룹
   const groups=[{t:'주력 장르 · 매출 20%+',rows:[]},{t:'중간 장르 · 매출 5–20%',rows:[]},{t:'소형 장르 · 매출 5% 미만',rows:[]}];
   rows.forEach(r=> groups[tier(r)].rows.push(r));
-  groups.forEach(grp=> grp.rows.sort((a,b)=>(b.rev||0)-(a.rev||0)));
+  groups.forEach(grp=> grp.rows.sort((a,b)=> a.g==='장르 없음'?1 : b.g==='장르 없음'?-1 : (b.rev||0)-(a.rev||0)));   // '장르 없음'은 그룹 내 맨 아래
   const rowHTML=r=> '<button type="button" class="gl-item gl-cols'+(r.on?' on':(any?' off':''))+'" data-genre="'+esc(r.g)+'" aria-pressed="'+r.on+'">'+
       '<span class="gl-dot" style="background:'+r.col+'"></span>'+
       '<span class="gl-name">'+esc(r.g)+'</span>'+
@@ -1849,7 +1850,7 @@ function renderCmp(){
     el.style.gridTemplateColumns='1fr';
     el.innerHTML='<div class="cmp-empty">시장 비교 매트릭스가 곧 생성됩니다 — 다음 자동 갱신 후 표시됩니다.</div>'; return;
   }
-  const markets=M.markets, genres=M.genres, cells=M.cells||{};
+  const markets=M.markets, genres=(M.genres||[]).slice().sort((a,b)=> a==='장르 없음'?1 : b==='장르 없음'?-1 : 0), cells=M.cells||{};
   let mx=0; markets.forEach(mk=> genres.forEach(g=>{ const c=cells[mk.key]&&cells[mk.key][g]; const v=c?c[cmpMetric]:0; if(v>mx) mx=v; }));
   mx=mx||1;
   let h='<div class="cmp-corner">장르＼시장</div>'+markets.map(mk=>'<div class="cmp-mh" title="'+esc(mk.name)+'">'+esc(mk.name)+'</div>').join('');
