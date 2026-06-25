@@ -615,7 +615,7 @@ def _axis_hist(prev, cap=12):
     return out[:cap]
 
 
-AXIS_PV = 'v5-grounded'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성 (v5: 주간 축 웹검색 근거·출처)
+AXIS_PV = 'v6-grounded'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성 (v6: 크롤러 비접근 도메인 제거·폴백)
 
 # 모든 AI 인사이트 공통 — 현직 게임업계에서 통용되는 용어·관점·표현만 쓰도록 강제(업계인이 한눈에 이해).
 INDUSTRY_VOICE = (
@@ -1190,6 +1190,7 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, 
     web_search=True면 신뢰 도메인(TRUSTED_DOMAINS) 안에서만 웹검색 도구 사용 + 비신뢰 링크 후처리 제거.
     마지막 시도는 사고 옵션을 빼고(파라미터 문제 대비 안전망) 호출. 모두 실패 시 None."""
     client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    use_allowed = True  # 신뢰도메인 화이트리스트로 검색 제한; 일부가 크롤러 차단(400)이면 False로 떨궈 무제한+사후필터 폴백
     for attempt in range(1, max_retries + 1):
         try:
             kwargs = dict(
@@ -1197,9 +1198,11 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, 
                 max_tokens=max_tokens,
                 messages=[{'role': 'user', 'content': prompt}],
             )
-            if web_search and attempt < max_retries:  # #11: 신뢰 도메인 화이트리스트 안에서만 검색(마지막 시도는 안전망으로 검색 끔)
-                kwargs['tools'] = [{'type': 'web_search_20250305', 'name': 'web_search',
-                                    'max_uses': 4, 'allowed_domains': TRUSTED_DOMAINS}]
+            if web_search and attempt < max_retries:  # #11: 신뢰 도메인 안에서 검색(마지막 시도는 안전망으로 검색 끔)
+                _tool = {'type': 'web_search_20250305', 'name': 'web_search', 'max_uses': 4}
+                if use_allowed:  # 크롤러 비접근 도메인으로 400 나면 use_allowed=False → 무제한 검색+사후필터
+                    _tool['allowed_domains'] = TRUSTED_DOMAINS
+                kwargs['tools'] = [_tool]
             if attempt < max_retries:  # 마지막 시도 전까지는 적응형 사고 + 최대 effort
                 kwargs['thinking'] = {'type': 'adaptive'}
                 kwargs['output_config'] = {'effort': THINKING_EFFORT}
@@ -1214,6 +1217,10 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, 
                 return _filter_sources(text) if web_search else text
             print(f"[WARN] 응답에 text 블록 없음 (시도 {attempt}/{max_retries}) — 재시도")
         except Exception as e:
+            if web_search and use_allowed and 'not accessible to our user agent' in str(e):
+                use_allowed = False  # 신뢰도메인 일부가 크롤러 비접근 → allowed_domains 제거 후 무제한 검색+사후필터로 폴백
+                print(f"[WARN] 일부 신뢰도메인 크롤러 비접근 → 무제한 검색+사후필터 폴백 후 재시도")
+                continue
             print(f"[WARN] Claude API 실패 (시도 {attempt}/{max_retries}): {e}")
         if attempt < max_retries:
             wait = 2 ** attempt  # 2, 4, 8초

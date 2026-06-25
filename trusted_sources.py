@@ -10,9 +10,10 @@
 # Tier B(글로벌 정론지) + Tier C(모바일/시장 데이터 분석) + 국내 게임 정론지.
 TRUSTED_DOMAINS = [
     # 글로벌 업계 정론지(B2B·뉴스)
-    'gamesindustry.biz', 'gamesbeat.com', 'gamedeveloper.com',
+    # 주의: gamesindustry.biz·eurogamer.net·ign.com은 Anthropic 크롤러를 차단해 allowed_domains에 넣으면 400 → 제외.
+    'gamesbeat.com', 'gamedeveloper.com',
     'pocketgamer.biz', 'mobilegamer.biz', 'videogameschronicle.com',
-    'eurogamer.net', 'gamespot.com', 'ign.com',
+    'gamespot.com',
     # 모바일/시장 데이터 분석사(수치 근거)
     'sensortower.com', 'nikopartners.com', 'gamerefinery.com',
     'naavik.co', 'deconstructoroffun.com', 'wnhub.io',
