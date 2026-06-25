@@ -251,6 +251,11 @@
   .gop-legend{ display:flex; gap:14px; flex-wrap:wrap; margin:8px 0 0; font-size:11px; color:var(--muted); }
   .gop-legend span{ display:inline-flex; align-items:center; gap:5px; }
   .gop-sw{ width:10px; height:10px; border-radius:50%; flex:0 0 auto; opacity:.7; }
+  .gop-insight{ margin:13px 0 0; border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:11px 14px; }   /* #13: 기회맵 시사점 */
+  .gopi-h{ font-size:12px; font-weight:700; color:var(--accent2text); margin-bottom:8px; }
+  .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.6; color:var(--text); padding:3px 0; }
+  .gopi-row .gop-sw{ margin-top:6px; }
+  .gopi-k{ flex:0 0 auto; font-size:11px; font-weight:700; color:var(--muted); background:var(--chip); border-radius:5px; padding:1px 7px; margin-top:2px; }
   .pubrow[aria-pressed="true"] td{ background:var(--chip); }
   .pubrow[aria-pressed="true"] td.pname{ color:var(--accent); }
   .pubchip{ display:inline-block; font-size:11.5px; color:var(--muted); background:var(--chip);
@@ -1350,6 +1355,19 @@ function renderGenreOpp(){
   gs.forEach(g=>{ const cx=xOf(g.n), cy=yOf(g.avg), r=rOf(g.rev);
     s+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="9">'+esc(g.genre)+'</text>'; });
   s+='</svg></div>';
+  // #13: 기회맵 PM 시사점 인사이트(블루오션/핵심격전/포화 + 매출 중심)
+  { const fmt=arr=>arr.slice(0,3).map(g=>esc(g.genre)).join(' · ');
+    const blueG=gs.filter(g=> g.n<=mx && g.avg<=my).sort((a,b)=>a.avg-b.avg);
+    const contG=gs.filter(g=> g.n>mx && g.avg<=my).sort((a,b)=>b.rev-a.rev);
+    const satG=gs.filter(g=> g.n>mx && g.avg>my).sort((a,b)=>b.n-a.n);
+    const topRev=gs.slice().sort((a,b)=>b.rev-a.rev)[0];
+    let ins='<div class="gop-insight"><div class="gopi-h">이 시장 진입 시사점</div>';
+    if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">매출 중심</span><span>추정매출이 가장 큰 장르는 <b>'+esc(topRev.genre)+'</b> (점유 '+(Math.round(topRev.rev*1000)/10)+'%) — 이 시장의 돈이 몰리는 축이에요.</span></div>';
+    if(blueG.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>블루오션</b> — 경쟁 적고 성과 좋은 <b>'+fmt(blueG)+'</b>. 신규 진입 1순위 후보.</span></div>';
+    if(contG.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#2563eb"></span><span><b>핵심 격전</b> — 시장 크고 상위권 몰린 <b>'+fmt(contG)+'</b>. 기회 크지만 대형 퍼블리셔와 정면승부.</span></div>';
+    if(satG.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>포화</b> — 게임 많은데 하위 분산된 <b>'+fmt(satG)+'</b>. 뚜렷한 차별화 없으면 진입 위험.</span></div>';
+    ins+='</div>'; s+=ins;
+  }
   wrap.innerHTML=s;
   const blue=gs.filter(g=> g.n<=mx && g.avg<=my).sort((a,b)=> a.avg-b.avg);
   const opp=(blue.length?blue:gs.slice().sort((a,b)=>a.avg-b.avg)).slice(0,3).map(x=>x.genre);
