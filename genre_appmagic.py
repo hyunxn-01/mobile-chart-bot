@@ -189,7 +189,7 @@ def fetch_one(track_id, session=None, timeout=15):
     return res
 
 
-def label_all(track_ids, cache, sleep=2.0, max_new=60, abort_after=3, cooldown_h=48, log=print):
+def label_all(track_ids, cache, sleep=1.5, max_new=150, abort_after=3, cooldown_h=48, log=print):
     """캐시에 없는 trackId만 AppMagic을 '아주 정중하게' 조회 → cache 채움(in-place).
     AppMagic은 대량 자동조회를 차단(410 Gone)하고, 반복하면 영구차단 위험이 있으므로 발자국 최소화:
       · 런당 max_new개 소량만, 느리게(sleep초)
