@@ -228,24 +228,19 @@ GENRE_PRIORITY = ['7014', '7017', '7015', '7016', '7013', '7006', '7012', '7001'
                   '7004', '7005', '7019', '7011', '7002', '7003', '7008', '7018', '7009', '7007']
 
 
+GENRE_NONE = '장르 없음'   # AppMagic 게임 장르 태그가 없는 경우(Apple/현지 폴백 미사용)
+
+
 def canon_genre(app):
-    """업계표준(AppMagic) 최우선 → 없으면 Apple genre_ids를 '우선순위'로 정규 장르(핵심 장르 우대)
-    → 현지 genre 폴백."""
+    """장르는 AppMagic 분류 안에서만 유지한다. L2(직계 서브) 우선 → 없으면 L1(둘 다 AppMagic 유래).
+    AppMagic이 게임 장르 태그를 주지 않으면 '장르 없음'으로 분류(Apple genre_ids·현지 장르 폴백 제거)."""
     am = AM_CACHE.get(str(app.get('track_id') or ''))
     if am:
         if am.get('genre'):      # ← 우리 모든 장르의 디폴트 = L2(직계 서브)
             return am['genre']
-        if am.get('top'):
+        if am.get('top'):        # L2가 비면 L1(역시 AppMagic 택소노미 유래)
             return am['top']
-    ids = {x.strip() for x in str(app.get('genre_ids', '')).split(',') if x.strip()}
-    for gid in GENRE_PRIORITY:        # 우선순위대로 — 핵심 장르 우대(어드벤처/캐주얼보다 RPG·전략 등)
-        if gid in ids and GENRE_ID_KR.get(gid):
-            return GENRE_ID_KR[gid]
-    for gid in ids:                   # 우선순위 목록에 없던 매핑이라도 있으면 채택
-        if GENRE_ID_KR.get(gid):
-            return GENRE_ID_KR[gid]
-    g = app.get('genre')
-    return g if (g and g not in ('미상', '게임', 'Games')) else '기타'
+    return GENRE_NONE
 
 
 def load_country_charts(country, kind):
