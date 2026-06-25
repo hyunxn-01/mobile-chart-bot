@@ -31,6 +31,7 @@ from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Font, Alignment, PatternFill
 from anthropic import Anthropic
+from trusted_sources import TRUSTED_DOMAINS, is_trusted_source   # #11: 신뢰 출처 화이트리스트
 
 ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
 GMAIL_USER = os.environ.get('GMAIL_USER')
@@ -614,7 +615,7 @@ def _axis_hist(prev, cap=12):
     return out[:cap]
 
 
-AXIS_PV = 'v4-industry'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성
+AXIS_PV = 'v5-grounded'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성 (v5: 주간 축 웹검색 근거·출처)
 
 # 모든 AI 인사이트 공통 — 현직 게임업계에서 통용되는 용어·관점·표현만 쓰도록 강제(업계인이 한눈에 이해).
 INDUSTRY_VOICE = (
@@ -628,7 +629,18 @@ INDUSTRY_VOICE = (
 )
 
 
-def _axis_prompt(scope_label, axis_label, digest, is_region):
+GROUNDING = (
+    "\n\n[근거·출처 · 매우 중요] 이번 기간에 눈에 띄게 급상승하거나 신규 진입한 게임이 있으면, "
+    "신뢰할 수 있는 게임 전문 매체에서 그 원인(출시 초기 효과·대규모 프로모션·스트리머 마케팅·업데이트·이벤트·콜라보·IP 등)을 "
+    "웹검색으로 확인해 한 줄로 덧붙여라. 확인되면 근거가 된 핵심 단어에 마크다운 링크 [단어](기사URL) 형태로 출처를 건다(URL을 따로 나열하지 말고 단어에만). "
+    "규칙 — (1) 편집된 뉴스 기사만 출처로 인정. 커뮤니티·게시판·댓글·SNS·위키는 절대 금지. "
+    "(2) 신뢰 출처로 확인되지 않으면 원인을 지어내지 말고 그냥 적지 마라(근거 없는 단정 금지). "
+    "(3) 정황·추정 수준이면 '~로 보인다'로 헤지하되, 그것도 신뢰 매체 보도가 있을 때만. "
+    "(4) 링크는 한 브리핑에서 꼭 필요한 2~4개로 절제한다."
+)
+
+
+def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False):
     scope = f"'{scope_label}' 지역(여러 나라 합산) 시장" if is_region else f"'{scope_label}' 단일 시장"
     win = _AXIS_WIN.get(axis_label, axis_label)
     s_struct = "지역 전체에서 강세 장르·퍼블리셔 점유" if is_region else "강세 장르·퍼블리셔가 매출을 얼마나 쥐는지(점유)"
@@ -641,7 +653,7 @@ def _axis_prompt(scope_label, axis_label, digest, is_region):
             "핵심 게임·플레이어: 이 기간 매출 상위 게임의 성격·강한 퍼블리셔. "
             f"움직임: 이 기간({win}) 진입·급상승·급하락 위주(근거 약하면 '- 데이터 누적 중'). "
             "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. PM 시사점: 진출·벤치마크·현지화 한 줄 결론. "
-            "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + INDUSTRY_VOICE)
+            "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + INDUSTRY_VOICE + (GROUNDING if grounded else ""))
 
 
 def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
@@ -660,7 +672,8 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
             axes[axis_key] = prev       # 7일 이내 최신 + 같은 프롬프트버전 → 재사용(비용 절감)
             continue
         try:
-            text = call_claude_with_retry(_axis_prompt(scope_label, axis_label, digest, is_region), max_tokens=MAX_OUTPUT_TOKENS)
+            _grounded = (axis_key == 'weekly')   # #11: 최근(주간) 축만 웹검색으로 원인·출처 보강
+            text = call_claude_with_retry(_axis_prompt(scope_label, axis_label, digest, is_region, grounded=_grounded), max_tokens=MAX_OUTPUT_TOKENS, web_search=_grounded)
         except Exception as e:
             print(f'[WARN] {scope_label} {axis_label} 브리핑 실패: {e}')
             if axis_key in prev_axes:
@@ -809,9 +822,9 @@ def build_global_brief(collected):
                   "각 항목 내용 가이드 — 횡단 신호: 여러 시장/지역에서 동시에 강한 게임·장르. "
                   "시장별 색깔: 주요 시장 간·지역 간 장르 색깔 대비. IP·퍼블리셔 동향: 여러 시장 관통 글로벌 IP·퍼블리셔. "
                   "진출 전략: 다음 진출·벤치마크 시장 결론. "
-                  "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + INDUSTRY_VOICE)
+                  "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + INDUSTRY_VOICE + (GROUNDING if axis_key == 'weekly' else ""))
         try:
-            text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS)
+            text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, web_search=(axis_key == 'weekly'))
         except Exception as e:
             print(f'[WARN] 글로벌 {axis_label} 브리핑 생성 실패: {e}')
             if axis_key in prev_axes:
@@ -1161,9 +1174,20 @@ def run_active_analyses(today_dt, current, active_names):
 # 7. Claude 요약 (재시도 로직 포함)
 # ============================================================
 
-def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4):
+def _filter_sources(text):
+    """#11: 브리핑 본문의 마크다운 링크 [라벨](url) 중 신뢰 출처가 아니면 링크만 제거(라벨 텍스트는 유지)."""
+    if not text:
+        return text
+    import re
+    return re.sub(r'\[([^\]]+)\]\((https?://[^)\s]+)\)',
+                  lambda m: m.group(0) if is_trusted_source(m.group(2)) else m.group(1),
+                  text)
+
+
+def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, web_search=False):
     """Claude API 호출 (Opus 4.8 적응형 사고 + effort 최대).
     응답은 thinking 블록 뒤 text 블록 → text만 추출. 일시 오류 시 지수 백오프 재시도.
+    web_search=True면 신뢰 도메인(TRUSTED_DOMAINS) 안에서만 웹검색 도구 사용 + 비신뢰 링크 후처리 제거.
     마지막 시도는 사고 옵션을 빼고(파라미터 문제 대비 안전망) 호출. 모두 실패 시 None."""
     client = Anthropic(api_key=ANTHROPIC_API_KEY)
     for attempt in range(1, max_retries + 1):
@@ -1173,16 +1197,21 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4):
                 max_tokens=max_tokens,
                 messages=[{'role': 'user', 'content': prompt}],
             )
+            if web_search and attempt < max_retries:  # #11: 신뢰 도메인 화이트리스트 안에서만 검색(마지막 시도는 안전망으로 검색 끔)
+                kwargs['tools'] = [{'type': 'web_search_20250305', 'name': 'web_search',
+                                    'max_uses': 4, 'allowed_domains': TRUSTED_DOMAINS}]
             if attempt < max_retries:  # 마지막 시도 전까지는 적응형 사고 + 최대 effort
                 kwargs['thinking'] = {'type': 'adaptive'}
                 kwargs['output_config'] = {'effort': THINKING_EFFORT}
             # 스트리밍 필수: max effort + 큰 max_tokens는 10분 초과 가능 → stream 사용
             with client.messages.stream(**kwargs) as stream:
                 final = stream.get_final_message()
-            text = next((b.text for b in final.content
-                         if getattr(b, 'type', None) == 'text'), None)
-            if text and text.strip():
-                return text
+            # 웹검색 시 검색 전후로 text 블록이 여러 개 → 모두 이어붙임
+            parts = [b.text for b in final.content
+                     if getattr(b, 'type', None) == 'text' and getattr(b, 'text', None)]
+            text = '\n'.join(parts).strip() if parts else None
+            if text:
+                return _filter_sources(text) if web_search else text
             print(f"[WARN] 응답에 text 블록 없음 (시도 {attempt}/{max_retries}) — 재시도")
         except Exception as e:
             print(f"[WARN] Claude API 실패 (시도 {attempt}/{max_retries}): {e}")
