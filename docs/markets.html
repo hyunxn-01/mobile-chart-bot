@@ -349,6 +349,8 @@
   .gitem .ginfo{ margin-right:0; }
   .ginfo:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .gdname{ cursor:pointer; position:relative; }
+  .aib-src{ color:var(--accent2text); text-decoration:underline dotted; text-underline-offset:2px; }
+  .aib-src:hover{ color:var(--accent2); text-decoration-style:solid; }
   .gdicon{ width:15px; height:15px; border-radius:4px; vertical-align:-3px; margin-right:4px; object-fit:cover; background:var(--chip); }   /* #14: 브리핑 게임명 옆 앱 아이콘 */
   .gdname:hover{ text-decoration:underline; }
   .gdname::after{ content:'상세보기'; position:absolute; left:0; top:-23px; font-size:10.5px; font-weight:600; background:var(--accent); color:#fff; padding:2px 7px; border-radius:5px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s; z-index:5; }
@@ -1403,7 +1405,7 @@ function linkifyGames(root){
   list.sort((a,b)=>b.length-a.length);
   const rx=new RegExp('('+list.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g');
   const walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-  const nodes=[]; while(walker.nextNode()){ const n=walker.currentNode; if(n.parentNode && n.parentNode.closest && n.parentNode.closest('.gdname,.aibrief-period,.aib-stats')) continue; nodes.push(n); }
+  const nodes=[]; while(walker.nextNode()){ const n=walker.currentNode; if(n.parentNode && n.parentNode.closest && n.parentNode.closest('.gdname,.aibrief-period,.aib-stats,a')) continue; nodes.push(n); }
   nodes.forEach(node=>{
     const text=node.nodeValue; rx.lastIndex=0; if(!rx.test(text)) return; rx.lastIndex=0;
     const frag=document.createDocumentFragment(); let last=0, m;
@@ -1730,7 +1732,13 @@ function loadBriefsIndex(){
 function renderMarketBrief(text){
   // 고정 항목 브리핑: '## 제목' → 제목 카드(.aib-sec+.aib-h) + 불릿. ## 없으면 옛 불릿 카드 폴백.
   const raw=String(text||'');
-  const inline=s=> esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  const inline=s=>{
+    { const _lk=[]; let _t=String(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,la,u)=>{ _lk.push({la,u}); return '@@LK'+(_lk.length-1)+'@@'; }); _t=esc(_t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); return _t.replace(/@@LK(\d+)@@/g,(mm,i)=>{ const L=_lk[+i]; return '<a class="aib-src" href="'+esc(L.u)+'" target="_blank" rel="noopener noreferrer" title="출처">'+esc(L.la)+'</a>'; }); }
+    const links=[];  /* #11 src-links */   // #11: 마크다운 링크 [라벨](url) → 하이퍼링크(출처). esc 전에 추출.
+    s=String(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,label,url)=>{ links.push({label,url}); return ''+(links.length-1)+''; });
+    let h=esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    return h.replace(/(\d+)/g,(m,i)=>{ const L=links[+i]; return '<a class="aib-src" href="'+esc(L.url)+'" target="_blank" rel="noopener noreferrer" title="출처">'+esc(L.label)+'</a>'; });
+  };
   const lines=raw.split(/\r?\n/);
   if(/^\s*#{1,3}\s+/m.test(raw)){
     let html='', open=false;
