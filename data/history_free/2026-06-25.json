@@ -1161,16 +1161,16 @@
     "platform": "App Store",
     "chart": "Top Free",
     "genre": "퍼즐",
-    "version": "1.44.0",
+    "version": "1.45.0",
     "genres_all": "게임, 퍼즐",
     "genre_ids": "6014,7012",
     "primary_genre": "Games",
     "release": "2024-06-28",
     "rating": 4.62542,
-    "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/d0/d1/24/d0d124bf-3527-57ba-75aa-27c05f52e605/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/100x100bb.jpg",
-    "updated": "2026-06-19",
+    "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/f1/3c/06/f13c06a7-3eee-6df1-3f13-fc4a920ff38d/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/100x100bb.jpg",
+    "updated": "2026-06-25",
     "ratings": 6693,
-    "notes": "Business as usual\nWe've tackled some bugs to ensure smoother and more reliable overall performance.",
+    "notes": "Smooth sailing ahead\nWe've fixed several minor issues to keep your gameplay experience steady and enjoyable.",
     "artist_id": 1452111779,
     "cv_rating": 4.62542,
     "cv_ratings": 6693
@@ -1513,30 +1513,6 @@
   },
   {
     "rank": 64,
-    "app_id": "com.easybrain.brainy.joygame.ios",
-    "track_id": "6770503071",
-    "title": "Puzzle Time Brainy Challenge",
-    "developer": "SmallStep Dev Team",
-    "category": "게임",
-    "platform": "App Store",
-    "chart": "Top Free",
-    "genre": "퍼즐",
-    "version": "1.0.0",
-    "genres_all": "게임, 엔터테인먼트, 퍼즐, 캐주얼",
-    "genre_ids": "6014,6016,7012,7003",
-    "primary_genre": "Games",
-    "release": "2026-06-15",
-    "rating": 3.58333,
-    "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a8/c7/0e/a8c70e79-d8f9-7699-aad5-528ccba644c9/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/100x100bb.jpg",
-    "updated": "2026-06-16",
-    "ratings": 12,
-    "notes": "",
-    "artist_id": 1473677344,
-    "cv_rating": 3.58333,
-    "cv_ratings": 12
-  },
-  {
-    "rank": 65,
     "app_id": "com.kiwifun.game.ios.screw.master",
     "track_id": "6749300334",
     "title": "나사 3D 퍼즐: 핀 풀기 게임",
@@ -1560,7 +1536,7 @@
     "cv_ratings": 1467
   },
   {
-    "rank": 66,
+    "rank": 65,
     "app_id": "com.warvow.iosom",
     "track_id": "6749140416",
     "title": "전선:WAR VOW",
@@ -1584,7 +1560,7 @@
     "cv_ratings": 7
   },
   {
-    "rank": 67,
+    "rank": 66,
     "app_id": "com.bubble.buster.rescue",
     "track_id": "6743385713",
     "title": "털실 마스터 - 마법의 정렬 버스주차퍼즐게임",
@@ -1608,7 +1584,7 @@
     "cv_ratings": 3932
   },
   {
-    "rank": 68,
+    "rank": 67,
     "app_id": "com.hidea.cat.magicrecipe",
     "track_id": "6446347021",
     "title": "고양이와 스프: 마법의 레시피",
@@ -1632,7 +1608,7 @@
     "cv_ratings": 1610
   },
   {
-    "rank": 69,
+    "rank": 68,
     "app_id": "com.fty.thejudge",
     "track_id": "6755861844",
     "title": "들여보낼까 말까? - Let Them In?　",
@@ -1656,7 +1632,7 @@
     "cv_ratings": 945
   },
   {
-    "rank": 70,
+    "rank": 69,
     "app_id": "com.cedargames.mysterytown",
     "track_id": "6503603603",
     "title": "미스터리 타운: 합성 게임 (Mystery Town)",
@@ -1680,7 +1656,7 @@
     "cv_ratings": 936
   },
   {
-    "rank": 71,
+    "rank": 70,
     "app_id": "com.crypto.code.master",
     "track_id": "6499306754",
     "title": "Code Busters: Word Puzzle Game",
@@ -1704,7 +1680,7 @@
     "cv_ratings": 32
   },
   {
-    "rank": 72,
+    "rank": 71,
     "app_id": "com.nguyenvh.holeio",
     "track_id": "1389111413",
     "title": "Hole.io",
@@ -1728,7 +1704,7 @@
     "cv_ratings": 50278
   },
   {
-    "rank": 73,
+    "rank": 72,
     "app_id": "com.nflystudio.InfiniteStaircase",
     "track_id": "947742764",
     "title": "무한의 계단",
@@ -1752,7 +1728,7 @@
     "cv_ratings": 51631
   },
   {
-    "rank": 74,
+    "rank": 73,
     "app_id": "com.kiloo.subwaysurfers",
     "track_id": "512939461",
     "title": "Subway Surfers",
@@ -1776,7 +1752,7 @@
     "cv_ratings": 18422
   },
   {
-    "rank": 75,
+    "rank": 74,
     "app_id": "com.nexon.kart",
     "track_id": "1466736988",
     "title": "카트라이더 러쉬플러스",
@@ -1800,7 +1776,7 @@
     "cv_ratings": 244458
   },
   {
-    "rank": 76,
+    "rank": 75,
     "app_id": "com.JindoBlu.OfflineGamesIOS",
     "track_id": "6448104157",
     "title": "데이터 필요없는 게임 - 와이파이 필요없는 게임",
@@ -1824,7 +1800,7 @@
     "cv_ratings": 9119
   },
   {
-    "rank": 77,
+    "rank": 76,
     "app_id": "com.brain.logic.joygame.ios",
     "track_id": "6747063674",
     "title": "Brain Puzzle 2: Logic Twist",
@@ -1848,7 +1824,7 @@
     "cv_ratings": 2106
   },
   {
-    "rank": 78,
+    "rank": 77,
     "app_id": "com.hollywood.merge",
     "track_id": "6755455500",
     "title": "할리우드 머지",
@@ -1872,7 +1848,7 @@
     "cv_ratings": 688
   },
   {
-    "rank": 79,
+    "rank": 78,
     "app_id": "com.ansangha.drgomoku",
     "track_id": "870442795",
     "title": "오목의 달인",
@@ -1896,7 +1872,7 @@
     "cv_ratings": 2910
   },
   {
-    "rank": 80,
+    "rank": 79,
     "app_id": "com.chess.iphone",
     "track_id": "329218549",
     "title": "체스 · 플레이 및 배우기 온라인",
@@ -1920,7 +1896,7 @@
     "cv_ratings": 15280
   },
   {
-    "rank": 81,
+    "rank": 80,
     "app_id": "com.fc.goods.sort.matching.puzzle.triplemaster",
     "track_id": "6482849843",
     "title": "상품 정렬: 매치 3 퍼즐 - Goods Sorting",
@@ -1944,7 +1920,7 @@
     "cv_ratings": 6715
   },
   {
-    "rank": 82,
+    "rank": 81,
     "app_id": "com.superplaystudios.dicedreams",
     "track_id": "1484468651",
     "title": "Dice Dreams™",
@@ -1968,7 +1944,7 @@
     "cv_ratings": 5806
   },
   {
-    "rank": 83,
+    "rank": 82,
     "app_id": "jp.pokemon.pokemontcgp",
     "track_id": "6479970832",
     "title": "포켓몬 카드 게임 Pocket",
@@ -1992,7 +1968,7 @@
     "cv_ratings": 34605
   },
   {
-    "rank": 84,
+    "rank": 83,
     "app_id": "com.com2us.futurecpb.ios.apple.global.normal",
     "track_id": "1458848044",
     "title": "컴투스프로야구V26",
@@ -2016,7 +1992,7 @@
     "cv_ratings": 38206
   },
   {
-    "rank": 85,
+    "rank": 84,
     "app_id": "com.brain.tricky.smallstep.ios",
     "track_id": "6670789598",
     "title": "Brain Puzzle: Tricky Quest",
@@ -2040,7 +2016,7 @@
     "cv_ratings": 5234
   },
   {
-    "rank": 86,
+    "rank": 85,
     "app_id": "com.pg2.ioskr",
     "track_id": "6767527649",
     "title": "에보트레이너",
@@ -2064,7 +2040,7 @@
     "cv_ratings": 0
   },
   {
-    "rank": 87,
+    "rank": 86,
     "app_id": "com.mondayoff.dinomutant",
     "track_id": "6451176533",
     "title": "Dino mutant : T-Rex",
@@ -2088,7 +2064,7 @@
     "cv_ratings": 2580
   },
   {
-    "rank": 88,
+    "rank": 87,
     "app_id": "kr.yunu.make10",
     "track_id": "1566126120",
     "title": "사과게임 - 화제의 인싸게임",
@@ -2112,7 +2088,7 @@
     "cv_ratings": 9356
   },
   {
-    "rank": 89,
+    "rank": 88,
     "app_id": "com.combo.yarnflow",
     "track_id": "6755183085",
     "title": "Yarn Loop: Knit Puzzle",
@@ -2136,7 +2112,7 @@
     "cv_ratings": 150
   },
   {
-    "rank": 90,
+    "rank": 89,
     "app_id": "com.Gaggle.fun.GooseGooseDuck",
     "track_id": "1558248707",
     "title": "Goose Goose Duck",
@@ -2160,7 +2136,7 @@
     "cv_ratings": 6650
   },
   {
-    "rank": 91,
+    "rank": 90,
     "app_id": "com.appteenplanet.drinkgames",
     "track_id": "1144557284",
     "title": "텐텐오락실",
@@ -2184,7 +2160,7 @@
     "cv_ratings": 30707
   },
   {
-    "rank": 92,
+    "rank": 91,
     "app_id": "com.robtop.geometryjumplite",
     "track_id": "698255242",
     "title": "Geometry Dash Lite",
@@ -2208,7 +2184,7 @@
     "cv_ratings": 5884
   },
   {
-    "rank": 93,
+    "rank": 92,
     "app_id": "com.com2us.probaseball3d.normal.freefull.apple.global.ios.universal",
     "track_id": "880551258",
     "title": "컴투스프로야구2026",
@@ -2232,7 +2208,7 @@
     "cv_ratings": 29923
   },
   {
-    "rank": 94,
+    "rank": 93,
     "app_id": "com.PlayWithUs.BizAndTownRN",
     "track_id": "6478472449",
     "title": "비즈 앤 타운: 회사 경영 시뮬레이션 - 타이쿤 게임",
@@ -2256,7 +2232,7 @@
     "cv_ratings": 5024
   },
   {
-    "rank": 95,
+    "rank": 94,
     "app_id": "com.nexon.fo4m",
     "track_id": "1273957743",
     "title": "EA SPORTS FC Online M",
@@ -2280,7 +2256,7 @@
     "cv_ratings": 38746
   },
   {
-    "rank": 96,
+    "rank": 95,
     "app_id": "com.chirpy.bird.sort",
     "track_id": "6756289996",
     "title": "Chirpy Sort: Bird Color Puzzle",
@@ -2304,7 +2280,7 @@
     "cv_ratings": 48
   },
   {
-    "rank": 97,
+    "rank": 96,
     "app_id": "net.gameduo.gv",
     "track_id": "6446516059",
     "title": "캣 히어로 : 방치형 RPG",
@@ -2328,7 +2304,7 @@
     "cv_ratings": 2986
   },
   {
-    "rank": 98,
+    "rank": 97,
     "app_id": "com.dino.screwdom",
     "track_id": "6740043080",
     "title": "Screwdom : 나사와 볼트 퍼즐",
@@ -2352,7 +2328,7 @@
     "cv_ratings": 9925
   },
   {
-    "rank": 99,
+    "rank": 98,
     "app_id": "com.mattel163.uno",
     "track_id": "1344700142",
     "title": "UNO!™",
@@ -2376,7 +2352,7 @@
     "cv_ratings": 17591
   },
   {
-    "rank": 100,
+    "rank": 99,
     "app_id": "com.battle.shoot.dragon",
     "track_id": "6746465127",
     "title": "세포 특공대 - 전략형 타워 디펜스",
