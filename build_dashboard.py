@@ -232,8 +232,11 @@ def canon_genre(app):
     """업계표준(AppMagic) 최우선 → 없으면 Apple genre_ids를 '우선순위'로 정규 장르(핵심 장르 우대)
     → 현지 genre 폴백."""
     am = AM_CACHE.get(str(app.get('track_id') or ''))
-    if am and am.get('top'):
-        return am['top']
+    if am:
+        if am.get('genre'):      # ← 우리 모든 장르의 디폴트 = L2(직계 서브)
+            return am['genre']
+        if am.get('top'):
+            return am['top']
     ids = {x.strip() for x in str(app.get('genre_ids', '')).split(',') if x.strip()}
     for gid in GENRE_PRIORITY:        # 우선순위대로 — 핵심 장르 우대(어드벤처/캐주얼보다 RPG·전략 등)
         if gid in ids and GENRE_ID_KR.get(gid):
@@ -494,6 +497,12 @@ def build_markets():
         # 현재 차트 게임을 상위 랭크부터, 그 외(과거 등장) 게임은 뒤에 — '보이는 게임' 커버리지 우선
         _ordered = sorted(_rank, key=lambda t: _rank[t]) + [t for t in sorted(_all) if t not in _rank]
         gam.label_all(_ordered, AM_CACHE)
+        # 전체 택소노미로 L2 도출(우리 모든 장르의 디폴트=L2) — 저장 리프→루트 거슬러 L2, 재조회 0. 신규+기존 통일.
+        _taxo = gam.fetch_taxonomy()
+        if _taxo:
+            (Path('data') / 'appmagic_taxonomy.json').write_text(
+                json.dumps(_taxo, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+            gam.apply_l2(AM_CACHE, _taxo)
         AM_CACHE_PATH.write_text(
             json.dumps(AM_CACHE, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     except Exception as e:

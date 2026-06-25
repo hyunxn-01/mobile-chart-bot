@@ -32,21 +32,81 @@ KOR_TOP = {
     'Fighting': '대전격투', 'Sandbox': '샌드박스', 'Geolocation': '위치기반', 'Rhythm': '리듬',
 }
 
-# AppMagic 서브장르(영문) → 한글(통용 표기). 없으면 영문 유지.
+# AppMagic L2 서브장르(영문) → 한글(통용 표기). 표준약어(MMORPG·MOBA·4X·FPS 등)는 영문 유지. 미매핑은 영문 그대로.
 KOR_SUB = {
-    'Roguelike': '로그라이크', 'Action Roguelike': '액션 로그라이크',
-    'MMORPG': 'MMORPG', 'Open World': '오픈월드', 'Turn-Based RPG': '턴제RPG',
-    'Action RPG': '액션RPG', 'Puzzle RPG': '퍼즐RPG', 'Idle RPG': '방치형RPG',
-    'Survival RPG': '서바이벌RPG', 'Gacha': '수집형', 'Survival': '서바이벌',
-    '4X': '4X', 'MOBA': 'MOBA', 'Auto Battler': '오토배틀러',
-    'Tower Defense': '타워디펜스', 'Build & Battle': '건설·배틀',
-    'Match-3': '매치3', 'Match 3': '매치3', 'Bubble Shooter': '버블슈터',
-    'Merge': '머지', 'Block Puzzle': '블록퍼즐', 'Word Puzzle': '워드퍼즐',
-    'Idle': '방치형', 'Tycoon': '타이쿤', 'Farming': '팜', 'Sandbox': '샌드박스',
-    'Battle Royale': '배틀로얄', 'FPS': 'FPS', 'Shoot \'em Up': '슈팅',
-    'Hypercasual': '하이퍼캐주얼', 'Solitaire': '솔리테어', 'Slots': '슬롯',
-    'Card Battler': '카드배틀러', 'CCG': '수집형카드', 'Platformer': '플랫포머',
-    'Party': '파티', 'Runner': '러너', 'Io': 'IO',
+    # 롤플레잉
+    'Idle RPG': '방치형RPG', 'MMORPG': 'MMORPG', 'Team Battler': '팀배틀러', 'Roguelike': '로그라이크',
+    'Action Roguelike': '액션 로그라이크', 'Action RPG (ARPG)': '액션RPG', 'Action RPG': '액션RPG',
+    'Puzzle RPG': '퍼즐RPG', 'Tactical RPG': '택틱스RPG', 'Empire Building': '제국건설',
+    'Open World RPG': '오픈월드RPG', 'Open World': '오픈월드', 'Action RPG/MMORPG': '액션RPG',
+    'Text-Based RPG': '텍스트RPG', 'Turn-Based RPG': '턴제RPG', 'Survival RPG': '서바이벌RPG',
+    'Survival Roguelike': '서바이벌 로그라이크', 'Gacha': '수집형',
+    # 퍼즐
+    'Match-3': '매치3', 'Match 3': '매치3', 'Match-3: Tile': '매치3 타일', 'Match 3D': '매치3D',
+    'Match-3 PvP': '매치3 PvP', 'Merge': '머지', 'Block Puzzle': '블록퍼즐', 'Word Puzzle': '워드퍼즐',
+    'Bubble Shooter': '버블슈터', 'Sudoku': '스도쿠', 'Trivia': '퀴즈', 'Physics Puzzle': '물리퍼즐',
+    'Logic Puzzle': '로직퍼즐', 'Jigsaw Puzzle': '직소퍼즐', 'Brick Breaker': '벽돌깨기',
+    'Match-2 Blast': '매치2 블라스트', 'Coloring': '컬러링', 'Sort Puzzle': '소트퍼즐',
+    'Connect Puzzle': '커넥트퍼즐', 'Nonogram': '노노그램', 'Minesweeper': '지뢰찾기', 'Maze': '미로',
+    'Find The Difference': '틀린그림찾기', 'Draw Line Puzzle': '라인퍼즐', 'Math Puzzle': '수학퍼즐',
+    'Fill & Organize': '정리퍼즐', 'Chain Puzzle': '체인퍼즐', 'Jam Puzzle': '잼퍼즐',
+    'Power Level Puzzle': '파워퍼즐', 'Puzzle: Coloring': '컬러링퍼즐', 'Swipe-To-Move': '스와이프퍼즐',
+    'Rope Puzzle': '로프퍼즐',
+    # 전략
+    '4X Strategy': '4X', '4X': '4X', 'Real Time Strategy (RTS)': 'RTS', 'MOBA': 'MOBA',
+    'Card Battler': '카드배틀러', 'Tactics': '택틱스', 'Turn-Based Strategy (TBS)': 'TBS',
+    'Tower Defense': '타워디펜스', 'Build & Battle': '건설·배틀', 'Auto Battler': '오토배틀러',
+    'Auto Chess': '오토체스', 'CCG (Collectible Card Games)': '수집형카드(CCG)', 'CCG': '수집형카드(CCG)',
+    'Real Time Tactics (RTT)': 'RTT', 'Turn-Based Tactics (TBT)': 'TBT', 'Takeover': '점령전',
+    # 카지노
+    'Slots': '슬롯', 'Casino Card Games': '카지노 카드', 'Bingo': '빙고', 'Poker': '포커',
+    'Mahjong': '마작', 'Roulette': '룰렛', 'Fish Hunter': '피쉬헌터', 'Plinko': '플린코',
+    'Crash': '크래시', 'Coin Looter': '코인루터', 'Pachinko': '파친코', 'Scratch Cards': '스크래치카드',
+    'Casino Domino': '카지노 도미노', 'Coin Pusher': '코인푸셔', 'Claw Machine': '인형뽑기', 'Keno': '키노',
+    'Teen Patti': '틴파티', 'Okey': '오케이', 'Rummy': '러미', 'Baloot': '발롯', 'Durak': '두락',
+    # 시뮬레이션
+    'Tycoon/Management': '타이쿤·경영', 'Tycoon': '타이쿤', 'Vehicle Simulator': '차량 시뮬',
+    'Sandbox': '샌드박스', 'Farming': '팜', 'Life Sim': '인생 시뮬', 'Fashion & Dress Up': '드레스업',
+    'Time Management': '타임매니지먼트', 'Dating Sim': '연애 시뮬', 'Job Simulator': '직업 시뮬',
+    'Animal Simulator': '동물 시뮬', 'Virtual Pet': '가상펫', 'Citybuilder': '도시건설',
+    'Home Design': '홈디자인', 'Fishing Simulator': '낚시 시뮬', 'Idol Training': '아이돌 육성',
+    'Breeding': '육성', 'Satisfaction': '힐링', 'Simulator: Dance': '댄스 시뮬', 'Idle': '방치형',
+    # 액션
+    'Platformer': '플랫포머', 'Action-Adventure': '액션 어드벤처', 'Fighting': '대전격투',
+    'Survival Horror': '서바이벌 호러', "Shoot 'em Up": '슈팅', 'Stealth': '스텔스',
+    "Beat 'em Up": '비트앰업', 'Brawl': '브롤', 'Artillery Shooter': '포격 슈팅',
+    'Asymmetric Battle': '비대칭 대전', 'Melee Battle Royale': '근접 배틀로얄',
+    # 아케이드
+    'Clicker/Idle': '클리커·방치형', 'Idle Arcade': '방치형 아케이드', 'Rhythm': '리듬',
+    '.io': 'IO', 'Pinball': '핀볼', 'Eat & Grow': '잡아먹기', 'Slicing': '슬라이싱',
+    'Destruction': '파괴', 'Arcade Fishing': '아케이드 낚시', 'Melee Arena': '근접 아레나',
+    'Timing': '타이밍', 'Ballz-like': '볼즈류',
+    # 슈팅
+    'First-Person Shooter (FPS)': 'FPS', 'Third-Person Shooter (TPS)': 'TPS', 'Battle Royale': '배틀로얄',
+    'Tactical Shooter': '택티컬 슈터', 'Sniper': '스나이퍼', 'Hero Shooter': '히어로 슈터',
+    'Looter Shooter': '루터 슈터', 'Cover Shooter': '커버 슈터', 'Survival Shooter': '서바이벌 슈터',
+    'Extraction Shooter': '익스트랙션 슈터', 'Vehicle Shooter': '차량 슈팅', 'Hunting': '헌팅',
+    'Top-Down Shooter (TDS)': 'TDS',
+    # 테이블탑
+    'Card Games': '카드', 'Board Games': '보드', 'Dice': '주사위', 'Mahjong Solitaire': '마작 솔리테어',
+    'Domino': '도미노', 'Carrom': '캐롬', 'Sea Battle': '해전', 'Solitaire': '솔리테어',
+    'Chess': '체스', 'Ludo': '루도', 'Backgammon': '백개먼',
+    # 어드벤처
+    'Quest': '퀘스트', 'Hidden Object': '히든오브젝트', 'Interactive Story': '인터랙티브 스토리',
+    'Survival': '서바이벌',
+    # 레이싱
+    'Arcade Racing': '아케이드 레이싱', 'Simulation Racing': '시뮬 레이싱',
+    'Racing: Mixed/Other Vehicles': '레이싱(기타)', 'Driving School': '운전 연수',
+    # 스포츠
+    'Arcade Sports': '아케이드 스포츠', 'Simulation Sports': '시뮬 스포츠', 'Sports Manager': '스포츠 경영',
+    # 키즈
+    'Kids: Educational': '키즈 교육', 'Kids: Simulator': '키즈 시뮬', 'Kids: Coloring & Drawing': '키즈 색칠',
+    'Kids: Fashion & Beauty': '키즈 패션', 'Kids: Activity': '키즈 액티비티', 'Kids: Cooking & DIY': '키즈 요리',
+    # 파티
+    'Truth or Dare': '진실게임', 'Mafia/Betrayal': '마피아', 'Mini Games': '미니게임',
+    'Interactive Guessing': '추측게임', 'Party Royale': '파티 로얄', 'Party': '파티',
+    # 기타 공통
+    'Hypercasual': '하이퍼캐주얼', 'Runner': '러너', 'Io': 'IO',
 }
 
 # 게임 난이도/타깃(AppMagic meta) → 한글
@@ -177,6 +237,70 @@ def label_all(track_ids, cache, sleep=2.0, max_new=60, abort_after=3, cooldown_h
         time.sleep(sleep)
     log(f'[OK] AppMagic 라벨: 신규 {new} · 미발견 {miss} · 남은 {max(0, len(todo) - new - miss)} · 캐시 {len([k for k in cache if k != "__meta"])}')
     return new, miss
+
+
+AM_TAGS = 'https://appmagic.rocks/api/v2/tags'
+
+
+def fetch_taxonomy(session=None, timeout=20):
+    """AppMagic 전체 games 장르 택소노미 → {id: {'name', 'parent'}}. 한 번 호출로 전 트리. 실패 시 {}."""
+    if requests is None:
+        return {}
+    s = session or requests
+    try:
+        r = s.get(AM_TAGS, params={'type': 'games'}, timeout=timeout,
+                  headers={'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json'})
+        r.raise_for_status()
+        data = (r.json() or {}).get('data') or []
+        return {t['id']: {'name': t.get('name', ''), 'parent': (t.get('parent_ids') or [None])[0]}
+                for t in data if t.get('type') == 'games' and 'id' in t}
+    except Exception as e:
+        print('[WARN] AppMagic 택소노미 조회 실패:', e)
+        return {}
+
+
+def _path_of(leaf_name, taxo, byname):
+    """리프 이름 → (top_en, l2_en, path_en[루트→리프]). 택소노미에서 부모를 거슬러 올라가 경로 복원."""
+    tid = byname.get(leaf_name)
+    if tid is None:
+        return leaf_name, leaf_name, [leaf_name]
+    ch, seen = [], set()
+    while tid is not None and tid in taxo and tid not in seen:
+        seen.add(tid)
+        ch.append(taxo[tid]['name'])
+        tid = taxo[tid]['parent']
+    ch.reverse()
+    if not ch:
+        return leaf_name, leaf_name, [leaf_name]
+    return ch[0], (ch[1] if len(ch) > 1 else ch[0]), ch
+
+
+def apply_l2(cache, taxo, log=print):
+    """캐시 각 항목의 저장 리프(sub_en/leaf_en)에서 L2(루트의 직계 자식)와 전체 경로를 도출,
+    genre·sub = L2(우리 모든 장르의 디폴트), top = L1, path_en = 전체 경로로 세팅. 택소노미 기반 → 재조회 0.
+    신규·기존(deepest leaf 저장분) 모두 통일 처리. 반환: 갱신 항목 수."""
+    if not taxo:
+        log('[WARN] 택소노미 없음 — L2 적용 건너뜀(top 유지)')
+        return 0
+    byname = {}
+    for tid, v in taxo.items():
+        byname.setdefault(v['name'], tid)
+    n = 0
+    for k, e in cache.items():
+        if k == '__meta' or not isinstance(e, dict) or not e.get('top'):
+            continue
+        leaf = e.get('leaf_en') or e.get('sub_en') or ''
+        if not leaf:
+            continue
+        top_en, l2_en, path = _path_of(leaf, taxo, byname)
+        e['top'] = kor_top(top_en)
+        e['genre'] = kor_sub(l2_en)   # ← 메인 장르 = L2
+        e['sub'] = kor_sub(l2_en)
+        e['l2_en'] = l2_en
+        e['path_en'] = path
+        n += 1
+    log(f'[OK] L2 적용: {n}개 항목 genre=L2로 매핑(전체 경로 보존)')
+    return n
 
 
 # 밤탈출-49일 실제 응답(요약)으로 파싱 검증 — 네트워크 없이.
