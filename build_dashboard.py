@@ -473,14 +473,27 @@ def build_markets():
         pass
     try:
         import genre_appmagic as gam
-        _tids = set()
+        _rank, _all = {}, set()
         for cc in countries:
             for kind in ('grossing', 'free'):
-                for _apps in load_country_charts(cc, kind).values():
+                _days = load_country_charts(cc, kind)
+                if not _days:
+                    continue
+                _last = sorted(_days.keys())[-1]   # 최신 스냅샷 = 현재 차트
+                for _dt, _apps in _days.items():
                     for _a in _apps:
-                        if _a.get('track_id'):
-                            _tids.add(str(_a.get('track_id')))
-        gam.label_all(sorted(_tids), AM_CACHE)
+                        _t = _a.get('track_id')
+                        if not _t:
+                            continue
+                        _t = str(_t)
+                        _all.add(_t)
+                        if _dt == _last:
+                            _r = _a.get('rank') or 999
+                            if _t not in _rank or _r < _rank[_t]:
+                                _rank[_t] = _r
+        # 현재 차트 게임을 상위 랭크부터, 그 외(과거 등장) 게임은 뒤에 — '보이는 게임' 커버리지 우선
+        _ordered = sorted(_rank, key=lambda t: _rank[t]) + [t for t in sorted(_all) if t not in _rank]
+        gam.label_all(_ordered, AM_CACHE)
         AM_CACHE_PATH.write_text(
             json.dumps(AM_CACHE, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     except Exception as e:
