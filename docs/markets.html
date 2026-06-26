@@ -1399,7 +1399,7 @@ function renderGenreOpp(){
     if(fort.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>요새</b> — 큰 돈을 1강이 장악: <b>'+fmtF(fort)+'</b>. 그 1강과 정면승부·차별화 IP 필요.</span></div>';
     if(niche.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>틈새 독점</b> — 작은 시장 단일 타이틀: <b>'+fmtR(niche)+'</b>. 시장 작아 업사이드 제한.</span></div>';
     if(small.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#2563eb"></span><span><b>소형 난전</b> — 작은 시장에 여럿 경쟁: <b>'+fmt(small)+'</b>.</span></div>';
-    if(pick) ins+='<div class="gopi-row"><span class="gopi-k" style="background:var(--accent);color:#fff">진입 1순위</span><span><b>'+esc(pick.genre)+'</b> — 큰 돈('+pick.revp+'%) + 절대강자 없음(1위 '+pick.top1+'%)'+((pick.mom!=null&&pick.mom>=0.3)?' + 점유 상승세':'')+'. '+(pick.topGame?'현재 선두 <b>'+esc(pick.topGame)+'</b> 대비 ':'')+'차별화 BM·리텐션이면 안착 여지.</span></div>';
+    if(pick) ins+='<div class="gopi-row"><span class="gopi-k">차트상 출발점</span><span>차트만 보면 <b>'+esc(pick.genre)+'</b>가 가장 눈에 띈다 — 큰 돈('+pick.revp+'%)에 절대강자 없음(1위 '+pick.top1+'%)'+((pick.mom!=null&&pick.mom>=0.3)?'·점유 상승세':'')+(pick.topGame?', 선두 <b>'+esc(pick.topGame)+'</b>':'')+'. 단 시장 규모·자사 역량·경쟁 반응은 차트 밖이라 <b>결론이 아닌 검토 출발점</b>.</span></div>';
     ins+='</div>'; s+=ins;
   }
   wrap.innerHTML=s;
