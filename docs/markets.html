@@ -1733,7 +1733,7 @@ function renderMarketBrief(text){
   // 고정 항목 브리핑: '## 제목' → 제목 카드(.aib-sec+.aib-h) + 불릿. ## 없으면 옛 불릿 카드 폴백.
   const raw=String(text||'');
   const inline=s=>{
-    { const _lk=[]; let _t=String(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,la,u)=>{ _lk.push({la,u}); return '@@LK'+(_lk.length-1)+'@@'; }); _t=esc(_t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); return _t.replace(/@@LK(\d+)@@/g,(mm,i)=>{ const L=_lk[+i]; return '<a class="aib-src" href="'+esc(L.u)+'" target="_blank" rel="noopener noreferrer" title="출처">'+esc(L.la)+'</a>'; }); }
+    { const _lk=[]; let _t=String(s).replace(/<\/?cite[^>]*>/g,'').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,la,u)=>{ _lk.push({la,u}); return '@@LK'+(_lk.length-1)+'@@'; }); _t=esc(_t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); return _t.replace(/@@LK(\d+)@@/g,(mm,i)=>{ const L=_lk[+i]; return '<a class="aib-src" href="'+esc(L.u)+'" target="_blank" rel="noopener noreferrer" title="출처">'+esc(L.la)+'</a>'; }); }
     const links=[];  /* #11 src-links */   // #11: 마크다운 링크 [라벨](url) → 하이퍼링크(출처). esc 전에 추출.
     s=String(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,label,url)=>{ links.push({label,url}); return ''+(links.length-1)+''; });
     let h=esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
