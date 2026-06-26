@@ -1000,7 +1000,10 @@ function renderGenreLegend(){
   if(!ds.length){ el.hidden=true; return; }
   const any=genreSel.length>0;
   // 장르별 게임 수·추정매출 점유(집계 리스트 기준)
-  const gstats={}; ((DATA.genres&&DATA.genres.list)||[]).forEach(g=>{ gstats[g.genre]={n:g.num_games, rev:(g.games||[]).reduce((s,x)=>s+(revShare(x.app_id)||0),0)}; });
+  // 매출(추정매출 점유)은 항상 매출차트 장르 구성으로 합산 — 인기차트로 토글해도 불변(게임수·점유 칸만 활성차트 반영)
+  const _grg=((FULL.charts&&FULL.charts.grossing&&FULL.charts.grossing.genres&&FULL.charts.grossing.genres.list))||[];
+  const _grossRev={}; _grg.forEach(g=>{ _grossRev[g.genre]=(g.games||[]).reduce((s,x)=>s+(revShare(x.app_id)||0),0); });
+  const gstats={}; ((DATA.genres&&DATA.genres.list)||[]).forEach(g=>{ gstats[g.genre]={n:g.num_games, rev:(_grossRev[g.genre]!=null?_grossRev[g.genre]:0)}; });
   const rows=ds.map(d=>{ const arr=d.data||[]; const g=d.label||''; const st=gstats[g]||{};
     return {g, on:genreSel.includes(g), share:(arr.length?arr[arr.length-1]:null), n:(st.n!=null?st.n:null), rev:(st.rev!=null?Math.round(st.rev*1000)/10:null), col:d.pointBackgroundColor||d.backgroundColor||'#888'}; });
   // 매출 구간별 그룹(주력≥20% · 중간 5–20% · 소형<5%), 그룹 안은 매출 내림차순
@@ -1331,13 +1334,13 @@ function renderWatch(){
 function renderGenreOpp(){
   const wrap=document.getElementById('gopout'), sub=document.getElementById('gopsub');
   if(!wrap) return;
-  const gl=(DATA.genres&&DATA.genres.list)||[];
+  const gl=((FULL.charts&&FULL.charts.grossing&&FULL.charts.grossing.genres&&FULL.charts.grossing.genres.list))||[];   // 진입 맵=매출 분석 → 항상 매출차트 기준(인기 토글 무관)
   let gs=gl.filter(g=> g.genre && g.genre!=='미상' && g.num_games>=1)
            .map(g=>{ const wr=(g.games||[]).map(x=>({aid:x.app_id, w:revShare(x.app_id)||0})).sort((a,b)=>b.w-a.w); const rev=wr.reduce((s,x)=>s+x.w,0);
                      const tg=wr[0]&&wr[0].aid&&DATA.games[wr[0].aid]; const topGame=tg?(tg.title_kr||tg.title||''):'';
                      return {genre:g.genre, n:g.num_games, rev, revp:Math.round(rev*1000)/10, top1: rev>0?Math.round(wr[0].w/rev*100):0, topGame}; })
            .filter(g=> g.rev>0);
-  { const gser=(DATA.genre_series&&DATA.genre_series.genres)||{}; gs.forEach(g=>{ const a=gser[g.genre]||[]; const cur=a.length?a[a.length-1]:null; const fst=a.find(v=>v!=null); g.mom=(cur!=null&&fst!=null)?Math.round((cur-fst)*10)/10:null; }); }
+  { const gser=((FULL.charts&&FULL.charts.grossing&&FULL.charts.grossing.genre_series&&FULL.charts.grossing.genre_series.genres))||{}; gs.forEach(g=>{ const a=gser[g.genre]||[]; const cur=a.length?a[a.length-1]:null; const fst=a.find(v=>v!=null); g.mom=(cur!=null&&fst!=null)?Math.round((cur-fst)*10)/10:null; }); }
   if(gs.length<3){ if(sub) sub.textContent=''; wrap.innerHTML='<p class="empty">장르 데이터가 더 쌓이면 진입 맵이 표시됩니다.</p>'; return; }
   const W=760,H=380,padL=54,padR=120,padT=26,padB=46;
   const plotW=W-padL-padR, plotH=H-padT-padB, PR=padL+plotW, PB=padT+plotH;
