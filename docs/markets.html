@@ -1741,12 +1741,13 @@ function renderMarketBrief(text){
   };
   const lines=raw.split(/\r?\n/);
   if(/^\s*#{1,3}\s+/m.test(raw)){
-    let html='', open=false, buf=null;
+    let html='', open=false, buf=null, seen=false;
     const flush=()=>{ if(buf!=null){ html+='<div class="mkb-li">'+inline(buf)+'</div>'; buf=null; } };
     const close=()=>{ flush(); if(open){ html+='</div>'; open=false; } };
     lines.forEach(ln=>{ const t=ln.trim(); if(!t) return;
       const hm=t.match(/^#{1,3}\s+(.*)$/);
-      if(hm){ close(); const title=hm[1].split(/\s+[—–-]\s+/)[0].trim(); html+='<div class="aib-sec"><div class="aib-h">'+inline(title)+'</div>'; open=true; return; }
+      if(hm){ seen=true; close(); const title=hm[1].split(/\s+[—–-]\s+/)[0].trim(); html+='<div class="aib-sec"><div class="aib-h">'+inline(title)+'</div>'; open=true; return; }
+      if(!seen) return;   // '##' 전 준비멘트(검색 전 영어/한국어 혼잣말) 무시
       if(!open){ html+='<div class="aib-sec">'; open=true; }
       const bm=t.match(/^[-•*]\s+(.*)$/);
       if(bm){ flush(); buf=bm[1]; }           // 새 불릿 시작 → 이전 불릿 flush
