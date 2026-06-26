@@ -615,7 +615,22 @@ def _axis_hist(prev, cap=12):
     return out[:cap]
 
 
-AXIS_PV = 'v6-grounded'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성 (v6: 크롤러 비접근 도메인 제거·폴백)
+AXIS_PV = 'v7-measure'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성 (v7: 사용량 측정용 강제 재생성, 비용설정은 v6와 동일)
+
+# [측정] API 사용량 집계 — 동작/비용 변화 없음, 기록만. 종료 시 atexit으로 총합·상위 비용 호출 출력.
+import atexit as _atexit
+USAGE_ROWS = []
+def _print_usage_summary():
+    if not USAGE_ROWS:
+        return
+    _ti = sum(r['in'] for r in USAGE_ROWS); _to = sum(r['out'] for r in USAGE_ROWS)
+    _tcr = sum(r['cr'] for r in USAGE_ROWS); _tcc = sum(r['cc'] for r in USAGE_ROWS); _tws = sum(r['ws'] for r in USAGE_ROWS)
+    print("=" * 64)
+    print(f"[USAGE 총합] 호출 {len(USAGE_ROWS)}건 | 입력 {_ti:,} | 출력(사고포함) {_to:,} | 캐시읽기 {_tcr:,} | 캐시생성 {_tcc:,} | 웹검색 {_tws}건")
+    for r in sorted(USAGE_ROWS, key=lambda x: x['out'], reverse=True)[:14]:
+        print(f"   - {r['label']}: out={r['out']:,} in={r['in']:,} ws={r['ws']} {'[검색]' if r['search'] else ''}")
+    print("=" * 64)
+_atexit.register(_print_usage_summary)
 
 # 모든 AI 인사이트 공통 — 현직 게임업계에서 통용되는 용어·관점·표현만 쓰도록 강제(업계인이 한눈에 이해).
 INDUSTRY_VOICE = (
@@ -673,7 +688,7 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
             continue
         try:
             _grounded = (axis_key == 'weekly')   # #11: 최근(주간) 축만 웹검색으로 원인·출처 보강
-            text = call_claude_with_retry(_axis_prompt(scope_label, axis_label, digest, is_region, grounded=_grounded), max_tokens=MAX_OUTPUT_TOKENS, web_search=_grounded)
+            text = call_claude_with_retry(_axis_prompt(scope_label, axis_label, digest, is_region, grounded=_grounded), max_tokens=MAX_OUTPUT_TOKENS, web_search=_grounded, usage_label=f"{scope_label}/{axis_label}")
         except Exception as e:
             print(f'[WARN] {scope_label} {axis_label} 브리핑 실패: {e}')
             if axis_key in prev_axes:
@@ -824,7 +839,7 @@ def build_global_brief(collected):
                   "진출 전략: 다음 진출·벤치마크 시장 결론. "
                   "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + INDUSTRY_VOICE + (GROUNDING if axis_key == 'weekly' else ""))
         try:
-            text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, web_search=(axis_key == 'weekly'))
+            text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, web_search=(axis_key == 'weekly'), usage_label=f"글로벌/{axis_label}")
         except Exception as e:
             print(f'[WARN] 글로벌 {axis_label} 브리핑 생성 실패: {e}')
             if axis_key in prev_axes:
@@ -1184,7 +1199,7 @@ def _filter_sources(text):
                   text)
 
 
-def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, web_search=False):
+def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, web_search=False, usage_label=''):
     """Claude API 호출 (Opus 4.8 적응형 사고 + effort 최대).
     응답은 thinking 블록 뒤 text 블록 → text만 추출. 일시 오류 시 지수 백오프 재시도.
     web_search=True면 신뢰 도메인(TRUSTED_DOMAINS) 안에서만 웹검색 도구 사용 + 비신뢰 링크 후처리 제거.
@@ -1209,6 +1224,16 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, 
             # 스트리밍 필수: max effort + 큰 max_tokens는 10분 초과 가능 → stream 사용
             with client.messages.stream(**kwargs) as stream:
                 final = stream.get_final_message()
+            try:  # [측정] 사용량 기록: 입력/출력(사고포함)/캐시/웹검색 횟수
+                _u = getattr(final, 'usage', None)
+                if _u is not None:
+                    _it = getattr(_u, 'input_tokens', 0) or 0; _ot = getattr(_u, 'output_tokens', 0) or 0
+                    _cr = getattr(_u, 'cache_read_input_tokens', 0) or 0; _cc = getattr(_u, 'cache_creation_input_tokens', 0) or 0
+                    _stu = getattr(_u, 'server_tool_use', None); _ws = (getattr(_stu, 'web_search_requests', 0) or 0) if _stu else 0
+                    USAGE_ROWS.append({'label': usage_label or '(call)', 'in': _it, 'out': _ot, 'cr': _cr, 'cc': _cc, 'ws': _ws, 'search': bool(web_search)})
+                    print(f"[USAGE] {usage_label or '(call)'}: in={_it:,} out={_ot:,} cache_r={_cr:,} web_search={_ws}")
+            except Exception as _ue:
+                print(f"[USAGE] 사용량 기록 실패: {_ue}")
             # 웹검색 시 검색 전후로 text 블록이 여러 개 → 모두 이어붙임
             parts = [b.text for b in final.content
                      if getattr(b, 'type', None) == 'text' and getattr(b, 'text', None)]
