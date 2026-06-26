@@ -615,6 +615,25 @@ def _axis_hist(prev, cap=12):
     return out[:cap]
 
 
+def _prior_signal(prev, cap=300):
+    """직전 브리핑에서 검증할 가치가 있는 신호(움직임·PM 시사점·진출 전략·횡단 신호)만 짧게 추출.
+    연속성 참조용·저비중 — 프롬프트에 '검증하되 반복 말라'로 주입. cite/링크 태그 정리·길이 캡."""
+    import re as _re
+    t = (prev or {}).get('text') or ''
+    if not t or '## ' not in t:
+        return ''
+    picks = []
+    for m in _re.finditer(r'##\s*(움직임|PM 시사점|진출 전략|횡단 신호)\s*\n(.+?)(?=\n##|\Z)', t, _re.S):
+        body = _re.sub(r'\s+', ' ', _re.sub(r'<[^>]+>|\[([^\]]+)\]\([^)]+\)', r'\1', m.group(2))).strip()
+        if body:
+            picks.append(f"{m.group(1)}: {body}")
+    s = ' / '.join(picks).strip()
+    if not s:
+        return ''
+    when = ((prev or {}).get('generated') or '')[:10]
+    return ((f"({when}) " if when else '') + s)[:cap]
+
+
 AXIS_PV = 'v8-high'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성 (v8: effort high·검색2·준비멘트 제거 첫 적용)
 
 # [측정] API 사용량 집계 — 동작/비용 변화 없음, 기록만. 종료 시 atexit으로 총합·상위 비용 호출 출력.
@@ -655,10 +674,13 @@ GROUNDING = (
 )
 
 
-def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False):
+def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False, prior_note=''):
     scope = f"'{scope_label}' 지역(여러 나라 합산) 시장" if is_region else f"'{scope_label}' 단일 시장"
     win = _AXIS_WIN.get(axis_label, axis_label)
     s_struct = "지역 전체에서 강세 장르·퍼블리셔 점유" if is_region else "강세 장르·퍼블리셔가 매출을 얼마나 쥐는지(점유)"
+    _pb = (f"\n\n[직전 '{axis_label}' 분석 메모 — 저비중·연속성 검증용] {prior_note}\n"
+           "→ 위 신호가 이번 데이터로도 유효한지 '## 움직임'에 한 줄로만 녹여라(맞으면 '지난 분석대로 ~', 바뀌었으면 '~로 전환'). "
+           "근거 약하면 무시하고, 단순 반복·복붙·새 항목 추가는 금지. 이 메모는 참고일 뿐 현재 데이터가 우선이다.") if prior_note else ""
     return (f"다음은 App Store 게임 '매출' 차트의 '{scope_label}' {axis_label} 스냅샷·추이다.\n\n"
             f"[{scope_label} · {axis_label}] {digest}\n\n"
             f"게임 사업 PM이 {scope}을 '{axis_label}'({win}) 시간축 관점에서 읽도록, 아래 5개 항목을 정확히 이 순서·제목으로 써라. "
@@ -668,7 +690,7 @@ def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False):
             "핵심 게임·플레이어: 이 기간 매출 상위 게임의 성격·강한 퍼블리셔. "
             f"움직임: 이 기간({win}) 진입·급상승·급하락 위주(근거 약하면 '- 데이터 누적 중'). "
             "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. PM 시사점: 진출·벤치마크·현지화 한 줄 결론. "
-            "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + INDUSTRY_VOICE + (GROUNDING if grounded else ""))
+            "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + _pb + INDUSTRY_VOICE + (GROUNDING if grounded else ""))
 
 
 def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
@@ -688,7 +710,7 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
             continue
         try:
             _grounded = (axis_key == 'weekly')   # #11: 최근(주간) 축만 웹검색으로 원인·출처 보강
-            text = call_claude_with_retry(_axis_prompt(scope_label, axis_label, digest, is_region, grounded=_grounded), max_tokens=MAX_OUTPUT_TOKENS, web_search=_grounded, usage_label=f"{scope_label}/{axis_label}")
+            text = call_claude_with_retry(_axis_prompt(scope_label, axis_label, digest, is_region, grounded=_grounded, prior_note=_prior_signal(prev)), max_tokens=MAX_OUTPUT_TOKENS, web_search=_grounded, usage_label=f"{scope_label}/{axis_label}")
         except Exception as e:
             print(f'[WARN] {scope_label} {axis_label} 브리핑 실패: {e}')
             if axis_key in prev_axes:
@@ -830,6 +852,8 @@ def build_global_brief(collected):
             continue
         win = _AXIS_WIN.get(axis_label, axis_label)
         body = '\n\n'.join(f"# {label} 분석\n{tx}" for label, tx in subs)
+        _gp = _prior_signal(prev)
+        _gpb = (f"\n\n[직전 '{axis_label}' 글로벌 메모 — 저비중·연속성 검증용] {_gp}\n→ 이번 종합과 비교해 유효/전환 여부만 '## 횡단 신호'에 한 줄로 녹여라(반복·복붙·새 항목 금지). 현재 분석이 우선이다.") if _gp else ""
         prompt = (f"다음은 같은 기간 App Store 게임 매출 차트를, 주요 시장은 개별·중소규모는 지역으로 묶어 '{axis_label}'({win}) 시간축으로 분석한 결과다.\n\n{body}\n\n"
                   f"위 '{axis_label}' 분석들을 토대로 종합하여, 게임 사업 PM이 전 세계를 횡단해 읽을 '{axis_label}'({win}) 헤드라인을 아래 4개 항목으로 써라. "
                   "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 핵심을 짧은 불릿(-) 1~3개로. 항목 제목은 그대로 둘 것.\n"
@@ -837,7 +861,7 @@ def build_global_brief(collected):
                   "각 항목 내용 가이드 — 횡단 신호: 여러 시장/지역에서 동시에 강한 게임·장르. "
                   "시장별 색깔: 주요 시장 간·지역 간 장르 색깔 대비. IP·퍼블리셔 동향: 여러 시장 관통 글로벌 IP·퍼블리셔. "
                   "진출 전략: 다음 진출·벤치마크 시장 결론. "
-                  "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + INDUSTRY_VOICE + (GROUNDING if axis_key == 'weekly' else ""))
+                  "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + _gpb + INDUSTRY_VOICE + (GROUNDING if axis_key == 'weekly' else ""))
         try:
             text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, web_search=(axis_key == 'weekly'), usage_label=f"글로벌/{axis_label}")
         except Exception as e:
