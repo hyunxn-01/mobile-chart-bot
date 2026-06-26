@@ -1750,7 +1750,7 @@ function renderMarketBrief(text){
       if(!open){ html+='<div class="aib-sec">'; open=true; }
       const bm=t.match(/^[-•*]\s+(.*)$/);
       if(bm){ flush(); buf=bm[1]; }           // 새 불릿 시작 → 이전 불릿 flush
-      else { buf=(buf!=null)?buf+' '+t:t; }   // 마커 없는 줄=같은 불릿의 연속(모델이 링크 앞뒤 \n으로 한 문장을 쪼개는 것 방지)
+      else { buf=(buf!=null)?(buf+(/^[,.)\]}%!?:;·、，。」]/.test(t)?'':' ')+t):t; }   // 마커 없는 줄=같은 불릿의 연속(모델이 링크 앞뒤 \n으로 쪼갠 것 합침; 구두점으로 시작하면 앞 공백 제거)
     });
     close();
     return html || ('<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>');
