@@ -259,6 +259,11 @@
   .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.6; color:var(--text); padding:3px 0; }
   .gopi-row .gop-sw{ margin-top:6px; }
   .gopi-k{ flex:0 0 auto; font-size:11px; font-weight:700; color:var(--muted); background:var(--chip); border-radius:5px; padding:1px 7px; margin-top:2px; }
+  .gl-insight{ border:1px solid var(--line); border-radius:9px; background:var(--panel); padding:9px 11px; margin:0 2px 9px; }
+  .gli-h{ font-size:11.5px; font-weight:700; color:var(--accent2text); margin-bottom:6px; }
+  .gli-row{ font-size:12px; line-height:1.5; color:var(--text); padding:1px 0; }
+  .gli-row .gli-k{ font-size:10.5px; font-weight:700; margin-right:6px; }
+  .gli-note{ font-size:10.5px; color:var(--muted); margin-top:5px; line-height:1.45; }
   .pubrow[aria-pressed="true"] td{ background:var(--chip); }
   .pubrow[aria-pressed="true"] td.pname{ color:var(--accent); }
   .pubchip{ display:inline-block; font-size:11.5px; color:var(--muted); background:var(--chip);
@@ -1012,7 +1017,18 @@ function renderGenreLegend(){
       '</button>';
   const _navSel=document.getElementById('countrySelNav');   // #6: 장르차트 시장 드롭다운(헤더/네비와 동기)
   const _mktOpts=_navSel?_navSel.innerHTML:'', _curMkt=_navSel?_navSel.value:'';
-  let html='<div class="gl-mkt" style="display:flex;align-items:center;gap:8px;margin:0 0 9px;"><label for="genreMktSel" style="font-size:12px;font-weight:700;color:var(--muted);flex:0 0 auto;">시장</label><select id="genreMktSel" aria-label="장르 차트 시장 선택" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:12.5px;font-weight:600;">'+_mktOpts+'</select></div>'+
+  // 장르 추이 PM 인사이트 — 표시 기간 점유 변화(주도·부상·둔화)
+  let _ins='';
+  { const mv=ds.map(d=>{ const a=d.data||[]; const cur=a.length?a[a.length-1]:null; const fst=a.find(v=>v!=null); const delta=(cur!=null&&fst!=null)?Math.round((cur-fst)*10)/10:null; return {g:d.label, cur, delta}; }).filter(x=>x.cur!=null);
+    const dom=mv.slice().sort((a,b)=>b.cur-a.cur)[0];
+    const up=mv.filter(x=>x.delta!=null&&x.delta>=0.3).sort((a,b)=>b.delta-a.delta).slice(0,2);
+    const dn=mv.filter(x=>x.delta!=null&&x.delta<=-0.3).sort((a,b)=>a.delta-b.delta).slice(0,2);
+    if(dom){ _ins='<div class="gl-insight"><div class="gli-h">장르 추이 읽기 <span style="font-weight:400;color:var(--muted)">· 표시 기간 점유 변화</span></div>'+
+      '<div class="gli-row"><span class="gli-k" style="color:var(--accent2text)">주도</span><b>'+esc(dom.g)+'</b> 현재 '+dom.cur+'%</div>'+
+      (up.length?'<div class="gli-row"><span class="gli-k" style="color:#16a34a">▲ 부상</span>'+up.map(r=>esc(r.g)+' +'+r.delta+'%p').join(' · ')+'</div>':'')+
+      (dn.length?'<div class="gli-row"><span class="gli-k" style="color:#e07c12">▼ 둔화</span>'+dn.map(r=>esc(r.g)+' '+r.delta+'%p').join(' · ')+'</div>':'')+
+      '<div class="gli-note">부상=신작·이벤트 모멘텀, 둔화=포화·이탈 신호일 수 있음(점유 기준).</div></div>'; } }
+  let html='<div class="gl-mkt" style="display:flex;align-items:center;gap:8px;margin:0 0 9px;"><label for="genreMktSel" style="font-size:12px;font-weight:700;color:var(--muted);flex:0 0 auto;">시장</label><select id="genreMktSel" aria-label="장르 차트 시장 선택" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:12.5px;font-weight:600;">'+_mktOpts+'</select></div>'+_ins+
     '<span class="gl-hint">장르를 누르면 그 선만 강조 · 매출 구간별 그룹</span>'+
     '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출</span></div>';
   groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
