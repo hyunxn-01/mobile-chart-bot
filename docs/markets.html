@@ -634,13 +634,14 @@
 
   <section class="cmpsec" id="cmpsec">
     <h2>시장 비교 · 장르 점유</h2>
-    <p class="sub cap" id="cmpsub"><span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b></span><span class="csep">│</span><span class="ci">한 행에서 진하기 차이 = <b>시장별 강·약(블루오션 후보)</b></span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span></p>
+    <p class="sub cap" id="cmpsub"><span class="ci">칸 색 진할수록 그 시장 매출에서 <b>점유 높음</b></span><span class="csep">│</span><span class="ci">한 행 = 같은 장르의 <b>시장별 강·약</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 시장서 약함 <b>(기회인지 수요부족인지는 차트만으론 판단 불가)</b></span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span></p>
     <div class="cmp-controls">
       <span class="cmp-clabel">지표</span>
       <button class="cmp-metric on" type="button" data-metric="rev">추정매출 점유</button>
       <button class="cmp-metric" type="button" data-metric="pre">차트 점유(게임수)</button>
     </div>
     <div class="cmp-wrap"><div class="cmp-grid" id="cmpGrid"></div></div>
+    <div class="gop-insight" id="cmpInsight" style="margin-top:14px"></div>
   </section>
 
   <div class="pubsec" id="aggsec">
@@ -1324,7 +1325,8 @@ function renderGenreOpp(){
   if(!wrap) return;
   const gl=(DATA.genres&&DATA.genres.list)||[];
   let gs=gl.filter(g=> g.genre && g.genre!=='미상' && g.avg_rank!=null && g.num_games>=1)
-           .map(g=>({genre:g.genre, n:g.num_games, avg:g.avg_rank, best:g.best_rank, rev:(g.games||[]).reduce((s,x)=>s+(revShare(x.app_id)||0),0)}));
+           .map(g=>{ const rvs=(g.games||[]).map(x=>revShare(x.app_id)||0).sort((a,b)=>b-a); const rev=rvs.reduce((s,x)=>s+x,0);
+                     return {genre:g.genre, n:g.num_games, avg:g.avg_rank, best:g.best_rank, rev, top1: rev>0?Math.round(rvs[0]/rev*100):0}; });
   if(gs.length<3){ if(sub) sub.textContent=''; wrap.innerHTML='<p class="empty">장르 데이터가 더 쌓이면 기회 맵이 표시됩니다.</p>'; return; }
   const W=760,H=380,padL=50,padR=120,padT=26,padB=46;
   const plotW=W-padL-padR, plotH=H-padT-padB;
@@ -1336,24 +1338,24 @@ function renderGenreOpp(){
   const med=a=>{ const b=a.slice().sort((x,y)=>x-y); const m=Math.floor(b.length/2); return b.length%2?b[m]:(b[m-1]+b[m])/2; };
   const mx=med(gs.map(g=>g.n)), my=med(gs.map(g=>g.avg));
   const xM=xOf(mx), yM=yOf(my);
-  const zoneOf=g=>{ const lc=g.n<=mx, gp=g.avg<=my; if(lc&&gp) return '#16a34a'; if(!lc&&gp) return '#2563eb'; if(lc&&!gp) return '#9b9a92'; return '#e07c12'; };
+  const zoneOf=g=>{ const lc=g.n<=mx, gp=g.avg<=my; if(lc&&gp) return '#64748b'; if(!lc&&gp) return '#2563eb'; if(lc&&!gp) return '#9b9a92'; return '#e07c12'; };
   const PR=padL+plotW, PB=padT+plotH;
   let s='<div class="gop-wrap"><svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="장르 기회 맵: 경쟁(게임 수) 대 성과(평균 순위) 버블 차트">';
-  s+='<rect x="'+padL+'" y="'+padT+'" width="'+(xM-padL)+'" height="'+(yM-padT)+'" fill="#16a34a" opacity="0.06"/>';
+  s+='<rect x="'+padL+'" y="'+padT+'" width="'+(xM-padL)+'" height="'+(yM-padT)+'" fill="#64748b" opacity="0.07"/>';
   s+='<rect x="'+xM+'" y="'+padT+'" width="'+(PR-xM)+'" height="'+(yM-padT)+'" fill="#2563eb" opacity="0.06"/>';
   s+='<rect x="'+padL+'" y="'+yM+'" width="'+(xM-padL)+'" height="'+(PB-yM)+'" fill="#9b9a92" opacity="0.05"/>';
   s+='<rect x="'+xM+'" y="'+yM+'" width="'+(PR-xM)+'" height="'+(PB-yM)+'" fill="#e07c12" opacity="0.06"/>';
   s+='<line class="gop-line" x1="'+xM+'" y1="'+padT+'" x2="'+xM+'" y2="'+PB+'" stroke-dasharray="4 4"/>';
   s+='<line class="gop-line" x1="'+padL+'" y1="'+yM+'" x2="'+PR+'" y2="'+yM+'" stroke-dasharray="4 4"/>';
   s+='<rect class="gop-line" x="'+padL+'" y="'+padT+'" width="'+plotW+'" height="'+plotH+'" fill="none"/>';
-  s+='<text x="'+(padL+7)+'" y="'+(padT+15)+'" font-size="10.5" font-weight="700" fill="#16a34a">블루오션</text>';
+  s+='<text x="'+(padL+7)+'" y="'+(padT+15)+'" font-size="10.5" font-weight="700" fill="#64748b">독식형(소수·상위)</text>';
   s+='<text x="'+(PR-7)+'" y="'+(padT+15)+'" text-anchor="end" font-size="10.5" font-weight="700" fill="#2563eb">핵심 격전</text>';
   s+='<text x="'+(padL+7)+'" y="'+(PB-8)+'" font-size="10.5" font-weight="700" fill="#9b9a92">틈새</text>';
   s+='<text x="'+(PR-7)+'" y="'+(PB-8)+'" text-anchor="end" font-size="10.5" font-weight="700" fill="#e07c12">포화</text>';
   s+='<text class="gop-axis" x="'+(padL+plotW/2)+'" y="'+(H-14)+'" text-anchor="middle" font-size="11">경쟁 — 차트 내 게임 수 →</text>';
   s+='<text class="gop-axis" x="15" y="'+(padT+plotH/2)+'" text-anchor="middle" font-size="11" transform="rotate(-90 15 '+(padT+plotH/2)+')">↑ 평균 순위 (위=상위권)</text>';
   gs.forEach(g=>{ const cx=xOf(g.n), cy=yOf(g.avg), r=rOf(g.rev), col=zoneOf(g);
-    s+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.5" stroke="'+col+'" stroke-width="1.3"><title>'+esc(g.genre)+' · 게임 '+g.n+'개 · 평균 '+g.avg+'위 · 추정매출 '+(Math.round(g.rev*1000)/10)+'%</title></circle>'; });
+    s+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.5" stroke="'+col+'" stroke-width="1.3"><title>'+esc(g.genre)+' · 게임 '+g.n+'개 · 평균 '+g.avg+'위 · 추정매출 '+(Math.round(g.rev*1000)/10)+'% · 1위 집중 '+g.top1+'%'+(g.n===1?' (단일 타이틀)':'')+'</title></circle>'; });
   // 라벨 충돌 회피: 추정매출(중요도) 큰 장르부터 배치 → 겹치면 세로 ±이동·좌측 시도, 그래도 자리 없으면 라벨 생략(버블·툴팁은 유지)
   { const lh=11, gap=1.5, maxNudge=33, ch=8.2, fs=9, placed=[];
     const hit=b=> placed.some(p=> b.l<p.l+p.w+gap && b.l+b.w>p.l-gap && b.t<p.t+p.h+gap && b.t+b.h>p.t-gap);
@@ -1367,23 +1369,26 @@ function renderGenreOpp(){
           s+='<text class="gop-lab" x="'+c.x.toFixed(1)+'" y="'+c.y.toFixed(1)+'" font-size="'+fs+'"'+(c.end?' text-anchor="end"':'')+'>'+esc(o.g.genre)+'</text>'; return; } }
     }); }
   s+='</svg></div>';
-  // #13: 기회맵 PM 시사점 인사이트(블루오션/핵심격전/포화 + 매출 중심)
+  // 기회맵 PM 시사점 — 정직 재해석: 집중도(1위 점유)로 독식 vs 분산 구분. '게임 수 적음'을 기회로 단정하지 않음.
   { const fmt=arr=>arr.slice(0,3).map(g=>esc(g.genre)).join(' · ');
-    const blueG=gs.filter(g=> g.n<=mx && g.avg<=my).sort((a,b)=>a.avg-b.avg);
-    const contG=gs.filter(g=> g.n>mx && g.avg<=my).sort((a,b)=>b.rev-a.rev);
-    const satG=gs.filter(g=> g.n>mx && g.avg>my).sort((a,b)=>b.n-a.n);
+    const fmtC=arr=>arr.slice(0,3).map(g=>esc(g.genre)+(g.n===1?'(단일)':'·'+g.top1+'%')).join(' · ');
+    const domG=gs.filter(g=> g.n<=mx && g.avg<=my).sort((a,b)=> b.rev-a.rev || b.top1-a.top1);   // 소수·상위 = 독식형
+    const contG=gs.filter(g=> g.n>mx && g.avg<=my).sort((a,b)=>b.rev-a.rev);                       // 다수·상위 = 검증된 대형 격전지
+    const satG=gs.filter(g=> g.n>mx && g.avg>my).sort((a,b)=>b.n-a.n);                              // 다수·하위 = 과열·저수익
+    const crack=contG.filter(g=> g.top1>0 && g.top1<50).sort((a,b)=>a.top1-b.top1);                 // 대형인데 1강 집중 낮음 = 현실적 진입 여지
     const topRev=gs.slice().sort((a,b)=>b.rev-a.rev)[0];
-    let ins='<div class="gop-insight"><div class="gopi-h">이 시장 진입 시사점</div>';
-    if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">매출 중심</span><span>추정매출이 가장 큰 장르는 <b>'+esc(topRev.genre)+'</b> (점유 '+(Math.round(topRev.rev*1000)/10)+'%) — 이 시장의 돈이 몰리는 축이에요.</span></div>';
-    if(blueG.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>블루오션</b> — 경쟁 적고 성과 좋은 <b>'+fmt(blueG)+'</b>. 신규 진입 1순위 후보.</span></div>';
-    if(contG.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#2563eb"></span><span><b>핵심 격전</b> — 시장 크고 상위권 몰린 <b>'+fmt(contG)+'</b>. 기회 크지만 대형 퍼블리셔와 정면승부.</span></div>';
-    if(satG.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>포화</b> — 게임 많은데 하위 분산된 <b>'+fmt(satG)+'</b>. 뚜렷한 차별화 없으면 진입 위험.</span></div>';
+    let ins='<div class="gop-insight"><div class="gopi-h">이 시장 진입 시사점 <span style="font-weight:400;color:var(--muted)">— 상위 차트 구조 기준(실제 수요·총매출·진입장벽은 별도 확인)</span></div>';
+    if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">매출 중심</span><span>돈이 가장 몰리는 장르는 <b>'+esc(topRev.genre)+'</b> (점유 '+(Math.round(topRev.rev*1000)/10)+'%).</span></div>';
+    if(domG.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>독식형</b> — 차트엔 소수만 보이지만 사실상 단일 강자 장악 <b>'+fmtC(domG)+'</b>. <b>블루오션이 아니라 진입 난이도 최상</b> — 1강과 정면승부거나 IP·차별화 틈새. (괄호=1위 집중도, 단일=게임 1개)</span></div>';
+    if(contG.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#2563eb"></span><span><b>대형 격전지</b> — 여러 게임이 상위권인 <b>'+fmt(contG)+'</b>. 수요·수익 입증됐지만 경쟁 치열 — 물량(UA)·BM·IP 없이는 위험.</span></div>';
+    if(crack.length) ins+='<div class="gopi-row"><span class="gopi-k" style="color:var(--accent)">진입 여지</span><span>대형 격전지 중 1강 집중이 풀린(분산된) <b>'+fmtC(crack)+'</b>가 그나마 현실적인 비집을 틈 — 수요는 큰데 절대강자가 없음.</span></div>';
+    if(satG.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>포화</b> — 게임 많은데 다 하위 분산된 <b>'+fmt(satG)+'</b>. 뚜렷한 차별화 없으면 매몰.</span></div>';
     ins+='</div>'; s+=ins;
   }
   wrap.innerHTML=s;
   const blue=gs.filter(g=> g.n<=mx && g.avg<=my).sort((a,b)=> a.avg-b.avg);
   const opp=(blue.length?blue:gs.slice().sort((a,b)=>a.avg-b.avg)).slice(0,3).map(x=>x.genre);
-  if(sub) sub.innerHTML='<span class="ci">버블=장르 · 크기=추정매출 점유 · 위치=경쟁 vs 평균 순위</span><span class="csep">│</span><span class="ci">블루오션: <b>'+opp.map(esc).join('</b> · <b>')+'</b></span>';
+  if(sub) sub.innerHTML='<span class="ci">버블=장르 · 크기=추정매출 · 위치=차트 내 게임 수 vs 평균 순위</span><span class="csep">│</span><span class="ci"><b>독식형</b>(소수·상위, 대개 단일 강자 장악): '+opp.map(esc).join(' · ')+'</span>';
 }
 function mdLite(raw){
   const lines=String(raw||'').split('\n');
@@ -1928,6 +1933,21 @@ function renderCmp(){
   el.innerHTML=h;
   el.style.gridTemplateColumns='132px repeat('+markets.length+',minmax(64px,1fr))';
   el.querySelectorAll('.cmp-cell').forEach(b=> b.addEventListener('click',()=> cmpJump(b.dataset.mk, b.dataset.g)));
+  renderCmpInsight();
+}
+function renderCmpInsight(){
+  const box=document.getElementById('cmpInsight'); if(!box) return;
+  const M=MATRIX; if(!M||!Array.isArray(M.markets)||!Array.isArray(M.genres)||!M.markets.length){ box.innerHTML=''; return; }
+  const cells=M.cells||{}, metric=cmpMetric;
+  const val=(mk,g)=>{ const c=cells[mk]&&cells[mk][g]; return (c&&c[metric]!=null)?c[metric]:0; };
+  const gStrong=M.genres.slice(0,5).map(g=>{ let bm=null,bv=-1; M.markets.forEach(mk=>{ const v=val(mk.key,g); if(v>bv){bv=v;bm=mk;} }); return {g, mk:bm?bm.name:'?', v:bv}; }).filter(x=>x.v>0);
+  const mTop=M.markets.slice(0,8).map(mk=>{ let bg=null,bv=-1; M.genres.forEach(g=>{ const v=val(mk.key,g); if(v>bv){bv=v;bg=g;} }); return {mk:mk.name, g:bg, v:bv}; }).filter(x=>x.v>0);
+  const lbl=metric==='rev'?'추정매출':'게임수';
+  let h='<div class="gopi-h">시장 비교 읽기 <span style="font-weight:400;color:var(--muted)">— '+lbl+' 점유 기준(상위 차트 한정)</span></div>';
+  if(gStrong.length) h+='<div class="gopi-row"><span class="gopi-k">장르→최강 시장</span><span>'+gStrong.map(x=>'<b>'+esc(x.g)+'</b> '+esc(x.mk)+'('+x.v+'%)').join(' · ')+'</span></div>';
+  if(mTop.length) h+='<div class="gopi-row"><span class="gopi-k">시장→1위 장르</span><span>'+mTop.map(x=>esc(x.mk)+' <b>'+esc(x.g)+'</b>').join(' · ')+'</span></div>';
+  h+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">주의</span><span>옅은·빈 칸이 \'기회\'인지 \'수요 없음\'인지는 이 표만으론 알 수 없음 — 총 시장 규모·진입장벽은 별도 확인.</span></div>';
+  box.innerHTML=h;
 }
 function cmpJump(mk, g){
   if(!mk) return;
