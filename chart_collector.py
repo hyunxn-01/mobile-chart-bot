@@ -670,7 +670,9 @@ GROUNDING = (
     "규칙 — (1) 편집된 뉴스 기사만 출처로 인정. 커뮤니티·게시판·댓글·SNS·위키는 절대 금지. "
     "(2) 신뢰 출처로 확인되지 않으면 원인을 지어내지 말고 그냥 적지 마라(근거 없는 단정 금지). "
     "(3) 정황·추정 수준이면 '~로 보인다'로 헤지하되, 그것도 신뢰 매체 보도가 있을 때만. "
-    "(4) 링크는 한 브리핑에서 꼭 필요한 2~4개로 절제한다."
+    "(4) 링크는 한 브리핑에서 꼭 필요한 2~4개로 절제한다. "
+    "(5) 출처의 수치는 그대로 인용하고 반올림·확대 단정 금지 — 예: $811.9m을 '$1bn 돌파'로 올리지 마라. "
+    "근사치는 '약 8억 달러'·'~수준'으로 헤지하고, 출처에 없는 수치는 만들지 마라."
 )
 
 
@@ -700,6 +702,12 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
     axes = {}
     for axis_key, axis_label in BRIEF_AXES:
         digest = weekly_digest if axis_key == 'weekly' else _market_axis_digest(market_key, axis_key)
+        if axis_key == 'weekly' and digest:   # [데이터 보강] 전주 대비 순위변동(WoW)을 커밋된 주간 시계열에서 덧붙여 '움직임' 근거 강화(없으면 그대로)
+            _mv = _market_axis_digest(market_key, 'weekly')
+            if _mv and '급상승:' in _mv:
+                _seg = _mv.split('장르분포')[0]; _i = _seg.find('급상승:')
+                if _i >= 0:
+                    digest = digest + ' | (전주대비) ' + _seg[_i:].strip().rstrip('| ').strip()
         if not digest:
             if axis_key in prev_axes:   # 미완성이지만 과거 생성분 있으면 유지
                 axes[axis_key] = prev_axes[axis_key]
