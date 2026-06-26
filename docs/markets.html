@@ -1017,18 +1017,7 @@ function renderGenreLegend(){
       '</button>';
   const _navSel=document.getElementById('countrySelNav');   // #6: 장르차트 시장 드롭다운(헤더/네비와 동기)
   const _mktOpts=_navSel?_navSel.innerHTML:'', _curMkt=_navSel?_navSel.value:'';
-  // 장르 추이 PM 인사이트 — 표시 기간 점유 변화(주도·부상·둔화)
-  let _ins='';
-  { const mv=ds.map(d=>{ const a=d.data||[]; const cur=a.length?a[a.length-1]:null; const fst=a.find(v=>v!=null); const delta=(cur!=null&&fst!=null)?Math.round((cur-fst)*10)/10:null; return {g:d.label, cur, delta}; }).filter(x=>x.cur!=null);
-    const dom=mv.slice().sort((a,b)=>b.cur-a.cur)[0];
-    const up=mv.filter(x=>x.delta!=null&&x.delta>=0.3).sort((a,b)=>b.delta-a.delta).slice(0,2);
-    const dn=mv.filter(x=>x.delta!=null&&x.delta<=-0.3).sort((a,b)=>a.delta-b.delta).slice(0,2);
-    if(dom){ _ins='<div class="gl-insight"><div class="gli-h">장르 추이 읽기 <span style="font-weight:400;color:var(--muted)">· 표시 기간 점유 변화</span></div>'+
-      '<div class="gli-row"><span class="gli-k" style="color:var(--accent2text)">주도</span><b>'+esc(dom.g)+'</b> 현재 '+dom.cur+'%</div>'+
-      (up.length?'<div class="gli-row"><span class="gli-k" style="color:#16a34a">▲ 부상</span>'+up.map(r=>esc(r.g)+' +'+r.delta+'%p').join(' · ')+'</div>':'')+
-      (dn.length?'<div class="gli-row"><span class="gli-k" style="color:#e07c12">▼ 둔화</span>'+dn.map(r=>esc(r.g)+' '+r.delta+'%p').join(' · ')+'</div>':'')+
-      '<div class="gli-note">부상=신작·이벤트 모멘텀, 둔화=포화·이탈 신호일 수 있음(점유 기준).</div></div>'; } }
-  let html='<div class="gl-mkt" style="display:flex;align-items:center;gap:8px;margin:0 0 9px;"><label for="genreMktSel" style="font-size:12px;font-weight:700;color:var(--muted);flex:0 0 auto;">시장</label><select id="genreMktSel" aria-label="장르 차트 시장 선택" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:12.5px;font-weight:600;">'+_mktOpts+'</select></div>'+_ins+
+  let html='<div class="gl-mkt" style="display:flex;align-items:center;gap:8px;margin:0 0 9px;"><label for="genreMktSel" style="font-size:12px;font-weight:700;color:var(--muted);flex:0 0 auto;">시장</label><select id="genreMktSel" aria-label="장르 차트 시장 선택" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:12.5px;font-weight:600;">'+_mktOpts+'</select></div>'+
     '<span class="gl-hint">장르를 누르면 그 선만 강조 · 매출 구간별 그룹</span>'+
     '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출</span></div>';
   groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
@@ -1344,9 +1333,11 @@ function renderGenreOpp(){
   if(!wrap) return;
   const gl=(DATA.genres&&DATA.genres.list)||[];
   let gs=gl.filter(g=> g.genre && g.genre!=='미상' && g.num_games>=1)
-           .map(g=>{ const rvs=(g.games||[]).map(x=>revShare(x.app_id)||0).sort((a,b)=>b-a); const rev=rvs.reduce((s,x)=>s+x,0);
-                     return {genre:g.genre, n:g.num_games, rev, revp:Math.round(rev*1000)/10, top1: rev>0?Math.round(rvs[0]/rev*100):0}; })
+           .map(g=>{ const wr=(g.games||[]).map(x=>({aid:x.app_id, w:revShare(x.app_id)||0})).sort((a,b)=>b.w-a.w); const rev=wr.reduce((s,x)=>s+x.w,0);
+                     const tg=wr[0]&&wr[0].aid&&DATA.games[wr[0].aid]; const topGame=tg?(tg.title_kr||tg.title||''):'';
+                     return {genre:g.genre, n:g.num_games, rev, revp:Math.round(rev*1000)/10, top1: rev>0?Math.round(wr[0].w/rev*100):0, topGame}; })
            .filter(g=> g.rev>0);
+  { const gser=(DATA.genre_series&&DATA.genre_series.genres)||{}; gs.forEach(g=>{ const a=gser[g.genre]||[]; const cur=a.length?a[a.length-1]:null; const fst=a.find(v=>v!=null); g.mom=(cur!=null&&fst!=null)?Math.round((cur-fst)*10)/10:null; }); }
   if(gs.length<3){ if(sub) sub.textContent=''; wrap.innerHTML='<p class="empty">장르 데이터가 더 쌓이면 진입 맵이 표시됩니다.</p>'; return; }
   const W=760,H=380,padL=54,padR=120,padT=26,padB=46;
   const plotW=W-padL-padR, plotH=H-padT-padB, PR=padL+plotW, PB=padT+plotH;
@@ -1391,17 +1382,24 @@ function renderGenreOpp(){
           s+='<text class="gop-lab" x="'+c.x.toFixed(1)+'" y="'+c.y.toFixed(1)+'" font-size="'+fs+'"'+(c.end?' text-anchor="end"':'')+'>'+esc(o.g.genre)+'</text>'; return; } }
     }); }
   s+='</svg></div>';
-  // PM 인사이트 — 진입 결정(매출 규모 × 1위 집중도)
-  { const fmtR=arr=>arr.slice(0,3).map(g=>esc(g.genre)+'('+g.revp+'%·집중'+g.top1+'%)').join(' · ');
-    const opp=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=> b.revp-a.revp);     // 진입 기회: 큰돈+분산
-    const fort=gs.filter(g=> g.revp>=RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);    // 요새: 큰돈+독식
-    const niche=gs.filter(g=> g.revp<RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);    // 틈새 독점: 작은돈+독식
+  // PM 인사이트 — 진입 결정(매출 규모 × 1위 집중도 × 점유 모멘텀) + 진입 1순위 추천
+  { const momS=g=> (g.mom!=null && g.mom>=0.3)?' <span style="color:#16a34a">▲</span>' : (g.mom!=null && g.mom<=-0.3)?' <span style="color:#e07c12">▼</span>' : '';
+    const fmtR=arr=>arr.slice(0,3).map(g=>esc(g.genre)+'('+g.revp+'%·집중'+g.top1+'%'+momS(g)+')').join(' · ');
+    const fmtF=arr=>arr.slice(0,3).map(g=>esc(g.genre)+'(집중'+g.top1+'%'+(g.topGame?'·1강 '+esc(g.topGame):'')+')').join(' · ');
+    const fmt=arr=>arr.slice(0,3).map(g=>esc(g.genre)).join(' · ');
+    const opp=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=> b.revp-a.revp);
+    const fort=gs.filter(g=> g.revp>=RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);
+    const niche=gs.filter(g=> g.revp<RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);
+    const small=gs.filter(g=> g.revp<RY && g.top1<CONC).sort((a,b)=> b.revp-a.revp);
     const topRev=gs.slice().sort((a,b)=>b.revp-a.revp)[0];
-    let ins='<div class="gop-insight"><div class="gopi-h">진입 결정 — 어디에 들어갈까 <span style="font-weight:400;color:var(--muted)">(세로=수요·매출, 가로=1위 집중도. 총 시장 규모·진입장벽은 별도 확인)</span></div>';
-    if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">돈의 축</span><span>이 시장 매출이 가장 몰리는 장르는 <b>'+esc(topRev.genre)+'</b> ('+topRev.revp+'%).</span></div>';
-    ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>진입 기회</b> — 큰 돈이 도는데 절대강자가 없는(분산) <b>'+(opp.length?fmtR(opp):'현재 없음')+'</b>. 신규가 안착할 현실적 여지 (괄호=매출 점유·1위 집중).</span></div>';
-    if(fort.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>요새</b> — 큰 돈이지만 1강이 장악한 <b>'+fmtR(fort)+'</b>. 들어가려면 그 1강과 정면승부·차별화 IP가 필요.</span></div>';
-    if(niche.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>틈새 독점</b> — 작은 시장을 1강이 먹은 <b>'+fmtR(niche)+'</b>. 시장 자체가 작아 업사이드 제한.</span></div>';
+    const pick=opp.slice().sort((a,b)=> b.revp-a.revp || (b.mom||0)-(a.mom||0))[0];   // 진입 1순위: 매출 큰 진입기회, 동률이면 상승세 우선
+    let ins='<div class="gop-insight"><div class="gopi-h">진입 결정 — 어디에 들어갈까 <span style="font-weight:400;color:var(--muted)">(세로=수요·매출, 가로=1위 집중도, ▲▼=점유 추세. 총 시장 규모·진입장벽은 별도 확인)</span></div>';
+    if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">돈의 축</span><span>매출이 가장 몰리는 장르는 <b>'+esc(topRev.genre)+'</b> ('+topRev.revp+'%).</span></div>';
+    ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>진입 기회</b> — 큰 돈인데 절대강자 없음(분산): <b>'+(opp.length?fmtR(opp):'현재 없음')+'</b>. 신규 안착 여지(괄호=매출·1위집중·점유추세).</span></div>';
+    if(fort.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>요새</b> — 큰 돈을 1강이 장악: <b>'+fmtF(fort)+'</b>. 그 1강과 정면승부·차별화 IP 필요.</span></div>';
+    if(niche.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>틈새 독점</b> — 작은 시장 단일 타이틀: <b>'+fmtR(niche)+'</b>. 시장 작아 업사이드 제한.</span></div>';
+    if(small.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#2563eb"></span><span><b>소형 난전</b> — 작은 시장에 여럿 경쟁: <b>'+fmt(small)+'</b>.</span></div>';
+    if(pick) ins+='<div class="gopi-row"><span class="gopi-k" style="background:var(--accent);color:#fff">진입 1순위</span><span><b>'+esc(pick.genre)+'</b> — 큰 돈('+pick.revp+'%) + 절대강자 없음(1위 '+pick.top1+'%)'+((pick.mom!=null&&pick.mom>=0.3)?' + 점유 상승세':'')+'. '+(pick.topGame?'현재 선두 <b>'+esc(pick.topGame)+'</b> 대비 ':'')+'차별화 BM·리텐션이면 안착 여지.</span></div>';
     ins+='</div>'; s+=ins;
   }
   wrap.innerHTML=s;
