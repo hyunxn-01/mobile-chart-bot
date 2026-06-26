@@ -247,7 +247,7 @@
   .gop-wrap svg{ display:block; max-width:790px; width:100%; height:auto; }
   .gop-line{ stroke:var(--line); }
   .gop-axis{ fill:var(--muted); }
-  .gop-lab{ fill:var(--text); }
+  .gop-lab{ fill:var(--text); paint-order:stroke; stroke:var(--bg); stroke-width:2.6px; stroke-linejoin:round; }
   .gop-legend{ display:flex; gap:14px; flex-wrap:wrap; margin:8px 0 0; font-size:11px; color:var(--muted); }
   .gop-legend span{ display:inline-flex; align-items:center; gap:5px; }
   .gop-sw{ width:10px; height:10px; border-radius:50%; flex:0 0 auto; opacity:.7; }
@@ -1354,8 +1354,18 @@ function renderGenreOpp(){
   s+='<text class="gop-axis" x="15" y="'+(padT+plotH/2)+'" text-anchor="middle" font-size="11" transform="rotate(-90 15 '+(padT+plotH/2)+')">↑ 평균 순위 (위=상위권)</text>';
   gs.forEach(g=>{ const cx=xOf(g.n), cy=yOf(g.avg), r=rOf(g.rev), col=zoneOf(g);
     s+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.5" stroke="'+col+'" stroke-width="1.3"><title>'+esc(g.genre)+' · 게임 '+g.n+'개 · 평균 '+g.avg+'위 · 추정매출 '+(Math.round(g.rev*1000)/10)+'%</title></circle>'; });
-  gs.forEach(g=>{ const cx=xOf(g.n), cy=yOf(g.avg), r=rOf(g.rev);
-    s+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="9">'+esc(g.genre)+'</text>'; });
+  // 라벨 충돌 회피: 추정매출(중요도) 큰 장르부터 배치 → 겹치면 세로 ±이동·좌측 시도, 그래도 자리 없으면 라벨 생략(버블·툴팁은 유지)
+  { const lh=11, gap=1.5, maxNudge=33, ch=8.2, fs=9, placed=[];
+    const hit=b=> placed.some(p=> b.l<p.l+p.w+gap && b.l+b.w>p.l-gap && b.t<p.t+p.h+gap && b.t+b.h>p.t-gap);
+    const inb=b=> b.t>=padT-3 && b.t+b.h<=PB+3 && b.l>=padL-2 && b.l+b.w<=W-2;
+    const order=gs.map(g=>({g, cx:xOf(g.n), cy:yOf(g.avg), r:rOf(g.rev)})).sort((a,b)=> b.g.rev-a.g.rev || b.g.n-a.g.n);
+    order.forEach(o=>{ const w=o.g.genre.length*ch+2, cands=[];
+      for(let d=0; d<=maxNudge; d+=lh){ for(const dy of (d===0?[0]:[d,-d])) cands.push({x:o.cx+o.r+3, y:o.cy+3+dy, end:false}); }
+      for(let d=0; d<=maxNudge; d+=lh){ for(const dy of (d===0?[0]:[d,-d])) cands.push({x:o.cx-o.r-3, y:o.cy+3+dy, end:true}); }
+      for(const c of cands){ const box={l:c.end? c.x-w : c.x, t:c.y-9, w, h:lh};
+        if(inb(box) && !hit(box)){ placed.push(box);
+          s+='<text class="gop-lab" x="'+c.x.toFixed(1)+'" y="'+c.y.toFixed(1)+'" font-size="'+fs+'"'+(c.end?' text-anchor="end"':'')+'>'+esc(o.g.genre)+'</text>'; return; } }
+    }); }
   s+='</svg></div>';
   // #13: 기회맵 PM 시사점 인사이트(블루오션/핵심격전/포화 + 매출 중심)
   { const fmt=arr=>arr.slice(0,3).map(g=>esc(g.genre)).join(' · ');
