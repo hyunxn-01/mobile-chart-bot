@@ -615,7 +615,7 @@ def _axis_hist(prev, cap=12):
     return out[:cap]
 
 
-AXIS_PV = 'v7-measure'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성 (v7: 사용량 측정용 강제 재생성, 비용설정은 v6와 동일)
+AXIS_PV = 'v8-high'   # 브리핑 프롬프트 버전 — 바꾸면 캐시 무효화·전 시장 1회 재생성 (v8: effort high·검색2·준비멘트 제거 첫 적용)
 
 # [측정] API 사용량 집계 — 동작/비용 변화 없음, 기록만. 종료 시 atexit으로 총합·상위 비용 호출 출력.
 import atexit as _atexit
@@ -1240,6 +1240,9 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, 
             text = '\n'.join(parts).strip() if parts else None
             if text and web_search and '##' in text:  # 웹검색 준비멘트(검색 전 영어/한국어 혼잣말)가 앞에 붙음 → 본문 '##'부터만 남김
                 text = text[text.index('##'):].strip()
+            if text and web_search:  # 네이티브 인용 태그 <cite index="x-y">…</cite> 제거(렌더 깨짐 방지). 본문 텍스트는 유지, 출처는 [라벨](url) 마크다운 링크로.
+                import re as _re
+                text = _re.sub(r'</?cite[^>]*>', '', text)
             if text:
                 return _filter_sources(text) if web_search else text
             print(f"[WARN] 응답에 text 블록 없음 (시도 {attempt}/{max_retries}) — 재시도")
