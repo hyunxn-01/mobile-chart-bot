@@ -42,8 +42,8 @@ RECIPIENT_EMAIL = os.environ.get('RECIPIENT_EMAIL')
 CLAUDE_MODEL = 'claude-opus-4-8'
 # 게임명 한글 변환용 모델(저비용·캐시). 음차/표기 변환은 호출이 작고 결과는 캐시돼 비용 미미.
 TRANSLATE_MODEL = 'claude-sonnet-4-6'
-# 적응형 사고 강도: max=작업량 최대(항상 깊게 사고). Opus 4.8은 adaptive 모드만 지원.
-THINKING_EFFORT = 'max'
+# 적응형 사고 강도: high(기본)=거의 항상 깊게 사고하되 max보다 사고토큰 절감(비용↓, 품질 거의 동일). 값: low/medium/high/max.
+THINKING_EFFORT = 'high'
 # 출력 토큰 상한(사고+응답 합산). 사고가 길어도 응답이 잘리지 않게 넉넉히.
 MAX_OUTPUT_TOKENS = 32000
 
@@ -1214,7 +1214,7 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, 
                 messages=[{'role': 'user', 'content': prompt}],
             )
             if web_search and attempt < max_retries:  # #11: 신뢰 도메인 안에서 검색(마지막 시도는 안전망으로 검색 끔)
-                _tool = {'type': 'web_search_20250305', 'name': 'web_search', 'max_uses': 4}
+                _tool = {'type': 'web_search_20250305', 'name': 'web_search', 'max_uses': 2}
                 if use_allowed:  # 크롤러 비접근 도메인으로 400 나면 use_allowed=False → 무제한 검색+사후필터
                     _tool['allowed_domains'] = TRUSTED_DOMAINS
                 kwargs['tools'] = [_tool]
@@ -1238,6 +1238,8 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, 
             parts = [b.text for b in final.content
                      if getattr(b, 'type', None) == 'text' and getattr(b, 'text', None)]
             text = '\n'.join(parts).strip() if parts else None
+            if text and web_search and '##' in text:  # 웹검색 준비멘트(검색 전 영어/한국어 혼잣말)가 앞에 붙음 → 본문 '##'부터만 남김
+                text = text[text.index('##'):].strip()
             if text:
                 return _filter_sources(text) if web_search else text
             print(f"[WARN] 응답에 text 블록 없음 (시도 {attempt}/{max_retries}) — 재시도")
@@ -1428,7 +1430,7 @@ def attach_insights(analyses, chart_used, cache):
             ch['insight'] = cached['text']
             ch['insight_cached'] = True
         else:
-            text = generate_timeframe_insight(name, ch, chart_used)
+            text = ''  # [비용절감] 레거시 /index 일일 AI 인사이트 비활성화 — 주력은 markets. AI 호출 생략(~$12/월↓). 되살리려면 generate_timeframe_insight(name, ch, chart_used) 복원.
             ch['insight'] = text
             ch['insight_cached'] = False
             cache[name] = {'key': key, 'sig': sig, 'text': text}
