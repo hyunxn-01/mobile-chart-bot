@@ -642,7 +642,7 @@
 
   <section class="cmpsec" id="cmpsec">
     <h2>시장 비교 · 장르 점유</h2>
-    <p class="sub cap" id="cmpsub"><span class="ci">칸 색 진할수록 그 시장 매출에서 <b>점유 높음</b></span><span class="csep">│</span><span class="ci">한 행 = 같은 장르의 <b>시장별 강·약</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 시장서 약함 <b>(기회인지 수요부족인지는 차트만으론 판단 불가)</b></span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span></p>
+    <p class="sub cap" id="cmpsub"><span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b> <span style="opacity:.75" title="추정매출 점유는 차트 순위 기반 추정(rank^-1.1). 정밀 매출 아님">(추정매출=순위 기반)</span></span><span class="csep">│</span><span class="ci">한 행 = 같은 장르의 <b>시장별 강·약</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 시장서 약함 <b>(기회인지 수요부족인지는 차트만으론 판단 불가)</b></span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span></p>
     <div class="cmp-controls">
       <span class="cmp-clabel">지표</span>
       <button class="cmp-metric on" type="button" data-metric="rev">추정매출 점유</button>
@@ -1021,8 +1021,8 @@ function renderGenreLegend(){
   const _navSel=document.getElementById('countrySelNav');   // #6: 장르차트 시장 드롭다운(헤더/네비와 동기)
   const _mktOpts=_navSel?_navSel.innerHTML:'', _curMkt=_navSel?_navSel.value:'';
   let html='<div class="gl-mkt" style="display:flex;align-items:center;gap:8px;margin:0 0 9px;"><label for="genreMktSel" style="font-size:12px;font-weight:700;color:var(--muted);flex:0 0 auto;">시장</label><select id="genreMktSel" aria-label="장르 차트 시장 선택" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:12.5px;font-weight:600;">'+_mktOpts+'</select></div>'+
-    '<span class="gl-hint">장르를 누르면 그 선만 강조 · 매출 구간별 그룹</span>'+
-    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출</span></div>';
+    '<span class="gl-hint">장르를 누르면 그 선만 강조 · 매출 구간별 그룹 · <b>매출%=차트 순위 기반 추정</b>(rank⁻¹·¹ 멱법칙, 정밀 매출 아님)</span>'+
+    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r" title="추정 매출 점유 — 차트 순위로 매출을 역산한 추정치(rank^-1.1 멱법칙으로 가중·정규화). 정밀 매출이 아니며, 게임별 과금방식(가챠·광고)·국가 객단가·웹샵 매출은 미반영. 상위 1~3위는 지수 가정에 민감.">매출 ⓘ</span></div>';
   groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
   el.innerHTML=html;
   { const _ms=document.getElementById('genreMktSel'); if(_ms){ if(_curMkt) _ms.value=_curMkt; _ms.addEventListener('change',ev=>{ if(typeof loadMarket==='function') loadMarket(ev.target.value); }); } }   // #6: 시장 변경 동기
@@ -1407,7 +1407,7 @@ function renderGenreOpp(){
   }
   wrap.innerHTML=s;
   const opp2=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=>b.revp-a.revp).slice(0,3).map(x=>x.genre);
-  if(sub) sub.innerHTML='<span class="ci">세로=그 시장 매출 규모(수요) · 가로=1위 집중도(왼쪽 분산↔오른쪽 독식) · 크기=게임 수</span><span class="csep">│</span><span class="ci"><b>진입 기회</b>(큰 돈·분산): '+(opp2.length?opp2.map(esc).join(' · '):'현재 없음')+'</span>';
+  if(sub) sub.innerHTML='<span class="ci">세로=매출 규모(수요·<b title="차트 순위로 매출 역산: rank^-1.1 멱법칙. 정밀 매출 아님(과금방식·국가 객단가·웹샵 미반영)">순위 기반 추정 ⓘ</b>) · 가로=1위 집중도(왼쪽 분산↔오른쪽 독식) · 크기=게임 수</span><span class="csep">│</span><span class="ci"><b>진입 기회</b>(큰 돈·분산): '+(opp2.length?opp2.map(esc).join(' · '):'현재 없음')+'</span>';
 }
 function mdLite(raw){
   const lines=String(raw||'').split('\n');
