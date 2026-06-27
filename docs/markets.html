@@ -359,6 +359,17 @@
   .gdname{ cursor:pointer; position:relative; }
   .aib-src{ color:var(--accent2text); text-decoration:underline dotted; text-underline-offset:2px; }
   .aib-src:hover{ color:var(--accent2); text-decoration-style:solid; }
+  /* 출처: 본문 각주 마커(¹) + 하단 출처 칩 — 링크를 본문 밖으로 분리 */
+  .aib-fn{ font-size:10px; font-weight:800; color:var(--accent2text); background:var(--accent2soft); border-radius:5px; padding:1px 4px; margin-left:2px; cursor:help; text-decoration:none; line-height:1; white-space:nowrap; }
+  .aib-srcfoot{ margin-top:13px; padding-top:11px; border-top:1px dashed var(--line); display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
+  .aib-srcfoot-h{ font-size:10.5px; font-weight:800; color:var(--muted); letter-spacing:.05em; margin-right:1px; }
+  .aib-srcitem{ display:inline-flex; align-items:center; gap:6px; max-width:300px; font-size:11.5px; color:var(--accent2text); background:var(--accent2soft); border:1px solid var(--line); padding:3px 11px 3px 4px; border-radius:999px; text-decoration:none; transition:background .12s,border-color .12s,color .12s; }
+  .aib-srcitem:hover{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
+  .aib-srcitem:hover .aib-srcdom{ color:#fff; opacity:.85; }
+  .aib-srcitem:hover .aib-srcn{ background:#fff; color:var(--accent2); }
+  .aib-srcn{ flex:0 0 auto; min-width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; background:var(--bg); color:var(--accent2text); border-radius:999px; }
+  .aib-srclab{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; font-weight:600; }
+  .aib-srcdom{ font-size:10.5px; opacity:.68; white-space:nowrap; }
   .gdicon{ width:15px; height:15px; border-radius:4px; vertical-align:-3px; margin-right:4px; object-fit:cover; background:var(--chip); }   /* #14: 브리핑 게임명 옆 앱 아이콘 */
   .gdname:hover{ text-decoration:underline; }
   .gdname::after{ content:'상세보기'; position:absolute; left:0; top:-23px; font-size:10.5px; font-weight:600; background:var(--accent); color:#fff; padding:2px 7px; border-radius:5px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s; z-index:5; }
@@ -1766,13 +1777,15 @@ function loadBriefsIndex(){
 function renderMarketBrief(text){
   // 고정 항목 브리핑: '## 제목' → 제목 카드(.aib-sec+.aib-h) + 불릿. ## 없으면 옛 불릿 카드 폴백.
   const raw=String(text||'');
-  const inline=s=>{
-    { const _lk=[]; let _t=String(s).replace(/<\/?cite[^>]*>/g,'').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,la,u)=>{ _lk.push({la,u}); return '@@LK'+(_lk.length-1)+'@@'; }); _t=esc(_t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); return _t.replace(/@@LK(\d+)@@/g,(mm,i)=>{ const L=_lk[+i]; return '<a class="aib-src" href="'+esc(L.u)+'" target="_blank" rel="noopener noreferrer" title="출처">'+esc(L.la)+'</a>'; }); }
-    const links=[];  /* #11 src-links */   // #11: 마크다운 링크 [라벨](url) → 하이퍼링크(출처). esc 전에 추출.
-    s=String(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,label,url)=>{ links.push({label,url}); return ''+(links.length-1)+''; });
-    let h=esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-    return h.replace(/(\d+)/g,(m,i)=>{ const L=links[+i]; return '<a class="aib-src" href="'+esc(L.url)+'" target="_blank" rel="noopener noreferrer" title="출처">'+esc(L.label)+'</a>'; });
+  const _src=[];   // 출처 누적(중복 url 합침) — 본문 밖 하단에 따로 렌더
+  const srcIdx=(la,u)=>{ for(let i=0;i<_src.length;i++){ if(_src[i].u===u){ if(la&&la.length>_src[i].la.length) _src[i].la=la; return i+1; } } _src.push({la:la||u,u}); return _src.length; };
+  const inline=s=>{   // [라벨](url) → 본문엔 라벨 텍스트 + 각주 마커(¹), 실제 링크는 _src로 분리(하단 '출처')
+    const marks=[];
+    let _t=String(s).replace(/<\/?cite[^>]*>/g,'').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,la,u)=>{ const n=srcIdx(la.trim(),u); marks.push({la:la.trim(),n}); return '@@MK'+(marks.length-1)+'@@'; });
+    _t=esc(_t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    return _t.replace(/@@MK(\d+)@@/g,(mm,i)=>{ const M=marks[+i]; return esc(M.la)+'<sup class="aib-fn" title="출처 '+M.n+': '+esc(M.la)+'">'+M.n+'</sup>'; });
   };
+  const srcFoot=()=>{ if(!_src.length) return ''; const dom=u=>{ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return ''; } }; return '<div class="aib-srcfoot"><span class="aib-srcfoot-h">출처</span>'+_src.map((s,i)=>'<a class="aib-srcitem" href="'+esc(s.u)+'" target="_blank" rel="noopener noreferrer" title="'+esc(s.u)+'"><span class="aib-srcn">'+(i+1)+'</span><span class="aib-srclab">'+esc(s.la)+'</span><span class="aib-srcdom">'+esc(dom(s.u))+'</span></a>').join('')+'</div>'; };
   const lines=raw.split(/\r?\n/);
   if(/^\s*#{1,3}\s+/m.test(raw)){
     let html='', open=false, buf=null, seen=false;
@@ -1788,7 +1801,7 @@ function renderMarketBrief(text){
       else { buf=(buf!=null)?(buf+(/^[,.)\]}%!?:;·、，。」]/.test(t)?'':' ')+t):t; }   // 마커 없는 줄=같은 불릿의 연속(모델이 링크 앞뒤 \n으로 쪼갠 것 합침; 구두점으로 시작하면 앞 공백 제거)
     });
     close();
-    return html || ('<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>');
+    return (html || ('<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>'))+srcFoot();
   }
   const cards=[]; let cur=null;
   lines.forEach(ln=>{ const t=ln.trim(); if(!t) return;
@@ -1797,8 +1810,8 @@ function renderMarketBrief(text){
     else { cur = (cur!=null) ? cur+' '+t : t; }
   });
   if(cur!=null) cards.push(cur);
-  if(!cards.length) return '<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>';
-  return cards.map(c=>'<div class="aib-sec"><div class="mkb-li">'+inline(c)+'</div></div>').join('');
+  if(!cards.length) return '<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>'+srcFoot();
+  return cards.map(c=>'<div class="aib-sec"><div class="mkb-li">'+inline(c)+'</div></div>').join('')+srcFoot();
 }
 // ----- 시간축 객체 접근 -----
 function briefAxisObj(b, axis){
@@ -1994,27 +2007,4 @@ fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'}).then(r=>r.json()
   const isNew = Array.isArray(idx.majors)||Array.isArray(idx.regions);
   if(isNew){
     const majors=idx.majors||[], regions=idx.regions||[], singles=(idx.countries||[]).slice();
-    regions.forEach(r=>{ MK_REGION_KEYS.add(r.key); (r.members||[]).forEach(cc=>{ MK_CC2REGION[cc]=r.key; }); });
-    if(majors.length) html+='<optgroup label="주요 시장">'+majors.map(m=>opt(m.key, nm(m.key))).join('')+'</optgroup>';
-    if(regions.length) html+='<optgroup label="지역 (합산)">'+regions.map(r=>opt(r.key, r.name+' ('+(r.members||[]).length+'개국)')).join('')+'</optgroup>';
-    singles.sort((a,b)=> nm(a.key).localeCompare(nm(b.key),'ko'));
-    if(singles.length) html+='<optgroup label="개별 국가">'+singles.map(c=>opt(c.key, nm(c.key))).join('')+'</optgroup>';
-  } else {                                  // 폴백: 옛 평면 index({countries:[{country}]})
-    const ccs=(idx.countries||[]).map(c=>c.country).sort((a,b)=> a==='kr'?-1:b==='kr'?1:nm(a).localeCompare(nm(b),'ko'));
-    html='<optgroup label="국가">'+ccs.map(cc=>opt(cc, nm(cc))).join('')+'</optgroup>';
-  }
-  if(sel){
-    sel.innerHTML=html;
-    const hasKr=[...sel.options].some(o=>o.value==='kr');
-    first=hasKr?'kr':((sel.options[0]||{}).value||'kr');
-    sel.value=first;
-    sel.addEventListener('change',e=>loadMarket(e.target.value));
-    const navSel=document.getElementById('countrySelNav');   // 네비 시장 선택(헤더와 동일 옵션)
-    if(navSel){ navSel.innerHTML=html; navSel.value=first; navSel.addEventListener('change',e=>loadMarket(e.target.value)); }
-  }
-  loadMarket(first);
-}).catch(e=>{ const m=document.getElementById('meta'); if(m) m.textContent='국가 목록을 불러오지 못했습니다: '+e.message; });
-loadBriefsIndex();  // AI 시장 브리핑(국가 선택과 독립)
-</script>
-</body>
-</html>
+    regions.forEach(r=>{ MK_REGION_KEYS.add(r.key); (r.members||[]).forEach(cc=>{ MK_CC2REGION[cc]=r.key
