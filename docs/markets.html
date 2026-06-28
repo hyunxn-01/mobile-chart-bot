@@ -718,7 +718,7 @@
     <p class="sub cap" id="gopsub"></p>
     <div id="gopout"></div>
     <div class="gop-legend">
-      <span><span class="gop-sw" style="background:#16a34a"></span>진입 기회 · 큰 돈·분산(절대강자 없음)</span>
+      <span><span class="gop-sw" style="background:#16a34a"></span>분산 대형 · 큰 돈, 1강 없음</span>
       <span><span class="gop-sw" style="background:#64748b"></span>요새 · 큰 돈·1강 독식</span>
       <span><span class="gop-sw" style="background:#2563eb"></span>소형 난전 · 작은 돈·분산</span>
       <span><span class="gop-sw" style="background:#e07c12"></span>틈새 독점 · 작은 돈·1강 독식</span>
@@ -1371,7 +1371,7 @@ function renderGenreOpp(){
   s+='<line class="gop-line" x1="'+xM+'" y1="'+padT+'" x2="'+xM+'" y2="'+PB+'" stroke-dasharray="4 4"/>';
   s+='<line class="gop-line" x1="'+padL+'" y1="'+yM+'" x2="'+PR+'" y2="'+yM+'" stroke-dasharray="4 4"/>';
   s+='<rect class="gop-line" x="'+padL+'" y="'+padT+'" width="'+plotW+'" height="'+plotH+'" fill="none"/>';
-  s+='<text x="'+(padL+7)+'" y="'+(padT+15)+'" font-size="11" font-weight="700" fill="#16a34a">진입 기회</text>';
+  s+='<text x="'+(padL+7)+'" y="'+(padT+15)+'" font-size="11" font-weight="700" fill="#16a34a">분산 대형</text>';
   s+='<text x="'+(PR-7)+'" y="'+(padT+15)+'" text-anchor="end" font-size="11" font-weight="700" fill="#94a3b8">요새 · 1강 독식</text>';
   s+='<text x="'+(padL+7)+'" y="'+(PB-8)+'" font-size="11" font-weight="700" fill="#2563eb">소형 난전</text>';
   s+='<text x="'+(PR-7)+'" y="'+(PB-8)+'" text-anchor="end" font-size="11" font-weight="700" fill="#e07c12">틈새 독점</text>';
@@ -1396,7 +1396,7 @@ function renderGenreOpp(){
           s+='<text class="gop-lab" x="'+c.x.toFixed(1)+'" y="'+c.y.toFixed(1)+'" font-size="'+fs+'"'+(c.end?' text-anchor="end"':'')+'>'+esc(o.g.genre)+'</text>'; return; } }
     }); }
   s+='</svg></div>';
-  // PM 인사이트 — 진입 결정(매출 규모 × 1위 집중도 × 점유 모멘텀) + 진입 1순위 추천
+  // PM 인사이트 — 사분면 구조 서술(매출 규모 × 1위 집중도 × 점유 모멘텀). 추천 아님
   { const momS=g=> (g.mom!=null && g.mom>=0.3)?' <span style="color:#16a34a">▲</span>' : (g.mom!=null && g.mom<=-0.3)?' <span style="color:#e07c12">▼</span>' : '';
     const fmtR=arr=>arr.slice(0,3).map(g=>esc(g.genre)+'('+g.revp+'%·집중'+g.top1+'%'+momS(g)+')').join(' · ');
     const fmtF=arr=>arr.slice(0,3).map(g=>esc(g.genre)+'(집중'+g.top1+'%'+(g.topGame?'·1강 '+esc(g.topGame):'')+')').join(' · ');
@@ -1406,19 +1406,18 @@ function renderGenreOpp(){
     const niche=gs.filter(g=> g.revp<RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);
     const small=gs.filter(g=> g.revp<RY && g.top1<CONC).sort((a,b)=> b.revp-a.revp);
     const topRev=gs.slice().sort((a,b)=>b.revp-a.revp)[0];
-    const pick=opp.slice().sort((a,b)=> b.revp-a.revp || (b.mom||0)-(a.mom||0))[0];   // 진입 1순위: 매출 큰 진입기회, 동률이면 상승세 우선
-    let ins='<div class="gop-insight"><div class="gopi-h">진입 결정 — 어디에 들어갈까 <span style="font-weight:400;color:var(--muted)">(세로=수요·매출, 가로=1위 집중도, ▲▼=점유 추세. 총 시장 규모·진입장벽은 별도 확인)</span></div>';
+    let ins='<div class="gop-insight"><div class="gopi-h">장르 지형 — 돈 × 1위 집중도 <span style="font-weight:400;color:var(--muted)">(세로=수요·매출, 가로=1위 집중도, ▲▼=점유 추세. 총 시장 규모·진입장벽은 차트 밖)</span></div>';
     if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">돈의 축</span><span>매출이 가장 몰리는 장르는 <b>'+esc(topRev.genre)+'</b> ('+topRev.revp+'%).</span></div>';
-    ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>진입 기회</b> — 큰 돈인데 절대강자 없음(분산): <b>'+(opp.length?fmtR(opp):'현재 없음')+'</b>. 신규 안착 여지(괄호=매출·1위집중·점유추세).</span></div>';
-    if(fort.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>요새</b> — 큰 돈을 1강이 장악: <b>'+fmtF(fort)+'</b>. 그 1강과 정면승부·차별화 IP 필요.</span></div>';
-    if(niche.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>틈새 독점</b> — 작은 시장 단일 타이틀: <b>'+fmtR(niche)+'</b>. 시장 작아 업사이드 제한.</span></div>';
+    ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>분산 대형</b> — 큰 돈인데 1위 점유가 낮음(여러 게임에 분산): <b>'+(opp.length?fmtR(opp):'해당 없음')+'</b> <span style="color:var(--muted)">(괄호=매출·1위집중·점유추세)</span>.</span></div>';
+    if(fort.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>요새</b> — 큰 돈을 1강이 장악: <b>'+fmtF(fort)+'</b>.</span></div>';
+    if(niche.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>틈새 독점</b> — 작은 시장을 단일 타이틀이 점유: <b>'+fmtR(niche)+'</b>.</span></div>';
     if(small.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#2563eb"></span><span><b>소형 난전</b> — 작은 시장에 여럿 경쟁: <b>'+fmt(small)+'</b>.</span></div>';
-    if(pick) ins+='<div class="gopi-row"><span class="gopi-k">차트상 출발점</span><span>차트만 보면 <b>'+esc(pick.genre)+'</b>가 가장 눈에 띈다 — 큰 돈('+pick.revp+'%)에 절대강자 없음(1위 '+pick.top1+'%)'+((pick.mom!=null&&pick.mom>=0.3)?'·점유 상승세':'')+(pick.topGame?', 선두 <b>'+esc(pick.topGame)+'</b>':'')+'. 단 시장 규모·자사 역량·경쟁 반응은 차트 밖이라 <b>결론이 아닌 검토 출발점</b>.</span></div>';
+    ins+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">읽는 법</span><span>색·위치는 시장 <b>구조</b>(돈 규모·1위 집중도)를 보여줄 뿐 진입 추천이 아니다 — \'어디가 비어 보이나\'는 읽혀도 <b>들어갈지</b>는 총 시장 규모·자사 IP·경쟁 반응으로 따로 판단.</span></div>';
     ins+='</div>'; s+=ins;
   }
   wrap.innerHTML=s;
   const opp2=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=>b.revp-a.revp).slice(0,3).map(x=>x.genre);
-  if(sub) sub.innerHTML='<span class="ci">세로=매출 규모(수요·<b title="차트 순위로 매출 역산: rank^-1.1 멱법칙. 정밀 매출 아님(과금방식·국가 객단가·웹샵 미반영)">순위 기반 추정 ⓘ</b>) · 가로=1위 집중도(왼쪽 분산↔오른쪽 독식) · 크기=게임 수</span><span class="csep">│</span><span class="ci"><b>진입 기회</b>(큰 돈·분산): '+(opp2.length?opp2.map(esc).join(' · '):'현재 없음')+'</span>';
+  if(sub) sub.innerHTML='<span class="ci">세로=매출 규모(수요·<b title="차트 순위로 매출 역산: rank^-1.1 멱법칙. 정밀 매출 아님(과금방식·국가 객단가·웹샵 미반영)">순위 기반 추정 ⓘ</b>) · 가로=1위 집중도(왼쪽 분산↔오른쪽 독식) · 크기=게임 수</span><span class="csep">│</span><span class="ci"><b>분산 대형</b>(큰 돈·1위 낮음): '+(opp2.length?opp2.map(esc).join(' · '):'없음')+'</span>';
 }
 function mdLite(raw){
   const lines=String(raw||'').split('\n');
