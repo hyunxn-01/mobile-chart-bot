@@ -9,11 +9,11 @@
 <style>
   :root{
     --bg:#ffffff; --panel:#f7f7f5; --line:#e5e4df; --text:#1d1d1b; --muted:#6b6a64;
-    --accent:#2563eb; --chip:#eef1f6;
+    --accent:#2563eb; --chip:#eef1f6; --srcblue:#0284c7; --srcbluesoft:#e0f2fe;
     --accent2:#6d5fe0; --accent2soft:#ecebfb; --accent2text:#5b4ec9;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#1a1a18; --panel:#242421; --line:#37362f; --text:#ececea; --muted:#a3a29a; --chip:#2c2f36; --accent2:#6f5fe8; --accent2soft:#322c4d; --accent2text:#a99bf5; }
+    :root{ --bg:#1a1a18; --panel:#242421; --line:#37362f; --text:#ececea; --muted:#a3a29a; --chip:#2c2f36; --accent2:#6f5fe8; --accent2soft:#322c4d; --accent2text:#a99bf5; --srcblue:#38bdf8; --srcbluesoft:#0c2f44; }
   }
   *{ box-sizing:border-box; }
   [hidden]{ display:none !important; }   /* 근본·일반 해결: 클래스가 display(flex 등)를 줘도 hidden 속성이 항상 이김. 개별 [hidden] 패치를 일반화. */
@@ -360,8 +360,9 @@
   .aib-src{ color:var(--accent2text); text-decoration:underline dotted; text-underline-offset:2px; }
   .aib-src:hover{ color:var(--accent2); text-decoration-style:solid; }
   /* 출처: 본문 각주 마커(¹) + 하단 출처 칩 — 링크를 본문 밖으로 분리 */
-  .aib-srctag{ font-size:10px; font-weight:700; color:var(--accent2text); background:var(--accent2soft); border-radius:5px; padding:1px 6px; margin-left:4px; text-decoration:none; vertical-align:1px; white-space:nowrap; letter-spacing:.02em; }
-  .aib-srctag:hover{ background:var(--accent2); color:#fff; }
+  .aib-srcw{ color:var(--srcblue); font-weight:600; }
+  .aib-srctag{ font-size:10px; font-weight:700; color:var(--srcblue); background:var(--srcbluesoft); border-radius:5px; padding:1px 6px; margin-left:3px; text-decoration:none; vertical-align:1px; white-space:nowrap; letter-spacing:.02em; }
+  .aib-srctag:hover{ background:var(--srcblue); color:#fff; }
   .aib-srcfoot{ margin-top:13px; padding-top:11px; border-top:1px dashed var(--line); display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
   .aib-srcfoot-h{ font-size:10.5px; font-weight:800; color:var(--muted); letter-spacing:.05em; margin-right:1px; }
   .aib-srcitem{ display:inline-flex; align-items:center; gap:6px; max-width:300px; font-size:11.5px; color:var(--accent2text); background:var(--accent2soft); border:1px solid var(--line); padding:3px 11px 3px 4px; border-radius:999px; text-decoration:none; transition:background .12s,border-color .12s,color .12s; }
@@ -1782,7 +1783,7 @@ function renderMarketBrief(text){
     const _lk=[];
     let _t=String(s).replace(/<\/?cite[^>]*>/g,'').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,la,u)=>{ _lk.push({la:la.trim(),u}); return '@@LK'+(_lk.length-1)+'@@'; });
     _t=esc(_t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-    return _t.replace(/@@LK(\d+)@@/g,(mm,i)=>{ const L=_lk[+i]; let dom=''; try{ dom=new URL(L.u).hostname.replace(/^www\./,''); }catch(e){} return esc(L.la)+'<a class="aib-srctag" href="'+esc(L.u)+'" target="_blank" rel="noopener noreferrer" title="출처: '+esc(dom||L.u)+'">출처</a>'; });
+    return _t.replace(/@@LK(\d+)@@/g,(mm,i)=>{ const L=_lk[+i]; let dom=''; try{ dom=new URL(L.u).hostname.replace(/^www\./,''); }catch(e){} return '<span class="aib-srcw">'+esc(L.la)+'</span><a class="aib-srctag" href="'+esc(L.u)+'" target="_blank" rel="noopener noreferrer" title="출처: '+esc(dom||L.u)+'">출처</a>'; });
   };
   const srcFoot=()=>{ if(!_src.length) return ''; const dom=u=>{ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return ''; } }; return '<div class="aib-srcfoot"><span class="aib-srcfoot-h">출처</span>'+_src.map((s,i)=>'<a class="aib-srcitem" href="'+esc(s.u)+'" target="_blank" rel="noopener noreferrer" title="'+esc(s.u)+'"><span class="aib-srcn">'+(i+1)+'</span><span class="aib-srclab">'+esc(s.la)+'</span><span class="aib-srcdom">'+esc(dom(s.u))+'</span></a>').join('')+'</div>'; };
   const lines=raw.split(/\r?\n/);
