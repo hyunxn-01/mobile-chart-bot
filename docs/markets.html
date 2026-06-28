@@ -2007,4 +2007,27 @@ fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'}).then(r=>r.json()
   const isNew = Array.isArray(idx.majors)||Array.isArray(idx.regions);
   if(isNew){
     const majors=idx.majors||[], regions=idx.regions||[], singles=(idx.countries||[]).slice();
-    regions.forEach(r=>{ MK_REGION_KEYS.add(r.key); (r.members||[]).forEach(cc=>{ MK_CC2REGION[cc]=r.key
+    regions.forEach(r=>{ MK_REGION_KEYS.add(r.key); (r.members||[]).forEach(cc=>{ MK_CC2REGION[cc]=r.key; }); });
+    if(majors.length) html+='<optgroup label="주요 시장">'+majors.map(m=>opt(m.key, nm(m.key))).join('')+'</optgroup>';
+    if(regions.length) html+='<optgroup label="지역 (합산)">'+regions.map(r=>opt(r.key, r.name+' ('+(r.members||[]).length+'개국)')).join('')+'</optgroup>';
+    singles.sort((a,b)=> nm(a.key).localeCompare(nm(b.key),'ko'));
+    if(singles.length) html+='<optgroup label="개별 국가">'+singles.map(c=>opt(c.key, nm(c.key))).join('')+'</optgroup>';
+  } else {                                  // 폴백: 옛 평면 index({countries:[{country}]})
+    const ccs=(idx.countries||[]).map(c=>c.country).sort((a,b)=> a==='kr'?-1:b==='kr'?1:nm(a).localeCompare(nm(b),'ko'));
+    html='<optgroup label="국가">'+ccs.map(cc=>opt(cc, nm(cc))).join('')+'</optgroup>';
+  }
+  if(sel){
+    sel.innerHTML=html;
+    const hasKr=[...sel.options].some(o=>o.value==='kr');
+    first=hasKr?'kr':((sel.options[0]||{}).value||'kr');
+    sel.value=first;
+    sel.addEventListener('change',e=>loadMarket(e.target.value));
+    const navSel=document.getElementById('countrySelNav');   // 네비 시장 선택(헤더와 동일 옵션)
+    if(navSel){ navSel.innerHTML=html; navSel.value=first; navSel.addEventListener('change',e=>loadMarket(e.target.value)); }
+  }
+  loadMarket(first);
+}).catch(e=>{ const m=document.getElementById('meta'); if(m) m.textContent='국가 목록을 불러오지 못했습니다: '+e.message; });
+loadBriefsIndex();  // AI 시장 브리핑(국가 선택과 독립)
+</script>
+</body>
+</html>
