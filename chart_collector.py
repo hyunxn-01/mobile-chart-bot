@@ -692,7 +692,7 @@ def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False, pri
             "핵심 게임·플레이어: 이 기간 매출 상위 게임의 성격·강한 퍼블리셔. "
             f"움직임: 이 기간({win}) 진입·급상승·급하락 위주(근거 약하면 '- 데이터 누적 중'). "
             "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. PM 시사점: 진출·벤치마크·현지화 한 줄 결론. "
-            "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + _pb + INDUSTRY_VOICE + (GROUNDING if grounded else ""))
+            "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·--- 금지. 한국어, 군더더기 없이. '게임/Games/游戏'는 분석 카테고리이지 장르가 아니다 — '상위 100이 전부 게임' 류 자명한 서술 금지, 장르는 구체 서브장르(MMORPG·4X·매치3 등)로만. 게임명 고유명사 외엔 한국어로만(游戏·ゲーム 등 외국어 일반어 금지)." + _pb + INDUSTRY_VOICE + (GROUNDING if grounded else ""))
 
 
 def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
@@ -869,7 +869,7 @@ def build_global_brief(collected):
                   "각 항목 내용 가이드 — 횡단 신호: 여러 시장/지역에서 동시에 강한 게임·장르. "
                   "시장별 색깔: 주요 시장 간·지역 간 장르 색깔 대비. IP·퍼블리셔 동향: 여러 시장 관통 글로벌 IP·퍼블리셔. "
                   "진출 전략: 다음 진출·벤치마크 시장 결론. "
-                  "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이." + _gpb + INDUSTRY_VOICE + (GROUNDING if axis_key == 'weekly' else ""))
+                  "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·--- 금지. 한국어, 군더더기 없이. '게임/Games/游戏'는 분석 카테고리이지 장르가 아니다 — '상위 100이 전부 게임' 류 자명한 서술 금지, 장르는 구체 서브장르(MMORPG·4X·매치3 등)로만. 게임명 고유명사 외엔 한국어로만(游戏·ゲーム 등 외국어 일반어 금지)." + _gpb + INDUSTRY_VOICE + (GROUNDING if axis_key == 'weekly' else ""))
         try:
             text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, web_search=(axis_key == 'weekly'), usage_label=f"글로벌/{axis_label}")
         except Exception as e:
