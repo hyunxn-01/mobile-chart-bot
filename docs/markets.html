@@ -1182,6 +1182,10 @@ function aggregate(keyName, periodDays){
   return out;
 }
 
+function pmCallout(rows){
+  const rs=rows.filter(Boolean).map(r=>'<div class="gopi-row"><span class="gopi-k">'+r[0]+'</span><span>'+r[1]+'</span></div>').join('');
+  return rs?('<div class="gop-insight"><div class="gopi-h">PM 관점</div>'+rs+'</div>'):'';
+}
 function renderAgg(keyName, period, els, labelName){
   const tf=(DATA.timeframes&&DATA.timeframes.daily)||{labels:[]};
   const labels=tf.labels||[], n=labels.length;
@@ -1222,6 +1226,7 @@ function renderAgg(keyName, period, els, labelName){
     });
     h+='</tbody></table></div>';
   }
+  { const top3=full.slice(0,3); const totG=full.reduce((a,e)=>a+(e.num_games||0),0); const t3G=top3.reduce((a,e)=>a+(e.num_games||0),0); const gShare=totG?Math.round(t3G/totG*100):0; let revLine=''; if(showRev){ const totR=full.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const t3R=top3.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); revLine=totR?(' · 추정매출 '+Math.round(t3R/totR*100)+'%'):''; } const conc=gShare>=60?'소수 과점':(gShare>=40?'중간':'분산'); h+=pmCallout([['상위 3'+labelName, '<b>'+top3.map(e=>esc(e.key)).join(' · ')+'</b>'], ['집중도', '상위 3개가 차트 게임의 <b>'+gShare+'%</b>'+revLine+'를 차지 — '+conc+'. 집중도가 높을수록 소수 강자 과점·신규 진입 장벽이 큰 구조.']]); }
   els.wrap.innerHTML=h;
   els.wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(aggSort.k===kk) aggSort.dir*=-1; else aggSort={k:kk, dir:(kk==='best_rank'||kk==='avg_rank'||kk==='key')?1:-1}; renderAggSection(); }));
   els.wrap.querySelectorAll('.pubrow').forEach(row=>{
@@ -1275,6 +1280,7 @@ function renderGap(){
     h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${newBadge(r.aid)}${esc(r.title)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
   });
   h+='</tbody></table></div>';
+  { const TH=20; const dl=rows.filter(r=>r.gap>=TH).sort((a,b)=>b.gap-a.gap); const rv=rows.filter(r=>r.gap<=-TH).sort((a,b)=>a.gap-b.gap); const ex=a=>a.slice(0,2).map(r=>esc(r.title)).join(' · '); h+=pmCallout([ dl.length?['인기↑·매출↓ '+dl.length+'개','다운로드는 높은데 매출 순위가 처짐 — 수익화(BM)·과금 설계·현지화가 약하다는 신호. 예: <b>'+ex(dl)+'</b>.']:null, rv.length?['매출↑·인기↓ '+rv.length+'개','다운로드 대비 매출이 높음 — 고객단가 높은 코어·고래 의존형. 예: <b>'+ex(rv)+'</b>.']:null, (!dl.length&&!rv.length)?['갭','큰 괴리(±'+TH+' 이상)가 거의 없음 — 인기와 매출 순위가 대체로 일치.']:null ]); }
   wrap.innerHTML=h;
   wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(gapSort.k===kk) gapSort.dir*=-1; else gapSort={k:kk, dir:(kk==='title'||kk==='gr'||kk==='fr')?1:-1}; renderGap(); }));
   wrap.querySelectorAll('.pubrow').forEach(row=> row.addEventListener('click',()=>{ const aid=row.dataset.aids; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
@@ -1308,6 +1314,7 @@ function renderMovers(){
   h+='</div>';
   const maxN=Math.max(entered.length,exited.length,up.length,down.length);
   if(maxN>10) h+='<button class="movers-more" id="moversMore">'+(moversExpanded?'접기 ▴':('전체 보기 ▾ · 최대 '+maxN+'개'))+'</button>';
+  { const updCnt=up.filter(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; }).length; const flux=entered.length+exited.length+up.length+down.length; h+=pmCallout([ ['이번 '+TF_LABEL[moversTf], '신규 <b>'+entered.length+'</b> · 이탈 <b>'+exited.length+'</b> · 급등 <b>'+up.length+'</b> · 급락 <b>'+down.length+'</b>'+(flux===0?' — 변동 거의 없음(안정)':'')], updCnt?['업데이트 동반','급등 중 <b>'+updCnt+'개</b>가 최근 7일 내 앱 업데이트 동반 — 이벤트·시즌·콘텐츠 효과일 가능성. 일시 반등인지 추세인지는 다음 기간 확인.']:null ]); }
   wrap.innerHTML=h;
   const mb=document.getElementById('moversMore'); if(mb) mb.addEventListener('click',()=>{ moversExpanded=!moversExpanded; renderMovers(); });
 }
@@ -1340,6 +1347,7 @@ function renderWatch(){
     h+='<div class="watchcard" data-aid="'+esc(r.aid)+'"><div class="watchcard-head"><span class="watchcard-rank">#'+(i+1)+'</span>'+newBadge(r.aid)+'<span class="gdname" data-aid="'+esc(r.aid)+'">'+esc((DATA.games[r.aid]||{}).title||r.aid)+'</span></div><div class="watch-traj">'+r.days+'일 전 <b>'+r.dStart+'위</b> → 현재 <b>'+r.dEnd+'위</b> <span class="watch-up">▲'+r.dImp+'</span></div><div class="watch-meta"><span>상승 '+r.ups+'일 · 하락 '+r.downs+'일</span>'+wk+'</div></div>';
   });
   h+='</div>';
+  { h+=pmCallout([ out.length?['지속 상승 '+out.length+'개','단기 급등과 달리 며칠째 계단식 상승 — 추세 지속 여부를 지켜볼 벤치마크·모니터링 후보. 선두 <b>'+esc((DATA.games[top[0].aid]||{}).title||top[0].aid)+'</b>(▲'+top[0].dImp+').']:null ]); }
   wrap.innerHTML=h;
   wrap.querySelectorAll('.watchcard').forEach(c=> c.addEventListener('click',()=>{ const aid=c.dataset.aid; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
 }
