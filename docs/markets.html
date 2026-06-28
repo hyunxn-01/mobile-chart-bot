@@ -360,7 +360,8 @@
   .aib-src{ color:var(--accent2text); text-decoration:underline dotted; text-underline-offset:2px; }
   .aib-src:hover{ color:var(--accent2); text-decoration-style:solid; }
   /* 출처: 본문 각주 마커(¹) + 하단 출처 칩 — 링크를 본문 밖으로 분리 */
-  .aib-fn{ font-size:10px; font-weight:800; color:var(--accent2text); background:var(--accent2soft); border-radius:5px; padding:1px 4px; margin-left:2px; cursor:help; text-decoration:none; line-height:1; white-space:nowrap; }
+  .aib-srctag{ font-size:10px; font-weight:700; color:var(--accent2text); background:var(--accent2soft); border-radius:5px; padding:1px 6px; margin-left:4px; text-decoration:none; vertical-align:1px; white-space:nowrap; letter-spacing:.02em; }
+  .aib-srctag:hover{ background:var(--accent2); color:#fff; }
   .aib-srcfoot{ margin-top:13px; padding-top:11px; border-top:1px dashed var(--line); display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
   .aib-srcfoot-h{ font-size:10.5px; font-weight:800; color:var(--muted); letter-spacing:.05em; margin-right:1px; }
   .aib-srcitem{ display:inline-flex; align-items:center; gap:6px; max-width:300px; font-size:11.5px; color:var(--accent2text); background:var(--accent2soft); border:1px solid var(--line); padding:3px 11px 3px 4px; border-radius:999px; text-decoration:none; transition:background .12s,border-color .12s,color .12s; }
@@ -1780,10 +1781,10 @@ function renderMarketBrief(text){
   const _src=[];   // 출처 누적(중복 url 합침) — 본문 밖 하단에 따로 렌더
   const srcIdx=(la,u)=>{ for(let i=0;i<_src.length;i++){ if(_src[i].u===u){ if(la&&la.length>_src[i].la.length) _src[i].la=la; return i+1; } } _src.push({la:la||u,u}); return _src.length; };
   const inline=s=>{   // [라벨](url) → 본문엔 라벨 텍스트 + 각주 마커(¹), 실제 링크는 _src로 분리(하단 '출처')
-    const marks=[];
-    let _t=String(s).replace(/<\/?cite[^>]*>/g,'').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,la,u)=>{ const n=srcIdx(la.trim(),u); marks.push({la:la.trim(),n}); return '@@MK'+(marks.length-1)+'@@'; });
+    const _lk=[];
+    let _t=String(s).replace(/<\/?cite[^>]*>/g,'').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,la,u)=>{ _lk.push({la:la.trim(),u}); return '@@LK'+(_lk.length-1)+'@@'; });
     _t=esc(_t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-    return _t.replace(/@@MK(\d+)@@/g,(mm,i)=>{ const M=marks[+i]; return esc(M.la)+'<sup class="aib-fn" title="출처 '+M.n+': '+esc(M.la)+'">'+M.n+'</sup>'; });
+    return _t.replace(/@@LK(\d+)@@/g,(mm,i)=>{ const L=_lk[+i]; let dom=''; try{ dom=new URL(L.u).hostname.replace(/^www\./,''); }catch(e){} return esc(L.la)+'<a class="aib-srctag" href="'+esc(L.u)+'" target="_blank" rel="noopener noreferrer" title="출처: '+esc(dom||L.u)+'">출처</a>'; });
   };
   const srcFoot=()=>{ if(!_src.length) return ''; const dom=u=>{ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return ''; } }; return '<div class="aib-srcfoot"><span class="aib-srcfoot-h">출처</span>'+_src.map((s,i)=>'<a class="aib-srcitem" href="'+esc(s.u)+'" target="_blank" rel="noopener noreferrer" title="'+esc(s.u)+'"><span class="aib-srcn">'+(i+1)+'</span><span class="aib-srclab">'+esc(s.la)+'</span><span class="aib-srcdom">'+esc(dom(s.u))+'</span></a>').join('')+'</div>'; };
   const lines=raw.split(/\r?\n/);
@@ -1801,7 +1802,7 @@ function renderMarketBrief(text){
       else { buf=(buf!=null)?(buf+(/^[,.)\]}%!?:;·、，。」]/.test(t)?'':' ')+t):t; }   // 마커 없는 줄=같은 불릿의 연속(모델이 링크 앞뒤 \n으로 쪼갠 것 합침; 구두점으로 시작하면 앞 공백 제거)
     });
     close();
-    return (html || ('<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>'))+srcFoot();
+    return (html || ('<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>'));
   }
   const cards=[]; let cur=null;
   lines.forEach(ln=>{ const t=ln.trim(); if(!t) return;
@@ -1810,8 +1811,8 @@ function renderMarketBrief(text){
     else { cur = (cur!=null) ? cur+' '+t : t; }
   });
   if(cur!=null) cards.push(cur);
-  if(!cards.length) return '<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>'+srcFoot();
-  return cards.map(c=>'<div class="aib-sec"><div class="mkb-li">'+inline(c)+'</div></div>').join('')+srcFoot();
+  if(!cards.length) return '<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>';
+  return cards.map(c=>'<div class="aib-sec"><div class="mkb-li">'+inline(c)+'</div></div>').join('');
 }
 // ----- 시간축 객체 접근 -----
 function briefAxisObj(b, axis){
