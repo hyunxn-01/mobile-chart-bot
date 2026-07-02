@@ -1814,11 +1814,11 @@ function renderMarketBrief(text){
     const isStrat=c=>/진출\s*전략|시사점|전략/.test(c.title);   // 전략·시사점 카드 = 두괄식 상단
     const strat=cards.filter(isStrat), rest=cards.filter(c=>!isStrat(c));
     const bl=b=>'<div class="mkb-li">'+inline(b)+'</div>';
-    const card=(c,mode)=>{ let h='<div class="aib-sec'+(mode==='key'?' aib-sec-key':'')+'"><div class="aib-h">'+inline(c.title)+'</div>'; if(mode==='sum'&&c.bullets.length>1){ h+=bl(c.bullets[0])+'<div class="aib-detail" hidden>'+c.bullets.slice(1).map(bl).join('')+'</div>'; } else { h+=c.bullets.map(bl).join(''); } return h+'</div>'; };
+    const card=(c,o)=>{ let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h">'+inline(c.title)+'</div>'; if(o.sum&&c.bullets.length>1){ h+=bl(c.bullets[0])+'<div class="aib-detail" hidden>'+c.bullets.slice(1).map(bl).join('')+'</div>'; } else { h+=c.bullets.map(bl).join(''); } return h+'</div>'; };
     let html='';
-    strat.forEach(c=> html+=card(c,'key'));    // 전략/시사점: 맨 위, 강조, 전문
-    rest.forEach(c=> html+=card(c,'sum'));      // 나머지: 첫 불릿(요약)만, 상세는 자세히로
-    if(rest.some(c=>c.bullets.length>1)) html+='<button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>';
+    strat.forEach(c=> html+=card(c,{key:true,sum:true}));   // 전략/시사점: 맨 위·강조 + 요약(자세히로 전문)
+    rest.forEach(c=> html+=card(c,{sum:true}));              // 나머지: 요약(자세히로 전문)
+    if(strat.concat(rest).some(c=>c.bullets.length>1)) html+='<button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>';
     return html;
   }
   const cards=[]; let cur=null;
