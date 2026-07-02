@@ -809,6 +809,7 @@ function switchTf(tf){
     banner.style.display=''; banner.textContent=`'${TF_LABEL[tf]}' 시간축은 아직 데이터가 부족합니다 (구간 ${t.labels.length}개). 기간이 더 쌓이면 추이선이 그려집니다.`;
   } else { banner.style.display='none'; }
   if(chart.resetZoom) chart.resetZoom();
+  { const y=chart.options.scales.y; y.reverse=true; y.min=1; y.max=100; }  // resetZoom이 장르 유동상한(점유%)을 복원해 게임차트 y축을 1~20으로 오염시키던 문제 방지 — 게임차트는 항상 순위 1~100 독립
   restyle();
   updateScrollbar();
 }
