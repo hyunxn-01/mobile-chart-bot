@@ -1,9 +1,9 @@
 {
-  "updated": "2026-07-02 07:37",
+  "updated": "2026-07-02 17:48",
   "entries": [
     {
       "date": "2026-07-02",
-      "generated": "2026-07-02 07:37",
+      "generated": "2026-07-02 17:48",
       "chart": "Top Grossing",
       "items": [
         {
@@ -11,10 +11,10 @@
           "period": "2026-07-01 → 2026-07-02",
           "text": "",
           "counts": {
-            "new": 12,
-            "drop": 12,
+            "new": 18,
+            "drop": 18,
             "up": 16,
-            "down": 30
+            "down": 35
           }
         },
         {
