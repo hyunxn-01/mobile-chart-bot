@@ -277,6 +277,8 @@
   .goptraj-tick{ position:absolute; transform:translateX(-50%); font-size:9px; color:var(--muted); text-align:center; }
   .goptraj-tick i{ display:block; width:1.5px; height:6px; background:var(--line); margin:0 auto 2px; }
   .goptraj-tick em{ font-style:normal; white-space:nowrap; }
+  #gopsec.traj-on #gopout .gop-wrap{ display:none; }
+  .goptraj-cap{ font-size:10.5px; color:var(--muted); flex-basis:100%; margin:3px 0 0; line-height:1.4; }
   .gop-insight{ margin:13px 0 0; border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:11px 14px; }   /* #13: 기회맵 시사점 */
   .gopi-h{ font-size:12px; font-weight:700; color:var(--accent2text); margin-bottom:8px; }
   .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.6; color:var(--text); padding:3px 0; }
@@ -741,8 +743,8 @@
     <h2>장르 진입 맵 <span style="font-size:13px;font-weight:500;color:var(--muted)">· 수요(매출) × 1위 집중도</span></h2>
     <p class="sub cap" id="gopsub"></p>
     <div id="goptrajbar" class="goptraj-bar"></div>
-    <div id="gopout"></div>
     <div id="goptrajwrap" hidden></div>
+    <div id="gopout"></div>
     <div class="gop-legend">
       <span><span class="gop-sw" style="background:#16a34a"></span>분산 대형 · 큰 돈, 1강 없음</span>
       <span><span class="gop-sw" style="background:#64748b"></span>요새 · 큰 돈·1강 독식</span>
@@ -1425,22 +1427,30 @@ function gopInterp(G,t){
     out[g]={revp:a.revp+(b.revp-a.revp)*f, top1:a.top1+(b.top1-a.top1)*f, n:a.n+(b.n-a.n)*f}; });
   return out;
 }
-function gopAnchorSvg(G,dIdx){
-  var m=G.days[dIdx-G.sIdx]||{}, s='';
-  G.genres.forEach(function(g){ var v=m[g]; if(!v||v.n<=0) return; var col=G.zoneOf(v.top1,v.revp);
-    s+='<circle cx="'+G.xOf(v.top1).toFixed(1)+'" cy="'+G.yOf(v.revp).toFixed(1)+'" r="'+G.rOf(v.n).toFixed(1)+'" fill="'+col+'" fill-opacity="0.09" stroke="'+col+'" stroke-width="1" stroke-opacity="0.38" stroke-dasharray="3 3"/>'; });
+function gopAnchorsPaths(G){
+  var labels=gopDailyRefs().labels, ms=G.days[0]||{}, me=G.days[G.days.length-1]||{}, s='';
+  var sD=(labels[G.sIdx]||'').slice(5), eD=(labels[G.eIdx]||'').slice(5);
+  G.genres.forEach(function(g){
+    var a=ms[g], b=me[g], hasA=a&&a.n>0, hasB=b&&b.n>0; if(!hasA&&!hasB) return;
+    var ref=hasB?b:a, col=G.zoneOf(ref.top1,ref.revp);
+    var ax=hasA?G.xOf(a.top1):0, ay=hasA?G.yOf(a.revp):0, bx=hasB?G.xOf(b.top1):0, by=hasB?G.yOf(b.revp):0;
+    if(hasA&&hasB) s+='<line x1="'+ax.toFixed(1)+'" y1="'+ay.toFixed(1)+'" x2="'+bx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="'+col+'" stroke-width="1" stroke-opacity="0.22" stroke-dasharray="2 3"/>';
+    if(hasA) s+='<g class="gop-pt"><circle cx="'+ax.toFixed(1)+'" cy="'+ay.toFixed(1)+'" r="'+G.rOf(a.n).toFixed(1)+'" fill="'+col+'" fill-opacity="0.05" stroke="'+col+'" stroke-width="1.1" stroke-opacity="0.5" stroke-dasharray="1.5 2.5"><title>'+esc(g)+' · 시작 '+sD+' · 매출 '+a.revp.toFixed(1)+'% · 집중 '+Math.round(a.top1)+'% · 게임 '+a.n+'</title></circle><text class="gop-hlab" x="'+(ax+G.rOf(a.n)+3).toFixed(1)+'" y="'+(ay+3).toFixed(1)+'">'+esc(g)+' ('+sD+' 시작)</text></g>';
+    if(hasB) s+='<g class="gop-pt"><circle cx="'+bx.toFixed(1)+'" cy="'+by.toFixed(1)+'" r="'+G.rOf(b.n).toFixed(1)+'" fill="'+col+'" fill-opacity="0.12" stroke="'+col+'" stroke-width="1.3" stroke-opacity="0.6" stroke-dasharray="5 3"><title>'+esc(g)+' · 종료 '+eD+' · 매출 '+b.revp.toFixed(1)+'% · 집중 '+Math.round(b.top1)+'% · 게임 '+b.n+'</title></circle><text class="gop-hlab" x="'+(bx+G.rOf(b.n)+3).toFixed(1)+'" y="'+(by+3).toFixed(1)+'">'+esc(g)+' ('+eD+' 종료)</text></g>';
+  });
   return s;
 }
 function gopRenderTraj(t){
   var G=_gopTraj.geom; if(!G) return; var labels=gopDailyRefs().labels;
   var s='<div class="gop-wrap"><svg viewBox="0 0 '+G.W+' '+G.H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="기간 추이 버블맵">';
   s+=gopBgSvg(G);
-  s+=gopAnchorSvg(G,G.sIdx); s+=gopAnchorSvg(G,G.eIdx);
+  s+=gopAnchorsPaths(G);
   var cur=gopInterp(G,t);
   var labSet={}; Object.keys(cur).sort(function(a,b){return cur[b].revp-cur[a].revp;}).slice(0,8).forEach(function(g){labSet[g]=1;});
   Object.keys(cur).forEach(function(g){ var v=cur[g]; if(v.n<0.3&&v.revp<0.2) return; var col=G.zoneOf(v.top1,v.revp), cx=G.xOf(v.top1), cy=G.yOf(v.revp), r=G.rOf(v.n);
-    s+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.62" stroke="'+col+'" stroke-width="1.5"><title>'+esc(g)+' · 매출 '+v.revp.toFixed(1)+'% · 집중 '+Math.round(v.top1)+'% · 게임 '+Math.round(v.n)+'</title></circle>';
-    if(labSet[g]) s+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="10">'+esc(g)+'</text>'; });
+    s+='<g class="gop-pt"><circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.62" stroke="'+col+'" stroke-width="1.5"><title>'+esc(g)+' · 매출 '+v.revp.toFixed(1)+'% · 집중 '+Math.round(v.top1)+'% · 게임 '+Math.round(v.n)+'</title></circle>';
+    if(labSet[g]) s+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="10">'+esc(g)+'</text>'; else s+='<text class="gop-hlab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'">'+esc(g)+'</text>';
+    s+='</g>'; });
   s+='</svg></div>';
   var w=document.getElementById('goptrajwrap'); if(w) w.innerHTML=s;
   var dd=Math.round(t), dEl=document.getElementById('goptrajDay'); if(dEl) dEl.textContent=labels[dd]||'';
@@ -1487,23 +1497,25 @@ function gopTrajToggle(){
 }
 function setupGopTraj(){
   var bar=document.getElementById('goptrajbar'); if(!bar) return;
+  var sec=document.getElementById('gopsec');
   var labels=gopDailyRefs().labels;
-  if(labels.length<3){ bar.innerHTML=''; var o=document.getElementById('gopout'), t=document.getElementById('goptrajwrap'); if(o)o.hidden=false; if(t)t.hidden=true; _gopTraj.on=false; return; }
+  var o=document.getElementById('gopout'), tw=document.getElementById('goptrajwrap');
+  if(labels.length<3){ bar.innerHTML=''; if(sec)sec.classList.remove('traj-on'); if(o)o.hidden=false; if(tw)tw.hidden=true; _gopTraj.on=false; return; }
   var first=labels[0], last=labels[labels.length-1];
-  bar.innerHTML='<button type="button" class="goptraj-toggle" id="goptrajToggle" aria-pressed="false">📅 기간 추이 보기</button>'+
-    '<div class="goptraj-ctrl" id="goptrajCtrl" hidden><span class="goptraj-lab">기간</span>'+
+  bar.innerHTML='<div class="goptraj-ctrl"><span class="goptraj-lab">기간</span>'+
     '<input type="date" class="goptraj-date" id="goptrajStart" min="'+first+'" max="'+last+'" value="'+first+'">'+
     '<span class="goptraj-arr">→</span>'+
     '<input type="date" class="goptraj-date" id="goptrajEnd" min="'+first+'" max="'+last+'" value="'+last+'">'+
     '<button type="button" class="goptraj-play" id="goptrajPlay">▶ 재생</button>'+
-    '<span class="goptraj-daylab">현재</span><span class="goptraj-day" id="goptrajDay">'+last+'</span></div>'+
-    '<div class="goptraj-slider-row" id="goptrajSliderRow" hidden><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 내 날짜 스크럽"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
-  document.getElementById('goptrajToggle').addEventListener('click', gopTrajToggle);
+    '<span class="goptraj-daylab">현재</span><span class="goptraj-day" id="goptrajDay">'+last+'</span>'+
+    '<span class="goptraj-cap">흐린 원 = 시작·종료일 위치(점선 시작 · 파선 종료 · 선 이동경로), 진한 원 = 현재 날짜. 버블에 마우스를 올리면 장르·수치가 표시됩니다.</span></div>'+
+    '<div class="goptraj-slider-row"><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 내 날짜 스크럽"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
   document.getElementById('goptrajStart').addEventListener('change', gopTrajRangeChange);
   document.getElementById('goptrajEnd').addEventListener('change', gopTrajRangeChange);
   document.getElementById('goptrajSlider').addEventListener('input', function(){ gopStop(); gopRenderTraj(gopSliderT()); });
   document.getElementById('goptrajPlay').addEventListener('click', gopPlay);
-  _gopTraj.on=false; var o2=document.getElementById('gopout'), t2=document.getElementById('goptrajwrap'); if(o2)o2.hidden=false; if(t2)t2.hidden=true;
+  _gopTraj.on=true; if(sec)sec.classList.add('traj-on'); if(o)o.hidden=false; if(tw)tw.hidden=false;
+  gopTrajRangeChange();
 }
 
 function renderGenreOpp(){
