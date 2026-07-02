@@ -1785,7 +1785,7 @@ function loadBriefsIndex(){
     selectBrief('global:global');
   }).catch(()=>{});
 }
-function toggleBriefDetail(btn){ const open=btn.getAttribute('data-open')==='1'; (btn.parentNode||document).querySelectorAll('.aib-detail').forEach(d=>{ d.hidden=open; }); btn.setAttribute('data-open', open?'0':'1'); btn.textContent = open?'자세히 ▾':'접기 ▴'; }
+function toggleBriefDetail(btn){ const card=btn.closest('.aib-sec'); if(!card) return; const willExpand=btn.getAttribute('data-open')!=='1'; const sum=card.querySelector('.aib-sum'), ana=card.querySelector('.aib-detail'); if(sum) sum.hidden=willExpand; if(ana) ana.hidden=!willExpand; btn.setAttribute('data-open', willExpand?'1':'0'); btn.textContent=willExpand?'접기 ▴':'자세히 ▾'; }
 function renderMarketBrief(text){
   // 고정 항목 브리핑: '## 제목' → 제목 카드(.aib-sec+.aib-h) + 불릿. ## 없으면 옛 불릿 카드 폴백.
   const raw=String(text||'');
@@ -1814,11 +1814,10 @@ function renderMarketBrief(text){
     const isStrat=c=>/진출\s*전략|시사점|전략/.test(c.title);   // 전략·시사점 카드 = 두괄식 상단
     const strat=cards.filter(isStrat), rest=cards.filter(c=>!isStrat(c));
     const bl=b=>'<div class="mkb-li">'+inline(b)+'</div>';
-    const card=(c,o)=>{ let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h">'+inline(c.title)+'</div>'; if(o.sum&&c.bullets.length>1){ h+=bl(c.bullets[0])+'<div class="aib-detail" hidden>'+c.bullets.slice(1).map(bl).join('')+'</div>'; } else { h+=c.bullets.map(bl).join(''); } return h+'</div>'; };
+    const card=(c,o)=>{ let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h">'+inline(c.title)+'</div>'; if(c.bullets.length>1){ h+='<div class="aib-sum">'+bl(c.bullets[0])+'</div><div class="aib-detail" hidden>'+c.bullets.slice(1).map(bl).join('')+'</div><button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>'; } else { h+=c.bullets.map(bl).join(''); } return h+'</div>'; };   // 접힘=요약만 / 자세히=요약 숨기고 분석만(카드별 토글)
     let html='';
-    strat.forEach(c=> html+=card(c,{key:true,sum:true}));   // 전략/시사점: 맨 위·강조 + 요약(자세히로 전문)
-    rest.forEach(c=> html+=card(c,{sum:true}));              // 나머지: 요약(자세히로 전문)
-    if(strat.concat(rest).some(c=>c.bullets.length>1)) html+='<button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>';
+    strat.forEach(c=> html+=card(c,{key:true}));   // 전략/시사점: 맨 위·강조
+    rest.forEach(c=> html+=card(c,{}));
     return html;
   }
   const cards=[]; let cur=null;
