@@ -1476,15 +1476,20 @@ def attach_insights(analyses, chart_used, cache):
 # 8. 엑셀
 # ============================================================
 
+_XL_BAD = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f]')
+def _xlclean(v):
+    return _XL_BAD.sub('', v) if isinstance(v, str) else v
+
+
 def _write_changes_to_sheet(ws, changes, title):
     is_ma = changes.get('mode') == 'moving_average'
     rank_label = '평균 순위' if is_ma else '순위'
 
     row = 1
-    ws.cell(row=row, column=1, value=title).font = Font(bold=True, size=12)
+    ws.cell(row=row, column=1, value=_xlclean(title)).font = Font(bold=True, size=12)
     row += 1
     if changes.get('warning'):
-        ws.cell(row=row, column=1, value=changes['warning']).font = Font(italic=True, color='C2410C')
+        ws.cell(row=row, column=1, value=_xlclean(changes['warning'])).font = Font(italic=True, color='C2410C')
         row += 1
     row += 1
 
@@ -1502,8 +1507,8 @@ def _write_changes_to_sheet(ws, changes, title):
         row += 1
     else:
         for item in items:
-            ws.cell(row=row, column=1, value=item['title'])
-            ws.cell(row=row, column=2, value=item['developer'])
+            ws.cell(row=row, column=1, value=_xlclean(item['title']))
+            ws.cell(row=row, column=2, value=_xlclean(item['developer']))
             if is_ma:
                 ws.cell(row=row, column=3, value=f"{rank_label} {item['avg_rank']} ({item['days_in_chart']}/{item['total_days']}일 등장)")
             else:
@@ -1523,8 +1528,8 @@ def _write_changes_to_sheet(ws, changes, title):
             row += 1
         else:
             for item in items:
-                ws.cell(row=row, column=1, value=item['title'])
-                ws.cell(row=row, column=2, value=item['developer'])
+                ws.cell(row=row, column=1, value=_xlclean(item['title']))
+                ws.cell(row=row, column=2, value=_xlclean(item['developer']))
                 arrow = '▲' if item['change'] > 0 else '▼'
                 ws.cell(row=row, column=3, value=f"{rank_label} {item['prev_rank']} → {item['curr_rank']} ({arrow}{abs(item['change'])})")
                 row += 1
@@ -1538,8 +1543,8 @@ def _write_changes_to_sheet(ws, changes, title):
         row += 1
     else:
         for item in items:
-            ws.cell(row=row, column=1, value=item['title'])
-            ws.cell(row=row, column=2, value=item['developer'])
+            ws.cell(row=row, column=1, value=_xlclean(item['title']))
+            ws.cell(row=row, column=2, value=_xlclean(item['developer']))
             if is_ma:
                 ws.cell(row=row, column=3, value=f"이전 {rank_label} {item['avg_rank']}에서 이탈")
             else:
@@ -1570,13 +1575,13 @@ def create_comprehensive_excel_report(current, analyses, summary, chart_used):
         warning_suffix = f"  {ch['warning']}" if ch.get('warning') else ""
         comparable_mark = "" if ch.get('comparable') else "  [비교 불가]"
         lines.append(f"  · {name}선: {ch['period_label']}{comparable_mark}{warning_suffix}")
-    ws['A5'] = "\n".join(lines)
+    ws['A5'] = _xlclean("\n".join(lines))
     ws['A5'].alignment = Alignment(wrap_text=True, vertical='top')
     ws.row_dimensions[5].height = max(30, len(analyses) * 30)
 
     ws['A7'] = 'Claude 종합 인사이트'
     ws['A7'].font = Font(bold=True, size=12)
-    ws['A8'] = summary
+    ws['A8'] = _xlclean(summary)
     ws['A8'].alignment = Alignment(wrap_text=True, vertical='top')
     ws.column_dimensions['A'].width = 100
     ws.row_dimensions[8].height = 600
@@ -1585,7 +1590,7 @@ def create_comprehensive_excel_report(current, analyses, summary, chart_used):
     df = pd.DataFrame(current)
     if not df.empty:
         for r in dataframe_to_rows(df, index=False, header=True):
-            ws2.append(r)
+            ws2.append([_xlclean(v) if isinstance(v, str) else v for v in r])
         for cell in ws2[1]:
             cell.font = Font(bold=True)
             cell.fill = PatternFill(start_color='DDDDDD', end_color='DDDDDD', fill_type='solid')
@@ -1828,7 +1833,10 @@ def main():
         print(f'[WARN] AI 브리핑 저장 실패: {e}')
 
     print("[4/4] 엑셀·메일 발송 (매일 종합)...")
-    excel_path = create_comprehensive_excel_report(current, analyses, combined, chart_used)
+    try:
+        excel_path = create_comprehensive_excel_report(current, analyses, combined, chart_used)
+    except Exception as _xe:
+        print(f'[WARN] 엑셀 리포트 생성 실패(비치명, 파이프라인 계속): {_xe}'); excel_path = None
     subject = f'[모바일 게임 차트] 종합 보고 {today} ({chart_used})'
     html_body = build_comprehensive_email_html(today, chart_used, current, analyses, combined)
     send_email_via_gmail(subject, html_body, attachment_path=excel_path)
