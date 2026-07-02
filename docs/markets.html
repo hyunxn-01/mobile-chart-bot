@@ -248,7 +248,7 @@
   .watch-meta{ font-size:11px; color:var(--muted); margin-top:5px; display:flex; gap:10px; flex-wrap:wrap; }
   .watch-up{ color:#16a34a; font-weight:700; }
   .gop-wrap{ overflow-x:auto; }
-  .gop-wrap svg{ display:block; max-width:790px; width:100%; height:auto; }
+  .gop-wrap svg{ display:block; max-width:none; width:100%; height:auto; }
   .gop-line{ stroke:var(--line); }
   .gop-axis{ fill:var(--muted); }
   .gop-lab{ fill:var(--text); paint-order:stroke; stroke:var(--bg); stroke-width:2.6px; stroke-linejoin:round; }
@@ -258,6 +258,25 @@
   .gop-legend{ display:flex; gap:14px; flex-wrap:wrap; margin:8px 0 0; font-size:11px; color:var(--muted); }
   .gop-legend span{ display:inline-flex; align-items:center; gap:5px; }
   .gop-sw{ width:10px; height:10px; border-radius:50%; flex:0 0 auto; opacity:.7; }
+  .goptraj-toggle{ font-size:12.5px; font-weight:700; border:1px solid var(--accent2); background:var(--accent2soft); color:var(--accent2text); border-radius:8px; padding:6px 13px; cursor:pointer; margin-top:2px; }
+  .goptraj-toggle[aria-pressed="true"]{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
+  .goptraj-ctrl{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0 2px; }
+  .goptraj-lab{ font-size:12px; font-weight:700; color:var(--muted); }
+  .goptraj-date{ font-size:12.5px; font-weight:600; padding:5px 9px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--text); }
+  .goptraj-arr{ color:var(--muted); font-weight:700; }
+  .goptraj-play{ font-size:12.5px; font-weight:700; border:1px solid var(--accent); background:var(--bg); color:var(--accent); border-radius:8px; padding:5px 13px; cursor:pointer; }
+  .goptraj-play:hover{ background:var(--accent); color:#fff; }
+  .goptraj-daylab{ font-size:11px; font-weight:700; color:var(--muted); margin-left:4px; }
+  .goptraj-day{ font-size:15px; font-weight:800; color:var(--accent2text); font-family:ui-monospace,Menlo,Consolas,monospace; }
+  .goptraj-slider-row{ position:relative; margin:16px 6px 34px; }
+  .goptraj-slider{ -webkit-appearance:none; appearance:none; width:100%; height:11px; border-radius:6px; background:var(--accent2soft); border:1.5px solid var(--accent2); outline:none; cursor:pointer; }
+  .goptraj-slider::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:26px; height:26px; border-radius:50%; background:var(--accent2); border:3px solid var(--bg); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:grab; margin-top:-9px; }
+  .goptraj-slider::-moz-range-thumb{ width:24px; height:24px; border-radius:50%; background:var(--accent2); border:3px solid var(--bg); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:grab; }
+  .goptraj-slider::-moz-range-track{ height:11px; border-radius:6px; background:var(--accent2soft); }
+  .goptraj-ticks{ position:absolute; left:0; right:0; top:15px; height:22px; pointer-events:none; }
+  .goptraj-tick{ position:absolute; transform:translateX(-50%); font-size:9px; color:var(--muted); text-align:center; }
+  .goptraj-tick i{ display:block; width:1.5px; height:6px; background:var(--line); margin:0 auto 2px; }
+  .goptraj-tick em{ font-style:normal; white-space:nowrap; }
   .gop-insight{ margin:13px 0 0; border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:11px 14px; }   /* #13: 기회맵 시사점 */
   .gopi-h{ font-size:12px; font-weight:700; color:var(--accent2text); margin-bottom:8px; }
   .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.6; color:var(--text); padding:3px 0; }
@@ -721,7 +740,9 @@
   <div class="pubsec" id="gopsec">
     <h2>장르 진입 맵 <span style="font-size:13px;font-weight:500;color:var(--muted)">· 수요(매출) × 1위 집중도</span></h2>
     <p class="sub cap" id="gopsub"></p>
+    <div id="goptrajbar" class="goptraj-bar"></div>
     <div id="gopout"></div>
+    <div id="goptrajwrap" hidden></div>
     <div class="gop-legend">
       <span><span class="gop-sw" style="background:#16a34a"></span>분산 대형 · 큰 돈, 1강 없음</span>
       <span><span class="gop-sw" style="background:#64748b"></span>요새 · 큰 돈·1강 독식</span>
@@ -1123,6 +1144,7 @@ function applyChart(){
   renderMovers();
   renderWatch();
   renderGenreOpp();
+  if(typeof setupGopTraj==='function') setupGopTraj();
 }
 
 function updateSourceTabs(){
@@ -1356,6 +1378,134 @@ function renderWatch(){
   wrap.innerHTML=h;
   wrap.querySelectorAll('.watchcard').forEach(c=> c.addEventListener('click',()=>{ const aid=c.dataset.aid; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
 }
+// ===== 버블맵 기간 추이(기간 스크럽) — 프론트 계산, 백엔드 무관 =====
+var _gopTraj={on:false, geom:null, timer:null};
+function gopDailyRefs(){ var G=FULL.charts&&FULL.charts.grossing; var d=G&&G.timeframes&&G.timeframes.daily; return {G:G, labels:(d&&d.labels)||[], series:(d&&d.series)||{}}; }
+function gopGenreOf(aid){ var G=FULL.charts&&FULL.charts.grossing; return ((G&&G.games&&G.games[aid])||DATA.games[aid]||{}).genre||null; }
+function gopDayMetrics(d){
+  var refs=gopDailyRefs(), series=refs.series, acc={}, allTot=0;
+  for(var aid in series){ var arr=series[aid]; var r=arr?arr[d]:null; if(r==null||r<=0) continue; var gen=gopGenreOf(aid); if(!gen||gen==='미상') continue; var w=revWeight(r); allTot+=w; var a=acc[gen]||(acc[gen]={tot:0,max:0,n:0}); a.tot+=w; a.n++; if(w>a.max)a.max=w; }
+  var out={}; if(allTot>0){ for(var g in acc){ var b=acc[g]; out[g]={revp:b.tot/allTot*100, top1:b.tot>0?b.max/b.tot*100:0, n:b.n}; } }
+  return out;
+}
+function gopBuildGeom(sIdx,eIdx){
+  var days=[]; for(var d=sIdx; d<=eIdx; d++) days.push(gopDayMetrics(d));
+  var genreSet={}, maxRev=1, maxN=1;
+  days.forEach(function(m){ for(var g in m){ genreSet[g]=1; if(m[g].revp>maxRev)maxRev=m[g].revp; if(m[g].n>maxN)maxN=m[g].n; } });
+  var W=1060,H=440,padL=54,padR=130,padT=26,padB=48;
+  var plotW=W-padL-padR, plotH=H-padT-padB, PR=padL+plotW, PB=padT+plotH, CONC=50;
+  var lastM=days[days.length-1], revs=Object.keys(lastM).map(function(g){return lastM[g].revp;}).sort(function(a,b){return a-b;});
+  var RY=revs.length?(revs.length%2?revs[(revs.length-1)/2]:(revs[revs.length/2-1]+revs[revs.length/2])/2):(maxRev/3);
+  var xOf=function(c){ return padL+Math.max(0,Math.min(100,c))/100*plotW; };
+  var yOf=function(v){ return PB-Math.sqrt(Math.max(0,v)/maxRev)*plotH; };
+  var rOf=function(n){ return 4+Math.sqrt(Math.max(0,n)/maxN)*16; };
+  var zoneOf=function(c,v){ var big=v>=RY, frag=c<CONC; if(big&&frag)return'#16a34a'; if(big&&!frag)return'#64748b'; if(!big&&frag)return'#2563eb'; return'#e07c12'; };
+  return {W:W,H:H,padL:padL,padR:padR,padT:padT,padB:padB,plotW:plotW,plotH:plotH,PR:PR,PB:PB,CONC:CONC,RY:RY,xOf:xOf,yOf:yOf,rOf:rOf,xM:xOf(CONC),yM:yOf(RY),zoneOf:zoneOf,days:days,sIdx:sIdx,eIdx:eIdx,genres:Object.keys(genreSet),maxRev:maxRev,maxN:maxN};
+}
+function gopBgSvg(G){
+  var s='<rect x="'+G.padL+'" y="'+G.padT+'" width="'+(G.xM-G.padL)+'" height="'+(G.yM-G.padT)+'" fill="#16a34a" opacity="0.08"/>';
+  s+='<rect x="'+G.xM+'" y="'+G.padT+'" width="'+(G.PR-G.xM)+'" height="'+(G.yM-G.padT)+'" fill="#64748b" opacity="0.08"/>';
+  s+='<rect x="'+G.padL+'" y="'+G.yM+'" width="'+(G.xM-G.padL)+'" height="'+(G.PB-G.yM)+'" fill="#2563eb" opacity="0.05"/>';
+  s+='<rect x="'+G.xM+'" y="'+G.yM+'" width="'+(G.PR-G.xM)+'" height="'+(G.PB-G.yM)+'" fill="#e07c12" opacity="0.06"/>';
+  s+='<line class="gop-line" x1="'+G.xM+'" y1="'+G.padT+'" x2="'+G.xM+'" y2="'+G.PB+'" stroke-dasharray="4 4"/>';
+  s+='<line class="gop-line" x1="'+G.padL+'" y1="'+G.yM+'" x2="'+G.PR+'" y2="'+G.yM+'" stroke-dasharray="4 4"/>';
+  s+='<rect class="gop-line" x="'+G.padL+'" y="'+G.padT+'" width="'+G.plotW+'" height="'+G.plotH+'" fill="none"/>';
+  s+='<text x="'+(G.padL+7)+'" y="'+(G.padT+15)+'" font-size="11" font-weight="700" fill="#16a34a">분산 대형</text>';
+  s+='<text x="'+(G.PR-7)+'" y="'+(G.padT+15)+'" text-anchor="end" font-size="11" font-weight="700" fill="#94a3b8">요새 · 1강 독식</text>';
+  s+='<text x="'+(G.padL+7)+'" y="'+(G.PB-8)+'" font-size="11" font-weight="700" fill="#2563eb">소형 난전</text>';
+  s+='<text x="'+(G.PR-7)+'" y="'+(G.PB-8)+'" text-anchor="end" font-size="11" font-weight="700" fill="#e07c12">틈새 독점</text>';
+  s+='<text class="gop-axis" x="'+(G.padL+G.plotW/2)+'" y="'+(G.H-14)+'" text-anchor="middle" font-size="11">← 분산(여러 게임 경쟁)   ·   1위 집중도   ·   독식(1강 장악) →</text>';
+  s+='<text class="gop-axis" x="14" y="'+(G.padT+G.plotH/2)+'" text-anchor="middle" font-size="11" transform="rotate(-90 14 '+(G.padT+G.plotH/2)+')">↑ 그 시장 매출 규모(수요)</text>';
+  return s;
+}
+function gopInterp(G,t){
+  var i=Math.max(G.sIdx,Math.min(G.eIdx,Math.floor(t))), j=Math.min(G.eIdx,i+1), f=t-i;
+  var mi=G.days[i-G.sIdx]||{}, mj=G.days[j-G.sIdx]||{}, out={};
+  G.genres.forEach(function(g){ var a=mi[g]||{revp:0,top1:0,n:0}, b=mj[g]||{revp:0,top1:0,n:0};
+    out[g]={revp:a.revp+(b.revp-a.revp)*f, top1:a.top1+(b.top1-a.top1)*f, n:a.n+(b.n-a.n)*f}; });
+  return out;
+}
+function gopAnchorSvg(G,dIdx){
+  var m=G.days[dIdx-G.sIdx]||{}, s='';
+  G.genres.forEach(function(g){ var v=m[g]; if(!v||v.n<=0) return; var col=G.zoneOf(v.top1,v.revp);
+    s+='<circle cx="'+G.xOf(v.top1).toFixed(1)+'" cy="'+G.yOf(v.revp).toFixed(1)+'" r="'+G.rOf(v.n).toFixed(1)+'" fill="'+col+'" fill-opacity="0.09" stroke="'+col+'" stroke-width="1" stroke-opacity="0.38" stroke-dasharray="3 3"/>'; });
+  return s;
+}
+function gopRenderTraj(t){
+  var G=_gopTraj.geom; if(!G) return; var labels=gopDailyRefs().labels;
+  var s='<div class="gop-wrap"><svg viewBox="0 0 '+G.W+' '+G.H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="기간 추이 버블맵">';
+  s+=gopBgSvg(G);
+  s+=gopAnchorSvg(G,G.sIdx); s+=gopAnchorSvg(G,G.eIdx);
+  var cur=gopInterp(G,t);
+  var labSet={}; Object.keys(cur).sort(function(a,b){return cur[b].revp-cur[a].revp;}).slice(0,8).forEach(function(g){labSet[g]=1;});
+  Object.keys(cur).forEach(function(g){ var v=cur[g]; if(v.n<0.3&&v.revp<0.2) return; var col=G.zoneOf(v.top1,v.revp), cx=G.xOf(v.top1), cy=G.yOf(v.revp), r=G.rOf(v.n);
+    s+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.62" stroke="'+col+'" stroke-width="1.5"><title>'+esc(g)+' · 매출 '+v.revp.toFixed(1)+'% · 집중 '+Math.round(v.top1)+'% · 게임 '+Math.round(v.n)+'</title></circle>';
+    if(labSet[g]) s+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="10">'+esc(g)+'</text>'; });
+  s+='</svg></div>';
+  var w=document.getElementById('goptrajwrap'); if(w) w.innerHTML=s;
+  var dd=Math.round(t), dEl=document.getElementById('goptrajDay'); if(dEl) dEl.textContent=labels[dd]||'';
+}
+function gopSliderT(){ var sl=document.getElementById('goptrajSlider'), G=_gopTraj.geom; if(!G||!sl) return 0; return G.sIdx+(+sl.value)/1000*(G.eIdx-G.sIdx); }
+function gopBuildTicks(){
+  var G=_gopTraj.geom, el=document.getElementById('goptrajTicks'); if(!G||!el) return;
+  var labels=gopDailyRefs().labels, span=G.eIdx-G.sIdx, h='';
+  for(var d=G.sIdx; d<=G.eIdx; d++){ var pct=span?(d-G.sIdx)/span*100:0; var lab=(labels[d]||'').slice(5);
+    var showLab=(d===G.sIdx||d===G.eIdx||span<=8||(d-G.sIdx)%2===0);
+    h+='<span class="goptraj-tick" style="left:'+pct.toFixed(2)+'%"><i></i>'+(showLab?'<em>'+lab+'</em>':'')+'</span>'; }
+  el.innerHTML=h;
+}
+function gopStop(){ if(_gopTraj.timer){ cancelAnimationFrame(_gopTraj.timer); _gopTraj.timer=null; } var p=document.getElementById('goptrajPlay'); if(p) p.textContent='▶ 재생'; }
+function gopPlay(){
+  var p=document.getElementById('goptrajPlay'), sl=document.getElementById('goptrajSlider'), G=_gopTraj.geom; if(!G||!sl) return;
+  if(_gopTraj.timer){ gopStop(); return; }
+  p.textContent='❚❚ 정지'; sl.value=0;
+  var span=G.eIdx-G.sIdx, durMs=Math.max(2200, span*680), t0=performance.now();
+  function step(now){ var f=(now-t0)/durMs; if(f>=1) f=1; sl.value=Math.round(f*1000); gopRenderTraj(G.sIdx+f*span);
+    if(f<1){ _gopTraj.timer=requestAnimationFrame(step); } else { _gopTraj.timer=null; p.textContent='▶ 재생'; } }
+  _gopTraj.timer=requestAnimationFrame(step);
+}
+function gopTrajRangeChange(){
+  gopStop();
+  var labels=gopDailyRefs().labels;
+  var sv=document.getElementById('goptrajStart').value, ev=document.getElementById('goptrajEnd').value;
+  var si=labels.indexOf(sv), ei=labels.indexOf(ev);
+  if(si<0) si=0; if(ei<0) ei=labels.length-1;
+  if(si>ei){ var tmp=si; si=ei; ei=tmp; }
+  if(ei-si<1){ if(ei<labels.length-1) ei=si+1; else if(si>0) si=ei-1; }
+  _gopTraj.geom=gopBuildGeom(si,ei);
+  var sl=document.getElementById('goptrajSlider'); if(sl) sl.value=1000;
+  gopBuildTicks(); gopRenderTraj(ei);
+}
+function gopTrajToggle(){
+  _gopTraj.on=!_gopTraj.on;
+  var tg=document.getElementById('goptrajToggle'), ctrl=document.getElementById('goptrajCtrl'), row=document.getElementById('goptrajSliderRow');
+  var out=document.getElementById('gopout'), tw=document.getElementById('goptrajwrap');
+  if(tg){ tg.setAttribute('aria-pressed', String(_gopTraj.on)); tg.textContent=_gopTraj.on?'✕ 현재 스냅샷으로':'📅 기간 추이 보기'; }
+  if(ctrl) ctrl.hidden=!_gopTraj.on; if(row) row.hidden=!_gopTraj.on;
+  if(out) out.hidden=_gopTraj.on; if(tw) tw.hidden=!_gopTraj.on;
+  if(_gopTraj.on) gopTrajRangeChange(); else gopStop();
+}
+function setupGopTraj(){
+  var bar=document.getElementById('goptrajbar'); if(!bar) return;
+  var labels=gopDailyRefs().labels;
+  if(labels.length<3){ bar.innerHTML=''; var o=document.getElementById('gopout'), t=document.getElementById('goptrajwrap'); if(o)o.hidden=false; if(t)t.hidden=true; _gopTraj.on=false; return; }
+  var first=labels[0], last=labels[labels.length-1];
+  bar.innerHTML='<button type="button" class="goptraj-toggle" id="goptrajToggle" aria-pressed="false">📅 기간 추이 보기</button>'+
+    '<div class="goptraj-ctrl" id="goptrajCtrl" hidden><span class="goptraj-lab">기간</span>'+
+    '<input type="date" class="goptraj-date" id="goptrajStart" min="'+first+'" max="'+last+'" value="'+first+'">'+
+    '<span class="goptraj-arr">→</span>'+
+    '<input type="date" class="goptraj-date" id="goptrajEnd" min="'+first+'" max="'+last+'" value="'+last+'">'+
+    '<button type="button" class="goptraj-play" id="goptrajPlay">▶ 재생</button>'+
+    '<span class="goptraj-daylab">현재</span><span class="goptraj-day" id="goptrajDay">'+last+'</span></div>'+
+    '<div class="goptraj-slider-row" id="goptrajSliderRow" hidden><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 내 날짜 스크럽"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
+  document.getElementById('goptrajToggle').addEventListener('click', gopTrajToggle);
+  document.getElementById('goptrajStart').addEventListener('change', gopTrajRangeChange);
+  document.getElementById('goptrajEnd').addEventListener('change', gopTrajRangeChange);
+  document.getElementById('goptrajSlider').addEventListener('input', function(){ gopStop(); gopRenderTraj(gopSliderT()); });
+  document.getElementById('goptrajPlay').addEventListener('click', gopPlay);
+  _gopTraj.on=false; var o2=document.getElementById('gopout'), t2=document.getElementById('goptrajwrap'); if(o2)o2.hidden=false; if(t2)t2.hidden=true;
+}
+
 function renderGenreOpp(){
   const wrap=document.getElementById('gopout'), sub=document.getElementById('gopsub');
   if(!wrap) return;
@@ -1367,7 +1517,7 @@ function renderGenreOpp(){
            .filter(g=> g.rev>0);
   { const gser=((FULL.charts&&FULL.charts.grossing&&FULL.charts.grossing.genre_series&&FULL.charts.grossing.genre_series.genres))||{}; gs.forEach(g=>{ const a=gser[g.genre]||[]; const cur=a.length?a[a.length-1]:null; const fst=a.find(v=>v!=null); g.mom=(cur!=null&&fst!=null)?Math.round((cur-fst)*10)/10:null; }); }
   if(gs.length<3){ if(sub) sub.textContent=''; wrap.innerHTML='<p class="empty">장르 데이터가 더 쌓이면 진입 맵이 표시됩니다.</p>'; return; }
-  const W=760,H=380,padL=54,padR=120,padT=26,padB=46;
+  const W=1060,H=440,padL=54,padR=130,padT=26,padB=48;
   const plotW=W-padL-padR, plotH=H-padT-padB, PR=padL+plotW, PB=padT+plotH;
   const maxN=Math.max(...gs.map(g=>g.n)), maxRev=Math.max(...gs.map(g=>g.revp));
   const xOf=t=> padL + Math.min(100,Math.max(0,t))/100*plotW;                         // 가로 = 1위 집중도(0~100): 왼쪽 분산 ↔ 오른쪽 독식
