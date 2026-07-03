@@ -466,6 +466,10 @@
   .cmp-metric{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font:inherit; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all .12s; }
   .cmp-metric:hover{ color:var(--text); border-color:var(--accent); }
   .cmp-metric.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .cmp-basis{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font:inherit; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all .12s; }
+  .cmp-basis:hover{ color:var(--text); border-color:var(--accent2); }
+  .cmp-basis.on{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
+  .cmp-cell.cmp-top{ box-shadow: inset 0 0 0 2px var(--accent2); font-weight:800; }
   .cmp-wrap{ overflow:auto; max-height:560px; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
   .cmp-grid{ display:grid; min-width:max-content; }
   .cmp-corner,.cmp-mh,.cmp-glabel{ padding:7px 9px; border-bottom:1px solid var(--line); border-right:1px solid var(--line); white-space:nowrap; font-size:12px; }
@@ -681,7 +685,10 @@
     <h2>시장 비교 · 장르 점유</h2>
     <p class="sub cap" id="cmpsub"><span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b> <span style="opacity:.75" title="추정매출 점유는 차트 순위 기반 추정(rank^-1.1). 정밀 매출 아님">(추정매출=순위 기반)</span></span><span class="csep">│</span><span class="ci">한 행 = 같은 장르의 <b>시장별 강·약</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 시장서 약함 <b>(기회인지 수요부족인지는 차트만으론 판단 불가)</b></span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span></p>
     <div class="cmp-controls">
-      <span class="cmp-clabel">지표</span>
+      <span class="cmp-clabel">기준</span>
+      <button class="cmp-basis on" type="button" data-basis="market">시장 기준</button>
+      <button class="cmp-basis" type="button" data-basis="genre">장르 기준</button>
+      <span class="cmp-clabel" style="margin-left:12px">지표</span>
       <button class="cmp-metric on" type="button" data-metric="rev">추정매출 점유</button>
       <button class="cmp-metric" type="button" data-metric="pre">차트 점유(게임수)</button>
     </div>
@@ -2115,7 +2122,7 @@ function loadMarket(cc){
 }
 
 // ===== 시장 비교 히트맵(장르×시장 매트릭스) =====
-let MATRIX=null, cmpMetric='rev';
+let MATRIX=null, cmpMetric='rev', cmpBasis='market';
 function loadMatrix(){
   fetch('./markets/genre_matrix.json?_='+Date.now(), {cache:'no-store'})
     .then(r=> r.ok ? r.json() : null).then(m=>{ MATRIX=m; renderCmp(); })
@@ -2129,23 +2136,30 @@ function renderCmp(){
     el.innerHTML='<div class="cmp-empty">시장 비교 매트릭스가 곧 생성됩니다 — 다음 자동 갱신 후 표시됩니다.</div>'; return;
   }
   const markets=M.markets, genres=(M.genres||[]).slice().sort((a,b)=> a==='장르 없음'?1 : b==='장르 없음'?-1 : 0), cells=M.cells||{};
-  let mx=0; markets.forEach(mk=> genres.forEach(g=>{ const c=cells[mk.key]&&cells[mk.key][g]; const v=c?c[cmpMetric]:0; if(v>mx) mx=v; }));
-  mx=mx||1;
+  const cval=(mkKey,g)=>{ const c=cells[mkKey]&&cells[mkKey][g]; return (c&&c[cmpMetric]!=null)?c[cmpMetric]:null; };
+  let gmx=0; markets.forEach(mk=> genres.forEach(g=>{ const v=cval(mk.key,g); if(v!=null&&v>gmx) gmx=v; })); gmx=gmx||1;
+  const rowMax={}, rowTop={}; genres.forEach(g=>{ let m=0,bm=null,bv=-1; markets.forEach(mk=>{ const v=cval(mk.key,g); if(v!=null){ if(v>m)m=v; if(v>bv){bv=v;bm=mk.key;} } }); rowMax[g]=m||1; rowTop[g]=(bv>0?bm:null); });
+  const byGenre=(cmpBasis==='genre');
   let h='<div class="cmp-corner">장르＼시장</div>'+markets.map(mk=>'<div class="cmp-mh" title="'+esc(mk.name)+'">'+esc(mk.name)+'</div>').join('');
   genres.forEach(g=>{
     h+='<div class="cmp-glabel"><span class="cmp-dot" style="background:'+genreColor(g)+'"></span>'+esc(g)+'</div>';
     markets.forEach(mk=>{
-      const c=cells[mk.key]&&cells[mk.key][g]; const v=(c&&c[cmpMetric]!=null)?c[cmpMetric]:null;
-      const t=v!=null?Math.min(1, v/mx):0;
+      const v=cval(mk.key,g);
+      const t=v!=null?Math.min(1, v/(byGenre?rowMax[g]:gmx)):0;
       const bg=v!=null?'rgba(13,148,136,'+(0.06+0.86*t).toFixed(3)+')':'transparent';
       const tc=t>0.5?'#fff':'var(--text)';
       const lbl=(cmpMetric==='rev'?'매출 점유':'차트 점유');
-      h+='<button class="cmp-cell" data-mk="'+esc(mk.key)+'" data-g="'+esc(g)+'" style="background:'+bg+';color:'+tc+'" title="'+esc(mk.name)+' · '+esc(g)+' · '+lbl+' '+(v!=null?v+'%':'–')+'">'+(v!=null?v:'')+'</button>';
+      const top=(byGenre&&rowTop[g]===mk.key&&v!=null&&v>0);
+      h+='<button class="cmp-cell'+(top?' cmp-top':'')+'" data-mk="'+esc(mk.key)+'" data-g="'+esc(g)+'" style="background:'+bg+';color:'+tc+'" title="'+esc(mk.name)+' · '+esc(g)+' · '+lbl+' '+(v!=null?v+'%':'–')+(top?' · 이 장르 최대 시장':'')+'">'+(v!=null?v:'')+'</button>';
     });
   });
   el.innerHTML=h;
   el.style.gridTemplateColumns='132px repeat('+markets.length+',minmax(64px,1fr))';
   el.querySelectorAll('.cmp-cell').forEach(b=> b.addEventListener('click',()=> cmpJump(b.dataset.mk, b.dataset.g)));
+  var _sub=document.getElementById('cmpsub');
+  if(_sub) _sub.innerHTML=byGenre
+    ? '<span class="ci">칸 색 = 그 <b>장르 행 안에서</b> 상대 강도 · <b>보라 테두리 = 그 장르 매출 최대 시장</b></span><span class="csep">│</span><span class="ci">한 행 = 그 장르가 <b>어느 시장에서 강한지</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 장르가 약한 시장</span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span>'
+    : '<span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b></span><span class="csep">│</span><span class="ci">한 행 = 같은 장르의 <b>시장별 강·약</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 시장서 약함</span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span>';
   renderCmpInsight();
 }
 function renderCmpInsight(){
@@ -2176,6 +2190,11 @@ function cmpJump(mk, g){
 document.querySelectorAll('.cmp-metric').forEach(b=> b.addEventListener('click',()=>{
   cmpMetric=b.dataset.metric;
   document.querySelectorAll('.cmp-metric').forEach(x=> x.classList.toggle('on', x===b));
+  renderCmp();
+}));
+document.querySelectorAll('.cmp-basis').forEach(b=> b.addEventListener('click',()=>{
+  cmpBasis=b.dataset.basis;
+  document.querySelectorAll('.cmp-basis').forEach(x=> x.classList.toggle('on', x===b));
   renderCmp();
 }));
 loadMatrix();
