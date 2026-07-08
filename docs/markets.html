@@ -1624,7 +1624,7 @@ function linkifyGames(root){
   const map={}, list=[];
   const addA=(a,aid)=>{ a=(a||'').trim(); if(a.length>=2 && !(a in map)){ map[a]=aid; list.push(a); } };
   // 국문 통용명 별칭: 스토어 원 타이틀과 다른 이름으로 쓰이는 유명 글로벌 게임(번들ID로 안정 매핑, 해당 시장에 있을 때만 등록). 근본은 프롬프트가 원 표기 강제 — 이건 기존 브리핑 표기 보정용.
-  const KO_ALIAS={ 'com.nianticlabs.pokemongo':['포켓몬 GO','포켓몬고'], 'jp.co.bandainamcogames.BNGI0221':['돗칸배틀','드래곤 볼 폭렬격전'], 'jp.co.bandainamcoent.BNEI0334':['드래곤 볼 레전즈','드래곤볼 레전즈'] };
+  const KO_ALIAS={ 'com.nianticlabs.pokemongo':['포켓몬 GO','포켓몬고'], 'jp.co.bandainamcogames.BNGI0221':['돗칸배틀','드래곤 볼 폭렬격전'], 'jp.co.bandainamcogames.BNGI0211':['돗칸배틀'], 'jp.co.bandainamcoent.BNEI0334':['드래곤 볼 레전즈','드래곤볼 레전즈'] };
   for(const aid in DATA.games){ const t=(DATA.games[aid].title||'').trim(); if(t.length<2) continue;
     addA(t,aid);
     [':','：','×','(','（','/','·'].forEach(c=>{ const i=t.indexOf(c); if(i>=2) addA(t.slice(0,i),aid); });   // '·' 추가: '원신·공월의 노래' → '원신' 등록
