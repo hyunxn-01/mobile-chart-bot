@@ -1986,13 +1986,11 @@ function renderMarketBrief(text){
     const strat=cards.filter(isStrat), rest=cards.filter(c=>!isStrat(c));
     const bl=b=>'<div class="mkb-li">'+inline(b)+'</div>';
     // 요약(첫 불릿)이 여러 문장으로 길어지면 첫 문장만 요약, 나머지는 분석으로 내림(요약>분석 방지 · grounding 문장이 요약에 붙는 문제 보정). 110자 이하 단문 요약은 건드리지 않음.
+    // 요약(첫 불릿) 보정: 모델이 '키포인트 - grounding(웹검색 상세)' 구조로 쓰므로, grounding 연결자 ' - '에서만 잘라 키포인트는 요약에 온전히 남기고 grounding은 분석으로 내림. 마침표로 자르면 키포인트 둘째 문장이 조각나 요약↔분석 연결이 끊기므로 마침표 분리는 안 함.
     const sumSplit=(bullets)=>{ let s0=String(bullets[0]||'').trim(), rest=bullets.slice(1);
-      if(s0.length>110){ const tail0=s0.slice(20);
-        const pm=tail0.search(/[.。]\s/); const pIdx=pm>=0?pm+21:-1;      // 첫 문장 끝(마침표 포함 다음)
-        const dm=tail0.search(/\s[-–—]\s/); const dIdx=dm>=0?dm+20:-1;    // grounding 연결자 ' - ' 앞(마침표 없는 개조식 대비)
-        const cands=[pIdx,dIdx].filter(x=>x>0); if(cands.length){ const cut=Math.min.apply(null,cands);
-          const head=s0.slice(0,cut).replace(/[\s\-–—]+$/,'').trim(), t=s0.slice(cut).replace(/^[\s\-–—]+/,'').trim();
-          if(head&&t) return {sum:head, rest:[t].concat(rest)}; } }
+      const dm=s0.slice(20).search(/\s[-–—]\s/);
+      if(dm>=0){ const cut=dm+20; const head=s0.slice(0,cut).replace(/[\s\-–—]+$/,'').trim(), t=s0.slice(cut).replace(/^[\s\-–—]+/,'').trim();
+        if(head&&t.length>=25) return {sum:head, rest:[t].concat(rest)}; }
       return {sum:s0, rest}; };
     const card=(c,o)=>{ let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h">'+inline(c.title)+'</div>'; const sp=sumSplit(c.bullets); if(sp.rest.length){ h+='<div class="aib-sum">'+bl(sp.sum)+'</div><div class="aib-detail" hidden>'+sp.rest.map(bl).join('')+'</div><button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>'; } else { h+=bl(sp.sum); } return h+'</div>'; };   // 접힘=요약(첫 문장)만 / 자세히=분석(카드별 토글)
     let html='';
