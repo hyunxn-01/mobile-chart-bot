@@ -2040,6 +2040,7 @@ function selectBriefDate(date){
 }
 function drawBriefCal(){
   const pop=document.getElementById('mkbriefCalPop'); if(!pop||!MK_CAL_MONTH) return;
+  if(!pop._noBubble){ pop._noBubble=1; pop.addEventListener('click',e=>e.stopPropagation()); }  // 팝업 내부 클릭이 바깥클릭-닫기로 새는 것 방지(월이동 재렌더로 화살표 타깃 detach → closest 오판정 → 달력 닫힘 버그)
   const y=MK_CAL_MONTH.y, m=MK_CAL_MONTH.m, pad=n=>String(n).padStart(2,'0');
   const avail=new Set(briefAvailableDates(curAxisObj()));
   const startDow=new Date(y,m-1,1).getDay(), days=new Date(y,m,0).getDate();
