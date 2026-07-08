@@ -1985,7 +1985,11 @@ function renderMarketBrief(text){
     const isStrat=c=>/진출\s*전략|시사점|전략/.test(c.title);   // 전략·시사점 카드 = 두괄식 상단
     const strat=cards.filter(isStrat), rest=cards.filter(c=>!isStrat(c));
     const bl=b=>'<div class="mkb-li">'+inline(b)+'</div>';
-    const card=(c,o)=>{ let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h">'+inline(c.title)+'</div>'; if(c.bullets.length>1){ h+='<div class="aib-sum">'+bl(c.bullets[0])+'</div><div class="aib-detail" hidden>'+c.bullets.slice(1).map(bl).join('')+'</div><button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>'; } else { h+=c.bullets.map(bl).join(''); } return h+'</div>'; };   // 접힘=요약만 / 자세히=요약 숨기고 분석만(카드별 토글)
+    // 요약(첫 불릿)이 여러 문장으로 길어지면 첫 문장만 요약, 나머지는 분석으로 내림(요약>분석 방지 · grounding 문장이 요약에 붙는 문제 보정). 110자 이하 단문 요약은 건드리지 않음.
+    const sumSplit=(bullets)=>{ let s0=String(bullets[0]||'').trim(), rest=bullets.slice(1);
+      if(s0.length>110){ const m=s0.match(/^([\s\S]{20,}?[.。])\s+(\S[\s\S]*)$/); if(m){ return {sum:m[1].trim(), rest:[m[2].trim()].concat(rest)}; } }
+      return {sum:s0, rest}; };
+    const card=(c,o)=>{ let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h">'+inline(c.title)+'</div>'; const sp=sumSplit(c.bullets); if(sp.rest.length){ h+='<div class="aib-sum">'+bl(sp.sum)+'</div><div class="aib-detail" hidden>'+sp.rest.map(bl).join('')+'</div><button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>'; } else { h+=bl(sp.sum); } return h+'</div>'; };   // 접힘=요약(첫 문장)만 / 자세히=분석(카드별 토글)
     let html='';
     strat.forEach(c=> html+=card(c,{key:true}));   // 전략/시사점: 맨 위·강조
     rest.forEach(c=> html+=card(c,{}));
