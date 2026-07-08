@@ -481,7 +481,17 @@ REGIONS = {
 }
 
 # 브리핑 캐던스: 7일 이내 생성분이 있으면 재생성 스킵(주간 주기·비용 절감)
-BRIEF_CADENCE_DAYS = 7
+BRIEF_CADENCE_DAYS = 7   # (레거시 파라미터; 실제 게이트는 _same_iso_week=ISO주(월~일) 경계, 매주 월요일 갱신)
+
+
+def _same_iso_week(gen):
+    """generated(YYYY-MM-DD…)가 지금과 같은 ISO 주(월~일)면 True(재생성 스킵). 새 주(월요일부터)면 False → 재생성. = 매주 월요일 갱신."""
+    try:
+        g = datetime.strptime((gen or '')[:10], '%Y-%m-%d').isocalendar()
+        n = datetime.now().isocalendar()
+        return (g[0], g[1]) == (n[0], n[1])
+    except Exception:
+        return False
 
 
 def _brief_fresh(fp, days=BRIEF_CADENCE_DAYS):
@@ -490,11 +500,7 @@ def _brief_fresh(fp, days=BRIEF_CADENCE_DAYS):
         if not fp.exists():
             return False
         d = json.loads(fp.read_text(encoding='utf-8'))
-        gen = (d.get('generated', '') or '')[:10]
-        if not gen:
-            return False
-        last = datetime.strptime(gen, '%Y-%m-%d')
-        return (datetime.now() - last).days < days
+        return _same_iso_week(d.get('generated', ''))
     except Exception:
         return False
 
@@ -593,10 +599,7 @@ def _axes_prev(fp):
 
 def _axis_fresh(o, days=BRIEF_CADENCE_DAYS):
     try:
-        gen = ((o or {}).get('generated', '') or '')[:10]
-        if not gen:
-            return False
-        return (datetime.now() - datetime.strptime(gen, '%Y-%m-%d')).days < days
+        return _same_iso_week((o or {}).get('generated', ''))
     except Exception:
         return False
 
