@@ -638,7 +638,7 @@ def _prior_signal(prev, cap=300):
     return ((f"({when}) " if when else '') + s)[:cap]
 
 
-AXIS_PV = 'v12-brief5'   # 브리핑 프롬프트 버전(바꾸면 캐시 무효화·전 시장 1회 재생성). v12: 분석 개수 고정 해제(중요요소 빠짐없이), 핵심 시사점도 요약+분석. v11: 라벨 금지·키포인트 요약·개조식·자기참조/대시 금지 · 2026-07-09 요약1문장 강화+grounding→분석(값 유지=강제재생성 안 함, 렌더 분리로 기존 보정·다음 주간 갱신 때 자연 반영)
+AXIS_PV = 'v13-2step'   # 브리핑 프롬프트 버전(바꾸면 캐시 무효화·전 시장 1회 재생성). v12: 분석 개수 고정 해제(중요요소 빠짐없이), 핵심 시사점도 요약+분석. v13: 2단계 생성(분석 먼저→그 분석을 요약, 요약⊆분석 대응 보장) · v11: 라벨 금지·키포인트 요약·개조식·자기참조/대시 금지 · 2026-07-09 요약1문장 강화+grounding→분석(값 유지=강제재생성 안 함, 렌더 분리로 기존 보정·다음 주간 갱신 때 자연 반영)
 
 # [측정] API 사용량 집계 — 동작/비용 변화 없음, 기록만. 종료 시 atexit으로 총합·상위 비용 호출 출력.
 import atexit as _atexit
@@ -680,6 +680,9 @@ GROUNDING = (
 )
 
 
+_ANALYSIS_INSTR = ("각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 분석 불릿(-)들로만 쓴다(요약 줄은 넣지 말 것, 바로 분석부터). 각 불릿은 그 항목의 핵심 근거·세부를 하나씩, 중요한 것을 빠짐없이(보통 3개 안팎, 중요하면 그 이상), 서로 다른 포인트로 중복 없이 담는다. '분석' 같은 라벨을 붙이지 말고 내용만 쓸 것. 항목 제목은 그대로 둘 것. 요약은 이 분석을 근거로 별도 단계에서 자동 생성되므로 여기서는 쓰지 마라.\n")
+
+
 def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False, prior_note=''):
     scope = f"'{scope_label}' 지역(여러 나라 합산) 시장" if is_region else f"'{scope_label}' 단일 시장"
     win = _AXIS_WIN.get(axis_label, axis_label)
@@ -690,13 +693,91 @@ def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False, pri
     return (f"다음은 App Store 게임 '매출' 차트의 '{scope_label}' {axis_label} 스냅샷·추이다.\n\n"
             f"[{scope_label} · {axis_label}] {digest}\n\n"
             f"게임 사업 PM이 {scope}을 '{axis_label}'({win}) 시간축 관점에서 읽도록, 아래 5개 항목을 정확히 이 순서·제목으로 써라. "
-            "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 불릿(-)으로 쓴다. 첫 불릿: 그 항목의 핵심을 한 문장(마침표 하나·대략 60자 이내)으로 압축한 요약(막연한 주제문 금지, 실제 시장·장르·게임·수치를 콕 집어 개조식 키포인트로. 예: '한국 MMORPG · 북미 캐주얼 퍼즐·보드 · 일본 가챠 RPG·스포츠 시뮬'). 요약 불릿에는 부연·상세·둘째 문장·웹검색으로 확인한 사실을 붙이지 마라(요약은 반드시 이후 어떤 분석 불릿보다 짧게. 요약은 헤드라인일 뿐, 근거·수치·출처는 전부 이후 분석 불릿에). 이후 불릿: 요약을 뒷받침하는 근거·세부를 중요한 것은 빠짐없이 담는다(보통 3개 안팎, 중요하면 그 이상도. 서로 다른 포인트, 중복 없이, 주요 분석 요소 누락 금지). '요약'·'분석' 같은 라벨 단어를 불릿 앞에 붙이지 말고 내용만 쓸 것. 요약만 훑어도 알맹이가 잡히고, 펼치면 중요한 분석이 다 담기게. 항목 제목은 그대로 둘 것.\n"
+            + _ANALYSIS_INSTR +
             "## 시장 구조\n## 주요 게임·퍼블리셔\n## 주요 순위 변동\n## 장르 기회\n## 핵심 시사점\n\n"
             f"각 항목은 '{axis_label}'({win}) 시간축 기준으로 해석한다. 시장 구조: {s_struct}. "
             "주요 게임·퍼블리셔: 이 기간 매출 상위 게임의 성격과 강한 퍼블리셔. "
             f"주요 순위 변동: 이 기간({win}) 진입·급상승·급하락 위주(근거 약하면 '- 데이터 누적 중'). "
-            "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. 핵심 시사점: 진출·벤치마크·현지화 결론(가장 중요). 다른 항목처럼 요약 한 줄 다음에 근거·분석 불릿을 반드시 붙일 것(한 줄로 끝내지 말 것). "
+            "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. 핵심 시사점: 진출·벤치마크·현지화 결론(가장 중요). 핵심 시사점도 한 줄로 끝내지 말고 분석 불릿을 여러 개 붙일 것. "
             "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 이모지·구분선(---) 금지. 문장에 'ㅡ' 대시(em·en 대시 포함) 쓰지 말고 마침표·쉼표·괄호·콜론으로. 문장은 짧은 개조식(명사형 종결. 예: '좌우함'·'유리'). 모호한 조어 금지, 실무에서 쓰는 명확한 용어로. '지난 분석/저번 분석/앞서' 같은 자기참조 표현 금지. 브리핑은 그것만 봐도 이해되게 사실을 직접 서술(연속성은 '지속·유지·전환' 등 현재 사실로만). 한국어, 군더더기 없이. '게임/Games/游戏'는 분석 카테고리이지 장르가 아니다(장르는 구체 서브장르 MMORPG·4X·매치3 등으로만, '상위 100이 전부 게임' 류 자명한 서술 금지). 게임명 고유명사 외엔 한국어로만(游戏·ゲーム 등 외국어 일반어 금지). 게임명은 데이터·디제스트에 나온 원 표기(스토어 타이틀) 그대로 쓰고 다른 언어로 번역·현지화하지 마라(예: 'Pokémon GO'를 '포켓몬 GO'로, 'Monopoly GO'를 '모노폴리 GO'로 바꾸지 말 것). 웹검색 기사에서 다른 표기를 봐도 본문 게임명은 원 표기로 통일." + _pb + INDUSTRY_VOICE + (GROUNDING if grounded else ""))
+
+
+def _brief_sections(text):
+    """브리핑 텍스트 → [[제목, [불릿...]], ...]. 렌더러와 동일 규칙(## 헤더, - 불릿, 이어지는 줄은 직전 불릿에 병합)."""
+    out = []; cur = None
+    for ln in (text or '').splitlines():
+        t = ln.strip()
+        if not t:
+            continue
+        m = re.match(r'^#{1,3}\s+(.*)$', t)
+        if m:
+            cur = [m.group(1).strip(), []]; out.append(cur); continue
+        if cur is None:
+            continue
+        bm = re.match(r'^[-\u2022*]\s+(.*)$', t)
+        if bm:
+            cur[1].append(bm.group(1).strip())
+        elif cur[1]:
+            cur[1][-1] += ' ' + t
+    return out
+
+
+def _summarize_sections(analysis_text, usage_label=''):
+    """[2단계] 생성된 분석(## 섹션+분석 불릿)을 읽고 섹션별 한 줄 요약을 별도 호출로 생성.
+    요약은 분석에 실제로 나온 내용만 담게 강제 → 요약⊆분석(요약↔분석 대응 보장). 반환 {제목: 요약문}, 실패 시 {}."""
+    if not analysis_text or not _brief_sections(analysis_text):
+        return {}
+    prompt = (
+        "다음은 게임 매출 차트 분석 브리핑이다. 각 '## 제목' 섹션마다, 그 섹션의 분석 불릿들을 종합해 핵심을 한 줄로 압축한 요약을 만들어라.\n"
+        "규칙: (1) 요약은 반드시 그 섹션 분석에 실제로 나온 내용만 담는다. 분석에 없는 새 게임·수치·주장을 절대 넣지 마라. "
+        "(2) 그 섹션에서 가장 중요한 1~2개 포인트만 한 문장(개조식 명사형 종결, 대략 70자 이내)으로. "
+        "(3) 굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 'ㅡ' 대시 금지(마침표·쉼표·괄호·콜론으로). 게임명은 분석에 나온 표기 그대로. "
+        "(4) '요약' 같은 라벨을 붙이지 말 것.\n"
+        "출력 형식: 각 섹션을 '## 제목'(원문과 똑같이) 다음 줄에 '- 요약문' 한 줄로만. 다른 설명·머리말 없이.\n\n"
+        + analysis_text
+    )
+    out = call_claude_with_retry(prompt, max_tokens=1200, web_search=False,
+                                 usage_label=(usage_label + '(요약2단계)'), thinking_off=True)
+    if not out:
+        print('[WARN] 2단계 요약 생성 실패 → 분석만으로 진행(폴백)')
+        return {}
+    res = {}
+    for title, bullets in _brief_sections(out):
+        if bullets:
+            res[title] = bullets[0].strip()
+    return res
+
+
+def _merge_summaries(analysis_text, summaries):
+    """[2단계] 분석 텍스트의 각 '## 제목' 바로 아래에 요약 불릿을 첫 불릿으로 삽입.
+    결과 형식 = 렌더러 기대(## 제목 / 첫 불릿=요약 / 이후=분석). 요약 없으면 그 섹션은 분석 그대로(폴백=구 동작)."""
+    if not summaries:
+        return analysis_text
+    out = []
+    for ln in (analysis_text or '').splitlines():
+        out.append(ln)
+        m = re.match(r'^#{1,3}\s+(.*)$', ln.strip())
+        if m:
+            title = m.group(1).strip()
+            sm = summaries.get(title)
+            if not sm:
+                for k, v in summaries.items():
+                    if (len(k) >= 6 and k[:6] == title[:6]) or (title and title in k) or (k and k in title):
+                        sm = v; break
+            if sm:
+                out.append('- ' + sm)
+    return '\n'.join(out)
+
+
+def _gen_brief_2step(analysis_prompt, grounded, usage_label):
+    """[2단계 파이프라인] 1) 분석 생성(웹검색 grounded는 여기서) → 2) 그 분석을 요약 → 3) 요약을 첫 불릿으로 병합.
+    분석 생성 실패 시 None. 요약 실패 시 분석만 반환(폴백)."""
+    analysis = call_claude_with_retry(analysis_prompt, max_tokens=MAX_OUTPUT_TOKENS,
+                                      web_search=grounded, usage_label=usage_label)
+    if not analysis:
+        return None
+    summaries = _summarize_sections(analysis, usage_label=usage_label)
+    return _merge_summaries(analysis, summaries)
 
 
 def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
@@ -722,9 +803,14 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
             continue
         try:
             _grounded = (axis_key == 'weekly')   # #11: 최근(주간) 축만 웹검색으로 원인·출처 보강
-            text = call_claude_with_retry(_axis_prompt(scope_label, axis_label, digest, is_region, grounded=_grounded, prior_note=_prior_signal(prev)), max_tokens=MAX_OUTPUT_TOKENS, web_search=_grounded, usage_label=f"{scope_label}/{axis_label}")
+            text = _gen_brief_2step(_axis_prompt(scope_label, axis_label, digest, is_region, grounded=_grounded, prior_note=_prior_signal(prev)), grounded=_grounded, usage_label=f"{scope_label}/{axis_label}")   # 2단계: 분석 생성→그 분석을 요약→첫 불릿 병합
         except Exception as e:
             print(f'[WARN] {scope_label} {axis_label} 브리핑 실패: {e}')
+            if axis_key in prev_axes:
+                axes[axis_key] = prev_axes[axis_key]
+            continue
+        if not text:
+            print(f'[WARN] {scope_label} {axis_label} 브리핑 결과 없음 → 폴백')
             if axis_key in prev_axes:
                 axes[axis_key] = prev_axes[axis_key]
             continue
@@ -868,16 +954,21 @@ def build_global_brief(collected):
         _gpb = (f"\n\n(직전 '{axis_label}' 글로벌 메모(저비중·연속성 검증용) {_gp}\n→ 달라진 점이 있으면 '## 전 시장 공통 흐름'에 현재 사실로만 반영하라('지난 분석/저번' 자기참조 금지, 반복·복붙·새 항목 금지). 현재 분석이 우선이다.") if _gp else ""
         prompt = (f"다음은 같은 기간 App Store 게임 매출 차트를, 주요 시장은 개별·중소규모는 지역으로 묶어 '{axis_label}'({win}) 시간축으로 분석한 결과다.\n\n{body}\n\n"
                   f"위 '{axis_label}' 분석들을 토대로 종합하여, 게임 사업 PM이 전 세계를 횡단해 읽을 '{axis_label}'({win}) 헤드라인을 아래 4개 항목으로 써라. "
-                  "각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 불릿(-)으로 쓴다. 첫 불릿: 그 항목의 핵심을 한 문장(마침표 하나·대략 60자 이내)으로 압축한 요약(막연한 주제문 금지, 실제 시장·장르·게임·수치를 콕 집어 개조식 키포인트로. 예: '한국 MMORPG · 북미 캐주얼 퍼즐·보드 · 일본 가챠 RPG·스포츠 시뮬'). 요약 불릿에는 부연·상세·둘째 문장·웹검색으로 확인한 사실을 붙이지 마라(요약은 반드시 이후 어떤 분석 불릿보다 짧게. 요약은 헤드라인일 뿐, 근거·수치·출처는 전부 이후 분석 불릿에). 이후 불릿: 요약을 뒷받침하는 근거·세부를 중요한 것은 빠짐없이 담는다(보통 3개 안팎, 중요하면 그 이상도. 서로 다른 포인트, 중복 없이, 주요 분석 요소 누락 금지). '요약'·'분석' 같은 라벨 단어를 불릿 앞에 붙이지 말고 내용만 쓸 것. 요약만 훑어도 알맹이가 잡히고, 펼치면 중요한 분석이 다 담기게. 항목 제목은 그대로 둘 것.\n"
+                  + _ANALYSIS_INSTR +
                   "## 전 시장 공통 흐름\n## 시장별 차이\n## IP·퍼블리셔\n## 진출 전략\n\n"
                   "각 항목 내용 가이드. 전 시장 공통 흐름: 여러 시장·지역에서 동시에 강한 게임·장르. "
                   "시장별 차이: 주요 시장 간·지역 간 장르 구성 대비. IP·퍼블리셔: 여러 시장을 관통하는 글로벌 IP·퍼블리셔. "
                   "진출 전략: 다음 진출·벤치마크 시장 결론(가장 중요). "
                   "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. 이모지·구분선(---) 금지. 문장에 'ㅡ' 대시(em·en 대시 포함) 쓰지 말고 마침표·쉼표·괄호·콜론으로. 문장은 짧은 개조식(명사형 종결. 예: '좌우함'·'유리'). 모호한 조어 금지, 실무에서 쓰는 명확한 용어로. '지난 분석/저번 분석/앞서' 같은 자기참조 표현 금지. 브리핑은 그것만 봐도 이해되게 사실을 직접 서술(연속성은 '지속·유지·전환' 등 현재 사실로만). 한국어, 군더더기 없이. '게임/Games/游戏'는 분석 카테고리이지 장르가 아니다(장르는 구체 서브장르 MMORPG·4X·매치3 등으로만, '상위 100이 전부 게임' 류 자명한 서술 금지). 게임명 고유명사 외엔 한국어로만(游戏·ゲーム 등 외국어 일반어 금지). 게임명은 데이터·디제스트에 나온 원 표기(스토어 타이틀) 그대로 쓰고 다른 언어로 번역·현지화하지 마라(예: 'Pokémon GO'를 '포켓몬 GO'로, 'Monopoly GO'를 '모노폴리 GO'로 바꾸지 말 것). 웹검색 기사에서 다른 표기를 봐도 본문 게임명은 원 표기로 통일." + _gpb + INDUSTRY_VOICE + (GROUNDING if axis_key == 'weekly' else ""))
         try:
-            text = call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, web_search=(axis_key == 'weekly'), usage_label=f"글로벌/{axis_label}")
+            text = _gen_brief_2step(prompt, grounded=(axis_key == 'weekly'), usage_label=f"글로벌/{axis_label}")   # 2단계: 분석 생성→요약→병합
         except Exception as e:
             print(f'[WARN] 글로벌 {axis_label} 브리핑 생성 실패: {e}')
+            if axis_key in prev_axes:
+                g_axes[axis_key] = prev_axes[axis_key]
+            continue
+        if not text:
+            print(f'[WARN] 글로벌 {axis_label} 브리핑 결과 없음 → 폴백')
             if axis_key in prev_axes:
                 g_axes[axis_key] = prev_axes[axis_key]
             continue
@@ -1235,7 +1326,7 @@ def _filter_sources(text):
                   text)
 
 
-def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, web_search=False, usage_label=''):
+def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, web_search=False, usage_label='', thinking_off=False):
     """Claude API 호출 (Opus 4.8 적응형 사고 + effort 최대).
     응답은 thinking 블록 뒤 text 블록 → text만 추출. 일시 오류 시 지수 백오프 재시도.
     web_search=True면 신뢰 도메인(TRUSTED_DOMAINS) 안에서만 웹검색 도구 사용 + 비신뢰 링크 후처리 제거.
@@ -1254,7 +1345,7 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, 
                 if use_allowed:  # 크롤러 비접근 도메인으로 400 나면 use_allowed=False → 무제한 검색+사후필터
                     _tool['allowed_domains'] = TRUSTED_DOMAINS
                 kwargs['tools'] = [_tool]
-            if attempt < max_retries:  # 마지막 시도 전까지는 적응형 사고 + 최대 effort
+            if attempt < max_retries and not thinking_off:  # 마지막 시도 전까지는 적응형 사고 + 최대 effort(thinking_off=요약 경량화)
                 kwargs['thinking'] = {'type': 'adaptive'}
                 kwargs['output_config'] = {'effort': THINKING_EFFORT}
             # 스트리밍 필수: max effort + 큰 max_tokens는 10분 초과 가능 → stream 사용
