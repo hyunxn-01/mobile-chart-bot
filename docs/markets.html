@@ -2139,6 +2139,12 @@ function loadMatrix(){
     .then(r=> r.ok ? r.json() : null).then(m=>{ MATRIX=m; renderCmp(); })
     .catch(()=>{ MATRIX=null; renderCmp(); });
 }
+// 장르 기준(각 장르의 추정매출 전 시장 합=100% 중 시장 비중)용 시장 규모 가중치.
+// 순위 프록시는 시장 내부 상대값이라 규모 미반영(작은 시장 1위나 큰 시장 1위나 동일) → 나라·지역별 추정 모바일게임 매출로 가중해 달러 근사.
+// 근거: Sensor Tower H1 2024 국가 IAP(중국·일본·한국 등)×연환산 + 2024 지역 리포트(중남미 ~$1.5B·중동 ~$1.2B 등). 절대값 아닌 상대 비율만 사용(추정치).
+const MKT_WEIGHT={ us:25, cn:15, jp:12, kr:5.5, tw:2, europe:10, na_oceania:3.5, middle_east:1.5, latam:1.3, sea:2.5, south_asia:0.8 };
+function _hexA(hex,a){ hex=String(hex||'#808080').replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join(''); const n=parseInt(hex,16); const v=isNaN(n)?0x808080:n; return 'rgba('+((v>>16)&255)+','+((v>>8)&255)+','+(v&255)+','+a.toFixed(3)+')'; }
+function _hexLum(hex){ hex=String(hex||'#808080').replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join(''); const n=parseInt(hex,16); const v=isNaN(n)?0x808080:n; return (0.299*((v>>16)&255)+0.587*((v>>8)&255)+0.114*(v&255))/255; }
 function renderCmp(){
   const el=document.getElementById('cmpGrid'); if(!el) return;
   const M=MATRIX;
@@ -2146,22 +2152,27 @@ function renderCmp(){
     el.style.gridTemplateColumns='1fr';
     el.innerHTML='<div class="cmp-empty">시장 비교 매트릭스가 곧 생성됩니다 — 다음 자동 갱신 후 표시됩니다.</div>'; return;
   }
-  const markets=M.markets, genres=(M.genres||[]).slice().sort((a,b)=> a==='장르 없음'?1 : b==='장르 없음'?-1 : 0), cells=M.cells||{};
-  const cval=(mkKey,g)=>{ const c=cells[mkKey]&&cells[mkKey][g]; return (c&&c[cmpMetric]!=null)?c[cmpMetric]:null; };
-  let gmx=0; markets.forEach(mk=> genres.forEach(g=>{ const v=cval(mk.key,g); if(v!=null&&v>gmx) gmx=v; })); gmx=gmx||1;
-  const rowMax={}, rowTop={}; genres.forEach(g=>{ let m=0,bm=null,bv=-1; markets.forEach(mk=>{ const v=cval(mk.key,g); if(v!=null){ if(v>m)m=v; if(v>bv){bv=v;bm=mk.key;} } }); rowMax[g]=m||1; rowTop[g]=(bv>0?bm:null); });
   const byGenre=(cmpBasis==='genre');
+  const markets=M.markets, genres=(M.genres||[]).slice().sort((a,b)=> a==='장르 없음'?1 : b==='장르 없음'?-1 : 0), cells=M.cells||{};
+  const raw=(mkKey,g)=>{ const c=cells[mkKey]&&cells[mkKey][g]; return (c&&c[cmpMetric]!=null)?c[cmpMetric]:null; };
+  // 장르 기준: (그 시장 내부 점유% × 시장 규모 가중) = 그 시장의 그 장르 추정 매출 → 장르별 전 시장 합 100% 중 비중(달러 근사)
+  const dollars=(mkKey,g)=>{ const v=raw(mkKey,g); if(v==null) return null; return v*(MKT_WEIGHT[mkKey]!=null?MKT_WEIGHT[mkKey]:1); };
+  const rowSumD={}; if(byGenre) genres.forEach(g=>{ let s=0; markets.forEach(mk=>{ const d=dollars(mk.key,g); if(d!=null) s+=d; }); rowSumD[g]=s; });
+  const cval=(mkKey,g)=>{ if(byGenre){ const d=dollars(mkKey,g), tot=rowSumD[g]; if(d==null||!tot) return null; return Math.round(d/tot*1000)/10; } return raw(mkKey,g); };
+  let gmx=0; if(!byGenre) markets.forEach(mk=> genres.forEach(g=>{ const v=cval(mk.key,g); if(v!=null&&v>gmx) gmx=v; }));
+  gmx=gmx||1;
+  const rowMax={}; genres.forEach(g=>{ let m=0; markets.forEach(mk=>{ const v=cval(mk.key,g); if(v!=null&&v>m)m=v; }); rowMax[g]=m||1; });
   let h='<div class="cmp-corner">장르＼시장</div>'+markets.map(mk=>'<div class="cmp-mh" title="'+esc(mk.name)+'">'+esc(mk.name)+'</div>').join('');
   genres.forEach(g=>{
-    h+='<div class="cmp-glabel"><span class="cmp-dot" style="background:'+genreColor(g)+'"></span>'+esc(g)+'</div>';
+    const gc=genreColor(g), gl=_hexLum(gc);
+    h+='<div class="cmp-glabel"><span class="cmp-dot" style="background:'+gc+'"></span>'+esc(g)+'</div>';
     markets.forEach(mk=>{
       const v=cval(mk.key,g);
       const t=v!=null?Math.min(1, v/(byGenre?rowMax[g]:gmx)):0;
-      const bg=v!=null?'rgba(13,148,136,'+(0.06+0.86*t).toFixed(3)+')':'transparent';
-      const tc=t>0.5?'#fff':'var(--text)';
-      const lbl=(cmpMetric==='rev'?'매출 점유':'차트 점유');
-      const top=(byGenre&&rowTop[g]===mk.key&&v!=null&&v>0);
-      h+='<button class="cmp-cell'+(top?' cmp-top':'')+'" data-mk="'+esc(mk.key)+'" data-g="'+esc(g)+'" style="background:'+bg+';color:'+tc+'" title="'+esc(mk.name)+' · '+esc(g)+' · '+lbl+' '+(v!=null?v+'%':'–')+(top?' · 이 장르 최대 시장':'')+'">'+(v!=null?v:'')+'</button>';
+      const bg=v!=null?(byGenre?_hexA(gc, 0.14+0.80*t):'rgba(13,148,136,'+(0.06+0.86*t).toFixed(3)+')'):'transparent';
+      const tc=byGenre?((t>0.5&&gl<0.62)?'#fff':'var(--text)'):(t>0.5?'#fff':'var(--text)');
+      const lbl=byGenre?'전 시장 매출 중 비중':(cmpMetric==='rev'?'매출 점유':'차트 점유');
+      h+='<button class="cmp-cell" data-mk="'+esc(mk.key)+'" data-g="'+esc(g)+'" style="background:'+bg+';color:'+tc+'" title="'+esc(mk.name)+' · '+esc(g)+' · '+lbl+' '+(v!=null?v+'%':'–')+'">'+(v!=null?v:'')+'</button>';
     });
   });
   el.innerHTML=h;
@@ -2169,7 +2180,7 @@ function renderCmp(){
   el.querySelectorAll('.cmp-cell').forEach(b=> b.addEventListener('click',()=> cmpJump(b.dataset.mk, b.dataset.g)));
   var _sub=document.getElementById('cmpsub');
   if(_sub) _sub.innerHTML=byGenre
-    ? '<span class="ci">칸 색 = 그 <b>장르 행 안에서</b> 상대 강도 · <b>보라 테두리 = 그 장르 매출 최대 시장</b></span><span class="csep">│</span><span class="ci">한 행 = 그 장르가 <b>어느 시장에서 강한지</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 장르가 약한 시장</span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span>'
+    ? '<span class="ci">한 행 = 그 <b>장르의 추정매출 전 시장 합을 100%</b>로 본 <b>시장별 비중</b>(행 합계 ≈100%)</span><span class="csep">│</span><span class="ci"><b>시장 규모 가중</b> 적용(외부 추정 매출) · 색 = 장르마다 다름</span><span class="csep">│</span><span class="ci">순위 기반 추정이라 근사치</span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span>'
     : '<span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b></span><span class="csep">│</span><span class="ci">한 행 = 같은 장르의 <b>시장별 강·약</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 시장서 약함</span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span>';
   renderCmpInsight();
 }
