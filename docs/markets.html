@@ -639,11 +639,11 @@
     <a class="chapdot active" data-target="chartsec" href="#chartsec"><span class="chaplabel">순위 추이</span></a>
     <a class="chapdot" id="navHist" data-target="histsec" href="#histsec" style="display:none"><span class="chaplabel">순위 이력</span></a>
     <a class="chapdot" data-target="cmpsec" href="#cmpsec"><span class="chaplabel">시장 비교</span></a>
+    <a class="chapdot" data-target="gopsec" href="#gopsec"><span class="chaplabel">장르 기회</span></a>
     <a class="chapdot" data-target="aggsec" href="#aggsec"><span class="chaplabel">퍼블리셔·장르</span></a>
     <a class="chapdot" data-target="gapsec" href="#gapsec"><span class="chaplabel">매출 ↔ 인기 갭</span></a>
     <a class="chapdot" data-target="moversec" href="#moversec"><span class="chaplabel">진입 · 이탈 · 급변</span></a>
     <a class="chapdot" data-target="watchsec" href="#watchsec"><span class="chaplabel">지속 상승</span></a>
-    <a class="chapdot" data-target="gopsec" href="#gopsec"><span class="chaplabel">장르 기회</span></a>
     <div class="navsrc-wrap" role="tablist" aria-label="차트 종류">
       <button class="navsrc" data-src="grossing" aria-selected="true">매출</button>
       <button class="navsrc" data-src="free" aria-selected="false">인기</button>
@@ -696,6 +696,20 @@
     <div class="gop-insight" id="cmpInsight" style="margin-top:14px"></div>
   </section>
 
+  <div class="pubsec" id="gopsec">
+    <h2>장르 진입 맵 <span style="font-size:13px;font-weight:500;color:var(--muted)">· 수요(매출) × 1위 집중도</span></h2>
+    <p class="sub cap" id="gopsub"></p>
+    <div id="goptrajbar" class="goptraj-bar"></div>
+    <div id="goptrajwrap" hidden></div>
+    <div id="gopout"></div>
+    <div class="gop-legend">
+      <span><span class="gop-sw" style="background:#16a34a"></span>분산 대형 · 큰 돈, 1강 없음</span>
+      <span><span class="gop-sw" style="background:#64748b"></span>요새 · 큰 돈·1강 독식</span>
+      <span><span class="gop-sw" style="background:#2563eb"></span>소형 난전 · 작은 돈·분산</span>
+      <span><span class="gop-sw" style="background:#e07c12"></span>틈새 독점 · 작은 돈·1강 독식</span>
+    </div>
+  </div>
+
   <div class="pubsec" id="aggsec">
     <div class="srcrow">
       <span class="srclabel">집계 기준</span>
@@ -744,20 +758,6 @@
     <h2>지속 상승 주목</h2>
     <p class="sub cap" id="watchsub"></p>
     <div id="watchout"></div>
-  </div>
-
-  <div class="pubsec" id="gopsec">
-    <h2>장르 진입 맵 <span style="font-size:13px;font-weight:500;color:var(--muted)">· 수요(매출) × 1위 집중도</span></h2>
-    <p class="sub cap" id="gopsub"></p>
-    <div id="goptrajbar" class="goptraj-bar"></div>
-    <div id="goptrajwrap" hidden></div>
-    <div id="gopout"></div>
-    <div class="gop-legend">
-      <span><span class="gop-sw" style="background:#16a34a"></span>분산 대형 · 큰 돈, 1강 없음</span>
-      <span><span class="gop-sw" style="background:#64748b"></span>요새 · 큰 돈·1강 독식</span>
-      <span><span class="gop-sw" style="background:#2563eb"></span>소형 난전 · 작은 돈·분산</span>
-      <span><span class="gop-sw" style="background:#e07c12"></span>틈새 독점 · 작은 돈·1강 독식</span>
-    </div>
   </div>
 
   <footer class="site-footer">
