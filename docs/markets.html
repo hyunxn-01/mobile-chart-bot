@@ -1455,7 +1455,7 @@ function gopRenderTraj(t){
   var cur=gopInterp(G,t);
   var labSet={}; Object.keys(cur).sort(function(a,b){return cur[b].revp-cur[a].revp;}).slice(0,8).forEach(function(g){labSet[g]=1;});
   Object.keys(cur).forEach(function(g){ var v=cur[g]; if(v.n<0.3&&v.revp<0.2) return; var col=G.zoneOf(v.top1,v.revp), cx=G.xOf(v.top1), cy=G.yOf(v.revp), r=G.rOf(v.n);
-    s+='<g class="gop-pt"><circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.62" stroke="'+col+'" stroke-width="1.5"><title>'+esc(g)+' · 매출 '+v.revp.toFixed(1)+'% · 집중 '+Math.round(v.top1)+'% · 게임 '+Math.round(v.n)+'</title></circle>';
+    s+='<g class="gop-pt gop-clk" data-g="'+esc(g)+'" style="cursor:pointer"><circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.62" stroke="'+col+'" stroke-width="1.5"><title>'+esc(g)+' · 매출 '+v.revp.toFixed(1)+'% · 집중 '+Math.round(v.top1)+'% · 게임 '+Math.round(v.n)+' · 클릭: 게임 보기</title></circle>';
     if(labSet[g]) s+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="10">'+esc(g)+'</text>'; else s+='<text class="gop-hlab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'">'+esc(g)+'</text>';
     s+='</g>'; });
   s+='</svg></div>';
@@ -1563,7 +1563,7 @@ function renderGenreOpp(){
   const bigSet=new Set(gs.slice().sort((a,b)=>b.rev-a.rev).slice(0,8).map(g=>g.genre));   // 매출 상위 8개(큰 버블)만 상시 라벨, 나머지는 hover 시 표기
   gs.forEach(g=>{ const cx=xOf(g.top1), cy=yOf(g.revp), r=rOf(g.n), col=zoneOf(g);
     const tip=esc(g.genre)+' · 매출 점유 '+g.revp+'% · 1위 집중 '+g.top1+'% · 게임 '+g.n+'개'+(g.n===1?'(단일 타이틀)':'');
-    s+='<g class="gop-pt"><circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.5" stroke="'+col+'" stroke-width="1.3"><title>'+tip+'</title></circle>';
+    s+='<g class="gop-pt gop-clk" data-g="'+esc(g.genre)+'" style="cursor:pointer"><circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.5" stroke="'+col+'" stroke-width="1.3"><title>'+tip+' · 클릭: 게임 보기</title></circle>';
     if(!bigSet.has(g.genre)) s+='<text class="gop-hlab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'">'+esc(g.genre)+'</text>';
     s+='</g>'; });
   // 큰 버블(매출 상위)만 상시 라벨 — 충돌 회피(매출순 배치·세로/좌측 이동)
@@ -1887,7 +1887,8 @@ function openGameDetail(aid){
   document.getElementById('gmClose').addEventListener('click',close);
   bg.addEventListener('click',e=>{ if(e.target===bg) close(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!bg.hidden) close(); });
-  document.addEventListener('click',e=>{ const el=e.target.closest&&e.target.closest('.gdname,.ginfo'); if(el&&el.getAttribute('data-aid')){ e.stopPropagation(); e.preventDefault(); const aid=el.getAttribute('data-aid');
+  document.addEventListener('click',e=>{ const el=e.target.closest&&e.target.closest('.gdname,.ginfo,.gg-row'); if(el&&el.getAttribute('data-aid')){ e.stopPropagation(); e.preventDefault(); const aid=el.getAttribute('data-aid');
+    const _mk=el.getAttribute('data-mk'); if(_mk){ openGameDetailInMarket(aid, _mk); return; }   // 히트맵/버블 장르목록: 그 시장 맥락으로 상세
     const inBrief = el.closest && el.closest('#mkbrief');
     const bm = MK_BRIEF_MARKET;
     if(inBrief && bm && bm.charts && bm.charts.grossing && bm.charts.grossing.games && bm.charts.grossing.games[aid]){
@@ -1897,6 +1898,43 @@ function openGameDetail(aid){
     } else openGameDetail(aid);
   } }, true);
 })();
+
+// ===== 장르 게임 목록 모달(히트맵 칸·버블 클릭 → 그 시장·장르 게임들) =====
+function openGameDetailInMarket(aid, marketKey){
+  var bm = (marketKey && marketKey===MK_CC && FULL) ? FULL : MK_MARKET_CACHE[marketKey];
+  if(bm && bm.charts && bm.charts.grossing && bm.charts.grossing.games && bm.charts.grossing.games[aid]){
+    var sF=FULL, sD=DATA; FULL=bm; DATA=bm.charts.grossing; _gwCache=null;   // 그 시장 맥락으로 상세(현재 차트 시장 안 바꿈)
+    try{ openGameDetail(aid); } finally { FULL=sF; DATA=sD; _gwCache=null; }
+  } else openGameDetail(aid);
+}
+function openGenreGames(marketKey, marketName, genre){
+  var bg=document.getElementById('gmodalBg'), body=document.getElementById('gmBody'); if(!bg||!body) return;
+  var bm = (marketKey===MK_CC && FULL) ? FULL : MK_MARKET_CACHE[marketKey];
+  var head='<div style="margin-bottom:6px"><div style="font-size:15px;font-weight:700">'+esc(marketName||marketKey)+' · '+esc(genre)+'</div><div id="ggsub" style="font-size:12px;color:var(--muted);margin-top:2px">게임 목록 불러오는 중…</div></div>';
+  if(!bm){
+    body.innerHTML=head; bg.hidden=false; document.body.style.overflow='hidden';
+    fetch('./markets/'+marketKey+'.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){ if(j){ MK_MARKET_CACHE[marketKey]=j; openGenreGames(marketKey, marketName, genre); } else { var s=document.getElementById('ggsub'); if(s) s.textContent='데이터를 불러오지 못했어요'; } }).catch(function(){ var s=document.getElementById('ggsub'); if(s) s.textContent='데이터를 불러오지 못했어요'; });
+    return;
+  }
+  var G=bm.charts&&bm.charts.grossing; if(!G){ body.innerHTML=head; bg.hidden=false; document.body.style.overflow='hidden'; return; }
+  var entry=((G.genres&&G.genres.list)||[]).filter(function(e){ return (e.genre||'').trim()===genre; })[0];
+  var rows='', count=0;
+  var sF=FULL, sD=DATA; FULL=bm; DATA=G; _gwCache=null;
+  try{
+    var arr=((entry&&entry.games)||[]).map(function(x){ var aid=x.app_id; var rank=gmLatest('grossing',aid); var meta=(G.games&&G.games[aid])||{}; return {aid:aid, rank:rank, rev:revShare(aid), title:(meta.title_kr||meta.title||aid), icon:meta.icon}; }).filter(function(x){ return x.rank!=null; }).sort(function(a,b){ return a.rank-b.rank; });
+    count=arr.length;
+    rows=arr.map(function(x){
+      var ic = x.icon ? '<img src="'+esc(x.icon)+'" alt="" referrerpolicy="no-referrer" loading="lazy" style="width:30px;height:30px;border-radius:7px;flex:0 0 auto">' : '<span style="width:30px;height:30px;border-radius:7px;background:var(--chip);display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);flex:0 0 auto">'+esc((x.title||'?').slice(0,1))+'</span>';
+      var rv = (x.rev!=null) ? ('추정매출 '+(Math.round(x.rev*1000)/10)+'%') : '';
+      return '<button type="button" class="gg-row" data-aid="'+esc(x.aid)+'" data-mk="'+esc(marketKey)+'" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-top:0.5px solid var(--line);padding:8px 2px;cursor:pointer;color:var(--text);font:inherit"><span style="min-width:36px;font-size:12px;color:var(--muted)">'+x.rank+'위</span>'+ic+'<span style="flex:1;font-size:13px">'+esc(x.title)+'</span><span style="font-size:12px;color:var(--muted);white-space:nowrap">'+rv+'</span></button>';
+    }).join('');
+  } finally { FULL=sF; DATA=sD; _gwCache=null; }
+  head='<div style="margin-bottom:6px"><div style="font-size:15px;font-weight:700">'+esc(marketName||marketKey)+' · '+esc(genre)+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">이 시장의 '+esc(genre)+' 게임 '+count+'개 · 매출 순</div></div>';
+  var foot='<p style="font-size:11.5px;color:var(--muted);margin:10px 0 0">게임을 누르면 순위 추이·추정매출 상세로 이동해요</p>';
+  body.innerHTML = head + (rows ? ('<div>'+rows+'</div>') : '<p style="color:var(--muted);padding:12px 0">이 시장 상위 차트에는 이 장르 게임이 없어요.</p>') + foot;
+  bg.hidden=false; document.body.style.overflow='hidden';
+}
+document.addEventListener('click', function(e){ var el=e.target.closest && e.target.closest('#gopsec .gop-clk[data-g]'); if(el){ var g=el.getAttribute('data-g'); var opt=document.querySelector('#countrySel option:checked'); openGenreGames(MK_CC, (opt&&opt.textContent)||MK_CC, g); } });
 
 // #8: 게임강조 카드(.pubrow/.pubcard/.watchcard) 클릭 시 장르차트 상태면 게임차트로 전환(강조가 보이도록) + 차트로 스크롤
 document.addEventListener('click',(e)=>{
@@ -2177,7 +2215,7 @@ function renderCmp(){
   });
   el.innerHTML=h;
   el.style.gridTemplateColumns='132px repeat('+markets.length+',minmax(64px,1fr))';
-  el.querySelectorAll('.cmp-cell').forEach(b=> b.addEventListener('click',()=> cmpJump(b.dataset.mk, b.dataset.g)));
+  el.querySelectorAll('.cmp-cell').forEach(b=> b.addEventListener('click',()=>{ var mk=b.dataset.mk, g=b.dataset.g, nm=((MATRIX.markets||[]).filter(function(m){return m.key===mk;})[0]||{}).name||mk; openGenreGames(mk, nm, g); }));
   var _sub=document.getElementById('cmpsub');
   if(_sub) _sub.innerHTML=byGenre
     ? '<span class="ci">한 행 = 그 <b>장르의 추정매출 전 시장 합을 100%</b>로 본 <b>시장별 비중</b>(행 합계 ≈100%)</span><span class="csep">│</span><span class="ci"><b>시장 규모 가중</b> 적용(외부 추정 매출) · 색 = 장르마다 다름</span><span class="csep">│</span><span class="ci">순위 기반 추정이라 근사치</span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span>'
