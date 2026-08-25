@@ -1389,16 +1389,25 @@ function renderWatch(){
 }
 // ===== 버블맵 기간 추이(기간 스크럽) — 프론트 계산, 백엔드 무관 =====
 var _gopTraj={on:false, geom:null, timer:null};
-function gopDailyRefs(){ var G=FULL.charts&&FULL.charts.grossing; var d=G&&G.timeframes&&G.timeframes.daily; return {G:G, labels:(d&&d.labels)||[], series:(d&&d.series)||{}}; }
+var GOP_UNIT='weekly';   // 버블맵 기간 단위(일 단위는 하루 등락이 커 추세가 묻혀 2026-08-26 주 단위로 전환). 월 단위로 올릴 땐 'monthly' — 완료 월 3개 이상(2026-10-01~)일 때만 궤적이 서고, gopFmtLabel과 setupGopTraj의 날짜 입력 min/max도 같이 본다.
+function gopRefs(){ var G=FULL.charts&&FULL.charts.grossing; var d=G&&G.timeframes&&G.timeframes[GOP_UNIT]; return {G:G, labels:(d&&d.labels)||[], series:(d&&d.series)||{}}; }
+function gopFmtLabel(s){ if(!s) return '';
+  if(GOP_UNIT==='monthly') return String(s).slice(0,4)+'년 '+(+String(s).slice(5,7))+'월';
+  if(GOP_UNIT==='weekly'){ var p=String(s).split('-'); return p.length>2?(+p[1])+'/'+(+p[2])+'주':String(s); }
+  return String(s).slice(5); }
+function gopSnapIdx(v, labels, dflt){ if(!v) return dflt; var i=labels.indexOf(v); if(i>=0) return i;
+  var best=dflt, bd=Infinity, tv=Date.parse(v); if(isNaN(tv)) return dflt;          // 주·월 라벨은 구간 시작일이라 그 사이 날짜를 고르면 가장 가까운 구간에 붙인다
+  for(var k=0;k<labels.length;k++){ var t=Date.parse(labels[k]); if(isNaN(t)) continue; var dd=Math.abs(t-tv); if(dd<bd){ bd=dd; best=k; } }
+  return best; }
 function gopGenreOf(aid){ var G=FULL.charts&&FULL.charts.grossing; return ((G&&G.games&&G.games[aid])||DATA.games[aid]||{}).genre||null; }
-function gopDayMetrics(d){
-  var refs=gopDailyRefs(), series=refs.series, acc={}, allTot=0;
+function gopFrameMetrics(d){
+  var refs=gopRefs(), series=refs.series, acc={}, allTot=0;
   for(var aid in series){ var arr=series[aid]; var r=arr?arr[d]:null; if(r==null||r<=0) continue; var gen=gopGenreOf(aid); if(!gen||gen==='미상') continue; var w=revWeight(r); allTot+=w; var a=acc[gen]||(acc[gen]={tot:0,max:0,n:0}); a.tot+=w; a.n++; if(w>a.max)a.max=w; }
   var out={}; if(allTot>0){ for(var g in acc){ var b=acc[g]; out[g]={revp:b.tot/allTot*100, top1:b.tot>0?b.max/b.tot*100:0, n:b.n}; } }
   return out;
 }
 function gopBuildGeom(sIdx,eIdx){
-  var days=[]; for(var d=sIdx; d<=eIdx; d++) days.push(gopDayMetrics(d));
+  var days=[]; for(var d=sIdx; d<=eIdx; d++) days.push(gopFrameMetrics(d));
   var genreSet={}, maxRev=1, maxN=1;
   days.forEach(function(m){ for(var g in m){ genreSet[g]=1; if(m[g].revp>maxRev)maxRev=m[g].revp; if(m[g].n>maxN)maxN=m[g].n; } });
   var W=1060,H=440,padL=54,padR=130,padT=26,padB=48;
@@ -1435,8 +1444,8 @@ function gopInterp(G,t){
   return out;
 }
 function gopAnchorsPaths(G){
-  var labels=gopDailyRefs().labels, ms=G.days[0]||{}, me=G.days[G.days.length-1]||{}, s='';
-  var sD=(labels[G.sIdx]||'').slice(5), eD=(labels[G.eIdx]||'').slice(5);
+  var labels=gopRefs().labels, ms=G.days[0]||{}, me=G.days[G.days.length-1]||{}, s='';
+  var sD=gopFmtLabel(labels[G.sIdx]), eD=gopFmtLabel(labels[G.eIdx]);
   G.genres.forEach(function(g){
     var a=ms[g], b=me[g], hasA=a&&a.n>0, hasB=b&&b.n>0; if(!hasA&&!hasB) return;
     var ref=hasB?b:a, col=G.zoneOf(ref.top1,ref.revp);
@@ -1448,7 +1457,7 @@ function gopAnchorsPaths(G){
   return s;
 }
 function gopRenderTraj(t){
-  var G=_gopTraj.geom; if(!G) return; var labels=gopDailyRefs().labels;
+  var G=_gopTraj.geom; if(!G) return; var labels=gopRefs().labels;
   var s='<div class="gop-wrap"><svg viewBox="0 0 '+G.W+' '+G.H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="기간 추이 버블맵">';
   s+=gopBgSvg(G);
   s+=gopAnchorsPaths(G);
@@ -1460,14 +1469,14 @@ function gopRenderTraj(t){
     s+='</g>'; });
   s+='</svg></div>';
   var w=document.getElementById('goptrajwrap'); if(w) w.innerHTML=s;
-  var dd=Math.round(t), dEl=document.getElementById('goptrajDay'); if(dEl) dEl.textContent=labels[dd]||'';
+  var dd=Math.round(t), dEl=document.getElementById('goptrajDay'); if(dEl) dEl.textContent=gopFmtLabel(labels[dd]);
 }
 function gopSliderT(){ var sl=document.getElementById('goptrajSlider'), G=_gopTraj.geom; if(!G||!sl) return 0; return G.sIdx+(+sl.value)/1000*(G.eIdx-G.sIdx); }
 function gopBuildTicks(){
   var G=_gopTraj.geom, el=document.getElementById('goptrajTicks'); if(!G||!el) return;
-  var labels=gopDailyRefs().labels, span=G.eIdx-G.sIdx, h='';
-  for(var d=G.sIdx; d<=G.eIdx; d++){ var pct=span?(d-G.sIdx)/span*100:0; var lab=(labels[d]||'').slice(5);
-    var showLab=(d===G.sIdx||d===G.eIdx||span<=8||(d-G.sIdx)%2===0);
+  var labels=gopRefs().labels, span=G.eIdx-G.sIdx, h='';
+  for(var d=G.sIdx; d<=G.eIdx; d++){ var pct=span?(d-G.sIdx)/span*100:0; var lab=gopFmtLabel(labels[d]);
+    var showLab=(d===G.sIdx||d===G.eIdx||span<=14||(d-G.sIdx)%2===0);
     h+='<span class="goptraj-tick" style="left:'+pct.toFixed(2)+'%"><i></i>'+(showLab?'<em>'+lab+'</em>':'')+'</span>'; }
   el.innerHTML=h;
 }
@@ -1483,10 +1492,9 @@ function gopPlay(){
 }
 function gopTrajRangeChange(){
   gopStop();
-  var labels=gopDailyRefs().labels;
+  var labels=gopRefs().labels;
   var sv=document.getElementById('goptrajStart').value, ev=document.getElementById('goptrajEnd').value;
-  var si=labels.indexOf(sv), ei=labels.indexOf(ev);
-  if(si<0) si=0; if(ei<0) ei=labels.length-1;
+  var si=gopSnapIdx(sv, labels, 0), ei=gopSnapIdx(ev, labels, labels.length-1);
   if(si>ei){ var tmp=si; si=ei; ei=tmp; }
   if(ei-si<1){ if(ei<labels.length-1) ei=si+1; else if(si>0) si=ei-1; }
   _gopTraj.geom=gopBuildGeom(si,ei);
@@ -1505,7 +1513,7 @@ function gopTrajToggle(){
 function setupGopTraj(){
   var bar=document.getElementById('goptrajbar'); if(!bar) return;
   var sec=document.getElementById('gopsec');
-  var labels=gopDailyRefs().labels;
+  var labels=gopRefs().labels;
   var o=document.getElementById('gopout'), tw=document.getElementById('goptrajwrap');
   if(labels.length<3){ bar.innerHTML=''; if(sec)sec.classList.remove('traj-on'); if(o)o.hidden=false; if(tw)tw.hidden=true; _gopTraj.on=false; return; }
   var first=labels[0], last=labels[labels.length-1];
@@ -1514,9 +1522,9 @@ function setupGopTraj(){
     '<span class="goptraj-arr">→</span>'+
     '<input type="date" class="goptraj-date" id="goptrajEnd" min="'+first+'" max="'+last+'" value="'+last+'">'+
     '<button type="button" class="goptraj-play" id="goptrajPlay">▶ 재생</button>'+
-    '<span class="goptraj-daylab">현재</span><span class="goptraj-day" id="goptrajDay">'+last+'</span>'+
-    '<span class="goptraj-cap">흐린 원 = 시작·종료일 위치(점선 시작 · 파선 종료 · 선 이동경로), 진한 원 = 현재 날짜. 버블에 마우스를 올리면 장르·수치가 표시됩니다.</span></div>'+
-    '<div class="goptraj-slider-row"><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 내 날짜 스크럽"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
+    '<span class="goptraj-daylab">현재</span><span class="goptraj-day" id="goptrajDay">'+gopFmtLabel(last)+'</span>'+
+    '<span class="goptraj-cap">주 단위입니다 — 각 주의 평균 순위로 계산해 차트 탭·메일 리포트와 기준이 같습니다. 흐린 원 = 시작·종료 주 위치(점선 시작 · 파선 종료 · 선 이동경로), 진한 원 = 현재 주. 버블에 마우스를 올리면 장르·수치가 표시됩니다.</span></div>'+
+    '<div class="goptraj-slider-row"><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 내 주 스크럽"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
   document.getElementById('goptrajStart').addEventListener('change', gopTrajRangeChange);
   document.getElementById('goptrajEnd').addEventListener('change', gopTrajRangeChange);
   document.getElementById('goptrajSlider').addEventListener('input', function(){ gopStop(); gopRenderTraj(gopSliderT()); });
