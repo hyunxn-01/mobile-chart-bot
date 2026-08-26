@@ -1393,7 +1393,7 @@ var GOP_UNIT='weekly';   // 버블맵 기간 단위(일 단위는 하루 등락�
 function gopRefs(){ var G=FULL.charts&&FULL.charts.grossing; var d=G&&G.timeframes&&G.timeframes[GOP_UNIT]; return {G:G, labels:(d&&d.labels)||[], series:(d&&d.series)||{}}; }
 function gopFmtLabel(s){ if(!s) return '';
   if(GOP_UNIT==='monthly') return String(s).slice(0,4)+'년 '+(+String(s).slice(5,7))+'월';
-  if(GOP_UNIT==='weekly'){ var p=String(s).split('-'); return p.length>2?(+p[1])+'/'+(+p[2])+'주':String(s); }
+  if(GOP_UNIT==='weekly'){ var p=String(s).split('-'); return p.length>2?(+p[1])+'/'+(+p[2]):String(s); }   // 그 주의 시작일만. 주 단위임은 안내 문구가 알린다
   return String(s).slice(5); }
 function gopSnapIdx(v, labels, dflt){ if(!v) return dflt; var i=labels.indexOf(v); if(i>=0) return i;
   var best=dflt, bd=Infinity, tv=Date.parse(v); if(isNaN(tv)) return dflt;          // 주·월 라벨은 구간 시작일이라 그 사이 날짜를 고르면 가장 가까운 구간에 붙인다
