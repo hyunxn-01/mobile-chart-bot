@@ -1389,8 +1389,11 @@ function renderWatch(){
 }
 // ===== 버블맵 기간 추이(기간 스크럽) — 프론트 계산, 백엔드 무관 =====
 var _gopTraj={on:false, geom:null, timer:null};
-var GOP_UNIT='weekly';   // 버블맵 기간 단위(일 단위는 하루 등락이 커 추세가 묻혀 2026-08-26 주 단위로 전환). 월 단위로 올릴 땐 'monthly' — 완료 월 3개 이상(2026-10-01~)일 때만 궤적이 서고, gopFmtLabel과 setupGopTraj의 날짜 입력 min/max도 같이 본다.
+var GOP_UNIT='monthly';   // 버블맵 기간 단위(일 단위는 하루 등락이 커 추세가 묻혀 2026-08-26 주 단위로, 완료 월이 4개 쌓여 2026-10-02 월 단위로 전환). 'weekly'로 되돌려도 날짜 입력·안내 문구가 따라 바뀐다.
 function gopRefs(){ var G=FULL.charts&&FULL.charts.grossing; var d=G&&G.timeframes&&G.timeframes[GOP_UNIT]; return {G:G, labels:(d&&d.labels)||[], series:(d&&d.series)||{}}; }
+function gopFirstPartial(){   // 수집 첫날이 그 달 1일이 아니면 첫 월 구간은 반쪽 달(예: 2026-06은 20일부터 11일치) → 기본 기간에서 뺀다(선택은 가능)
+  if(GOP_UNIT!=='monthly') return false; var G=FULL.charts&&FULL.charts.grossing, dl=(G&&G.timeframes&&G.timeframes.daily&&G.timeframes.daily.labels)||[], ml=gopRefs().labels;
+  return !!(dl.length&&ml.length&&String(dl[0]).slice(0,7)===ml[0]&&String(dl[0]).slice(8,10)!=='01'); }
 function gopFmtLabel(s){ if(!s) return '';
   if(GOP_UNIT==='monthly') return String(s).slice(0,4)+'년 '+(+String(s).slice(5,7))+'월';
   if(GOP_UNIT==='weekly'){ var p=String(s).split('-'); return p.length>2?(+p[1])+'/'+(+p[2]):String(s); }   // 그 주의 시작일만. 주 단위임은 안내 문구가 알린다
@@ -1516,15 +1519,19 @@ function setupGopTraj(){
   var labels=gopRefs().labels;
   var o=document.getElementById('gopout'), tw=document.getElementById('goptrajwrap');
   if(labels.length<3){ bar.innerHTML=''; if(sec)sec.classList.remove('traj-on'); if(o)o.hidden=false; if(tw)tw.hidden=true; _gopTraj.on=false; return; }
-  var first=labels[0], last=labels[labels.length-1];
+  var mon=GOP_UNIT==='monthly', U=mon?'월':'주', part=gopFirstPartial();
+  var first=labels[(part&&labels.length>=4)?1:0], last=labels[labels.length-1];   // 반쪽 첫 달은 완료 월이 3개 이상 남을 때만 기본에서 뺀다
+  var pick=function(id,val){ if(!mon) return '<input type="date" class="goptraj-date" id="'+id+'" min="'+labels[0]+'" max="'+last+'" value="'+val+'">';
+    return '<select class="goptraj-date" id="'+id+'">'+labels.map(function(l,i){ return '<option value="'+l+'"'+(l===val?' selected':'')+'>'+gopFmtLabel(l)+((part&&i===0)?' (일부)':'')+'</option>'; }).join('')+'</select>'; };   // 월 라벨(YYYY-MM)은 날짜 입력에 안 맞아 목록으로 고른다
   bar.innerHTML='<div class="goptraj-ctrl"><span class="goptraj-lab">기간</span>'+
-    '<input type="date" class="goptraj-date" id="goptrajStart" min="'+first+'" max="'+last+'" value="'+first+'">'+
+    pick('goptrajStart', first)+
     '<span class="goptraj-arr">→</span>'+
-    '<input type="date" class="goptraj-date" id="goptrajEnd" min="'+first+'" max="'+last+'" value="'+last+'">'+
+    pick('goptrajEnd', last)+
     '<button type="button" class="goptraj-play" id="goptrajPlay">▶ 재생</button>'+
     '<span class="goptraj-daylab">현재</span><span class="goptraj-day" id="goptrajDay">'+gopFmtLabel(last)+'</span>'+
-    '<span class="goptraj-cap">주 단위입니다 — 각 주의 평균 순위로 계산해 차트 탭·메일 리포트와 기준이 같습니다. 흐린 원 = 시작·종료 주 위치(점선 시작 · 파선 종료 · 선 이동경로), 진한 원 = 현재 주. 버블에 마우스를 올리면 장르·수치가 표시됩니다.</span></div>'+
-    '<div class="goptraj-slider-row"><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 내 주 스크럽"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
+    '<span class="goptraj-cap">'+U+' 단위입니다 — 각 '+U+'의 평균 순위로 계산해 차트 탭·메일 리포트와 기준이 같습니다. 흐린 원 = 시작·종료 '+U+' 위치(점선 시작 · 파선 종료 · 선 이동경로), 진한 원 = 현재 '+U+'. 버블에 마우스를 올리면 장르·수치가 표시됩니다.'+
+    (part?' 첫 달('+gopFmtLabel(labels[0])+')은 '+String(((FULL.charts.grossing.timeframes.daily||{}).labels||[''])[0]).slice(8,10).replace(/^0/,'')+'일부터 수집한 일부 기간이라 기본 기간에서 뺐습니다(목록에서 고를 수 있습니다).':'')+'</span></div>'+
+    '<div class="goptraj-slider-row"><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 내 '+U+' 스크럽"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
   document.getElementById('goptrajStart').addEventListener('change', gopTrajRangeChange);
   document.getElementById('goptrajEnd').addEventListener('change', gopTrajRangeChange);
   document.getElementById('goptrajSlider').addEventListener('input', function(){ gopStop(); gopRenderTraj(gopSliderT()); });
