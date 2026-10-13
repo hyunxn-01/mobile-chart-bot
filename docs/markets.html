@@ -581,7 +581,7 @@
         </svg>
       </div>
       <div class="intro-block"><h3>왜 만들었나</h3><p>게임 사업 PM은 "지금 시장에서 무슨 일이 일어나는가"를 매일 빠르게 파악해야 합니다. 앱스토어 차트는 그날의 스냅샷일 뿐 추세·경쟁 구도·신작 성패가 안 보입니다. 유료 분석툴 없이도 매일 자동으로 시장을 추적·분석하는 도구를 직접 만들었습니다.</p></div>
-      <div class="intro-block"><h3>어떻게</h3><p>매일 아침 한국 앱스토어 매출·인기 차트를 자동 수집(GitHub Actions)하고, 순위를 누적해 시간축 추세로 가공합니다. 퍼블리셔·장르 집계, 매출↔인기 갭, 진입·이탈·급변, 추정 매출 점유율을 더하고, AI가 매일 시장을 요약해 메일·대시보드로 전달합니다.</p></div>
+      <div class="intro-block"><h3>어떻게</h3><p>매일 아침 주요국 앱스토어 매출·인기 차트를 자동 수집(GitHub Actions)하고, 순위를 누적해 시간축 추세로 가공합니다. 퍼블리셔·장르 집계, 매출↔인기 갭, 진입·이탈·급변, 추정 매출 점유율을 추가하고, AI가 매주 시장을 분석해 대시보드로 전달합니다.</p></div>
       <div class="intro-block"><h3>무엇을 읽나</h3><p>어떤 퍼블리셔·장르가 매출을 점유하는지, 신작이 정착하는지 이탈하는지, 다운로드 대비 수익화가 약한 게임은 무엇인지, 순위 급변으로 본 이벤트 효과까지 읽을 수 있습니다.</p></div>
       <div class="intro-block"><h3>어디에 쓰나</h3><p>경쟁사 동향 모니터링, 장르 진입 타이밍 판단, 벤치마킹 대상 발굴, 신작 런칭 성과 추적까지, 사업 의사결정에 매일 쓰는 시장 대시보드입니다.</p></div>
     </div>
@@ -600,7 +600,7 @@
     <div class="mkbrief-tabs" id="mkbriefTabs" role="tablist" aria-label="시장 브리핑 탭"></div>
     <div class="mkbrief-axis" id="mkbriefAxis" role="tablist" aria-label="시간축 탭"></div>
     <div class="mkbrief-body" id="mkbriefBody"></div>
-    <p class="mkbrief-foot">AI(Opus)가 주요 시장·지역을 <strong>시간축별(주·월·분기·년)</strong>로 분석 — 기간이 완료된 시간축만 생성되고, 7일마다 갱신.</p>
+    <p class="mkbrief-foot">AI(Opus)가 주요 시장·지역을 <strong>시간축별(주·월·분기·년)</strong>로 분석합니다. 기간이 완료된 시간축만 생성되고, 매주 월요일에 갱신됩니다.</p>
   </details>
 
   <h2 class="sectitle" id="secTitleChart">순위 추이</h2>
@@ -703,10 +703,10 @@
     <div id="goptrajwrap" hidden></div>
     <div id="gopout"></div>
     <div class="gop-legend">
-      <span><span class="gop-sw" style="background:#16a34a"></span>분산 대형 · 큰 돈, 1강 없음</span>
-      <span><span class="gop-sw" style="background:#64748b"></span>요새 · 큰 돈·1강 독식</span>
-      <span><span class="gop-sw" style="background:#2563eb"></span>소형 난전 · 작은 돈·분산</span>
-      <span><span class="gop-sw" style="background:#e07c12"></span>틈새 독점 · 작은 돈·1강 독식</span>
+      <span><span class="gop-sw" style="background:#16a34a"></span>분산 대형 · 큰 매출, 1강 없음</span>
+      <span><span class="gop-sw" style="background:#64748b"></span>요새 · 큰 매출·1강 독식</span>
+      <span><span class="gop-sw" style="background:#2563eb"></span>소형 난전 · 작은 매출·분산</span>
+      <span><span class="gop-sw" style="background:#e07c12"></span>틈새 독점 · 작은 매출·1강 독식</span>
     </div>
   </div>
 
@@ -1069,7 +1069,7 @@ function renderGenreLegend(){
   const _mktOpts=_navSel?_navSel.innerHTML:'', _curMkt=_navSel?_navSel.value:'';
   let html='<div class="gl-mkt" style="display:flex;align-items:center;gap:8px;margin:0 0 9px;"><label for="genreMktSel" style="font-size:12px;font-weight:700;color:var(--muted);flex:0 0 auto;">시장</label><select id="genreMktSel" aria-label="장르 차트 시장 선택" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:12.5px;font-weight:600;">'+_mktOpts+'</select></div>'+
     '<span class="gl-hint">장르를 누르면 그 선만 강조 · 매출 구간별 그룹 · <b>매출%=차트 순위 기반 추정</b>(rank⁻¹·¹ 멱법칙, 정밀 매출 아님)</span>'+
-    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r" title="추정 매출 점유 — 차트 순위로 매출을 역산한 추정치(rank^-1.1 멱법칙으로 가중·정규화). 정밀 매출이 아니며, 게임별 과금방식(가챠·광고)·국가 객단가·웹샵 매출은 미반영. 상위 1~3위는 지수 가정에 민감.">매출 ⓘ</span></div>';
+    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r" title="추정 매출 점유: 차트 순위로 매출을 역산한 추정치(rank^-1.1 멱법칙으로 가중·정규화). 정밀 매출이 아니며, 게임별 과금방식(가챠·광고)·국가 객단가·웹샵 매출은 미반영. 상위 1~3위는 지수 가정에 민감.">매출 ⓘ</span></div>';
   groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
   el.innerHTML=html;
   { const _ms=document.getElementById('genreMktSel'); if(_ms){ if(_curMkt) _ms.value=_curMkt; _ms.addEventListener('change',ev=>{ if(typeof loadMarket==='function') loadMarket(ev.target.value); }); } }   // #6: 시장 변경 동기
@@ -1262,7 +1262,7 @@ function renderAgg(keyName, period, els, labelName){
     });
     h+='</tbody></table></div>';
   }
-  { const top3=full.slice(0,3); const totG=full.reduce((a,e)=>a+(e.num_games||0),0); const t3G=top3.reduce((a,e)=>a+(e.num_games||0),0); const gShare=totG?Math.round(t3G/totG*100):0; const names='<b>'+top3.map(e=>esc(e.key)).join(' · ')+'</b>'; let rd,imp; if(showRev){ const totR=full.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const t3R=top3.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const rShare=totR?Math.round(t3R/totR*100):0; const diag=(rShare-gShare>=12)?('적은 타이틀로 매출을 빨아들이는 <b>고효율 과점</b>(소수 IP 의존)'):((gShare-rShare>=12)?'매출보다 머릿수로 차트를 채우는 구조(타이틀 수 경쟁)':'게임 수만큼 매출도 — 점유가 비례'); rd=['구조', '상위 3'+labelName+'('+names+')이 게임 수론 <b>'+gShare+'%</b>인데 추정매출은 <b>'+rShare+'%</b> — '+diag+'.']; imp=['볼 포인트', (rShare-gShare>=12)?('신규 진입 상대는 많은 게임이 아니라 이 소수 IP의 라이브옵스·과금력 — 보통 그 BM·업데이트 주기를 벤치마크로 본다.'):('점유가 분산된 편이라 단일 강자보다 카테고리 전반의 경쟁 강도를 본다.')]; } else { const conc=gShare>=55?'소수 과점':(gShare>=35?'중간':'분산'); rd=['구조', '상위 3'+labelName+'('+names+')이 차트의 <b>'+gShare+'%</b> 차지 — '+conc+'.']; imp=['볼 포인트','인기 차트는 신규 유입의 풀 — 상위 집중이 높으면 신작이 들 틈이 좁은지, 낮으면 회전이 빠른지를 본다.']; } h+=pmCallout([rd,imp]); }
+  { const top3=full.slice(0,3); const totG=full.reduce((a,e)=>a+(e.num_games||0),0); const t3G=top3.reduce((a,e)=>a+(e.num_games||0),0); const gShare=totG?Math.round(t3G/totG*100):0; const names='<b>'+top3.map(e=>esc(e.key)).join(' · ')+'</b>'; let rd,imp; if(showRev){ const totR=full.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const t3R=top3.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const rShare=totR?Math.round(t3R/totR*100):0; const diag=(rShare-gShare>=12)?('적은 타이틀로 매출을 빨아들이는 <b>고효율 과점</b>(소수 IP 의존)'):((gShare-rShare>=12)?'매출보다 머릿수로 차트를 채우는 구조(타이틀 수 경쟁)':'게임 수만큼 매출도 올라 점유가 비례'); rd=['구조', '상위 3'+labelName+'('+names+')이 게임 수론 <b>'+gShare+'%</b>인데 추정매출은 <b>'+rShare+'%</b>. '+diag+'.']; imp=['볼 포인트', (rShare-gShare>=12)?('신규 진입 상대는 많은 게임이 아니라 이 소수 IP의 라이브옵스·과금력. 보통 그 BM·업데이트 주기를 벤치마크로 본다.'):('점유가 분산된 편이라 단일 강자보다 카테고리 전반의 경쟁 강도를 본다.')]; } else { const conc=gShare>=55?'소수 과점':(gShare>=35?'중간':'분산'); rd=['구조', '상위 3'+labelName+'('+names+')이 차트의 <b>'+gShare+'%</b> 차지: '+conc+'.']; imp=['볼 포인트','인기 차트는 신규 유입의 풀. 상위 집중이 높으면 신작이 들 틈이 좁은지, 낮으면 회전이 빠른지를 본다.']; } h+=pmCallout([rd,imp]); }
   els.wrap.innerHTML=h;
   els.wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(aggSort.k===kk) aggSort.dir*=-1; else aggSort={k:kk, dir:(kk==='best_rank'||kk==='avg_rank'||kk==='key')?1:-1}; renderAggSection(); }));
   els.wrap.querySelectorAll('.pubrow').forEach(row=>{
@@ -1316,7 +1316,7 @@ function renderGap(){
     h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${newBadge(r.aid)}${esc(r.title)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
   });
   h+='</tbody></table></div>';
-  { const TH=20; const dl=rows.filter(r=>r.gap>=TH).sort((a,b)=>b.gap-a.gap); const rv=rows.filter(r=>r.gap<=-TH).sort((a,b)=>a.gap-b.gap); const big=rows.slice().sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap))[0]; let diag,point; if(rv.length>=dl.length*2&&rv.length>=3){ diag='매출↑·인기↓('+rv.length+')가 인기↑·매출↓('+dl.length+')의 두 배 이상 — 다운로드보다 <b>객단가(코어 과금)로 버는 시장</b>.'; point='신규 진입은 바이럴 UA보다 코어 리텐션·과금 설계가 관건인지를 본다.'; } else if(dl.length>=rv.length*2&&dl.length>=3){ diag='인기↑·매출↓('+dl.length+')가 매출↑·인기↓('+rv.length+')의 두 배 이상 — 트래픽은 받는데 <b>수익화가 덜 따라온 시장</b>.'; point='이미 트래픽 있는 타이틀의 BM·현지화를 반면교사·기회로 본다.'; } else if(dl.length||rv.length){ diag='매출↑형 '+rv.length+' · 인기↑형 '+dl.length+' — 양쪽이 비슷해 수익화·트래픽이 균형 잡힌 편.'; point='특정 편향이 없어 개별 극단 게임 위주로 본다.'; } else { diag='큰 괴리(±'+TH+'↑)가 거의 없음 — 인기와 매출 순위가 대체로 일치.'; point='순위 괴리 시그널이 약해 절대 순위·추세로 본다.'; } const rs=[['성격', diag+((big&&Math.abs(big.gap)>=TH)?(' 최대 괴리 <b>'+esc(big.title)+'</b>(인기 '+big.fr+'·매출 '+big.gr+'위).'):'')]]; rs.push(['볼 포인트', point]); h+=pmCallout(rs); }
+  { const TH=20; const dl=rows.filter(r=>r.gap>=TH).sort((a,b)=>b.gap-a.gap); const rv=rows.filter(r=>r.gap<=-TH).sort((a,b)=>a.gap-b.gap); const big=rows.slice().sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap))[0]; let diag,point; if(rv.length>=dl.length*2&&rv.length>=3){ diag='매출↑·인기↓('+rv.length+')가 인기↑·매출↓('+dl.length+')의 두 배 이상. 다운로드보다 <b>객단가(코어 과금)로 버는 시장</b>.'; point='신규 진입은 바이럴 UA보다 코어 리텐션·과금 설계가 관건인지를 본다.'; } else if(dl.length>=rv.length*2&&dl.length>=3){ diag='인기↑·매출↓('+dl.length+')가 매출↑·인기↓('+rv.length+')의 두 배 이상. 트래픽은 받는데 <b>수익화가 덜 따라온 시장</b>.'; point='이미 트래픽 있는 타이틀의 BM·현지화를 반면교사·기회로 본다.'; } else if(dl.length||rv.length){ diag='매출↑형 '+rv.length+' · 인기↑형 '+dl.length+'. 양쪽이 비슷해 수익화·트래픽이 균형 잡힌 편.'; point='특정 편향이 없어 개별 극단 게임 위주로 본다.'; } else { diag='큰 괴리(±'+TH+'↑)가 거의 없음. 인기와 매출 순위가 대체로 일치.'; point='순위 괴리 시그널이 약해 절대 순위·추세로 본다.'; } const rs=[['성격', diag+((big&&Math.abs(big.gap)>=TH)?(' 최대 괴리 <b>'+esc(big.title)+'</b>(인기 '+big.fr+'·매출 '+big.gr+'위).'):'')]]; rs.push(['볼 포인트', point]); h+=pmCallout(rs); }
   wrap.innerHTML=h;
   wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(gapSort.k===kk) gapSort.dir*=-1; else gapSort={k:kk, dir:(kk==='title'||kk==='gr'||kk==='fr')?1:-1}; renderGap(); }));
   wrap.querySelectorAll('.pubrow').forEach(row=> row.addEventListener('click',()=>{ const aid=row.dataset.aids; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
@@ -1337,7 +1337,7 @@ function renderMovers(){
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
   const anyUpd=up.some(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; });
-  sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci" title="상위권일수록 작은 변동도 급변(순위대 보정) · 기간별 기준(일 8·주월 5계단)">급변 — 순위대·기간 보정</span>`+(anyUpd?`<span class="csep">│</span><span class="ci"><span class="mv-upd">↻</span> 업데이트 동반</span>`:``);
+  sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci" title="상위권일수록 작은 변동도 급변(순위대 보정) · 기간별 기준(일 8·주월 5계단)">급변: 순위대·기간 보정</span>`+(anyUpd?`<span class="csep">│</span><span class="ci"><span class="mv-upd">↻</span> 업데이트 동반</span>`:``);
   const nm=aid=>newBadge(aid)+'<span class="gdname" data-aid="'+esc(aid)+'">'+esc((DATA.games[aid]||{}).title||aid)+'</span>';
   const LIMIT = moversExpanded?9999:10;
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,LIMIT).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
@@ -1350,7 +1350,7 @@ function renderMovers(){
   h+='</div>';
   const maxN=Math.max(entered.length,exited.length,up.length,down.length);
   if(maxN>10) h+='<button class="movers-more" id="moversMore">'+(moversExpanded?'접기 ▴':('전체 보기 ▾ · 최대 '+maxN+'개'))+'</button>';
-  { const updCnt=up.filter(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; }).length; const surgePct=up.length?Math.round(updCnt/up.length*100):0; const gc={}; up.forEach(e=>{ const gg=(DATA.games[e.aid]||{}).genre; if(gg) gc[gg]=(gc[gg]||0)+1; }); const topG=Object.keys(gc).sort((a,b)=>gc[b]-gc[a])[0]; const topGn=topG?gc[topG]:0; let diag; if(up.length>=3&&surgePct>=50) diag='이번 급등 '+up.length+'개 중 <b>'+surgePct+'%</b>가 앱 업데이트와 맞물림 — 순위를 움직이는 건 신작보다 <b>라이브옵스·이벤트</b>.'; else if(up.length>=3) diag='급등 중 업데이트 동반은 '+surgePct+'%뿐 — 업데이트 외 요인(시즌·외부 유입·UA)이 순위를 흔드는 편.'; else diag='이번 기간 급등이 적어 순위가 비교적 안정.'; const rs=[['동인', diag]]; if(topG&&topGn>=Math.max(2,Math.ceil(up.length*0.3))) rs.push(['진원', '급등이 <b>'+esc(topG)+'</b>에 몰림('+topGn+'/'+up.length+') — 이 장르에 이벤트·신작 모멘텀.']); rs.push(['볼 포인트', surgePct>=50?'노출 확보에 신작 런칭보다 업데이트·이벤트 타이밍을 본다.':'업데이트 외에 무엇이 순위를 흔드는지를 추가로 본다.']); h+=pmCallout(rs); }
+  { const updCnt=up.filter(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; }).length; const surgePct=up.length?Math.round(updCnt/up.length*100):0; const gc={}; up.forEach(e=>{ const gg=(DATA.games[e.aid]||{}).genre; if(gg) gc[gg]=(gc[gg]||0)+1; }); const topG=Object.keys(gc).sort((a,b)=>gc[b]-gc[a])[0]; const topGn=topG?gc[topG]:0; let diag; if(up.length>=3&&surgePct>=50) diag='이번 급등 '+up.length+'개 중 <b>'+surgePct+'%</b>가 앱 업데이트와 맞물림. 순위를 움직이는 건 신작보다 <b>라이브옵스·이벤트</b>.'; else if(up.length>=3) diag='급등 중 업데이트 동반은 '+surgePct+'%뿐. 업데이트 외 요인(시즌·외부 유입·UA)이 순위를 흔드는 편.'; else diag='이번 기간 급등이 적어 순위가 비교적 안정.'; const rs=[['동인', diag]]; if(topG&&topGn>=Math.max(2,Math.ceil(up.length*0.3))) rs.push(['진원', '급등이 <b>'+esc(topG)+'</b>에 몰림('+topGn+'/'+up.length+'). 이 장르에 이벤트·신작 모멘텀.']); rs.push(['볼 포인트', surgePct>=50?'노출 확보에 신작 런칭보다 업데이트·이벤트 타이밍을 본다.':'업데이트 외에 무엇이 순위를 흔드는지를 추가로 본다.']); h+=pmCallout(rs); }
   wrap.innerHTML=h;
   const mb=document.getElementById('moversMore'); if(mb) mb.addEventListener('click',()=>{ moversExpanded=!moversExpanded; renderMovers(); });
 }
@@ -1383,7 +1383,7 @@ function renderWatch(){
     h+='<div class="watchcard" data-aid="'+esc(r.aid)+'"><div class="watchcard-head"><span class="watchcard-rank">#'+(i+1)+'</span>'+newBadge(r.aid)+'<span class="gdname" data-aid="'+esc(r.aid)+'">'+esc((DATA.games[r.aid]||{}).title||r.aid)+'</span></div><div class="watch-traj">'+r.days+'일 전 <b>'+r.dStart+'위</b> → 현재 <b>'+r.dEnd+'위</b> <span class="watch-up">▲'+r.dImp+'</span></div><div class="watch-meta"><span>상승 '+r.ups+'일 · 하락 '+r.downs+'일</span>'+wk+'</div></div>';
   });
   h+='</div>';
-  { const newCnt=out.filter(r=>!!newBadge(r.aid)).length; const estCnt=out.length-newCnt; const ch=newCnt>estCnt?'신작 안착 흐름이 우세':(estCnt>newCnt?'기존작 재점화가 우세':'신작·기존작이 섞임'); h+=pmCallout([['성격', '급등 리스트엔 없지만 며칠째 계단식으로 오르는 <b>조용한 상승</b> '+out.length+'개 — 아직 안 터졌지만 올라오는 초기 신호. 신작 '+newCnt+' · 기존 '+estCnt+'로 '+ch+'. 선두 <b>'+esc((DATA.games[top[0].aid]||{}).title||top[0].aid)+'</b>(▲'+top[0].dImp+').'], ['볼 포인트', '이미 큰 게임보다 이런 초기 상승군을 다음 분기 경쟁·벤치마크 후보로 미리 본다.']]); }
+  { const newCnt=out.filter(r=>!!newBadge(r.aid)).length; const estCnt=out.length-newCnt; const ch=newCnt>estCnt?'신작 안착 흐름이 우세':(estCnt>newCnt?'기존작 재점화가 우세':'신작·기존작이 섞임'); h+=pmCallout([['성격', '급등 리스트엔 없지만 며칠째 계단식으로 오르는 <b>조용한 상승</b> '+out.length+'개. 아직 안 터졌지만 올라오는 초기 신호. 신작 '+newCnt+' · 기존 '+estCnt+'로 '+ch+'. 선두 <b>'+esc((DATA.games[top[0].aid]||{}).title||top[0].aid)+'</b>(▲'+top[0].dImp+').'], ['볼 포인트', '이미 큰 게임보다 이런 초기 상승군을 다음 분기 경쟁·벤치마크 후보로 미리 본다.']]); }
   wrap.innerHTML=h;
   wrap.querySelectorAll('.watchcard').forEach(c=> c.addEventListener('click',()=>{ const aid=c.dataset.aid; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
 }
@@ -1529,7 +1529,7 @@ function setupGopTraj(){
     pick('goptrajEnd', last)+
     '<button type="button" class="goptraj-play" id="goptrajPlay">▶ 재생</button>'+
     '<span class="goptraj-daylab">현재</span><span class="goptraj-day" id="goptrajDay">'+gopFmtLabel(last)+'</span>'+
-    '<span class="goptraj-cap">'+U+' 단위입니다 — 각 '+U+'의 평균 순위로 계산해 차트 탭·메일 리포트와 기준이 같습니다. 흐린 원 = 시작·종료 '+U+' 위치(점선 시작 · 파선 종료 · 선 이동경로), 진한 원 = 현재 '+U+'. 버블에 마우스를 올리면 장르·수치가 표시됩니다.'+
+    '<span class="goptraj-cap">'+U+' 단위입니다. 각 '+U+'의 평균 순위로 계산해 차트 탭·메일 리포트와 기준이 같습니다. 흐린 원 = 시작·종료 '+U+' 위치(점선 시작 · 파선 종료 · 선 이동경로), 진한 원 = 현재 '+U+'. 버블에 마우스를 올리면 장르·수치가 표시됩니다.'+
     (part?' 첫 달('+gopFmtLabel(labels[0])+')은 '+String(((FULL.charts.grossing.timeframes.daily||{}).labels||[''])[0]).slice(8,10).replace(/^0/,'')+'일부터 수집한 일부 기간이라 기본 기간에서 뺐습니다(목록에서 고를 수 있습니다).':'')+'</span></div>'+
     '<div class="goptraj-slider-row"><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 내 '+U+' 스크럽"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
   document.getElementById('goptrajStart').addEventListener('change', gopTrajRangeChange);
@@ -1604,18 +1604,18 @@ function renderGenreOpp(){
     const niche=gs.filter(g=> g.revp<RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);
     const small=gs.filter(g=> g.revp<RY && g.top1<CONC).sort((a,b)=> b.revp-a.revp);
     const topRev=gs.slice().sort((a,b)=>b.revp-a.revp)[0];
-    let ins='<div class="gop-insight"><div class="gopi-h">장르 지형 — 돈 × 1위 집중도 <span style="font-weight:400;color:var(--muted)">(세로=수요·매출, 가로=1위 집중도, ▲▼=점유 추세. 총 시장 규모·진입장벽은 차트 밖)</span></div>';
-    if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">돈의 축</span><span>매출이 가장 몰리는 장르는 <b>'+esc(topRev.genre)+'</b> ('+topRev.revp+'%).</span></div>';
-    ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>분산 대형</b> — 큰 돈인데 1위 점유가 낮음(여러 게임에 분산): <b>'+(opp.length?fmtR(opp):'해당 없음')+'</b> <span style="color:var(--muted)">(괄호=매출·1위집중·점유추세)</span>.</span></div>';
-    if(fort.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>요새</b> — 큰 돈을 1강이 장악: <b>'+fmtF(fort)+'</b>.</span></div>';
-    if(niche.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>틈새 독점</b> — 작은 시장을 단일 타이틀이 점유: <b>'+fmtR(niche)+'</b>.</span></div>';
-    if(small.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#2563eb"></span><span><b>소형 난전</b> — 작은 시장에 여럿 경쟁: <b>'+fmt(small)+'</b>.</span></div>';
-    ins+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">읽는 법</span><span>색·위치는 시장 <b>구조</b>(돈 규모·1위 집중도)를 보여줄 뿐 진입 추천이 아니다 — \'어디가 비어 보이나\'는 읽혀도 <b>들어갈지</b>는 총 시장 규모·자사 IP·경쟁 반응으로 따로 판단.</span></div>';
+    let ins='<div class="gop-insight"><div class="gopi-h">장르 지형: 매출 규모 × 1위 집중도 <span style="font-weight:400;color:var(--muted)">(세로=수요·매출, 가로=1위 집중도, ▲▼=점유 추세. 총 시장 규모·진입장벽은 차트 밖)</span></div>';
+    if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">매출 축</span><span>매출이 가장 몰리는 장르는 <b>'+esc(topRev.genre)+'</b> ('+topRev.revp+'%).</span></div>';
+    ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>분산 대형</b>: 매출 규모가 큰데 1위 점유가 낮음(여러 게임에 분산): <b>'+(opp.length?fmtR(opp):'해당 없음')+'</b> <span style="color:var(--muted)">(괄호=매출·1위집중·점유추세)</span>.</span></div>';
+    if(fort.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>요새</b>: 큰 매출을 1강이 장악: <b>'+fmtF(fort)+'</b>.</span></div>';
+    if(niche.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>틈새 독점</b>: 작은 시장을 단일 타이틀이 점유: <b>'+fmtR(niche)+'</b>.</span></div>';
+    if(small.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#2563eb"></span><span><b>소형 난전</b>: 작은 시장에 여럿 경쟁: <b>'+fmt(small)+'</b>.</span></div>';
+    ins+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">읽는 법</span><span>색·위치는 시장 <b>구조</b>(매출 규모·1위 집중도)를 보여줄 뿐 진입 추천이 아니다. \'어디가 비어 보이나\'는 읽혀도 <b>들어갈지</b>는 총 시장 규모·자사 IP·경쟁 반응으로 따로 판단.</span></div>';
     ins+='</div>'; s+=ins;
   }
   wrap.innerHTML=s;
   const opp2=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=>b.revp-a.revp).slice(0,3).map(x=>x.genre);
-  if(sub) sub.innerHTML='<span class="ci">세로=매출 규모(수요·<b title="차트 순위로 매출 역산: rank^-1.1 멱법칙. 정밀 매출 아님(과금방식·국가 객단가·웹샵 미반영)">순위 기반 추정 ⓘ</b>) · 가로=1위 집중도(왼쪽 분산↔오른쪽 독식) · 크기=게임 수</span><span class="csep">│</span><span class="ci"><b>분산 대형</b>(큰 돈·1위 낮음): '+(opp2.length?opp2.map(esc).join(' · '):'없음')+'</span>';
+  if(sub) sub.innerHTML='<span class="ci">세로=매출 규모(수요·<b title="차트 순위로 매출 역산: rank^-1.1 멱법칙. 정밀 매출 아님(과금방식·국가 객단가·웹샵 미반영)">순위 기반 추정 ⓘ</b>) · 가로=1위 집중도(왼쪽 분산↔오른쪽 독식) · 크기=게임 수</span><span class="csep">│</span><span class="ci"><b>분산 대형</b>(큰 매출·1위 낮음): '+(opp2.length?opp2.map(esc).join(' · '):'없음')+'</span>';
 }
 function mdLite(raw){
   const lines=String(raw||'').split('\n');
@@ -2038,7 +2038,7 @@ function renderMarketBrief(text){
       else { cur.bullets.push(t); }
     });
     if(!cards.length) return '<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>';
-    const isStrat=c=>/진출\s*전략|시사점|전략/.test(c.title);   // 전략·시사점 카드 = 두괄식 상단
+    const isStrat=c=>/진출\s*전략|시사점|전략|실행\s*방안/.test(c.title);   // 전략·시사점·실행 방안 카드 = 두괄식 상단(2026-10-14 '실행 방안' 추가)
     const strat=cards.filter(isStrat), rest=cards.filter(c=>!isStrat(c));
     const bl=b=>'<div class="mkb-li">'+inline(b)+'</div>';
     // 요약(첫 불릿)이 여러 문장으로 길어지면 첫 문장만 요약, 나머지는 분석으로 내림(요약>분석 방지 · grounding 문장이 요약에 붙는 문제 보정). 110자 이하 단문 요약은 건드리지 않음.
@@ -2128,7 +2128,7 @@ function renderBriefAxisTabs(b){
   const el=document.getElementById('mkbriefAxis'); if(!el) return;
   el.innerHTML=MK_BRIEF_AXES.map(([k,lab])=>{
     const on=!!briefAxisObj(b,k);
-    return '<button class="mkbax-tab" type="button" role="tab" data-ax="'+k+'"'+(on?'':' disabled title="데이터 누적 중 — 해당 기간이 완료되면 자동 생성돼요"')+' aria-selected="'+(k===MK_BRIEF_AXIS)+'">'+lab+'</button>';
+    return '<button class="mkbax-tab" type="button" role="tab" data-ax="'+k+'"'+(on?'':' disabled title="데이터 누적 중. 해당 기간이 완료되면 자동 생성됩니다"')+' aria-selected="'+(k===MK_BRIEF_AXIS)+'">'+lab+'</button>';
   }).join('');
   el.querySelectorAll('.mkbax-tab:not([disabled])').forEach(btn=>btn.addEventListener('click',()=>selectBriefAxis(btn.dataset.ax)));
 }
@@ -2203,7 +2203,7 @@ function renderCmp(){
   const M=MATRIX;
   if(!M || !Array.isArray(M.markets) || !M.markets.length || !Array.isArray(M.genres) || !M.genres.length){
     el.style.gridTemplateColumns='1fr';
-    el.innerHTML='<div class="cmp-empty">시장 비교 매트릭스가 곧 생성됩니다 — 다음 자동 갱신 후 표시됩니다.</div>'; return;
+    el.innerHTML='<div class="cmp-empty">시장 비교 매트릭스가 곧 생성됩니다. 다음 자동 갱신 후 표시됩니다.</div>'; return;
   }
   const byGenre=(cmpBasis==='genre');
   const markets=M.markets, genres=(M.genres||[]).slice().sort((a,b)=> a==='장르 없음'?1 : b==='장르 없음'?-1 : 0), cells=M.cells||{};
@@ -2245,10 +2245,10 @@ function renderCmpInsight(){
   const gStrong=M.genres.slice(0,5).map(g=>{ let bm=null,bv=-1; M.markets.forEach(mk=>{ const v=val(mk.key,g); if(v>bv){bv=v;bm=mk;} }); return {g, mk:bm?bm.name:'?', v:bv}; }).filter(x=>x.v>0);
   const mTop=M.markets.slice(0,8).map(mk=>{ let bg=null,bv=-1; M.genres.forEach(g=>{ const v=val(mk.key,g); if(v>bv){bv=v;bg=g;} }); return {mk:mk.name, g:bg, v:bv}; }).filter(x=>x.v>0);
   const lbl=metric==='rev'?'추정매출':'게임수';
-  let h='<div class="gopi-h">시장 비교 읽기 <span style="font-weight:400;color:var(--muted)">— '+lbl+' 점유 기준(상위 차트 한정)</span></div>';
+  let h='<div class="gopi-h">시장 비교 읽기 <span style="font-weight:400;color:var(--muted)">('+lbl+' 점유 기준, 상위 차트 한정)</span></div>';
   if(gStrong.length) h+='<div class="gopi-row"><span class="gopi-k">장르→최강 시장</span><span>'+gStrong.map(x=>'<b>'+esc(x.g)+'</b> '+esc(x.mk)+'('+x.v+'%)').join(' · ')+'</span></div>';
   if(mTop.length) h+='<div class="gopi-row"><span class="gopi-k">시장→1위 장르</span><span>'+mTop.map(x=>esc(x.mk)+' <b>'+esc(x.g)+'</b>').join(' · ')+'</span></div>';
-  h+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">주의</span><span>옅은·빈 칸이 \'기회\'인지 \'수요 없음\'인지는 이 표만으론 알 수 없음 — 총 시장 규모·진입장벽은 별도 확인.</span></div>';
+  h+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">주의</span><span>옅은·빈 칸이 \'기회\'인지 \'수요 없음\'인지는 이 표만으론 알 수 없음. 총 시장 규모·진입장벽은 별도 확인.</span></div>';
   box.innerHTML=h;
 }
 function cmpJump(mk, g){
