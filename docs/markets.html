@@ -22,21 +22,21 @@
     line-height:1.5; }
   .wrap{ max-width:1560px; margin:0 auto; padding:20px 22px 72px; }
   header h1{ font-size:20px; font-weight:600; margin:0 0 4px; }
-  .meta{ font-size:13px; color:var(--muted); margin:0 0 16px; }
+  .meta{ font-size:14px; color:var(--muted); margin:0 0 16px; }
   .meta b{ color:var(--text); font-weight:600; }
   .titlerow{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
-  .toradar{ display:inline-flex; align-items:center; gap:6px; background:var(--accent); color:#fff; border:1px solid var(--accent); border-radius:8px; padding:6px 13px; font-size:13px; font-weight:700; text-decoration:none; line-height:1; }
+  .toradar{ display:inline-flex; align-items:center; gap:6px; background:var(--accent); color:#fff; border:1px solid var(--accent); border-radius:8px; padding:6px 13px; font-size:14px; font-weight:700; text-decoration:none; line-height:1; }
   .toradar:hover{ filter:brightness(1.08); }
-  .toradar .ra{ font-size:12px; }
+  .toradar .ra{ font-size:13px; }
   .titlerow h1{ margin:0; }
-  .maker{ display:inline-flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:5px 12px; font-size:13px; line-height:1; }
-  .maker-label{ font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--muted); }
+  .maker{ display:inline-flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:5px 12px; font-size:14px; line-height:1; }
+  .maker-label{ font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--muted); }
   .maker-name{ font-weight:700; color:var(--text); }
   .maker .msep{ color:var(--line); }
   .maker-mail{ color:var(--muted); display:inline-flex; align-items:center; gap:5px; }
   .maker-mail svg{ flex:0 0 auto; }
   .intro{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; }
-  .intro>summary{ cursor:pointer; padding:12px 16px; font-size:13.5px; font-weight:600; color:var(--text); list-style:none; display:flex; align-items:center; gap:8px; border-radius:12px; user-select:none; -webkit-user-select:none; }
+  .intro>summary{ cursor:pointer; padding:12px 16px; font-size:14.5px; font-weight:600; color:var(--text); list-style:none; display:flex; align-items:center; gap:8px; border-radius:12px; user-select:none; -webkit-user-select:none; }
   .intro>summary:hover{ background:var(--chip); }
   .intro>summary:focus{ outline:none; }
   .intro>summary:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
@@ -44,11 +44,11 @@
   .intro>summary::before{ display:none; }
   .intro[open]>summary::before{ transform:rotate(90deg); }
   .intro-title{ color:var(--accent); font-weight:700; }
-  .intro-sub{ color:var(--muted); font-weight:400; font-size:12.5px; }
-  .intro-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); font-weight:600; flex:0 0 auto; }
+  .intro-sub{ color:var(--muted); font-weight:400; font-size:13.5px; }
+  .intro-hint{ margin-left:auto; font-size:13px; color:var(--muted); font-weight:600; flex:0 0 auto; }
   .intro-hint::after{ content:'펼쳐보기 ▾'; }
   .intro[open] .intro-hint::after{ content:'접기 ▴'; }
-  .intro-clickme{ font-size:11px; font-weight:700; color:#fff; background:var(--accent); border-radius:999px; padding:3px 11px; flex:0 0 auto; white-space:nowrap; letter-spacing:.02em; animation:introBeckon 1.7s ease-in-out infinite; }
+  .intro-clickme{ font-size:12.5px; font-weight:700; color:#fff; background:var(--accent); border-radius:999px; padding:3px 11px; flex:0 0 auto; white-space:nowrap; letter-spacing:.02em; animation:introBeckon 1.7s ease-in-out infinite; }
   .intro:hover .intro-clickme{ animation:none; }
   .intro[open] .intro-clickme{ display:none; }
   @keyframes introBeckon{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
@@ -56,83 +56,83 @@
   .intro-body{ padding:15px 16px 16px; display:grid; grid-template-columns:repeat(4,1fr); gap:14px 18px; }
   @media (max-width:820px){ .intro-body{ grid-template-columns:repeat(2,1fr); } }
   @media (max-width:480px){ .intro-body{ grid-template-columns:1fr; } }
-  .intro-block h3{ font-size:12.5px; font-weight:700; color:var(--accent); margin:0 0 5px; }
-  .intro-block p{ font-size:12.5px; color:var(--muted); line-height:1.65; margin:0; }
+  .intro-block h3{ font-size:13.5px; font-weight:700; color:var(--accent); margin:0 0 5px; }
+  .intro-block p{ font-size:13.5px; color:var(--muted); line-height:1.65; margin:0; }
   .intro-diagram{ grid-column:1/-1; margin:0 0 4px; }
   .intro-diagram svg{ width:100%; height:auto; max-width:780px; display:block; margin:0 auto; }
-  .intro-diagram .idg-cap{ text-align:center; font-size:11px; color:var(--muted); margin:7px 0 0; }
+  .intro-diagram .idg-cap{ text-align:center; font-size:12.5px; color:var(--muted); margin:7px 0 0; }
   .idg text{ font-family:system-ui,-apple-system,'Segoe UI',sans-serif; }
   .idg-frame{ fill:none; stroke:var(--line); stroke-width:1.2; }
   .idg-pill{ fill:var(--accent); }
   .idg-box{ fill:var(--panel); stroke:var(--line); stroke-width:1.2; }
   .idg-ai{ fill:var(--accent2soft); stroke:var(--accent2); stroke-width:1.5; }
-  .idg-pt{ fill:#fff; font-weight:700; font-size:11px; }
-  .idg-t{ fill:var(--text); font-weight:700; font-size:13px; }
-  .idg-tai{ fill:var(--accent2text); font-weight:700; font-size:13px; }
-  .idg-s{ fill:var(--muted); font-size:9px; }
-  .idg-sai{ fill:var(--accent2text); font-size:9px; opacity:.9; }
+  .idg-pt{ fill:#fff; font-weight:700; font-size:12.5px; }
+  .idg-t{ fill:var(--text); font-weight:700; font-size:14px; }
+  .idg-tai{ fill:var(--accent2text); font-weight:700; font-size:14px; }
+  .idg-s{ fill:var(--muted); font-size:12px; }
+  .idg-sai{ fill:var(--accent2text); font-size:12px; opacity:.9; }
   .idg-mono{ font-family:ui-monospace,Menlo,Consolas,monospace; }
-  .idg-arr{ fill:var(--muted); font-size:16px; }
+  .idg-arr{ fill:var(--muted); font-size:17px; }
   .aibrief{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; overflow:hidden; }
   .aibrief-toggle{ width:100%; display:flex; align-items:center; gap:10px; padding:12px 16px; background:transparent; border:0; cursor:pointer; text-align:left; font:inherit; color:var(--text); flex-wrap:wrap; }
   .aibrief-toggle:hover{ background:var(--chip); }
-  .aibrief-badge{ font-size:11px; font-weight:700; color:#fff; background:var(--accent2); border-radius:6px; padding:3px 9px; flex:0 0 auto; }
-  .aibrief-date{ font-size:11.5px; color:var(--muted); }
-  .aibrief-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); display:inline-flex; align-items:center; gap:5px; flex:0 0 auto; }
+  .aibrief-badge{ font-size:12.5px; font-weight:700; color:#fff; background:var(--accent2); border-radius:6px; padding:3px 9px; flex:0 0 auto; }
+  .aibrief-date{ font-size:13px; color:var(--muted); }
+  .aibrief-hint{ margin-left:auto; font-size:13px; color:var(--muted); display:inline-flex; align-items:center; gap:5px; flex:0 0 auto; }
   .aibrief-caret{ transition:transform .15s; }
   .aibrief.open .aibrief-caret{ transform:rotate(180deg); }
   .aibrief-body{ display:none; padding:14px 16px 14px; }
   .aibrief.open .aibrief-body{ display:block; }
   .aibrief-item{ margin-top:20px; padding-top:18px; border-top:2px solid var(--line); }
   .aibrief-item:first-child{ margin-top:6px; padding-top:0; border-top:0; }
-  .aibrief-period{ display:inline-block; font-size:11.5px; font-weight:800; color:var(--accent2text); background:var(--accent2soft); padding:3px 11px; border-radius:6px; margin:0 0 9px; }
+  .aibrief-period{ display:inline-block; font-size:13px; font-weight:800; color:var(--accent2text); background:var(--accent2soft); padding:3px 11px; border-radius:6px; margin:0 0 9px; }
   .aib-sec{ margin-top:8px; padding:9px 12px 10px; background:var(--bg); border:1px solid var(--line); border-radius:9px; }
   .aib-sec-key{ background:var(--accent2soft); }
-  .aib-h{ font-size:15px; font-weight:800; color:var(--accent2text); margin:0 0 7px; display:flex; align-items:center; gap:7px; letter-spacing:-.01em; }
+  .aib-h{ font-size:16px; font-weight:800; color:var(--accent2text); margin:0 0 7px; display:flex; align-items:center; gap:7px; letter-spacing:-.01em; }
   .aib-detail[hidden]{ display:none; }
-  .aib-more{ display:inline-block; margin:8px 0 2px; font-size:12.5px; font-weight:700; color:var(--accent2text); background:var(--accent2soft); border:none; border-radius:7px; padding:5px 13px; cursor:pointer; }
+  .aib-more{ display:inline-block; margin:8px 0 2px; font-size:13.5px; font-weight:700; color:var(--accent2text); background:var(--accent2soft); border:none; border-radius:7px; padding:5px 13px; cursor:pointer; }
   .aib-more:hover{ background:var(--accent2); color:#fff; }
   .aib-sec-key .aib-more{ background:var(--bg); border:1px solid var(--accent2); }  /* 강조카드: 버튼 배경이 카드(accent2soft)와 겹쳐 안 보이는 문제 → 배경색+강조 테두리로 대비 */
   .aib-h::before{ content:''; width:4px; height:13px; background:var(--accent2text); border-radius:2px; flex:0 0 auto; }
-  .aib-p{ font-size:12.5px; color:var(--text); line-height:1.65; margin:5px 0; }
-  .aib-li{ font-size:12.5px; color:var(--text); line-height:1.6; margin:4px 0 4px 14px; position:relative; }
+  .aib-p{ font-size:13.5px; color:var(--text); line-height:1.65; margin:5px 0; }
+  .aib-li{ font-size:13.5px; color:var(--text); line-height:1.6; margin:4px 0 4px 14px; position:relative; }
   .aib-li::before{ content:'·'; position:absolute; left:-10px; color:var(--accent2text); }
-  .aib-quote{ font-size:12.5px; color:var(--text); line-height:1.6; margin:6px 0; padding:7px 11px; background:var(--chip); border-radius:7px; }
+  .aib-quote{ font-size:13.5px; color:var(--text); line-height:1.6; margin:6px 0; padding:7px 11px; background:var(--chip); border-radius:7px; }
   .aib-hr{ height:1px; background:var(--line); margin:12px 0; border:0; }
   .aibup{ color:#16a34a; font-weight:600; }
   .aibdn{ color:#dc2626; font-weight:600; }
   .aibrief-dates{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:2px 0 12px; }
-  .aibrief-dlabel{ font-size:11px; color:var(--muted); font-weight:700; margin-right:2px; }
-  .aibrief-dnote{ font-size:10.5px; color:var(--muted); }
-  .aibrief-dchip{ font-size:11px; color:var(--muted); background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 10px; cursor:pointer; font-weight:600; }
+  .aibrief-dlabel{ font-size:12.5px; color:var(--muted); font-weight:700; margin-right:2px; }
+  .aibrief-dnote{ font-size:12px; color:var(--muted); }
+  .aibrief-dchip{ font-size:12.5px; color:var(--muted); background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 10px; cursor:pointer; font-weight:600; }
   .aibrief-dchip.on{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
-  .aibrief-foot{ margin-top:11px; font-size:11px; color:var(--muted); }
+  .aibrief-foot{ margin-top:11px; font-size:12.5px; color:var(--muted); }
   .aib-stats{ display:flex; flex-wrap:wrap; gap:6px; margin:0 0 9px; }
-  .aib-stat{ font-size:11px; color:var(--muted); background:var(--chip); border-radius:6px; padding:3px 9px; }
+  .aib-stat{ font-size:12.5px; color:var(--muted); background:var(--chip); border-radius:6px; padding:3px 9px; }
   .aib-stat b{ color:var(--text); font-weight:700; }
   .aibrief-body .gdname{ background:var(--accent2soft); color:var(--accent2text); border-radius:5px; padding:1px 6px; }
   .aibrief-body .gdname:hover{ background:var(--accent2); color:#fff; text-decoration:none; }
   .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
-  .tab{ font:inherit; font-size:14px; padding:7px 14px; border:1px solid var(--line);
+  .tab{ font:inherit; font-size:15px; padding:7px 14px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
   .tab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
   .tab:disabled{ opacity:.4; cursor:not-allowed; }
-  .hint{ font-size:12px; color:var(--muted); margin:6px 0 10px; }
+  .hint{ font-size:13px; color:var(--muted); margin:6px 0 10px; }
   .hintrow{ display:flex; align-items:center; gap:12px; justify-content:space-between; margin:10px 0 12px; }
   .hintrow .hint{ margin:0; }
-  .resetzoom{ font:inherit; font-size:12.5px; padding:6px 12px; border:1px solid var(--line);
+  .resetzoom{ font:inherit; font-size:13.5px; padding:6px 12px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; white-space:nowrap; }
   .resetzoom:hover{ background:var(--chip); }
   .cap{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 14px; line-height:1.5; }
   .cap .ci{ display:inline-flex; align-items:center; gap:5px; }
   .cap b{ color:var(--text); font-weight:600; }
   .cdot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; display:inline-block; }
-  .cchip{ font-size:11px; font-weight:700; border-radius:5px; padding:1px 6px; white-space:nowrap; }
-  .cic{ font-size:13px; line-height:1; font-style:normal; }
-  .sub.cap{ gap:4px 9px; font-size:12.5px; color:var(--muted); }
+  .cchip{ font-size:12.5px; font-weight:700; border-radius:5px; padding:1px 6px; white-space:nowrap; }
+  .cic{ font-size:14px; line-height:1; font-style:normal; }
+  .sub.cap{ gap:4px 9px; font-size:13.5px; color:var(--muted); }
   .csep{ color:var(--line); }
   .cact{ background:rgba(37,99,235,0.13); color:#3b82f6; font-weight:600; border-radius:6px; padding:2px 9px; white-space:nowrap; }
-  .banner{ font-size:13px; color:#9a5b00; background:#fff5e6; border:1px solid #f3d9a6;
+  .banner{ font-size:14px; color:#9a5b00; background:#fff5e6; border:1px solid #f3d9a6;
     padding:8px 12px; border-radius:8px; margin:0 0 12px; }
   @media (prefers-color-scheme: dark){ .banner{ color:#f0c074; background:#2e2616; border-color:#4a3c1d; } }
   .layout{ display:flex; gap:18px; align-items:flex-start; }
@@ -146,34 +146,34 @@
   .panel{ flex:0 0 440px; min-width:0; max-width:440px; border:1px solid var(--line); border-radius:12px;
     background:var(--panel); padding:11px; }
   .panel .row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; }
-  .search{ font:inherit; font-size:14px; flex:1; min-width:0; padding:8px 10px; border:1px solid var(--line);
+  .search{ font:inherit; font-size:15px; flex:1; min-width:0; padding:8px 10px; border:1px solid var(--line);
     border-radius:8px; background:var(--bg); color:var(--text); }
-  .clearbtn{ font:inherit; font-size:12.5px; padding:8px 10px; border:1px solid var(--line);
+  .clearbtn{ font:inherit; font-size:13.5px; padding:8px 10px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; white-space:nowrap; }
-  .selcount{ font-size:12px; color:var(--muted); margin:0 2px 8px; }
+  .selcount{ font-size:13px; color:var(--muted); margin:0 2px 8px; }
   .list{ height:380px; overflow-y:auto; display:flex; flex-direction:column; gap:3px; }
   .gitem{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; font:inherit;
-    font-size:13px; padding:6px 8px; border:1px solid transparent; background:transparent;
+    font-size:14px; padding:6px 8px; border:1px solid transparent; background:transparent;
     color:var(--text); border-radius:7px; cursor:pointer; }
   .gitem:hover{ background:var(--chip); }
   .gitem[aria-pressed="true"]{ background:var(--chip); border-color:var(--line); }
   .sw{ width:10px; height:10px; border-radius:3px; flex:0 0 auto; background:#c9c8c2; }
   .gname{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .gdev{ color:var(--muted); font-size:11.5px; }
-  .grank{ flex:0 0 auto; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .newbadge{ display:inline-block; font-size:9.5px; font-weight:700; color:#fff; background:#e0455e; border-radius:5px; padding:1px 4px; margin-right:5px; vertical-align:middle; letter-spacing:.3px; }
-  .grating{ flex:0 0 auto; font-size:11px; color:#e0a82e; white-space:nowrap; }
-  .panelnote{ font-size:11px; color:var(--muted); margin:2px 2px 8px; line-height:1.45; }
+  .gdev{ color:var(--muted); font-size:13px; }
+  .grank{ flex:0 0 auto; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .newbadge{ display:inline-block; font-size:11.5px; font-weight:700; color:#fff; background:#e0455e; border-radius:5px; padding:1px 4px; margin-right:5px; vertical-align:middle; letter-spacing:.3px; }
+  .grating{ flex:0 0 auto; font-size:12.5px; color:#e0a82e; white-space:nowrap; }
+  .panelnote{ font-size:12.5px; color:var(--muted); margin:2px 2px 8px; line-height:1.45; }
   .gitem.out{ opacity:.5; }
   .gitem.out[aria-pressed="true"]{ opacity:1; }
-  .empty{ font-size:13px; color:var(--muted); padding:10px 4px; }
-  .sectitle{ font-size:16px; font-weight:600; margin:0 0 4px; }
-  .sec-mkt{ font-size:12px; font-weight:600; color:var(--accent2text); background:var(--accent2soft); border-radius:6px; padding:1px 8px; margin-left:9px; vertical-align:2px; white-space:nowrap; }
+  .empty{ font-size:14px; color:var(--muted); padding:10px 4px; }
+  .sectitle{ font-size:17px; font-weight:600; margin:0 0 4px; }
+  .sec-mkt{ font-size:13px; font-weight:600; color:var(--accent2text); background:var(--accent2soft); border-radius:6px; padding:1px 8px; margin-left:9px; vertical-align:2px; white-space:nowrap; }
   .histsec{ margin-top:34px; padding-top:30px; border-top:1px solid var(--line); }
-  .histsec h2{ font-size:16px; font-weight:600; margin:0 0 4px; }
-  .histsec .sub{ font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+  .histsec h2{ font-size:17px; font-weight:600; margin:0 0 4px; }
+  .histsec .sub{ font-size:13.5px; color:var(--muted); margin:0 0 10px; }
   .histscroll{ overflow:auto; max-height:640px; border:1px solid var(--line); border-radius:10px; }
-  .histtable{ border-collapse:separate; border-spacing:0; font-size:12.5px; width:max-content; min-width:100%; }
+  .histtable{ border-collapse:separate; border-spacing:0; font-size:13.5px; width:max-content; min-width:100%; }
   .histtable th, .histtable td{ padding:8px 16px; text-align:center; white-space:nowrap;
     border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }
   .histtable thead th{ position:sticky; top:0; z-index:1; background:var(--panel); color:var(--muted); font-weight:500; }
@@ -191,39 +191,39 @@
   .histtable td.na{ color:var(--muted); }
   .srcrow{ display:flex; align-items:center; gap:10px; margin:0 0 12px; flex-wrap:wrap; }
   .srcrow .tabs{ margin:0 0 0 8px; }
-  .srclabel{ font-size:12.5px; color:var(--muted); }
+  .srclabel{ font-size:13.5px; color:var(--muted); }
   .stabs{ display:inline-flex; gap:4px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:3px; }
-  .stab{ font:inherit; font-size:13.5px; padding:7px 16px; border:0; background:transparent; color:var(--muted);
+  .stab{ font:inherit; font-size:14.5px; padding:7px 16px; border:0; background:transparent; color:var(--muted);
     border-radius:8px; cursor:pointer; font-weight:500; }
   .stab[aria-selected="true"]{ background:var(--accent); color:#fff; }
   .stab:disabled{ opacity:.45; cursor:not-allowed; }
   .pubsec{ margin-top:34px; padding-top:30px; border-top:1px solid var(--line); }
-  .pubsec h2{ font-size:16px; font-weight:600; margin:0 0 4px; }
-  .pubsec .sub{ font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+  .pubsec h2{ font-size:17px; font-weight:600; margin:0 0 4px; }
+  .pubsec .sub{ font-size:13.5px; color:var(--muted); margin:0 0 10px; }
   .pubsearch{ width:100%; max-width:320px; margin:0 0 12px; box-sizing:border-box; }
   .periodtabs{ display:flex; flex-wrap:wrap; gap:5px; margin:0 0 10px; }
-  .ptab{ font:inherit; font-size:12.5px; padding:5px 12px; border:1px solid var(--line);
+  .ptab{ font:inherit; font-size:13.5px; padding:5px 12px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:7px; cursor:pointer; white-space:nowrap; }
   .ptab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
-  .mtab{ font:inherit; font-size:13px; padding:6px 12px; border:1px solid var(--line); background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
+  .mtab{ font:inherit; font-size:14px; padding:6px 12px; border:1px solid var(--line); background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
   .mtab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
   td.gapdl{ color:#e07c12; font-weight:600; } td.gaprev{ color:#16a34a; font-weight:600; }
   .movergrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-  .movercol h3{ font-size:13px; margin:0 0 6px; font-weight:600; }
+  .movercol h3{ font-size:14px; margin:0 0 6px; font-weight:600; }
   .moverlist{ display:flex; flex-direction:column; gap:4px; }
-  .moveritem{ font-size:12.5px; padding:5px 8px; border:1px solid var(--line); border-radius:7px; background:var(--panel); display:flex; gap:6px; align-items:center; }
+  .moveritem{ font-size:13.5px; padding:5px 8px; border:1px solid var(--line); border-radius:7px; background:var(--panel); display:flex; gap:6px; align-items:center; }
   .moveritem .mvg{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .moveritem .mvr{ flex:0 0 auto; color:var(--muted); font-size:11.5px; font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .moveritem .mvd{ flex:0 0 auto; min-width:44px; box-sizing:border-box; text-align:center; font-size:11px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; padding:2px 6px; border-radius:5px; }
+  .moveritem .mvr{ flex:0 0 auto; color:var(--muted); font-size:13px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .moveritem .mvd{ flex:0 0 auto; min-width:44px; box-sizing:border-box; text-align:center; font-size:12.5px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; padding:2px 6px; border-radius:5px; }
   .mvd.up{ color:#15803d; background:rgba(22,163,74,.15); } .mvd.down{ color:#b91c1c; background:rgba(220,38,38,.15); }
-  .movers-more{ display:block; margin:12px auto 0; padding:7px 18px; font:inherit; font-size:12.5px; font-weight:600; color:var(--muted); background:var(--bg); border:1px solid var(--line); border-radius:999px; cursor:pointer; }
+  .movers-more{ display:block; margin:12px auto 0; padding:7px 18px; font:inherit; font-size:13.5px; font-weight:600; color:var(--muted); background:var(--bg); border:1px solid var(--line); border-radius:999px; cursor:pointer; }
   .movers-more:hover{ border-color:var(--muted); color:var(--text); background:var(--chip); }
   @media (max-width:820px){ .movergrid{ grid-template-columns:1fr 1fr; } }
   .pubcontrols{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:0 0 12px; }
   .pubcontrols .pubsearch{ margin:0; flex:0 1 300px; max-width:300px; }
   .pubcontrols .periodtabs{ margin:0; }
   .pubscroll{ overflow:auto; max-height:520px; border:1px solid var(--line); border-radius:10px; }
-  .pubtable{ border-collapse:separate; border-spacing:0; font-size:13px; width:100%; }
+  .pubtable{ border-collapse:separate; border-spacing:0; font-size:14px; width:100%; }
   .pubtable th, .pubtable td{ padding:9px 14px; border-bottom:1px solid var(--line); white-space:nowrap;
     font-variant-numeric:tabular-nums; text-align:center; }
   .pubtable thead th{ position:sticky; top:0; z-index:1; background:var(--panel); color:var(--muted); font-weight:500; }
@@ -233,7 +233,7 @@
   .pubrow:hover td{ background:var(--chip); }
   .pubtable th.sortable{ cursor:pointer; user-select:none; }
   .pubtable th.sortable:hover{ color:var(--text); }
-  .pubtable th .sarr{ opacity:.3; font-size:9px; margin-left:3px; }
+  .pubtable th .sarr{ opacity:.3; font-size:10px; margin-left:3px; }
   .pubtable th.sorton{ color:var(--accent); }
   .pubtable th.sorton .sarr{ opacity:1; }
   .tblsearch{ margin:2px 0 9px; }
@@ -242,85 +242,85 @@
   .watchcard{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:11px 13px; cursor:pointer; transition:border-color .12s; }
   .watchcard:hover{ border-color:var(--accent); }
   .watchcard-head{ display:flex; align-items:center; gap:7px; margin-bottom:6px; }
-  .watchcard-rank{ font-size:11px; font-weight:700; color:var(--accent); flex:0 0 auto; }
-  .watch-traj{ font-size:12.5px; color:var(--muted); }
+  .watchcard-rank{ font-size:12.5px; font-weight:700; color:var(--accent); flex:0 0 auto; }
+  .watch-traj{ font-size:13.5px; color:var(--muted); }
   .watch-traj b{ color:var(--text); font-variant-numeric:tabular-nums; }
-  .watch-meta{ font-size:11px; color:var(--muted); margin-top:5px; display:flex; gap:10px; flex-wrap:wrap; }
+  .watch-meta{ font-size:12.5px; color:var(--muted); margin-top:5px; display:flex; gap:10px; flex-wrap:wrap; }
   .watch-up{ color:#16a34a; font-weight:700; }
   .gop-wrap{ overflow-x:auto; }
   .gop-wrap svg{ display:block; max-width:none; width:100%; height:auto; }
   .gop-line{ stroke:var(--line); }
   .gop-axis{ fill:var(--muted); }
   .gop-lab{ fill:var(--text); paint-order:stroke; stroke:var(--bg); stroke-width:2.6px; stroke-linejoin:round; }
-  .gop-pt .gop-hlab{ fill:var(--text); font-size:9px; paint-order:stroke; stroke:var(--bg); stroke-width:2.8px; stroke-linejoin:round; opacity:0; pointer-events:none; transition:opacity .08s; }
+  .gop-pt .gop-hlab{ fill:var(--text); font-size:12px; paint-order:stroke; stroke:var(--bg); stroke-width:2.8px; stroke-linejoin:round; opacity:0; pointer-events:none; transition:opacity .08s; }
   .gop-pt:hover .gop-hlab{ opacity:1; }
   .gop-pt:hover circle{ fill-opacity:0.78; }
-  .gop-legend{ display:flex; gap:14px; flex-wrap:wrap; margin:8px 0 0; font-size:11px; color:var(--muted); }
+  .gop-legend{ display:flex; gap:14px; flex-wrap:wrap; margin:8px 0 0; font-size:12.5px; color:var(--muted); }
   .gop-legend span{ display:inline-flex; align-items:center; gap:5px; }
   .gop-sw{ width:10px; height:10px; border-radius:50%; flex:0 0 auto; opacity:.7; }
-  .goptraj-toggle{ font-size:12.5px; font-weight:700; border:1px solid var(--accent2); background:var(--accent2soft); color:var(--accent2text); border-radius:8px; padding:6px 13px; cursor:pointer; margin-top:2px; }
+  .goptraj-toggle{ font-size:13.5px; font-weight:700; border:1px solid var(--accent2); background:var(--accent2soft); color:var(--accent2text); border-radius:8px; padding:6px 13px; cursor:pointer; margin-top:2px; }
   .goptraj-toggle[aria-pressed="true"]{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
   .goptraj-ctrl{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0 2px; }
-  .goptraj-lab{ font-size:12px; font-weight:700; color:var(--muted); }
-  .goptraj-date{ font-size:12.5px; font-weight:600; padding:5px 9px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--text); }
+  .goptraj-lab{ font-size:13px; font-weight:700; color:var(--muted); }
+  .goptraj-date{ font-size:13.5px; font-weight:600; padding:5px 9px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--text); }
   .goptraj-arr{ color:var(--muted); font-weight:700; }
-  .goptraj-play{ font-size:12.5px; font-weight:700; border:1px solid var(--accent); background:var(--bg); color:var(--accent); border-radius:8px; padding:5px 13px; cursor:pointer; }
+  .goptraj-play{ font-size:13.5px; font-weight:700; border:1px solid var(--accent); background:var(--bg); color:var(--accent); border-radius:8px; padding:5px 13px; cursor:pointer; }
   .goptraj-play:hover{ background:var(--accent); color:#fff; }
-  .goptraj-daylab{ font-size:11px; font-weight:700; color:var(--muted); margin-left:4px; }
-  .goptraj-day{ font-size:15px; font-weight:800; color:var(--accent2text); font-family:ui-monospace,Menlo,Consolas,monospace; }
+  .goptraj-daylab{ font-size:12.5px; font-weight:700; color:var(--muted); margin-left:4px; }
+  .goptraj-day{ font-size:16px; font-weight:800; color:var(--accent2text); font-family:ui-monospace,Menlo,Consolas,monospace; }
   .goptraj-slider-row{ position:relative; margin:16px 6px 34px; }
   .goptraj-slider{ -webkit-appearance:none; appearance:none; width:100%; height:11px; border-radius:6px; background:var(--accent2soft); border:1.5px solid var(--accent2); outline:none; cursor:pointer; }
   .goptraj-slider::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:26px; height:26px; border-radius:50%; background:var(--accent2); border:3px solid var(--bg); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:grab; margin-top:-9px; }
   .goptraj-slider::-moz-range-thumb{ width:24px; height:24px; border-radius:50%; background:var(--accent2); border:3px solid var(--bg); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:grab; }
   .goptraj-slider::-moz-range-track{ height:11px; border-radius:6px; background:var(--accent2soft); }
   .goptraj-ticks{ position:absolute; left:0; right:0; top:15px; height:22px; pointer-events:none; }
-  .goptraj-tick{ position:absolute; transform:translateX(-50%); font-size:9px; color:var(--muted); text-align:center; }
+  .goptraj-tick{ position:absolute; transform:translateX(-50%); font-size:12px; color:var(--muted); text-align:center; }
   .goptraj-tick i{ display:block; width:1.5px; height:6px; background:var(--line); margin:0 auto 2px; }
   .goptraj-tick em{ font-style:normal; white-space:nowrap; }
   #gopsec.traj-on #gopout .gop-wrap{ display:none; }
-  .goptraj-cap{ font-size:10.5px; color:var(--muted); flex-basis:100%; margin:3px 0 0; line-height:1.4; }
+  .goptraj-cap{ font-size:12px; color:var(--muted); flex-basis:100%; margin:3px 0 0; line-height:1.4; }
   .gop-insight{ margin:13px 0 0; border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:11px 14px; }   /* #13: 기회맵 시사점 */
-  .gopi-h{ font-size:12px; font-weight:700; color:var(--accent2text); margin-bottom:8px; }
-  .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.6; color:var(--text); padding:3px 0; }
+  .gopi-h{ font-size:13px; font-weight:700; color:var(--accent2text); margin-bottom:8px; }
+  .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:14px; line-height:1.6; color:var(--text); padding:3px 0; }
   .gopi-row .gop-sw{ margin-top:6px; }
-  .gopi-k{ flex:0 0 auto; font-size:11px; font-weight:700; color:var(--muted); background:var(--chip); border-radius:5px; padding:1px 7px; margin-top:2px; }
+  .gopi-k{ flex:0 0 auto; font-size:12.5px; font-weight:700; color:var(--muted); background:var(--chip); border-radius:5px; padding:1px 7px; margin-top:2px; }
   .gl-insight{ border:1px solid var(--line); border-radius:9px; background:var(--panel); padding:9px 11px; margin:0 2px 9px; }
-  .gli-h{ font-size:11.5px; font-weight:700; color:var(--accent2text); margin-bottom:6px; }
-  .gli-row{ font-size:12px; line-height:1.5; color:var(--text); padding:1px 0; }
-  .gli-row .gli-k{ font-size:10.5px; font-weight:700; margin-right:6px; }
-  .gli-note{ font-size:10.5px; color:var(--muted); margin-top:5px; line-height:1.45; }
+  .gli-h{ font-size:13px; font-weight:700; color:var(--accent2text); margin-bottom:6px; }
+  .gli-row{ font-size:13px; line-height:1.5; color:var(--text); padding:1px 0; }
+  .gli-row .gli-k{ font-size:12px; font-weight:700; margin-right:6px; }
+  .gli-note{ font-size:12px; color:var(--muted); margin-top:5px; line-height:1.45; }
   .pubrow[aria-pressed="true"] td{ background:var(--chip); }
   .pubrow[aria-pressed="true"] td.pname{ color:var(--accent); }
-  .pubchip{ display:inline-block; font-size:11.5px; color:var(--muted); background:var(--chip);
+  .pubchip{ display:inline-block; font-size:13px; color:var(--muted); background:var(--chip);
     border-radius:6px; padding:2px 7px; margin:2px 4px 2px 0; }
   .panel-toggle{ display:none; width:100%; align-items:center; justify-content:space-between; font:inherit;
-    font-size:14px; font-weight:600; padding:10px 12px; border:1px solid var(--line); border-radius:10px;
+    font-size:15px; font-weight:600; padding:10px 12px; border:1px solid var(--line); border-radius:10px;
     background:var(--bg); color:var(--text); cursor:pointer; }
   .panel-toggle .caret{ transition:transform .15s; color:var(--muted); }
   .panel-toggle[aria-expanded="true"] .caret{ transform:rotate(180deg); }
   .histcards, .pubcards{ display:flex; flex-direction:column; gap:10px; }
   .histcard, .pubcard{ border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--panel); }
   .histcard-head, .pubcard-head{ display:flex; align-items:center; gap:8px; margin-bottom:7px; }
-  .histcard-head b, .pubcard-head b{ font-weight:600; font-size:14px; }
+  .histcard-head b, .pubcard-head b{ font-weight:600; font-size:15px; }
   .histcard-head .cbar{ display:inline-block; width:10px; height:18px; border-radius:5px; flex:0 0 auto; }
   .histcard-row{ display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; -webkit-overflow-scrolling:touch; }
   .hcell{ flex:0 0 auto; text-align:center; min-width:44px; padding:4px 6px; border-radius:7px; background:var(--bg);
     border:1px solid var(--line); font-variant-numeric:tabular-nums; }
-  .hcell i{ display:block; font-style:normal; font-size:10px; color:var(--muted); margin-bottom:1px; }
-  .hcell b{ font-size:13px; font-weight:600; }
+  .hcell i{ display:block; font-style:normal; font-size:12px; color:var(--muted); margin-bottom:1px; }
+  .hcell b{ font-size:14px; font-weight:600; }
   .hcell.up b{ color:#16a34a; } .hcell.down b{ color:#dc2626; } .hcell.na b{ color:var(--muted); font-weight:400; }
   .pubcard{ cursor:pointer; }
   .pubcard[aria-pressed="true"]{ border-color:var(--accent); }
   .pubcard[aria-pressed="true"] .pubcard-head b{ color:var(--accent); }
-  .pubcard-head .prank{ font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
-  .pubcard-stats{ font-size:12.5px; color:var(--muted); margin:0 0 7px; font-variant-numeric:tabular-nums; }
+  .pubcard-head .prank{ font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .pubcard-stats{ font-size:13.5px; color:var(--muted); margin:0 0 7px; font-variant-numeric:tabular-nums; }
   .pubcard-games{ display:flex; flex-wrap:wrap; }
   .pubcards{ max-height:330px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:8px; }
   .chapnav{ position:fixed; left:max(14px, calc(50% - 824px)); top:96px; width:132px; display:flex; flex-direction:column; gap:2px; z-index:60; padding:7px; border:1px solid var(--line); border-radius:11px; background:var(--panel); }
-  .chaptitle{ font-size:10.5px; font-weight:600; letter-spacing:.05em; color:var(--muted); padding:3px 9px 6px; }
+  .chaptitle{ font-size:12px; font-weight:600; letter-spacing:.05em; color:var(--muted); padding:3px 9px 6px; }
   .chapdot{ display:flex; align-items:center; gap:9px; cursor:pointer; text-decoration:none; padding:6px 9px; border-radius:7px; transition:background .12s; }
   .chapdot::before{ content:''; width:7px; height:7px; border-radius:50%; background:var(--muted); opacity:.45; flex:0 0 auto; transition:all .15s; }
-  .chaplabel{ font-size:12px; color:var(--muted); white-space:nowrap; transition:color .15s; }
+  .chaplabel{ font-size:13px; color:var(--muted); white-space:nowrap; transition:color .15s; }
   .chapdot:hover{ background:var(--chip); }
   .chapdot.active{ background:var(--chip); }
   .chapdot.active::before{ background:var(--accent); opacity:1; width:8px; height:8px; }
@@ -328,57 +328,57 @@
   @media (min-width:821px){ .wrap{ padding-left:160px; } }
   @media (max-width:820px){ .chapnav{ display:none; } }
   .navmkt-wrap{ display:flex; flex-direction:column; gap:4px; margin-bottom:6px; padding-bottom:7px; border-bottom:1px solid var(--line); }
-  .navmkt-label{ font-size:10.5px; font-weight:600; letter-spacing:.05em; color:var(--muted); padding-left:9px; }
-  .navmkt{ font:inherit; font-size:12px; font-weight:600; padding:5px 9px; border:1px solid var(--line); background:var(--bg); color:var(--text); border-radius:7px; cursor:pointer; width:100%; max-width:100%; }
+  .navmkt-label{ font-size:12px; font-weight:600; letter-spacing:.05em; color:var(--muted); padding-left:9px; }
+  .navmkt{ font:inherit; font-size:13px; font-weight:600; padding:5px 9px; border:1px solid var(--line); background:var(--bg); color:var(--text); border-radius:7px; cursor:pointer; width:100%; max-width:100%; }
   .navsrc-wrap{ display:flex; gap:3px; margin-top:7px; padding-top:8px; border-top:1px solid var(--line); }
-  .navsrc{ flex:1; font:inherit; font-size:11.5px; font-weight:500; padding:5px 0; border:1px solid var(--line); background:var(--bg); color:var(--muted); border-radius:6px; cursor:pointer; }
+  .navsrc{ flex:1; font:inherit; font-size:13px; font-weight:500; padding:5px 0; border:1px solid var(--line); background:var(--bg); color:var(--muted); border-radius:6px; cursor:pointer; }
   .navsrc[aria-selected="true"]{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .navsrc:disabled{ opacity:.4; cursor:not-allowed; }
   .site-footer{ margin-top:56px; padding-top:22px; border-top:1px solid var(--line); text-align:center; color:var(--muted); }
-  .site-footer .sf-by{ font-size:13px; }
+  .site-footer .sf-by{ font-size:14px; }
   .site-footer .sf-by b{ color:var(--text); font-weight:600; }
-  .site-footer .sf-sub{ font-size:12px; margin-top:6px; }
+  .site-footer .sf-sub{ font-size:13px; margin-top:6px; }
   .site-footer a{ color:var(--accent); text-decoration:none; }
   .site-footer a:hover{ text-decoration:underline; }
   .gmodal-bg{ position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; display:flex; align-items:center; justify-content:center; padding:18px; }
   .gmodal{ position:relative; width:560px; max-width:100%; max-height:90vh; overflow:auto; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:20px 22px; }
-  .gmclose{ position:absolute; top:12px; right:12px; width:30px; height:30px; border:1px solid var(--line); background:var(--bg); color:var(--muted); border-radius:8px; cursor:pointer; font-size:13px; line-height:1; }
+  .gmclose{ position:absolute; top:12px; right:12px; width:30px; height:30px; border:1px solid var(--line); background:var(--bg); color:var(--muted); border-radius:8px; cursor:pointer; font-size:14px; line-height:1; }
   .gmclose:hover{ background:var(--chip); }
   .gmhead{ display:flex; align-items:center; gap:14px; margin:2px 34px 16px 0; }
   .gmicon{ width:60px; height:60px; border-radius:14px; flex:0 0 auto; object-fit:cover; border:1px solid var(--line); }
   .gmicon-ph{ display:flex; align-items:center; justify-content:center; background:var(--chip); color:var(--muted); font-size:24px; font-weight:700; }
   .gmtitle{ font-size:19px; font-weight:600; }
-  .gmsub{ font-size:13px; color:var(--muted); margin-top:3px; }
+  .gmsub{ font-size:14px; color:var(--muted); margin-top:3px; }
   .gmgrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
   .gmstat{ background:var(--panel); border-radius:9px; padding:9px 11px; }
-  .gmstat .gml{ font-size:11px; color:var(--muted); }
+  .gmstat .gml{ font-size:12.5px; color:var(--muted); }
   .gmstat .gmv{ font-size:18px; font-weight:600; margin-top:2px; font-variant-numeric:tabular-nums; }
   .gmstar{ color:#e0a82e; }
-  .gmgap{ margin-top:12px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:13px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
-  .gmrev{ margin-top:10px; padding:10px 13px; background:var(--accent); color:#fff; border-radius:9px; font-size:13px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .gmgap{ margin-top:12px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:14px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .gmrev{ margin-top:10px; padding:10px 13px; background:var(--accent); color:#fff; border-radius:9px; font-size:14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .gmrev b{ color:#fff; }
   .gmrev .gmmuted{ color:rgba(255,255,255,.85); }
-  .gmrevlabel{ font-size:11px; font-weight:700; color:rgba(255,255,255,.92); flex:0 0 auto; }
-  .gmdisc{ margin-top:7px; font-size:11px; color:var(--muted); line-height:1.5; }
-  .gmmeta{ margin-top:10px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:12.5px; }
+  .gmrevlabel{ font-size:12.5px; font-weight:700; color:rgba(255,255,255,.92); flex:0 0 auto; }
+  .gmdisc{ margin-top:7px; font-size:12.5px; color:var(--muted); line-height:1.5; }
+  .gmmeta{ margin-top:10px; padding:10px 13px; background:var(--panel); border-radius:9px; font-size:13.5px; }
   .gmmeta-row{ display:flex; gap:8px; align-items:baseline; margin-bottom:4px; }
-  .gmmeta-l{ font-size:11px; font-weight:700; color:var(--muted); flex:0 0 80px; }
+  .gmmeta-l{ font-size:12.5px; font-weight:700; color:var(--muted); flex:0 0 80px; }
   .gmmeta-row b{ font-variant-numeric:tabular-nums; }
-  .gmmeta-note{ font-size:11px; color:var(--muted); font-weight:400; }
-  .gmmeta-notes{ margin-top:6px; padding-top:7px; border-top:1px solid var(--line); font-size:12px; color:var(--text); line-height:1.55; white-space:pre-line; max-height:104px; overflow:auto; }
-  .gmmeta-notes-l{ font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:3px; }
-  .gmevent{ margin-top:10px; padding:10px 13px; background:rgba(22,163,74,0.10); border:1px solid rgba(22,163,74,0.38); border-radius:9px; font-size:12.5px; color:var(--text); }
-  .gmevent-tag{ font-size:11px; font-weight:700; color:#fff; background:#16a34a; border-radius:5px; padding:2px 7px; margin-right:6px; }
+  .gmmeta-note{ font-size:12.5px; color:var(--muted); font-weight:400; }
+  .gmmeta-notes{ margin-top:6px; padding-top:7px; border-top:1px solid var(--line); font-size:13px; color:var(--text); line-height:1.55; white-space:pre-line; max-height:104px; overflow:auto; }
+  .gmmeta-notes-l{ font-size:12.5px; font-weight:700; color:var(--muted); display:block; margin-bottom:3px; }
+  .gmevent{ margin-top:10px; padding:10px 13px; background:rgba(22,163,74,0.10); border:1px solid rgba(22,163,74,0.38); border-radius:9px; font-size:13.5px; color:var(--text); }
+  .gmevent-tag{ font-size:12.5px; font-weight:700; color:#fff; background:#16a34a; border-radius:5px; padding:2px 7px; margin-right:6px; }
   .gmevent b{ font-variant-numeric:tabular-nums; }
   .gmevent-up{ color:#16a34a; font-weight:700; }
-  .gmevent-note{ font-size:11px; color:var(--muted); margin-top:5px; line-height:1.5; }
-  .mv-upd{ display:inline-block; margin-left:4px; font-size:10px; font-weight:700; color:#16a34a; border:1px solid rgba(22,163,74,.45); border-radius:4px; padding:0 4px; vertical-align:middle; cursor:help; }
+  .gmevent-note{ font-size:12.5px; color:var(--muted); margin-top:5px; line-height:1.5; }
+  .mv-upd{ display:inline-block; margin-left:4px; font-size:12px; font-weight:700; color:#16a34a; border:1px solid rgba(22,163,74,.45); border-radius:4px; padding:0 4px; vertical-align:middle; cursor:help; }
   .pubtable td.prev{ color:var(--text); font-variant-numeric:tabular-nums; }
-  .gmmuted{ color:var(--muted); font-size:12px; }
+  .gmmuted{ color:var(--muted); font-size:13px; }
   .gmspark{ margin-top:14px; border-top:1px solid var(--line); padding-top:12px; }
-  .gmsparkt{ font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .gmsparkt{ font-size:13px; color:var(--muted); margin-bottom:6px; }
   .gmspark svg{ width:100%; height:auto; display:block; }
-  .ginfo{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; width:18px; height:18px; border-radius:50%; border:1px solid var(--line); color:var(--muted); font-size:11px; cursor:pointer; margin-right:6px; vertical-align:middle; }
+  .ginfo{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; width:18px; height:18px; border-radius:50%; border:1px solid var(--line); color:var(--muted); font-size:12.5px; cursor:pointer; margin-right:6px; vertical-align:middle; }
   .gitem .ginfo{ margin-right:0; }
   .ginfo:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .gdname{ cursor:pointer; position:relative; }
@@ -386,20 +386,20 @@
   .aib-src:hover{ color:var(--accent2); text-decoration-style:solid; }
   /* 출처: 본문 각주 마커(¹) + 하단 출처 칩 — 링크를 본문 밖으로 분리 */
   .aib-srcw{ color:var(--srcblue); font-weight:600; }
-  .aib-srctag{ font-size:10px; font-weight:700; color:var(--srcblue); background:var(--srcbluesoft); border-radius:5px; padding:1px 6px; margin-left:3px; text-decoration:none; vertical-align:1px; white-space:nowrap; letter-spacing:.02em; }
+  .aib-srctag{ font-size:12px; font-weight:700; color:var(--srcblue); background:var(--srcbluesoft); border-radius:5px; padding:1px 6px; margin-left:3px; text-decoration:none; vertical-align:1px; white-space:nowrap; letter-spacing:.02em; }
   .aib-srctag:hover{ background:var(--srcblue); color:#fff; }
   .aib-srcfoot{ margin-top:13px; padding-top:11px; border-top:1px dashed var(--line); display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
-  .aib-srcfoot-h{ font-size:10.5px; font-weight:800; color:var(--muted); letter-spacing:.05em; margin-right:1px; }
-  .aib-srcitem{ display:inline-flex; align-items:center; gap:6px; max-width:300px; font-size:11.5px; color:var(--accent2text); background:var(--accent2soft); border:1px solid var(--line); padding:3px 11px 3px 4px; border-radius:999px; text-decoration:none; transition:background .12s,border-color .12s,color .12s; }
+  .aib-srcfoot-h{ font-size:12px; font-weight:800; color:var(--muted); letter-spacing:.05em; margin-right:1px; }
+  .aib-srcitem{ display:inline-flex; align-items:center; gap:6px; max-width:300px; font-size:13px; color:var(--accent2text); background:var(--accent2soft); border:1px solid var(--line); padding:3px 11px 3px 4px; border-radius:999px; text-decoration:none; transition:background .12s,border-color .12s,color .12s; }
   .aib-srcitem:hover{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
   .aib-srcitem:hover .aib-srcdom{ color:#fff; opacity:.85; }
   .aib-srcitem:hover .aib-srcn{ background:#fff; color:var(--accent2); }
-  .aib-srcn{ flex:0 0 auto; min-width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; background:var(--bg); color:var(--accent2text); border-radius:999px; }
+  .aib-srcn{ flex:0 0 auto; min-width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; background:var(--bg); color:var(--accent2text); border-radius:999px; }
   .aib-srclab{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; font-weight:600; }
-  .aib-srcdom{ font-size:10.5px; opacity:.68; white-space:nowrap; }
+  .aib-srcdom{ font-size:12px; opacity:.68; white-space:nowrap; }
   .gdicon{ width:15px; height:15px; border-radius:4px; vertical-align:-3px; margin-right:4px; object-fit:cover; background:var(--chip); }   /* #14: 브리핑 게임명 옆 앱 아이콘 */
   .gdname:hover{ text-decoration:underline; }
-  .gdname::after{ content:'상세보기'; position:absolute; left:0; top:-23px; font-size:10.5px; font-weight:600; background:var(--accent); color:#fff; padding:2px 7px; border-radius:5px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s; z-index:5; }
+  .gdname::after{ content:'상세보기'; position:absolute; left:0; top:-23px; font-size:12px; font-weight:600; background:var(--accent); color:#fff; padding:2px 7px; border-radius:5px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s; z-index:5; }
   .gdname:hover::after{ opacity:1; }
   @media (max-width:560px){ .gmgrid{ grid-template-columns:repeat(2,1fr); } }
   @media (max-width:820px){ .gdname::after{ display:none; } }
@@ -428,105 +428,143 @@
     .panel-body.open{ display:block; }
     .list{ max-height:300px; }
     .glegend{ height:auto; max-height:340px; }
-    .histtable th, .histtable td{ padding:6px 9px; font-size:12px; }
+    .histtable th, .histtable td{ padding:6px 9px; font-size:13px; }
     .histtable .gcol{ width:112px; min-width:112px; max-width:112px; }
     .histtable .colorcol{ left:112px; }
     .histtable .avg3m{ left:130px; }
   }
   .mkbar{ display:flex; align-items:center; gap:10px; margin:14px 0 2px; flex-wrap:wrap; }
-  .mkbar .mklabel{ font-size:12px; font-weight:700; letter-spacing:.02em; color:var(--muted); text-transform:uppercase; }
-  .mkbar .mksel{ appearance:none; -webkit-appearance:none; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:9px 34px 9px 13px; font-size:14px; font-weight:600; cursor:pointer; min-width:150px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+  .mkbar .mklabel{ font-size:13px; font-weight:700; letter-spacing:.02em; color:var(--muted); text-transform:uppercase; }
+  .mkbar .mksel{ appearance:none; -webkit-appearance:none; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:9px 34px 9px 13px; font-size:15px; font-weight:600; cursor:pointer; min-width:150px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
   .mkbar .mksel:hover{ border-color:var(--accent); }
   .mkbar .mksel:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-weak,rgba(80,130,255,.18)); }
   .cmoderow{ display:flex; align-items:center; gap:12px; margin:6px 0 12px; flex-wrap:wrap; }
   .cmode-wrap{ display:inline-flex; gap:0; border:1px solid var(--line); border-radius:11px; padding:3px; background:var(--panel); }
-  .cmode{ appearance:none; border:0; background:transparent; color:var(--muted); font-size:13.5px; font-weight:700; padding:7px 16px; border-radius:8px; cursor:pointer; transition:all .12s; }
+  .cmode{ appearance:none; border:0; background:transparent; color:var(--muted); font-size:14.5px; font-weight:700; padding:7px 16px; border-radius:8px; cursor:pointer; transition:all .12s; }
   .cmode:hover{ color:var(--text); }
   .cmode[aria-selected="true"]{ background:var(--accent); color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.16); }
-  .cmode-hint{ font-size:12.5px; color:var(--muted); }
+  .cmode-hint{ font-size:13.5px; color:var(--muted); }
   .glegend{ display:flex; flex-direction:column; gap:1px; padding:0 2px 2px; height:520px; overflow-y:auto; }
-  .glegend .gl-hint{ font-size:11.5px; color:var(--muted); margin:0 2px 6px; padding-top:10px; }
+  .glegend .gl-hint{ font-size:13px; color:var(--muted); margin:0 2px 6px; padding-top:10px; }
   .gl-cols{ display:grid; grid-template-columns:12px 1fr 34px 42px 48px; gap:9px; align-items:center; }
   .glegend .gl-head{ position:sticky; top:0; z-index:2; background:var(--panel); padding:4px 8px 5px; border-bottom:1px solid var(--line); }
-  .glegend .gl-head span{ font-size:11px; color:var(--muted); }
+  .glegend .gl-head span{ font-size:12.5px; color:var(--muted); }
   .glegend .gl-head .gh-r{ text-align:right; }
-  .glegend .gl-group{ display:flex; align-items:center; gap:7px; margin:9px 2px 3px; font-size:11.5px; font-weight:700; color:var(--muted); }
+  .glegend .gl-group{ display:flex; align-items:center; gap:7px; margin:9px 2px 3px; font-size:13px; font-weight:700; color:var(--muted); }
   .glegend .gl-group .gg-bar{ width:3px; height:12px; border-radius:2px; background:var(--accent); flex:0 0 auto; }
-  .glegend .gl-item{ width:100%; text-align:left; font:inherit; font-size:13px; color:var(--text); cursor:pointer; background:transparent; border:1px solid transparent; border-radius:7px; padding:5px 8px; transition:background .12s, border-color .12s; }
+  .glegend .gl-item{ width:100%; text-align:left; font:inherit; font-size:14px; color:var(--text); cursor:pointer; background:transparent; border:1px solid transparent; border-radius:7px; padding:5px 8px; transition:background .12s, border-color .12s; }
   .glegend .gl-item:hover{ background:var(--chip); }
   .glegend .gl-item.on{ border-color:var(--line); background:var(--chip); font-weight:700; }
   .glegend .gl-item.off{ opacity:.45; }
   .glegend .gl-dot{ width:10px; height:10px; border-radius:3px; }
   .glegend .gl-name{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .glegend .gl-meta{ font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
+  .glegend .gl-meta{ font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
   .glegend .gl-rev{ color:var(--accent); font-weight:600; }
   .cmpsec{ margin:20px 0 6px; }
   .cmp-controls{ display:flex; align-items:center; gap:8px; margin:6px 0 11px; }
-  .cmp-clabel{ font-size:12px; color:var(--muted); }
-  .cmp-metric{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font:inherit; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all .12s; }
+  .cmp-clabel{ font-size:13px; color:var(--muted); }
+  .cmp-metric{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font:inherit; font-size:13.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all .12s; }
   .cmp-metric:hover{ color:var(--text); border-color:var(--accent); }
   .cmp-metric.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
-  .cmp-basis{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font:inherit; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all .12s; }
+  .cmp-basis{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font:inherit; font-size:13.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all .12s; }
   .cmp-basis:hover{ color:var(--text); border-color:var(--accent2); }
   .cmp-basis.on{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
   .cmp-cell.cmp-top{ box-shadow: inset 0 0 0 2px var(--accent2); font-weight:800; }
   .cmp-wrap{ overflow:auto; max-height:560px; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
   .cmp-grid{ display:grid; min-width:max-content; }
-  .cmp-corner,.cmp-mh,.cmp-glabel{ padding:7px 9px; border-bottom:1px solid var(--line); border-right:1px solid var(--line); white-space:nowrap; font-size:12px; }
+  .cmp-corner,.cmp-mh,.cmp-glabel{ padding:7px 9px; border-bottom:1px solid var(--line); border-right:1px solid var(--line); white-space:nowrap; font-size:13px; }
   .cmp-mh{ position:sticky; top:0; z-index:2; background:var(--panel); font-weight:700; color:var(--text); text-align:center; }
   .cmp-glabel{ position:sticky; left:0; z-index:1; background:var(--panel); display:flex; align-items:center; gap:7px; font-weight:600; color:var(--text); }
-  .cmp-corner{ position:sticky; top:0; left:0; z-index:3; background:var(--panel); font-size:11px; color:var(--muted); font-weight:700; }
+  .cmp-corner{ position:sticky; top:0; left:0; z-index:3; background:var(--panel); font-size:12.5px; color:var(--muted); font-weight:700; }
   .cmp-dot{ width:9px; height:9px; border-radius:3px; flex:0 0 auto; }
-  .cmp-cell{ appearance:none; margin:0; padding:7px 6px; border:0; border-bottom:1px solid var(--line); border-right:1px solid var(--line); font:inherit; font-size:12px; font-variant-numeric:tabular-nums; text-align:center; color:var(--text); cursor:pointer; min-width:62px; }
+  .cmp-cell{ appearance:none; margin:0; padding:7px 6px; border:0; border-bottom:1px solid var(--line); border-right:1px solid var(--line); font:inherit; font-size:13px; font-variant-numeric:tabular-nums; text-align:center; color:var(--text); cursor:pointer; min-width:62px; }
   .cmp-cell:hover{ outline:2px solid var(--accent); outline-offset:-2px; position:relative; z-index:1; }
-  .cmp-empty{ padding:22px 16px; color:var(--muted); font-size:13px; }
+  .cmp-empty{ padding:22px 16px; color:var(--muted); font-size:14px; }
   .mkbrief{ margin:0 0 16px; padding:0; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
   .mkbrief>:not(summary){ padding-left:16px; padding-right:16px; }
   .mkbrief-head{ display:flex; align-items:center; gap:8px; margin-bottom:0; }
-  .mkbrief-badge{ font-size:13.5px; font-weight:700; color:var(--accent2text); }
-  .mkbrief-date{ font-size:12.5px; font-weight:400; color:var(--muted); }
+  .mkbrief-badge{ font-size:14.5px; font-weight:700; color:var(--accent2text); }
+  .mkbrief-date{ font-size:13.5px; font-weight:400; color:var(--muted); }
   .mkbrief-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; margin-bottom:13px; }   /* 과거기록 버튼(헤더)과 시장 탭 사이 간격 */
-  .mkbrief-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:9px; cursor:pointer; transition:all .12s; }
+  .mkbrief-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:13.5px; font-weight:700; padding:6px 12px; border-radius:9px; cursor:pointer; transition:all .12s; }
   .mkbrief-tab:hover{ color:var(--text); border-color:var(--accent2); }
   .mkbrief-tab[aria-selected="true"]{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
-  .mkbrief-body{ font-size:14px; line-height:1.72; }
+  .mkbrief-body{ font-size:15px; line-height:1.72; }
   .mkbrief-body .aib-sec{ margin-top:9px; }
   .mkbrief-body .aib-sec:first-child{ margin-top:0; }
   .mkbrief-body .mkb-li{ position:relative; padding-left:15px; }
   .mkbrief-body .mkb-li::before{ content:''; position:absolute; left:2px; top:7px; width:5px; height:5px; border-radius:50%; background:var(--accent2text); }
   .mkbrief-body strong{ color:var(--accent2text); font-weight:700; }
-  .mkbrief-foot{ margin:12px 0 0; padding-bottom:15px; font-size:11.5px; color:var(--muted); }
+  .mkbrief-foot{ margin:12px 0 0; padding-bottom:15px; font-size:13px; color:var(--muted); }
   .mkbrief-body .gdname{ background:var(--accent2soft); color:var(--accent2text); font-weight:600; border-radius:5px; padding:1px 6px; white-space:nowrap; }
   .mkbrief-body .gdname:hover{ background:var(--accent2); color:#fff; text-decoration:none; }
-  .mkbrief>summary.mkbrief-head{ display:flex; align-items:center; gap:8px; cursor:pointer; list-style:none; position:relative; padding:12px 16px; border-radius:12px; font-size:13.5px; font-weight:600; color:var(--text); user-select:none; -webkit-user-select:none; }
+  .mkbrief>summary.mkbrief-head{ display:flex; align-items:center; gap:8px; cursor:pointer; list-style:none; position:relative; padding:12px 16px; border-radius:12px; font-size:14.5px; font-weight:600; color:var(--text); user-select:none; -webkit-user-select:none; }
   .mkbrief>summary.mkbrief-head:hover{ background:var(--chip); }
   .mkbrief>summary.mkbrief-head:focus{ outline:none; }
   .mkbrief>summary.mkbrief-head:focus-visible{ outline:2px solid var(--accent2); outline-offset:-2px; }
   .mkbrief>summary.mkbrief-head::-webkit-details-marker{ display:none; }
-  .mkbrief-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); font-weight:600; flex:0 0 auto; }
+  .mkbrief-hint{ margin-left:auto; font-size:13px; color:var(--muted); font-weight:600; flex:0 0 auto; }
   .mkbrief-hint::after{ content:'펼쳐보기 ▾'; }
   .mkbrief[open] .mkbrief-hint::after{ content:'접기 ▴'; }
   .mkbrief-calrow{ position:relative; margin-top:8px; }
-  .mkbrief-cal{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:8px; cursor:pointer; }
+  .mkbrief-cal{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:13px; font-weight:700; padding:4px 10px; border-radius:8px; cursor:pointer; }
   .mkbrief-cal:hover{ border-color:var(--accent2); color:var(--text); }
   .mkbrief-calpop{ position:absolute; top:30px; left:0; z-index:30; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px; width:248px; box-shadow:0 8px 28px rgba(0,0,0,.32); }
   .mkcal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-  .mkcal-title{ font-size:13px; font-weight:800; color:var(--text); }
-  .mkcal-nav{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--text); width:24px; height:24px; border-radius:7px; cursor:pointer; font-size:14px; line-height:1; }
+  .mkcal-title{ font-size:14px; font-weight:800; color:var(--text); }
+  .mkcal-nav{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--text); width:24px; height:24px; border-radius:7px; cursor:pointer; font-size:15px; line-height:1; }
   .mkcal-nav:hover{ border-color:var(--accent2); }
   .mkcal-dow{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:3px; }
-  .mkcal-dow span{ text-align:center; font-size:10px; color:var(--muted); }
+  .mkcal-dow span{ text-align:center; font-size:12px; color:var(--muted); }
   .mkcal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
-  .mkcal-d{ appearance:none; border:0; background:transparent; color:var(--muted); font-size:12px; height:28px; border-radius:7px; cursor:default; }
+  .mkcal-d{ appearance:none; border:0; background:transparent; color:var(--muted); font-size:13px; height:28px; border-radius:7px; cursor:default; }
   .mkcal-d.has{ background:var(--accent2soft); color:var(--accent2text); font-weight:800; cursor:pointer; }
   .mkcal-d.has:hover{ background:var(--accent2); color:#fff; }
   .mkcal-d.mkcal-empty{ visibility:hidden; }
-  .mkcal-note{ margin-top:8px; font-size:10.5px; color:var(--muted); }
+  .mkcal-note{ margin-top:8px; font-size:12px; color:var(--muted); }
   .mkbrief-axis{ display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 12px; }
-  .mkbax-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12px; font-weight:700; padding:5px 13px; border-radius:999px; cursor:pointer; transition:background .12s,color .12s,border-color .12s; }
+  .mkbax-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:13px; font-weight:700; padding:5px 13px; border-radius:999px; cursor:pointer; transition:background .12s,color .12s,border-color .12s; }
   .mkbax-tab:hover:not([disabled]){ border-color:var(--accent2); color:var(--text); }
   .mkbax-tab[aria-selected="true"]{ background:var(--accent2); border-color:var(--accent2); color:#fff; }
   .mkbax-tab[disabled]{ opacity:.4; cursor:not-allowed; }
+
+  /* ===== 2026-10-16 가시성·가독성(사용자 승인 — 견본 project/mobile-chart-bot/견본/2026-10-16-가시성-가독성/) =====
+     글자 크기는 위 선언을 한 단계씩 올렸다(9~10.5→12 · 11→12.5 · 11.5·12→13 · 12.5→13.5 · 13→14 · 13.5→14.5 · 14→15 · 15→16 · 16→17).
+     페이지 제목(header h1 20px)은 사용자 지시로 그대로 둔다. */
+  .sectitle, .histsec h2, .pubsec h2, .cmpsec h2{ font-size:20px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; }
+  .gopi-h{ font-size:13.5px; }
+  .aibdn{ color:#e07c12; font-weight:600; }
+  .gop-insight.pm-top{ margin:0 0 12px; }
+  @media (prefers-color-scheme: light){   /* 숫자·표시가 읽기 대비 4.5:1을 넘게(같은 계열의 진한 색) */
+    .aibup, .histtable td.up, td.gaprev, .watch-up, .hcell.up b, .gmevent-up{ color:#15803d; }
+    td.gapdl, .aibdn{ color:#b45309; }
+    .mv-upd{ color:#15803d; border-color:rgba(21,128,61,.5); }
+    .newbadge{ background:#c81e3f; }
+    .gmevent-tag{ background:#15803d; }
+    .mvd.up{ color:#166534; }
+    .cact{ color:#1d4ed8; }
+  }
+  @media (prefers-color-scheme: dark){    /* 어두운 화면의 파란 글자 */
+    .intro-title, .intro-block h3, .glegend .gl-rev, .watchcard-rank, .goptraj-play, .pubtable th.sorton,
+    .pubrow[aria-pressed="true"] td.pname, .pubcard[aria-pressed="true"] .pubcard-head b, .site-footer a{ color:#60a5fa; }
+  }
+  /* 표: 숫자는 오른쪽 정렬(이름·게임 목록·첫 칸은 왼쪽), 갭 표는 폭 880px */
+  .pubtable th, .pubtable td{ text-align:right; }
+  .pubtable td.pname, .pubtable th.pname, .pubtable td.pgames, .pubtable th.pgames, .pubtable th:first-child, .pubtable td:first-child{ text-align:left; }
+  #gapout .pubscroll{ max-width:880px; }
+  /* 진입 맵 기간 막대: 양 끝 날짜 글자를 안쪽 정렬(화면 밖으로 나가지 않게) */
+  .goptraj-tick:first-of-type{ transform:none; text-align:left; } .goptraj-tick:first-of-type i{ margin-left:0; }
+  .goptraj-tick:last-of-type{ transform:translateX(-100%); text-align:right; } .goptraj-tick:last-of-type i{ margin-right:0; margin-left:auto; }
+  /* 휴대폰 */
+  .movercol{ min-width:0; }
+  @media (max-width:560px){
+    .movergrid{ grid-template-columns:1fr; }                       /* 진입·이탈·급변 한 줄에 하나(페이지 폭 넘침 해소) */
+    .sub.cap{ display:block; } .sub.cap .ci{ display:inline; } .sub.cap .csep{ margin:0 5px; }   /* 설명 줄을 문장처럼 */
+    #gopsec .gop-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }   /* 진입 맵은 읽을 수 있는 크기로 옆으로 밀어 보기 */
+    #gopsec .gop-wrap svg{ width:820px !important; max-width:none; height:auto; }
+    #gopsec .gop-wrap svg text{ font-size:15px !important; }
+    #gopsec .gop-wrap::after{ content:'← 옆으로 밀어서 보기 →'; display:block; font-size:12px; color:var(--muted); text-align:center; padding:4px 0; position:sticky; left:0; }
+  }
 </style>
 </head>
 <body>
@@ -711,6 +749,7 @@
   </div>
 
   <div class="pubsec" id="aggsec">
+    <h2 id="aggtitle">퍼블리셔별 차트 장악력</h2>
     <div class="srcrow">
       <span class="srclabel">집계 기준</span>
       <div class="stabs" role="tablist" aria-label="집계 기준">
@@ -718,7 +757,6 @@
         <button class="stab" role="tab" data-agg="genre" aria-selected="false">장르</button>
       </div>
     </div>
-    <h2 id="aggtitle">퍼블리셔별 차트 장악력</h2>
     <p class="sub cap" id="aggsub"></p>
     <div class="pubcontrols">
       <input class="search pubsearch" id="aggsearch" type="search" placeholder="이름·게임 검색" aria-label="집계 검색">
@@ -768,6 +806,31 @@
 <script>
 const PALETTE = ['#2563eb','#dc2626','#16a34a','#d97706','#7c3aed','#0891b2','#db2777','#65a30d',
   '#ea580c','#0d9488','#4f46e5','#b91c1c','#15803d','#a16207','#9333ea','#0e7490','#be185d','#c2410c'];
+// ===== 2026-10-16 가시성·가독성: 차트 글자·눈금·세로축 제목·장르 선 끝 이름 =====
+Chart.defaults.font.size = 13;
+Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif";
+const TICKC = matchMedia('(prefers-color-scheme: dark)').matches ? '#a3a29a' : '#6b6a64';   // 캔버스는 CSS 변수를 못 읽어 화면 설정으로 고른다
+function fmtTick(s){ s=String(s); let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m) return (+m[2])+'/'+(+m[3]); m=s.match(/^(\d{4})-(\d{2})$/); if(m) return (+m[2])+'월'; return s; }
+// 세로축 제목을 가로 글씨로 축 왼쪽 가운데에(덱 그래프 규칙과 같은 자리). 그림 왼쪽 여백은 차트 옵션 layout.padding.left
+Chart.register({ id:'yTitleH', afterDraw(c){
+  if(!c.canvas || c.canvas.id!=='chart') return;
+  const lines = chartMode==='genre' ? ['점유율','(%)'] : ['순위','(위=1위)'];
+  const ctx=c.ctx, a=c.chartArea; ctx.save(); ctx.font='600 '+(isMobile()?12:13)+'px '+Chart.defaults.font.family; ctx.fillStyle=TICKC;
+  ctx.textAlign='left'; ctx.textBaseline='middle'; const y0=(a.top+a.bottom)/2-(lines.length-1)*9;
+  lines.forEach((s,i)=> ctx.fillText(s, 2, y0+i*18)); ctx.restore(); } });
+// 장르 차트(C안): 목록에서 고른 장르만 선 끝에 이름과 최근 7일 평균 값을 적는다(데스크톱만 — 휴대폰은 목록이 그래프 아래에 있다)
+Chart.register({ id:'genreEndLabels',
+  beforeUpdate(c){ if(!c.canvas || c.canvas.id!=='chart') return; const p=c.options.layout && c.options.layout.padding; if(!p || typeof p!=='object') return;
+    p.right = (chartMode==='genre' && genreSel.length && !isMobile()) ? 150 : 0; },
+  afterDatasetsDraw(c){ if(!c.canvas || c.canvas.id!=='chart' || chartMode!=='genre' || !genreSel.length || isMobile()) return;
+    const ctx=c.ctx, a=c.chartArea, pts=[];
+    c.data.datasets.forEach((d,i)=>{ if(!genreSel.includes(d.label)) return; const meta=c.getDatasetMeta(i); if(meta.hidden) return;
+      let k=meta.data.length-1; while(k>=0 && (d.data[k]==null || meta.data[k].x>a.right+1)) k--; if(k<0) return;
+      pts.push({ y:meta.data[k].y, t:d.label+' '+d.data[k]+'%', col:d.gcol||d.borderColor }); });
+    pts.sort((p,q)=>p.y-q.y); for(let k=1;k<pts.length;k++){ if(pts[k].y-pts[k-1].y<16) pts[k].y=pts[k-1].y+16; }
+    ctx.save(); ctx.font='700 13px '+Chart.defaults.font.family; ctx.textBaseline='middle'; ctx.textAlign='left';
+    pts.forEach(p=>{ ctx.fillStyle=p.col; ctx.fillText(p.t, a.right+8, p.y); }); ctx.restore(); } });
+
 const TF_LABEL = {daily:'일별', weekly:'주별', monthly:'월별', quarterly:'분기별', yearly:'년별'};
 
 let FULL=null, DATA=null, chart=null, activeTf='daily', activeChart='grossing';
@@ -1011,16 +1074,18 @@ function genreDatasets(){
   const li=labels.length-1;
   names.sort((a,b)=> a==='장르 없음'?1 : b==='장르 없음'?-1 : share(b,li)-share(a,li));   // '장르 없음'은 항상 맨 뒤(스택 끝)
   // 퍼센트 기반 선차트: 기본은 선만(도트 없음), 범례 클릭으로 강조하면 그 장르에 도트 표시(게임 차트와 동일)
-  const any=genreSel.length>0;
+  // 2026-10-16 C안(사용자 선택): 선은 최근 7일 평균, 기본은 모두 회색이고 목록에서 고른 장르만 색·점·선 끝 이름(게임 차트와 같은 규칙).
+  // 그날 값은 ds.daily에 두어 목록의 '점유' 칸과 툴팁이 쓴다.
+  const ma7=a=> a.map((_,i)=>{ let s=0,c=0; for(let k=Math.max(0,i-6);k<=i;k++){ if(a[k]!=null){ s+=a[k]; c++; } } return c?Math.round(s/c*10)/10:null; });
   return names.map((g,i)=>{
     const col=genreColor(g), on=genreSel.includes(g);
-    const ds={ aid:'__genre__'+g, label:g, type:'line',
-      data:gs.genres[g].map((_,idx)=> share(g,idx)),
+    const daily=gs.genres[g].map((_,idx)=> share(g,idx));
+    const ds={ aid:'__genre__'+g, label:g, type:'line', daily, gcol:col,
+      data:ma7(daily),
       backgroundColor:col, pointBackgroundColor:col, pointBorderColor:col,
       fill:false, pointHoverRadius:6, spanGaps:false, tension:0.25 };
-    if(on){ ds.borderColor=col; ds.borderWidth=3; ds.pointRadius=3.4; ds.order=0; }
-    else if(any){ ds.borderColor=col+'33'; ds.borderWidth=1.4; ds.pointRadius=0; ds.order=2; }
-    else { ds.borderColor=col; ds.borderWidth=2.4; ds.pointRadius=0; ds.order=1; }
+    if(on){ ds.borderColor=col; ds.borderWidth=3; ds.pointRadius=0; ds.order=0; }   // 점은 마우스를 올린 곳에만(7일 평균선에 날마다 점을 찍으면 구슬처럼 촘촘해짐 — C안 견본과 같게)
+    else { ds.borderColor='rgba(150,150,145,0.38)'; ds.borderWidth=1.3; ds.pointRadius=0; ds.pointHoverRadius=4; ds.order=2; }
     return ds;
   });
 }
@@ -1051,7 +1116,7 @@ function renderGenreLegend(){
   const _grg=((FULL.charts&&FULL.charts.grossing&&FULL.charts.grossing.genres&&FULL.charts.grossing.genres.list))||[];
   const _grossRev={}; _grg.forEach(g=>{ _grossRev[g.genre]=(g.games||[]).reduce((s,x)=>s+(revShare(x.app_id)||0),0); });
   const gstats={}; ((DATA.genres&&DATA.genres.list)||[]).forEach(g=>{ gstats[g.genre]={n:g.num_games, rev:(_grossRev[g.genre]!=null?_grossRev[g.genre]:0)}; });
-  const rows=ds.map(d=>{ const arr=d.data||[]; const g=d.label||''; const st=gstats[g]||{};
+  const rows=ds.map(d=>{ const arr=d.daily||d.data||[]; const g=d.label||''; const st=gstats[g]||{};
     return {g, on:genreSel.includes(g), share:(arr.length?arr[arr.length-1]:null), n:(st.n!=null?st.n:null), rev:(st.rev!=null?Math.round(st.rev*1000)/10:null), col:d.pointBackgroundColor||d.backgroundColor||'#888'}; });
   // 매출 구간별 그룹(주력≥20% · 중간 5–20% · 소형<5%), 그룹 안은 매출 내림차순
   const tier=r=> r.g==='장르 없음' ? 2 : (r.rev!=null&&r.rev>=20)?0 : (r.rev!=null&&r.rev>=5)?1 : 2;   // '장르 없음'은 항상 소형 그룹
@@ -1104,7 +1169,7 @@ function setChartMode(mode){
     if(panelEl) panelEl.style.display=''; setPanelMode('genre');
     if(secT) secT.textContent='장르 추이'; markSectionMarkets();
     if(hint) hint.textContent='장르별 점유율(%) 추이 · 같은 날 합치면 100% (매출/인기 전환 가능)';
-    if(charthint) charthint.innerHTML='<span class="ci">선 하나 = 한 장르</span><span class="csep">│</span><span class="ci">값 = 그날 차트 내 <b>점유율(%)</b> · 합 100%</span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>이동</b></span>';
+    if(charthint) charthint.innerHTML='<span class="ci">선 = 장르별 <b>점유율</b>(최근 7일 평균)</span><span class="csep">│</span><span class="ci">목록에서 장르를 누르면 <b>색과 이름</b>이 표시됩니다</span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>이동</b></span>';
     const banner=document.getElementById('banner'); if(banner) banner.style.display='none';
     { const hs=document.getElementById('histsec'); if(hs) hs.style.display='none'; const nh=document.getElementById('navHist'); if(nh) nh.style.display='none'; }   // #7: 순위이력은 게임차트에서만
     chart.data.labels=genreSeries().labels;
@@ -1112,7 +1177,7 @@ function setChartMode(mode){
     chart.options.scales.x.stacked=false; chart.options.scales.y.stacked=false;  // 선차트(누적 아님)
     y.reverse=false; if(y.title) y.title.text='장르 점유율 (%)'; if(y.ticks){ y.ticks.callback=(v)=>v+'%'; }
     chart.options.plugins.legend.display=false;  // Chart.js 범례는 generateLabels 충돌 → 아래 HTML 범례로 대체
-    chart.options.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}%`;
+    chart.options.plugins.tooltip.callbacks.label=(c)=>{ const d=c.dataset.daily, dv=d?d[c.dataIndex]:null; return `${c.dataset.label} · 7일 평균 ${c.parsed.y}%`+(dv!=null?` (그날 ${dv}%)`:''); };
     if(chart.resetZoom) chart.resetZoom();
     applyGenreYAxis();  // resetZoom이 원본 max=100을 복원하므로 그 뒤에 유동 상한 적용
     chart.update(); updateScrollbar();
@@ -1220,7 +1285,7 @@ function aggregate(keyName, periodDays){
 
 function pmCallout(rows){
   const rs=rows.filter(Boolean).map(r=>'<div class="gopi-row"><span class="gopi-k">'+r[0]+'</span><span>'+r[1]+'</span></div>').join('');
-  return rs?('<div class="gop-insight"><div class="gopi-h">PM 관점</div>'+rs+'</div>'):'';
+  return rs?('<div class="gop-insight pm-top"><div class="gopi-h">PM 관점</div>'+rs+'</div>'):'';   // 2026-10-16: 구간 요점을 표 위에
 }
 function renderAgg(keyName, period, els, labelName){
   const tf=(DATA.timeframes&&DATA.timeframes.daily)||{labels:[]};
@@ -1262,7 +1327,7 @@ function renderAgg(keyName, period, els, labelName){
     });
     h+='</tbody></table></div>';
   }
-  { const top3=full.slice(0,3); const totG=full.reduce((a,e)=>a+(e.num_games||0),0); const t3G=top3.reduce((a,e)=>a+(e.num_games||0),0); const gShare=totG?Math.round(t3G/totG*100):0; const names='<b>'+top3.map(e=>esc(e.key)).join(' · ')+'</b>'; let rd,imp; if(showRev){ const totR=full.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const t3R=top3.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const rShare=totR?Math.round(t3R/totR*100):0; const diag=(rShare-gShare>=12)?('적은 타이틀로 매출을 빨아들이는 <b>고효율 과점</b>(소수 IP 의존)'):((gShare-rShare>=12)?'매출보다 머릿수로 차트를 채우는 구조(타이틀 수 경쟁)':'게임 수만큼 매출도 올라 점유가 비례'); rd=['구조', '상위 3'+labelName+'('+names+')이 게임 수론 <b>'+gShare+'%</b>인데 추정매출은 <b>'+rShare+'%</b>. '+diag+'.']; imp=['볼 포인트', (rShare-gShare>=12)?('신규 진입 상대는 많은 게임이 아니라 이 소수 IP의 라이브옵스·과금력. 보통 그 BM·업데이트 주기를 벤치마크로 본다.'):('점유가 분산된 편이라 단일 강자보다 카테고리 전반의 경쟁 강도를 본다.')]; } else { const conc=gShare>=55?'소수 과점':(gShare>=35?'중간':'분산'); rd=['구조', '상위 3'+labelName+'('+names+')이 차트의 <b>'+gShare+'%</b> 차지: '+conc+'.']; imp=['볼 포인트','인기 차트는 신규 유입의 풀. 상위 집중이 높으면 신작이 들 틈이 좁은지, 낮으면 회전이 빠른지를 본다.']; } h+=pmCallout([rd,imp]); }
+  { const top3=full.slice(0,3); const totG=full.reduce((a,e)=>a+(e.num_games||0),0); const t3G=top3.reduce((a,e)=>a+(e.num_games||0),0); const gShare=totG?Math.round(t3G/totG*100):0; const names='<b>'+top3.map(e=>esc(e.key)).join(' · ')+'</b>'; let rd,imp; if(showRev){ const totR=full.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const t3R=top3.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const rShare=totR?Math.round(t3R/totR*100):0; const diag=(rShare-gShare>=12)?('적은 타이틀로 매출을 빨아들이는 <b>고효율 과점</b>(소수 IP 의존)'):((gShare-rShare>=12)?'매출보다 머릿수로 차트를 채우는 구조(타이틀 수 경쟁)':'게임 수만큼 매출도 올라 점유가 비례'); rd=['구조', '상위 3'+labelName+'('+names+')이 게임 수론 <b>'+gShare+'%</b>인데 추정매출은 <b>'+rShare+'%</b>. '+diag+'.']; imp=['볼 포인트', (rShare-gShare>=12)?('신규 진입 상대는 많은 게임이 아니라 이 소수 IP의 라이브옵스·과금력. 보통 그 BM·업데이트 주기를 벤치마크로 본다.'):('점유가 분산된 편이라 단일 강자보다 카테고리 전반의 경쟁 강도를 본다.')]; } else { const conc=gShare>=55?'소수 과점':(gShare>=35?'중간':'분산'); rd=['구조', '상위 3'+labelName+'('+names+')이 차트의 <b>'+gShare+'%</b> 차지: '+conc+'.']; imp=['볼 포인트','인기 차트는 신규 유입의 풀. 상위 집중이 높으면 신작이 들 틈이 좁은지, 낮으면 회전이 빠른지를 본다.']; } h=pmCallout([rd,imp])+h; }
   els.wrap.innerHTML=h;
   els.wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(aggSort.k===kk) aggSort.dir*=-1; else aggSort={k:kk, dir:(kk==='best_rank'||kk==='avg_rank'||kk==='key')?1:-1}; renderAggSection(); }));
   els.wrap.querySelectorAll('.pubrow').forEach(row=>{
@@ -1316,7 +1381,7 @@ function renderGap(){
     h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${newBadge(r.aid)}${esc(r.title)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
   });
   h+='</tbody></table></div>';
-  { const TH=20; const dl=rows.filter(r=>r.gap>=TH).sort((a,b)=>b.gap-a.gap); const rv=rows.filter(r=>r.gap<=-TH).sort((a,b)=>a.gap-b.gap); const big=rows.slice().sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap))[0]; let diag,point; if(rv.length>=dl.length*2&&rv.length>=3){ diag='매출↑·인기↓('+rv.length+')가 인기↑·매출↓('+dl.length+')의 두 배 이상. 다운로드보다 <b>객단가(코어 과금)로 버는 시장</b>.'; point='신규 진입은 바이럴 UA보다 코어 리텐션·과금 설계가 관건인지를 본다.'; } else if(dl.length>=rv.length*2&&dl.length>=3){ diag='인기↑·매출↓('+dl.length+')가 매출↑·인기↓('+rv.length+')의 두 배 이상. 트래픽은 받는데 <b>수익화가 덜 따라온 시장</b>.'; point='이미 트래픽 있는 타이틀의 BM·현지화를 반면교사·기회로 본다.'; } else if(dl.length||rv.length){ diag='매출↑형 '+rv.length+' · 인기↑형 '+dl.length+'. 양쪽이 비슷해 수익화·트래픽이 균형 잡힌 편.'; point='특정 편향이 없어 개별 극단 게임 위주로 본다.'; } else { diag='큰 괴리(±'+TH+'↑)가 거의 없음. 인기와 매출 순위가 대체로 일치.'; point='순위 괴리 시그널이 약해 절대 순위·추세로 본다.'; } const rs=[['성격', diag+((big&&Math.abs(big.gap)>=TH)?(' 최대 괴리 <b>'+esc(big.title)+'</b>(인기 '+big.fr+'·매출 '+big.gr+'위).'):'')]]; rs.push(['볼 포인트', point]); h+=pmCallout(rs); }
+  { const TH=20; const dl=rows.filter(r=>r.gap>=TH).sort((a,b)=>b.gap-a.gap); const rv=rows.filter(r=>r.gap<=-TH).sort((a,b)=>a.gap-b.gap); const big=rows.slice().sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap))[0]; let diag,point; if(rv.length>=dl.length*2&&rv.length>=3){ diag='매출↑·인기↓('+rv.length+')가 인기↑·매출↓('+dl.length+')의 두 배 이상. 다운로드보다 <b>객단가(코어 과금)로 버는 시장</b>.'; point='신규 진입은 바이럴 UA보다 코어 리텐션·과금 설계가 관건인지를 본다.'; } else if(dl.length>=rv.length*2&&dl.length>=3){ diag='인기↑·매출↓('+dl.length+')가 매출↑·인기↓('+rv.length+')의 두 배 이상. 트래픽은 받는데 <b>수익화가 덜 따라온 시장</b>.'; point='이미 트래픽 있는 타이틀의 BM·현지화를 반면교사·기회로 본다.'; } else if(dl.length||rv.length){ diag='매출↑형 '+rv.length+' · 인기↑형 '+dl.length+'. 양쪽이 비슷해 수익화·트래픽이 균형 잡힌 편.'; point='특정 편향이 없어 개별 극단 게임 위주로 본다.'; } else { diag='큰 괴리(±'+TH+'↑)가 거의 없음. 인기와 매출 순위가 대체로 일치.'; point='순위 괴리 시그널이 약해 절대 순위·추세로 본다.'; } const rs=[['성격', diag+((big&&Math.abs(big.gap)>=TH)?(' 최대 괴리 <b>'+esc(big.title)+'</b>(인기 '+big.fr+'·매출 '+big.gr+'위).'):'')]]; rs.push(['볼 포인트', point]); h=pmCallout(rs)+h; }
   wrap.innerHTML=h;
   wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(gapSort.k===kk) gapSort.dir*=-1; else gapSort={k:kk, dir:(kk==='title'||kk==='gr'||kk==='fr')?1:-1}; renderGap(); }));
   wrap.querySelectorAll('.pubrow').forEach(row=> row.addEventListener('click',()=>{ const aid=row.dataset.aids; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
@@ -1350,7 +1415,7 @@ function renderMovers(){
   h+='</div>';
   const maxN=Math.max(entered.length,exited.length,up.length,down.length);
   if(maxN>10) h+='<button class="movers-more" id="moversMore">'+(moversExpanded?'접기 ▴':('전체 보기 ▾ · 최대 '+maxN+'개'))+'</button>';
-  { const updCnt=up.filter(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; }).length; const surgePct=up.length?Math.round(updCnt/up.length*100):0; const gc={}; up.forEach(e=>{ const gg=(DATA.games[e.aid]||{}).genre; if(gg) gc[gg]=(gc[gg]||0)+1; }); const topG=Object.keys(gc).sort((a,b)=>gc[b]-gc[a])[0]; const topGn=topG?gc[topG]:0; let diag; if(up.length>=3&&surgePct>=50) diag='이번 급등 '+up.length+'개 중 <b>'+surgePct+'%</b>가 앱 업데이트와 맞물림. 순위를 움직이는 건 신작보다 <b>라이브옵스·이벤트</b>.'; else if(up.length>=3) diag='급등 중 업데이트 동반은 '+surgePct+'%뿐. 업데이트 외 요인(시즌·외부 유입·UA)이 순위를 흔드는 편.'; else diag='이번 기간 급등이 적어 순위가 비교적 안정.'; const rs=[['동인', diag]]; if(topG&&topGn>=Math.max(2,Math.ceil(up.length*0.3))) rs.push(['진원', '급등이 <b>'+esc(topG)+'</b>에 몰림('+topGn+'/'+up.length+'). 이 장르에 이벤트·신작 모멘텀.']); rs.push(['볼 포인트', surgePct>=50?'노출 확보에 신작 런칭보다 업데이트·이벤트 타이밍을 본다.':'업데이트 외에 무엇이 순위를 흔드는지를 추가로 본다.']); h+=pmCallout(rs); }
+  { const updCnt=up.filter(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; }).length; const surgePct=up.length?Math.round(updCnt/up.length*100):0; const gc={}; up.forEach(e=>{ const gg=(DATA.games[e.aid]||{}).genre; if(gg) gc[gg]=(gc[gg]||0)+1; }); const topG=Object.keys(gc).sort((a,b)=>gc[b]-gc[a])[0]; const topGn=topG?gc[topG]:0; let diag; if(up.length>=3&&surgePct>=50) diag='이번 급등 '+up.length+'개 중 <b>'+surgePct+'%</b>가 앱 업데이트와 맞물림. 순위를 움직이는 건 신작보다 <b>라이브옵스·이벤트</b>.'; else if(up.length>=3) diag='급등 중 업데이트 동반은 '+surgePct+'%뿐. 업데이트 외 요인(시즌·외부 유입·UA)이 순위를 흔드는 편.'; else diag='이번 기간 급등이 적어 순위가 비교적 안정.'; const rs=[['동인', diag]]; if(topG&&topGn>=Math.max(2,Math.ceil(up.length*0.3))) rs.push(['진원', '급등이 <b>'+esc(topG)+'</b>에 몰림('+topGn+'/'+up.length+'). 이 장르에 이벤트·신작 모멘텀.']); rs.push(['볼 포인트', surgePct>=50?'노출 확보에 신작 런칭보다 업데이트·이벤트 타이밍을 본다.':'업데이트 외에 무엇이 순위를 흔드는지를 추가로 본다.']); h=pmCallout(rs)+h; }
   wrap.innerHTML=h;
   const mb=document.getElementById('moversMore'); if(mb) mb.addEventListener('click',()=>{ moversExpanded=!moversExpanded; renderMovers(); });
 }
@@ -1383,7 +1448,7 @@ function renderWatch(){
     h+='<div class="watchcard" data-aid="'+esc(r.aid)+'"><div class="watchcard-head"><span class="watchcard-rank">#'+(i+1)+'</span>'+newBadge(r.aid)+'<span class="gdname" data-aid="'+esc(r.aid)+'">'+esc((DATA.games[r.aid]||{}).title||r.aid)+'</span></div><div class="watch-traj">'+r.days+'일 전 <b>'+r.dStart+'위</b> → 현재 <b>'+r.dEnd+'위</b> <span class="watch-up">▲'+r.dImp+'</span></div><div class="watch-meta"><span>상승 '+r.ups+'일 · 하락 '+r.downs+'일</span>'+wk+'</div></div>';
   });
   h+='</div>';
-  { const newCnt=out.filter(r=>!!newBadge(r.aid)).length; const estCnt=out.length-newCnt; const ch=newCnt>estCnt?'신작 안착 흐름이 우세':(estCnt>newCnt?'기존작 재점화가 우세':'신작·기존작이 섞임'); h+=pmCallout([['성격', '급등 리스트엔 없지만 며칠째 계단식으로 오르는 <b>조용한 상승</b> '+out.length+'개. 아직 안 터졌지만 올라오는 초기 신호. 신작 '+newCnt+' · 기존 '+estCnt+'로 '+ch+'. 선두 <b>'+esc((DATA.games[top[0].aid]||{}).title||top[0].aid)+'</b>(▲'+top[0].dImp+').'], ['볼 포인트', '이미 큰 게임보다 이런 초기 상승군을 다음 분기 경쟁·벤치마크 후보로 미리 본다.']]); }
+  { const newCnt=out.filter(r=>!!newBadge(r.aid)).length; const estCnt=out.length-newCnt; const ch=newCnt>estCnt?'신작 안착 흐름이 우세':(estCnt>newCnt?'기존작 재점화가 우세':'신작·기존작이 섞임'); h=pmCallout([['성격', '급등 리스트엔 없지만 며칠째 계단식으로 오르는 <b>조용한 상승</b> '+out.length+'개. 아직 안 터졌지만 올라오는 초기 신호. 신작 '+newCnt+' · 기존 '+estCnt+'로 '+ch+'. 선두 <b>'+esc((DATA.games[top[0].aid]||{}).title||top[0].aid)+'</b>(▲'+top[0].dImp+').'], ['볼 포인트', '이미 큰 게임보다 이런 초기 상승군을 다음 분기 경쟁·벤치마크 후보로 미리 본다.']])+h; }
   wrap.innerHTML=h;
   wrap.querySelectorAll('.watchcard').forEach(c=> c.addEventListener('click',()=>{ const aid=c.dataset.aid; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
 }
@@ -1413,7 +1478,7 @@ function gopBuildGeom(sIdx,eIdx){
   var days=[]; for(var d=sIdx; d<=eIdx; d++) days.push(gopFrameMetrics(d));
   var genreSet={}, maxRev=1, maxN=1;
   days.forEach(function(m){ for(var g in m){ genreSet[g]=1; if(m[g].revp>maxRev)maxRev=m[g].revp; if(m[g].n>maxN)maxN=m[g].n; } });
-  var W=1060,H=440,padL=54,padR=130,padT=26,padB=48;
+  var W=1060,H=440,padL=96,padR=130,padT=26,padB=48;
   var plotW=W-padL-padR, plotH=H-padT-padB, PR=padL+plotW, PB=padT+plotH, CONC=50;
   var lastM=days[days.length-1], revs=Object.keys(lastM).map(function(g){return lastM[g].revp;}).sort(function(a,b){return a-b;});
   var RY=revs.length?(revs.length%2?revs[(revs.length-1)/2]:(revs[revs.length/2-1]+revs[revs.length/2])/2):(maxRev/3);
@@ -1436,7 +1501,7 @@ function gopBgSvg(G){
   s+='<text x="'+(G.padL+7)+'" y="'+(G.PB-8)+'" font-size="11" font-weight="700" fill="#2563eb">소형 난전</text>';
   s+='<text x="'+(G.PR-7)+'" y="'+(G.PB-8)+'" text-anchor="end" font-size="11" font-weight="700" fill="#e07c12">틈새 독점</text>';
   s+='<text class="gop-axis" x="'+(G.padL+G.plotW/2)+'" y="'+(G.H-14)+'" text-anchor="middle" font-size="11">← 분산(여러 게임 경쟁)   ·   1위 집중도   ·   독식(1강 장악) →</text>';
-  s+='<text class="gop-axis" x="14" y="'+(G.padT+G.plotH/2)+'" text-anchor="middle" font-size="11" transform="rotate(-90 14 '+(G.padT+G.plotH/2)+')">↑ 그 시장 매출 규모(수요)</text>';
+  s+='<text class="gop-axis" x="6" y="'+(G.padT+G.plotH/2-10)+'" font-size="12.5" font-weight="600"><tspan x="6">↑ 매출 규모</tspan><tspan x="6" dy="17">(수요)</tspan></text>';
   return s;
 }
 function gopInterp(G,t){
@@ -1551,7 +1616,7 @@ function renderGenreOpp(){
            .filter(g=> g.rev>0);
   { const gser=((FULL.charts&&FULL.charts.grossing&&FULL.charts.grossing.genre_series&&FULL.charts.grossing.genre_series.genres))||{}; gs.forEach(g=>{ const a=gser[g.genre]||[]; const cur=a.length?a[a.length-1]:null; const fst=a.find(v=>v!=null); g.mom=(cur!=null&&fst!=null)?Math.round((cur-fst)*10)/10:null; }); }
   if(gs.length<3){ if(sub) sub.textContent=''; wrap.innerHTML='<p class="empty">장르 데이터가 더 쌓이면 진입 맵이 표시됩니다.</p>'; return; }
-  const W=1060,H=440,padL=54,padR=130,padT=26,padB=48;
+  const W=1060,H=440,padL=96,padR=130,padT=26,padB=48;
   const plotW=W-padL-padR, plotH=H-padT-padB, PR=padL+plotW, PB=padT+plotH;
   const maxN=Math.max(...gs.map(g=>g.n)), maxRev=Math.max(...gs.map(g=>g.revp));
   const xOf=t=> padL + Math.min(100,Math.max(0,t))/100*plotW;                         // 가로 = 1위 집중도(0~100): 왼쪽 분산 ↔ 오른쪽 독식
@@ -1574,7 +1639,7 @@ function renderGenreOpp(){
   s+='<text x="'+(padL+7)+'" y="'+(PB-8)+'" font-size="11" font-weight="700" fill="#2563eb">소형 난전</text>';
   s+='<text x="'+(PR-7)+'" y="'+(PB-8)+'" text-anchor="end" font-size="11" font-weight="700" fill="#e07c12">틈새 독점</text>';
   s+='<text class="gop-axis" x="'+(padL+plotW/2)+'" y="'+(H-14)+'" text-anchor="middle" font-size="11">← 분산(여러 게임 경쟁)   ·   1위 집중도   ·   독식(1강 장악) →</text>';
-  s+='<text class="gop-axis" x="14" y="'+(padT+plotH/2)+'" text-anchor="middle" font-size="11" transform="rotate(-90 14 '+(padT+plotH/2)+')">↑ 그 시장 매출 규모(수요)</text>';
+  s+='<text class="gop-axis" x="6" y="'+(padT+plotH/2-10)+'" font-size="12.5" font-weight="600"><tspan x="6">↑ 매출 규모</tspan><tspan x="6" dy="17">(수요)</tspan></text>';
   const bigSet=new Set(gs.slice().sort((a,b)=>b.rev-a.rev).slice(0,8).map(g=>g.genre));   // 매출 상위 8개(큰 버블)만 상시 라벨, 나머지는 hover 시 표기
   gs.forEach(g=>{ const cx=xOf(g.top1), cy=yOf(g.revp), r=rOf(g.n), col=zoneOf(g);
     const tip=esc(g.genre)+' · 매출 점유 '+g.revp+'% · 1위 집중 '+g.top1+'% · 게임 '+g.n+'개'+(g.n===1?'(단일 타이틀)':'');
@@ -1595,7 +1660,7 @@ function renderGenreOpp(){
     }); }
   s+='</svg></div>';
   // PM 인사이트 — 사분면 구조 서술(매출 규모 × 1위 집중도 × 점유 모멘텀). 추천 아님
-  { const momS=g=> (g.mom!=null && g.mom>=0.3)?' <span style="color:#16a34a">▲</span>' : (g.mom!=null && g.mom<=-0.3)?' <span style="color:#e07c12">▼</span>' : '';
+  { const momS=g=> (g.mom!=null && g.mom>=0.3)?' <span class="aibup">▲</span>' : (g.mom!=null && g.mom<=-0.3)?' <span class="aibdn">▼</span>' : '';
     const fmtR=arr=>arr.slice(0,3).map(g=>esc(g.genre)+'('+g.revp+'%·집중'+g.top1+'%'+momS(g)+')').join(' · ');
     const fmtF=arr=>arr.slice(0,3).map(g=>esc(g.genre)+'(집중'+g.top1+'%'+(g.topGame?'·1강 '+esc(g.topGame):'')+')').join(' · ');
     const fmt=arr=>arr.slice(0,3).map(g=>esc(g.genre)).join(' · ');
@@ -1729,7 +1794,7 @@ function init(full){
     type:'line',
     data:{ labels:DATA.timeframes.daily.labels, datasets:buildDatasets() },
     options:{
-      responsive:true, maintainAspectRatio:false, animation:false,
+      responsive:true, maintainAspectRatio:false, animation:false, layout:{ padding:{ left:(MOB?46:58), right:0 } },
       interaction:{ mode:'nearest', intersect:false, axis:'xy' },
       plugins:{ legend:{display:false},
         tooltip:{ filter:(it)=> it.parsed.y!=null,
@@ -1738,9 +1803,9 @@ function init(full){
           pan:{ enabled:!MOB, mode:'x', threshold:6, onPan:updateScrollbar },
           zoom:{ wheel:{enabled:!MOB, speed:0.05}, drag:{ enabled:false }, pinch:{enabled:false}, mode:'x', onZoomComplete:updateScrollbar } } },
       scales:{
-        y:{ reverse:true, min:1, max:100, title:{display:true, text:'순위 (위가 1위)'},
-            ticks:{ stepSize:10, color:'#8b8b85' }, grid:{ color:'rgba(130,130,125,0.14)' } },
-        x:{ ticks:{ color:'#8b8b85', maxRotation:0, autoSkip:true, maxTicksLimit:14 }, grid:{ display:false } } },
+        y:{ reverse:true, min:1, max:100, title:{display:false, text:'순위 (위가 1위)'},
+            ticks:{ stepSize:10, color:TICKC }, grid:{ color:'rgba(130,130,125,0.14)' } },
+        x:{ ticks:{ color:TICKC, maxRotation:0, autoSkip:true, autoSkipPadding:28, maxTicksLimit:9, callback:function(v){ return fmtTick(this.getLabelForValue(v)); } }, grid:{ display:false } } },
     },
   });
 
@@ -2222,8 +2287,8 @@ function renderCmp(){
     markets.forEach(mk=>{
       const v=cval(mk.key,g);
       const t=v!=null?Math.min(1, v/(byGenre?rowMax[g]:gmx)):0;
-      const bg=v!=null?(byGenre?_hexA(gc, 0.14+0.80*t):'rgba(13,148,136,'+(0.06+0.86*t).toFixed(3)+')'):'transparent';
-      const tc=byGenre?((t>0.5&&gl<0.62)?'#fff':'var(--text)'):(t>0.5?'#fff':'var(--text)');
+      const bg=v!=null?(byGenre?_hexA(gc, 0.12+0.48*t):'rgba(15,118,110,'+(0.06+0.64*t).toFixed(3)+')'):'transparent';
+      const tc='var(--text)';   // 2026-10-16: 흰 글씨는 중간 농도에서 대비 4.5:1 미달 → 늘 진한 글씨, 대신 최대 농도를 낮춤
       const lbl=byGenre?'전 시장 매출 중 비중':(cmpMetric==='rev'?'매출 점유':'차트 점유');
       h+='<button class="cmp-cell" data-mk="'+esc(mk.key)+'" data-g="'+esc(g)+'" style="background:'+bg+';color:'+tc+'" title="'+esc(mk.name)+' · '+esc(g)+' · '+lbl+' '+(v!=null?v+'%':'–')+'">'+(v!=null?v:'')+'</button>';
     });
