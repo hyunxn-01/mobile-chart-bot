@@ -565,6 +565,11 @@
     #gopsec .gop-wrap svg text{ font-size:15px !important; }
     #gopsec .gop-wrap::after{ content:'← 옆으로 밀어서 보기 →'; display:block; font-size:12px; color:var(--muted); text-align:center; padding:4px 0; position:sticky; left:0; }
   }
+
+  /* 2026-10-16 설명 문구(가안): 계산 방식·한계는 ⓘ — 마우스를 올리면 풍선, 누르면 바로 아래 펼침(휴대폰) */
+  .dinfo{ display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; border-radius:50%; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12px; font-weight:700; font-style:normal; line-height:1; cursor:pointer; margin-left:4px; vertical-align:middle; }
+  .dinfo:hover, .dinfo:focus-visible{ border-color:var(--muted); color:var(--text); outline:none; }
+  .dinfo-pop{ display:block; flex-basis:100%; margin:4px 0 2px; padding:6px 10px; border-radius:8px; background:var(--panel); border:1px solid var(--line); color:var(--text); font-size:13px; font-style:normal; font-weight:400; line-height:1.55; }
 </style>
 </head>
 <body>
@@ -638,7 +643,7 @@
     <div class="mkbrief-tabs" id="mkbriefTabs" role="tablist" aria-label="시장 브리핑 탭"></div>
     <div class="mkbrief-axis" id="mkbriefAxis" role="tablist" aria-label="시간축 탭"></div>
     <div class="mkbrief-body" id="mkbriefBody"></div>
-    <p class="mkbrief-foot">AI(Opus)가 주요 시장·지역을 <strong>시간축별(주·월·분기·년)</strong>로 분석합니다. 기간이 완료된 시간축만 생성되고, 매주 월요일에 갱신됩니다.</p>
+    <p class="mkbrief-foot">AI(Opus)가 주요 시장과 지역을 주 · 월 · 분기 단위로 분석하고, 매주 월요일에 갱신합니다.</p>
   </details>
 
   <h2 class="sectitle" id="secTitleChart">순위 추이</h2>
@@ -647,7 +652,7 @@
       <button class="cmode" data-cmode="genre" role="tab" aria-selected="true">장르 차트</button>
       <button class="cmode" data-cmode="game" role="tab" aria-selected="false">게임 차트</button>
     </div>
-    <span class="cmode-hint" id="cmodeHint">게임별 순위 추이 · 오른쪽에서 게임 선택</span>
+    <span class="cmode-hint" id="cmodeHint">게임마다 순위의 변화</span>
   </div>
   <div class="srcrow">
     <span class="srclabel">차트 종류</span>
@@ -664,7 +669,7 @@
     </div>
   </div>
   <div class="hintrow">
-    <p class="hint sub cap" id="charthint"><span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">오른쪽에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>좌우 이동</b></span></p>
+    <p class="hint sub cap" id="charthint"><span class="ci">회색 선은 전체 게임이며, 휠로 확대하고 끌어서 옮길 수 있습니다.</span><span class="ci"><span class="cact">▸ 목록에서 게임을 누르면 색과 이름</span></span></p>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
 
@@ -721,7 +726,7 @@
 
   <section class="cmpsec" id="cmpsec">
     <h2>시장 비교 · 장르 점유</h2>
-    <p class="sub cap" id="cmpsub"><span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b> <span style="opacity:.75" title="추정매출 점유는 차트 순위 기반 추정(rank^-1.1). 정밀 매출 아님">(추정매출=순위 기반)</span></span><span class="csep">│</span><span class="ci">한 행 = 같은 장르의 <b>시장별 강·약</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 시장서 약함 <b>(기회인지 수요부족인지는 차트만으론 판단 불가)</b></span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span></p>
+    <p class="sub cap" id="cmpsub"><span class="ci">색이 진할수록 그 시장에서 장르 비중이 큽니다.</span><span class="ci"><span class="cact">▸ 칸을 누르면 해당 게임 목록</span></span></p>
     <div class="cmp-controls">
       <span class="cmp-clabel">기준</span>
       <button class="cmp-basis on" type="button" data-basis="market">시장 기준</button>
@@ -740,12 +745,6 @@
     <div id="goptrajbar" class="goptraj-bar"></div>
     <div id="goptrajwrap" hidden></div>
     <div id="gopout"></div>
-    <div class="gop-legend">
-      <span><span class="gop-sw" style="background:#16a34a"></span>분산 대형 · 큰 매출, 1강 없음</span>
-      <span><span class="gop-sw" style="background:#64748b"></span>요새 · 큰 매출·1강 독식</span>
-      <span><span class="gop-sw" style="background:#2563eb"></span>소형 난전 · 작은 매출·분산</span>
-      <span><span class="gop-sw" style="background:#e07c12"></span>틈새 독점 · 작은 매출·1강 독식</span>
-    </div>
   </div>
 
   <div class="pubsec" id="aggsec">
@@ -830,6 +829,18 @@ Chart.register({ id:'genreEndLabels',
     pts.sort((p,q)=>p.y-q.y); for(let k=1;k<pts.length;k++){ if(pts[k].y-pts[k-1].y<16) pts[k].y=pts[k-1].y+16; }
     ctx.save(); ctx.font='700 13px '+Chart.defaults.font.family; ctx.textBaseline='middle'; ctx.textAlign='left';
     pts.forEach(p=>{ ctx.fillStyle=p.col; ctx.fillText(p.t, a.right+8, p.y); }); ctx.restore(); } });
+
+// 2026-10-16 설명 문구(가안) 도우미: ⓘ 표시 · 기간 이름 · 조사(와/과)
+function dinfo(t){ return '<i class="dinfo" role="button" tabindex="0" aria-label="설명 보기" title="'+String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">i</i>'; }
+function dinfoToggle(t){ const host=t.closest('.ci')||t; const nx=host.nextElementSibling; if(nx && nx.classList.contains('dinfo-pop')){ nx.remove(); return; } const p=document.createElement('span'); p.className='dinfo-pop'; p.textContent=t.getAttribute('title')||''; host.after(p); }
+document.addEventListener('click', e=>{ const t=e.target.closest && e.target.closest('.dinfo'); if(!t) return; e.preventDefault(); e.stopPropagation(); dinfoToggle(t); }, true);
+document.addEventListener('keydown', e=>{ if(e.key!=='Enter' && e.key!==' ') return; const t=e.target.closest && e.target.closest('.dinfo'); if(!t) return; e.preventDefault(); dinfoToggle(t); });
+function mvLabel(tf, s){ s=String(s||''); let m;
+  if(tf==='weekly' && (m=s.match(/^\d{4}-(\d{2})-(\d{2})$/))) return (+m[1])+'/'+(+m[2])+' 주';
+  if((m=s.match(/^\d{4}-Q(\d)$/))) return m[1]+'분기';
+  if((m=s.match(/^(\d{4})$/))) return m[1]+'년';
+  return fmtTick(s); }
+function waGwa(s){ s=String(s); const c=s.charCodeAt(s.length-1); if(c>=0xAC00 && c<=0xD7A3) return ((c-0xAC00)%28)?'과':'와'; return '2459'.indexOf(s.slice(-1))>=0?'와':'과'; }
 
 const TF_LABEL = {daily:'일별', weekly:'주별', monthly:'월별', quarterly:'분기별', yearly:'년별'};
 
@@ -1053,7 +1064,8 @@ function setupChartDrag(){
 let chartMode='genre';   // 처음 뜨는 차트는 장르 차트(init의 _wantGenre 경로로 로드 직후 전환)
 let _wired=false;  // 정적 버튼 이벤트는 1회만 바인딩(국가 전환 시 init 재호출돼도 중복 방지)
 let genreSel=[];   // 장르 차트에서 강조된 장르명(범례 클릭 토글)
-const CHARTHINT_GAME='<span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">오른쪽에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>좌우 이동</b></span>';
+const CHARTHINT_GAME='<span class="ci">회색 선은 전체 게임이며, 휠로 확대하고 끌어서 옮길 수 있습니다.</span><span class="ci"><span class="cact">▸ 목록에서 게임을 누르면 색과 이름</span></span>';
+const CHARTHINT_GAME_MOB='<span class="ci">회색 선은 전체 게임이며, ＋/－ 단추로 확대하고 아래 막대로 옮길 수 있습니다.</span><span class="ci"><span class="cact">▸ 목록에서 게임을 누르면 색과 이름</span></span>';   // 휴대폰은 휠 · 끌기 대신 ＋/－ 단추와 아래 막대
 function genreSeries(){ return (DATA && DATA.genre_series) || {labels:[], genres:{}}; }
 const GENRE_ORDER=['롤플레잉','전략','캐주얼','퍼즐','시뮬레이션','액션','어드벤처','스포츠','레이싱','보드','카지노','카드','아케이드','음악','단어','트리비아','교육','가족'];
 function genreColor(name){   // 시장 무관 고정색(장르 이름 기반 — 시장 바뀌어도 동일 장르=동일 색)
@@ -1133,8 +1145,7 @@ function renderGenreLegend(){
   const _navSel=document.getElementById('countrySelNav');   // #6: 장르차트 시장 드롭다운(헤더/네비와 동기)
   const _mktOpts=_navSel?_navSel.innerHTML:'', _curMkt=_navSel?_navSel.value:'';
   let html='<div class="gl-mkt" style="display:flex;align-items:center;gap:8px;margin:0 0 9px;"><label for="genreMktSel" style="font-size:12px;font-weight:700;color:var(--muted);flex:0 0 auto;">시장</label><select id="genreMktSel" aria-label="장르 차트 시장 선택" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:12.5px;font-weight:600;">'+_mktOpts+'</select></div>'+
-    '<span class="gl-hint">장르를 누르면 그 선만 강조 · 매출 구간별 그룹 · <b>매출%=차트 순위 기반 추정</b>(rank⁻¹·¹ 멱법칙, 정밀 매출 아님)</span>'+
-    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r" title="추정 매출 점유: 차트 순위로 매출을 역산한 추정치(rank^-1.1 멱법칙으로 가중·정규화). 정밀 매출이 아니며, 게임별 과금방식(가챠·광고)·국가 객단가·웹샵 매출은 미반영. 상위 1~3위는 지수 가정에 민감.">매출 ⓘ</span></div>';
+    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r" title="추정 매출 비중: 순위가 높을수록 매출이 크다는 가정으로 차트 순위에서 거꾸로 계산한 값입니다. 실제 매출이 아니며, 과금 방식 · 나라별 결제 금액 · 웹 상점 매출은 반영하지 않습니다.">매출 ⓘ</span></div>';
   groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
   el.innerHTML=html;
   { const _ms=document.getElementById('genreMktSel'); if(_ms){ if(_curMkt) _ms.value=_curMkt; _ms.addEventListener('change',ev=>{ if(typeof loadMarket==='function') loadMarket(ev.target.value); }); } }   // #6: 시장 변경 동기
@@ -1168,8 +1179,8 @@ function setChartMode(mode){
     if(tabsEl) tabsEl.style.display='none';
     if(panelEl) panelEl.style.display=''; setPanelMode('genre');
     if(secT) secT.textContent='장르 추이'; markSectionMarkets();
-    if(hint) hint.textContent='장르별 점유율(%) 추이 · 같은 날 합치면 100% (매출/인기 전환 가능)';
-    if(charthint) charthint.innerHTML='<span class="ci">선 = 장르별 <b>점유율</b>(최근 7일 평균)</span><span class="csep">│</span><span class="ci">목록에서 장르를 누르면 <b>색과 이름</b>이 표시됩니다</span><span class="csep">│</span><span class="ci">휠 <b>확대</b> · 드래그 <b>이동</b></span>';
+    if(hint) hint.textContent='상위 100위 안에서 장르마다 차지하는 비율의 변화';
+    if(charthint) charthint.innerHTML='<span class="ci">선은 최근 7일 평균이며, '+(isMobile()?'＋/－ 단추로 확대하고 아래 막대로 옮길 수 있습니다':'휠로 확대하고 끌어서 옮길 수 있습니다')+'.</span><span class="ci"><span class="cact">▸ 목록에서 장르를 누르면 색과 이름</span></span>';
     const banner=document.getElementById('banner'); if(banner) banner.style.display='none';
     { const hs=document.getElementById('histsec'); if(hs) hs.style.display='none'; const nh=document.getElementById('navHist'); if(nh) nh.style.display='none'; }   // #7: 순위이력은 게임차트에서만
     chart.data.labels=genreSeries().labels;
@@ -1187,8 +1198,8 @@ function setChartMode(mode){
     if(panelEl) panelEl.style.display=''; setPanelMode('game');
     if(secT) secT.textContent='순위 추이'; markSectionMarkets();
     { const hs=document.getElementById('histsec'); if(hs) hs.style.display=''; const nh=document.getElementById('navHist'); if(nh) nh.style.display=''; }   // #7: 게임차트에서 순위이력 표시
-    if(hint) hint.textContent='게임별 순위 추이 · 오른쪽에서 게임 선택';
-    if(charthint) charthint.innerHTML=CHARTHINT_GAME;
+    if(hint) hint.textContent='게임마다 순위의 변화';
+    if(charthint) charthint.innerHTML=isMobile()?CHARTHINT_GAME_MOB:CHARTHINT_GAME;
     chart.options.scales.x.stacked=false; chart.options.scales.y.stacked=false;  // 누적 해제(게임 라인)
     y.reverse=true; y.min=1; y.max=100; if(y.title) y.title.text='순위 (위가 1위)'; if(y.ticks){ y.ticks.stepSize=10; y.ticks.callback=undefined; }
     chart.options.plugins.legend.display=false;
@@ -1293,7 +1304,7 @@ function renderAgg(keyName, period, els, labelName){
   if(!n || !Object.keys(DATA.games).length){ els.sub.textContent=''; els.wrap.innerHTML='<p class="empty">데이터가 쌓이면 표시됩니다.</p>'; return; }
   const startIdx=period?Math.max(0,n-period):0;
   const showRev=(activeChart==='grossing');
-  els.sub.innerHTML=`<span class="ci"><b>${labels[startIdx]||''}</b> ~ <b>${labels[n-1]||''}</b> 기준</span><span class="csep">│</span><span class="ci">${labelName}별 게임 수 · 최고/평균 순위</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 행 클릭 → 그래프 강조</span></span>`;
+  els.sub.innerHTML=`<span class="ci">${fmtTick(labels[startIdx]||'')} ~ ${fmtTick(labels[n-1]||'')} 동안 ${labelName}마다 차트에 든 게임 수와 순위입니다.</span><span class="ci"><span class="cact">▸ 행을 누르면 그래프에 표시</span></span>`;
   const full=aggregate(keyName, period);
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
   const q=norm((els.search||{}).value);
@@ -1373,9 +1384,9 @@ function renderGap(){
   let view=q? rows.filter(r=>norm(r.title).includes(q)) : rows.slice();
   const k=gapSort.k, dir=gapSort.dir;
   view.sort((a,b)=>{ if(k==='title') return dir*String(a.title).localeCompare(String(b.title),'ko'); return dir*((a[k]||0)-(b[k]||0)); });
-  sub.innerHTML=`<span class="ci">함께 든 게임 <b>${total}</b>개</span><span class="csep">│</span><span class="ci">갭 = 매출 − 인기 순위</span><span class="csep">│</span><span class="ci"><span class="cdot" style="background:#e07c12"></span> 다운로드↑·매출↓ &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출↑·다운로드↓</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 행 클릭 → 그래프 강조</span></span>`;
+  sub.innerHTML=`<span class="ci">매출 순위와 인기 순위가 크게 다른 게임입니다(두 차트에 모두 든 ${total}개).</span><span class="ci"><span class="cdot" style="background:#e07c12"></span> 인기보다 매출이 낮음 &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출보다 인기가 낮음</span><span class="ci"><span class="cact">▸ 행을 누르면 그래프에 표시</span></span>`;
   if(!view.length){ wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
-  let h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+sortTh('게임','title',gapSort,'pname')+sortTh('매출 순위','gr',gapSort)+sortTh('인기 순위','fr',gapSort)+sortTh('갭','gap',gapSort)+'</tr></thead><tbody>';
+  let h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+sortTh('게임','title',gapSort,'pname')+sortTh('매출 순위','gr',gapSort)+sortTh('인기 순위','fr',gapSort)+sortTh('갭 ⓘ','gap',gapSort).replace('<th ','<th title="매출 순위에서 인기 순위를 뺀 값입니다. 양수면 인기에 비해 매출이 낮습니다." ')+'</tr></thead><tbody>';
   view.forEach(r=>{
     const cls=r.gap>0?'gapdl':(r.gap<0?'gaprev':'');
     h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${newBadge(r.aid)}${esc(r.title)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
@@ -1402,7 +1413,7 @@ function renderMovers(){
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
   const anyUpd=up.some(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; });
-  sub.innerHTML=`<span class="ci"><b>${labels[pi]}</b> → <b>${labels[ni]}</b> 비교</span><span class="csep">│</span><span class="ci">${TF_LABEL[moversTf]} · ${activeChart==='grossing'?'매출':'인기'} 차트</span><span class="csep">│</span><span class="ci" title="상위권일수록 작은 변동도 급변(순위대 보정) · 기간별 기준(일 8·주월 5계단)">급변: 순위대·기간 보정</span>`+(anyUpd?`<span class="csep">│</span><span class="ci"><span class="mv-upd">↻</span> 업데이트 동반</span>`:``);
+  sub.innerHTML=`<span class="ci">${mvLabel(moversTf,labels[pi])}${waGwa(mvLabel(moversTf,labels[pi]))} ${mvLabel(moversTf,labels[ni])}의 ${activeChart==='grossing'?'매출':'인기'} 차트를 비교했습니다.</span>`+(anyUpd?`<span class="ci"><span class="mv-upd">↻</span> 업데이트가 함께 있었던 게임</span>`:``)+`<span class="ci">${dinfo('급등 · 급락 기준은 순위대와 기간마다 다릅니다. 상위권일수록 작은 변동도 급변으로 보고, 하루 기준은 8계단, 주 · 월 기준은 5계단입니다.')}</span>`;
   const nm=aid=>newBadge(aid)+'<span class="gdname" data-aid="'+esc(aid)+'">'+esc((DATA.games[aid]||{}).title||aid)+'</span>';
   const LIMIT = moversExpanded?9999:10;
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,LIMIT).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
@@ -1440,7 +1451,7 @@ function renderWatch(){
   }
   out.sort((a,b)=> b.score-a.score || b.dImp-a.dImp);
   const top=out.slice(0,8);
-  if(sub) sub.innerHTML='<span class="ci">최근 <b>'+Math.min(8,(d.labels||[]).length)+'</b>일 추세 기준</span><span class="csep">│</span><span class="ci">조건: 누적 <b>▲8계단+</b> · 상승일 우세 · 주간 추세 동반</span><span class="csep">│</span><span class="ci"><span class="cact">▸ 카드 클릭 → 그래프 강조</span></span>';
+  if(sub) sub.innerHTML='<span class="ci">최근 '+Math.min(8,(d.labels||[]).length)+'일 동안 8계단 이상 오르고, 오른 날이 더 많은 게임입니다.</span><span class="ci"><span class="cact">▸ 카드를 누르면 그래프에 표시</span></span><span class="ci">'+dinfo('조건: 최근 '+Math.min(8,(d.labels||[]).length)+'일 누적 8계단 이상 상승, 오른 날이 내린 날보다 많음, 주간 추세도 상승.')+'</span>';
   if(!top.length){ wrap.innerHTML='<p class="empty">지금은 지속 상승 신호가 뚜렷한 게임이 없습니다.</p>'; return; }
   let h='<div class="watchgrid">';
   top.forEach((r,i)=>{
@@ -1594,8 +1605,7 @@ function setupGopTraj(){
     pick('goptrajEnd', last)+
     '<button type="button" class="goptraj-play" id="goptrajPlay">▶ 재생</button>'+
     '<span class="goptraj-daylab">현재</span><span class="goptraj-day" id="goptrajDay">'+gopFmtLabel(last)+'</span>'+
-    '<span class="goptraj-cap">'+U+' 단위입니다. 각 '+U+'의 평균 순위로 계산해 차트 탭·메일 리포트와 기준이 같습니다. 흐린 원 = 시작·종료 '+U+' 위치(점선 시작 · 파선 종료 · 선 이동경로), 진한 원 = 현재 '+U+'. 버블에 마우스를 올리면 장르·수치가 표시됩니다.'+
-    (part?' 첫 달('+gopFmtLabel(labels[0])+')은 '+String(((FULL.charts.grossing.timeframes.daily||{}).labels||[''])[0]).slice(8,10).replace(/^0/,'')+'일부터 수집한 일부 기간이라 기본 기간에서 뺐습니다(목록에서 고를 수 있습니다).':'')+'</span></div>'+
+    '<span class="goptraj-cap">흐린 원은 시작 '+(U==='월'?'달':U)+', 진한 원은 지금 '+(U==='월'?'달':U)+'입니다. 원에 마우스를 올리면 수치가 나옵니다.'+dinfo((U==='월'?'달':U)+'마다 평균 순위로 계산합니다(차트 탭과 같은 기준).'+(part?' 첫 달('+gopFmtLabel(labels[0])+')은 '+String(((FULL.charts.grossing.timeframes.daily||{}).labels||[''])[0]).slice(8,10).replace(/^0/,'')+'일부터 수집한 일부 기간이라 기본 기간에서 뺐고, 목록에서 고를 수 있습니다.':''))+'</span></div>'+
     '<div class="goptraj-slider-row"><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 내 '+U+' 스크럽"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
   document.getElementById('goptrajStart').addEventListener('change', gopTrajRangeChange);
   document.getElementById('goptrajEnd').addEventListener('change', gopTrajRangeChange);
@@ -1669,7 +1679,7 @@ function renderGenreOpp(){
     const niche=gs.filter(g=> g.revp<RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);
     const small=gs.filter(g=> g.revp<RY && g.top1<CONC).sort((a,b)=> b.revp-a.revp);
     const topRev=gs.slice().sort((a,b)=>b.revp-a.revp)[0];
-    let ins='<div class="gop-insight"><div class="gopi-h">장르 지형: 매출 규모 × 1위 집중도 <span style="font-weight:400;color:var(--muted)">(세로=수요·매출, 가로=1위 집중도, ▲▼=점유 추세. 총 시장 규모·진입장벽은 차트 밖)</span></div>';
+    let ins='<div class="gop-insight"><div class="gopi-h">장르 지형 요약 <span style="font-weight:400;color:var(--muted)">· ▲▼ 점유 추세</span></div>';
     if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">매출 축</span><span>매출이 가장 몰리는 장르는 <b>'+esc(topRev.genre)+'</b> ('+topRev.revp+'%).</span></div>';
     ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>분산 대형</b>: 매출 규모가 큰데 1위 점유가 낮음(여러 게임에 분산): <b>'+(opp.length?fmtR(opp):'해당 없음')+'</b> <span style="color:var(--muted)">(괄호=매출·1위집중·점유추세)</span>.</span></div>';
     if(fort.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>요새</b>: 큰 매출을 1강이 장악: <b>'+fmtF(fort)+'</b>.</span></div>';
@@ -1680,7 +1690,7 @@ function renderGenreOpp(){
   }
   wrap.innerHTML=s;
   const opp2=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=>b.revp-a.revp).slice(0,3).map(x=>x.genre);
-  if(sub) sub.innerHTML='<span class="ci">세로=매출 규모(수요·<b title="차트 순위로 매출 역산: rank^-1.1 멱법칙. 정밀 매출 아님(과금방식·국가 객단가·웹샵 미반영)">순위 기반 추정 ⓘ</b>) · 가로=1위 집중도(왼쪽 분산↔오른쪽 독식) · 크기=게임 수</span><span class="csep">│</span><span class="ci"><b>분산 대형</b>(큰 매출·1위 낮음): '+(opp2.length?opp2.map(esc).join(' · '):'없음')+'</span>';
+  if(sub) sub.innerHTML='<span class="ci">위로 갈수록 매출이 크고, 오른쪽으로 갈수록 1위 게임에 매출이 쏠린 장르입니다. 원 크기는 게임 수입니다.</span><span class="ci">'+dinfo('매출 규모는 차트 순위로 거꾸로 계산한 추정치입니다. 1위 집중도는 그 장르 매출에서 1위 게임이 차지하는 비율입니다.')+'</span>';
 }
 function mdLite(raw){
   const lines=String(raw||'').split('\n');
@@ -1780,14 +1790,14 @@ function init(full){
     const _p=document.querySelector('.panel'); if(_p) _p.style.display=''; setPanelMode('game');
     document.querySelectorAll('[data-cmode]').forEach(b=> b.setAttribute('aria-selected', String(b.dataset.cmode==='game')));
     const _st=document.getElementById('secTitleChart'); if(_st) _st.textContent='순위 추이';
-    const _h=document.getElementById('cmodeHint'); if(_h) _h.textContent='게임별 순위 추이 · 오른쪽에서 게임 선택'; }
+    const _h=document.getElementById('cmodeHint'); if(_h) _h.textContent='게임마다 순위의 변화'; }
   hideGenreLegend();
   applyChart();
   markSectionMarkets();
   renderAiBrief();
 
   const MOB=isMobile();
-  if(MOB){ const hint=document.getElementById('charthint'); if(hint) hint.innerHTML='<span class="ci"><span class="cdot" style="background:#9b9a92"></span>회색 선 = 전체 게임</span><span class="csep">│</span><span class="ci">아래에서 선택 → <b>강조</b></span><span class="csep">│</span><span class="ci">＋/－ <b>확대</b> · 막대 끌어 <b>이동</b></span>'; }
+  if(MOB){ const hint=document.getElementById('charthint'); if(hint) hint.innerHTML=CHARTHINT_GAME_MOB; }
 
   if(chart){ chart.destroy(); chart=null; }   // 국가 전환 재호출 시 기존 차트 파기(Canvas 재사용 에러 방지)
   chart=new Chart(document.getElementById('chart'),{
@@ -2298,8 +2308,8 @@ function renderCmp(){
   el.querySelectorAll('.cmp-cell').forEach(b=> b.addEventListener('click',()=>{ var mk=b.dataset.mk, g=b.dataset.g, nm=((MATRIX.markets||[]).filter(function(m){return m.key===mk;})[0]||{}).name||mk; openGenreGames(mk, nm, g); }));
   var _sub=document.getElementById('cmpsub');
   if(_sub) _sub.innerHTML=byGenre
-    ? '<span class="ci">한 행 = 그 <b>장르의 추정매출 전 시장 합을 100%</b>로 본 <b>시장별 비중</b>(행 합계 ≈100%)</span><span class="csep">│</span><span class="ci"><b>시장 규모 가중</b> 적용(외부 추정 매출) · 색 = 장르마다 다름</span><span class="csep">│</span><span class="ci">순위 기반 추정이라 근사치</span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span>'
-    : '<span class="ci">칸 색 진할수록 그 시장에서 <b>점유 높음</b></span><span class="csep">│</span><span class="ci">한 행 = 같은 장르의 <b>시장별 강·약</b></span><span class="csep">│</span><span class="ci">옅은·빈 칸 = 그 시장서 약함</span><span class="csep">│</span><span class="ci">칸 클릭 → 그 시장·장르로</span>';
+    ? '<span class="ci">한 장르의 전 세계 추정 매출을 100%로 보고 시장마다 나눈 비중입니다(시장 규모 반영).</span><span class="ci"><span class="cact">▸ 칸을 누르면 해당 게임 목록</span></span><span class="ci">'+dinfo('차트 순위로 거꾸로 계산한 추정 매출에 나라별 시장 규모를 곱한 근사치입니다. 색은 장르마다 다릅니다.')+'</span>'
+    : '<span class="ci">색이 진할수록 그 시장에서 장르 비중이 큽니다.</span><span class="ci"><span class="cact">▸ 칸을 누르면 해당 게임 목록</span></span>';
   renderCmpInsight();
 }
 function renderCmpInsight(){
@@ -2310,9 +2320,9 @@ function renderCmpInsight(){
   const gStrong=M.genres.slice(0,5).map(g=>{ let bm=null,bv=-1; M.markets.forEach(mk=>{ const v=val(mk.key,g); if(v>bv){bv=v;bm=mk;} }); return {g, mk:bm?bm.name:'?', v:bv}; }).filter(x=>x.v>0);
   const mTop=M.markets.slice(0,8).map(mk=>{ let bg=null,bv=-1; M.genres.forEach(g=>{ const v=val(mk.key,g); if(v>bv){bv=v;bg=g;} }); return {mk:mk.name, g:bg, v:bv}; }).filter(x=>x.v>0);
   const lbl=metric==='rev'?'추정매출':'게임수';
-  let h='<div class="gopi-h">시장 비교 읽기 <span style="font-weight:400;color:var(--muted)">('+lbl+' 점유 기준, 상위 차트 한정)</span></div>';
-  if(gStrong.length) h+='<div class="gopi-row"><span class="gopi-k">장르→최강 시장</span><span>'+gStrong.map(x=>'<b>'+esc(x.g)+'</b> '+esc(x.mk)+'('+x.v+'%)').join(' · ')+'</span></div>';
-  if(mTop.length) h+='<div class="gopi-row"><span class="gopi-k">시장→1위 장르</span><span>'+mTop.map(x=>esc(x.mk)+' <b>'+esc(x.g)+'</b>').join(' · ')+'</span></div>';
+  let h='<div class="gopi-h">시장 비교 요약 <span style="font-weight:400;color:var(--muted)">· '+(metric==='rev'?'추정 매출 기준':'게임 수 기준')+'</span></div>';
+  if(gStrong.length) h+='<div class="gopi-row"><span class="gopi-k">장르별 가장 큰 시장</span><span>'+gStrong.map(x=>'<b>'+esc(x.g)+'</b> '+esc(x.mk)+'('+x.v+'%)').join(' · ')+'</span></div>';
+  if(mTop.length) h+='<div class="gopi-row"><span class="gopi-k">시장별 1위 장르</span><span>'+mTop.map(x=>esc(x.mk)+' <b>'+esc(x.g)+'</b>').join(' · ')+'</span></div>';
   h+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">주의</span><span>옅은·빈 칸이 \'기회\'인지 \'수요 없음\'인지는 이 표만으론 알 수 없음. 총 시장 규모·진입장벽은 별도 확인.</span></div>';
   box.innerHTML=h;
 }
