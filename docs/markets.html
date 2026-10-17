@@ -76,39 +76,39 @@
   .aibrief{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; overflow:hidden; }
   .aibrief-toggle{ width:100%; display:flex; align-items:center; gap:10px; padding:12px 16px; background:transparent; border:0; cursor:pointer; text-align:left; font:inherit; color:var(--text); flex-wrap:wrap; }
   .aibrief-toggle:hover{ background:var(--chip); }
-  .aibrief-badge{ font-size:12.5px; font-weight:700; color:#fff; background:var(--accent2); border-radius:6px; padding:3px 9px; flex:0 0 auto; }
-  .aibrief-date{ font-size:13px; color:var(--muted); }
-  .aibrief-hint{ margin-left:auto; font-size:13px; color:var(--muted); display:inline-flex; align-items:center; gap:5px; flex:0 0 auto; }
+  .aibrief-badge{ font-size:11px; font-weight:700; color:#fff; background:var(--accent2); border-radius:6px; padding:3px 9px; flex:0 0 auto; }
+  .aibrief-date{ font-size:11.5px; color:var(--muted); }
+  .aibrief-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); display:inline-flex; align-items:center; gap:5px; flex:0 0 auto; }
   .aibrief-caret{ transition:transform .15s; }
   .aibrief.open .aibrief-caret{ transform:rotate(180deg); }
   .aibrief-body{ display:none; padding:14px 16px 14px; }
   .aibrief.open .aibrief-body{ display:block; }
   .aibrief-item{ margin-top:20px; padding-top:18px; border-top:2px solid var(--line); }
   .aibrief-item:first-child{ margin-top:6px; padding-top:0; border-top:0; }
-  .aibrief-period{ display:inline-block; font-size:13px; font-weight:800; color:var(--accent2text); background:var(--accent2soft); padding:3px 11px; border-radius:6px; margin:0 0 9px; }
+  .aibrief-period{ display:inline-block; font-size:11.5px; font-weight:800; color:var(--accent2text); background:var(--accent2soft); padding:3px 11px; border-radius:6px; margin:0 0 9px; }
   .aib-sec{ margin-top:8px; padding:9px 12px 10px; background:var(--bg); border:1px solid var(--line); border-radius:9px; }
   .aib-sec-key{ background:var(--accent2soft); }
-  .aib-h{ font-size:16px; font-weight:800; color:var(--accent2text); margin:0 0 7px; display:flex; align-items:center; gap:7px; letter-spacing:-.01em; }
+  .aib-h{ font-size:15px; font-weight:800; color:var(--accent2text); margin:0 0 7px; display:flex; align-items:center; gap:7px; letter-spacing:-.01em; }
   .aib-detail[hidden]{ display:none; }
-  .aib-more{ display:inline-block; margin:8px 0 2px; font-size:13.5px; font-weight:700; color:var(--accent2text); background:var(--accent2soft); border:none; border-radius:7px; padding:5px 13px; cursor:pointer; }
+  .aib-more{ display:inline-block; margin:8px 0 2px; font-size:12.5px; font-weight:700; color:var(--accent2text); background:var(--accent2soft); border:none; border-radius:7px; padding:5px 13px; cursor:pointer; }
   .aib-more:hover{ background:var(--accent2); color:#fff; }
   .aib-sec-key .aib-more{ background:var(--bg); border:1px solid var(--accent2); }  /* 강조카드: 버튼 배경이 카드(accent2soft)와 겹쳐 안 보이는 문제 → 배경색+강조 테두리로 대비 */
   .aib-h::before{ content:''; width:4px; height:13px; background:var(--accent2text); border-radius:2px; flex:0 0 auto; }
-  .aib-p{ font-size:13.5px; color:var(--text); line-height:1.65; margin:5px 0; }
-  .aib-li{ font-size:13.5px; color:var(--text); line-height:1.6; margin:4px 0 4px 14px; position:relative; }
+  .aib-p{ font-size:12.5px; color:var(--text); line-height:1.65; margin:5px 0; }
+  .aib-li{ font-size:12.5px; color:var(--text); line-height:1.6; margin:4px 0 4px 14px; position:relative; }
   .aib-li::before{ content:'·'; position:absolute; left:-10px; color:var(--accent2text); }
-  .aib-quote{ font-size:13.5px; color:var(--text); line-height:1.6; margin:6px 0; padding:7px 11px; background:var(--chip); border-radius:7px; }
+  .aib-quote{ font-size:12.5px; color:var(--text); line-height:1.6; margin:6px 0; padding:7px 11px; background:var(--chip); border-radius:7px; }
   .aib-hr{ height:1px; background:var(--line); margin:12px 0; border:0; }
   .aibup{ color:#16a34a; font-weight:600; }
   .aibdn{ color:#dc2626; font-weight:600; }
   .aibrief-dates{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:2px 0 12px; }
-  .aibrief-dlabel{ font-size:12.5px; color:var(--muted); font-weight:700; margin-right:2px; }
-  .aibrief-dnote{ font-size:12px; color:var(--muted); }
-  .aibrief-dchip{ font-size:12.5px; color:var(--muted); background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 10px; cursor:pointer; font-weight:600; }
+  .aibrief-dlabel{ font-size:11px; color:var(--muted); font-weight:700; margin-right:2px; }
+  .aibrief-dnote{ font-size:10.5px; color:var(--muted); }
+  .aibrief-dchip{ font-size:11px; color:var(--muted); background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 10px; cursor:pointer; font-weight:600; }
   .aibrief-dchip.on{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
-  .aibrief-foot{ margin-top:11px; font-size:12.5px; color:var(--muted); }
+  .aibrief-foot{ margin-top:11px; font-size:11px; color:var(--muted); }
   .aib-stats{ display:flex; flex-wrap:wrap; gap:6px; margin:0 0 9px; }
-  .aib-stat{ font-size:12.5px; color:var(--muted); background:var(--chip); border-radius:6px; padding:3px 9px; }
+  .aib-stat{ font-size:11px; color:var(--muted); background:var(--chip); border-radius:6px; padding:3px 9px; }
   .aib-stat b{ color:var(--text); font-weight:700; }
   .aibrief-body .gdname{ background:var(--accent2soft); color:var(--accent2text); border-radius:5px; padding:1px 6px; }
   .aibrief-body .gdname:hover{ background:var(--accent2); color:#fff; text-decoration:none; }
@@ -386,17 +386,17 @@
   .aib-src:hover{ color:var(--accent2); text-decoration-style:solid; }
   /* 출처: 본문 각주 마커(¹) + 하단 출처 칩 — 링크를 본문 밖으로 분리 */
   .aib-srcw{ color:var(--srcblue); font-weight:600; }
-  .aib-srctag{ font-size:12px; font-weight:700; color:var(--srcblue); background:var(--srcbluesoft); border-radius:5px; padding:1px 6px; margin-left:3px; text-decoration:none; vertical-align:1px; white-space:nowrap; letter-spacing:.02em; }
+  .aib-srctag{ font-size:10px; font-weight:700; color:var(--srcblue); background:var(--srcbluesoft); border-radius:5px; padding:1px 6px; margin-left:3px; text-decoration:none; vertical-align:1px; white-space:nowrap; letter-spacing:.02em; }
   .aib-srctag:hover{ background:var(--srcblue); color:#fff; }
   .aib-srcfoot{ margin-top:13px; padding-top:11px; border-top:1px dashed var(--line); display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
-  .aib-srcfoot-h{ font-size:12px; font-weight:800; color:var(--muted); letter-spacing:.05em; margin-right:1px; }
-  .aib-srcitem{ display:inline-flex; align-items:center; gap:6px; max-width:300px; font-size:13px; color:var(--accent2text); background:var(--accent2soft); border:1px solid var(--line); padding:3px 11px 3px 4px; border-radius:999px; text-decoration:none; transition:background .12s,border-color .12s,color .12s; }
+  .aib-srcfoot-h{ font-size:10.5px; font-weight:800; color:var(--muted); letter-spacing:.05em; margin-right:1px; }
+  .aib-srcitem{ display:inline-flex; align-items:center; gap:6px; max-width:300px; font-size:11.5px; color:var(--accent2text); background:var(--accent2soft); border:1px solid var(--line); padding:3px 11px 3px 4px; border-radius:999px; text-decoration:none; transition:background .12s,border-color .12s,color .12s; }
   .aib-srcitem:hover{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
   .aib-srcitem:hover .aib-srcdom{ color:#fff; opacity:.85; }
   .aib-srcitem:hover .aib-srcn{ background:#fff; color:var(--accent2); }
-  .aib-srcn{ flex:0 0 auto; min-width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; background:var(--bg); color:var(--accent2text); border-radius:999px; }
+  .aib-srcn{ flex:0 0 auto; min-width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; background:var(--bg); color:var(--accent2text); border-radius:999px; }
   .aib-srclab{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; font-weight:600; }
-  .aib-srcdom{ font-size:12px; opacity:.68; white-space:nowrap; }
+  .aib-srcdom{ font-size:10.5px; opacity:.68; white-space:nowrap; }
   .gdicon{ width:15px; height:15px; border-radius:4px; vertical-align:-3px; margin-right:4px; object-fit:cover; background:var(--chip); }   /* #14: 브리핑 게임명 옆 앱 아이콘 */
   .gdname:hover{ text-decoration:underline; }
   .gdname::after{ content:'상세보기'; position:absolute; left:0; top:-23px; font-size:12px; font-weight:600; background:var(--accent); color:#fff; padding:2px 7px; border-radius:5px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s; z-index:5; }
@@ -483,47 +483,47 @@
   .mkbrief{ margin:0 0 16px; padding:0; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
   .mkbrief>:not(summary){ padding-left:16px; padding-right:16px; }
   .mkbrief-head{ display:flex; align-items:center; gap:8px; margin-bottom:0; }
-  .mkbrief-badge{ font-size:14.5px; font-weight:700; color:var(--accent2text); }
-  .mkbrief-date{ font-size:13.5px; font-weight:400; color:var(--muted); }
+  .mkbrief-badge{ font-size:13.5px; font-weight:700; color:var(--accent2text); }
+  .mkbrief-date{ font-size:12.5px; font-weight:400; color:var(--muted); }
   .mkbrief-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; margin-bottom:13px; }   /* 과거기록 버튼(헤더)과 시장 탭 사이 간격 */
-  .mkbrief-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:13.5px; font-weight:700; padding:6px 12px; border-radius:9px; cursor:pointer; transition:all .12s; }
+  .mkbrief-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:9px; cursor:pointer; transition:all .12s; }
   .mkbrief-tab:hover{ color:var(--text); border-color:var(--accent2); }
   .mkbrief-tab[aria-selected="true"]{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
-  .mkbrief-body{ font-size:15px; line-height:1.72; }
+  .mkbrief-body{ font-size:14px; line-height:1.72; }
   .mkbrief-body .aib-sec{ margin-top:9px; }
   .mkbrief-body .aib-sec:first-child{ margin-top:0; }
   .mkbrief-body .mkb-li{ position:relative; padding-left:15px; }
   .mkbrief-body .mkb-li::before{ content:''; position:absolute; left:2px; top:7px; width:5px; height:5px; border-radius:50%; background:var(--accent2text); }
   .mkbrief-body strong{ color:var(--accent2text); font-weight:700; }
-  .mkbrief-foot{ margin:12px 0 0; padding-bottom:15px; font-size:13px; color:var(--muted); }
+  .mkbrief-foot{ margin:12px 0 0; padding-bottom:15px; font-size:11.5px; color:var(--muted); }
   .mkbrief-body .gdname{ background:var(--accent2soft); color:var(--accent2text); font-weight:600; border-radius:5px; padding:1px 6px; white-space:nowrap; }
   .mkbrief-body .gdname:hover{ background:var(--accent2); color:#fff; text-decoration:none; }
-  .mkbrief>summary.mkbrief-head{ display:flex; align-items:center; gap:8px; cursor:pointer; list-style:none; position:relative; padding:12px 16px; border-radius:12px; font-size:14.5px; font-weight:600; color:var(--text); user-select:none; -webkit-user-select:none; }
+  .mkbrief>summary.mkbrief-head{ display:flex; align-items:center; gap:8px; cursor:pointer; list-style:none; position:relative; padding:12px 16px; border-radius:12px; font-size:13.5px; font-weight:600; color:var(--text); user-select:none; -webkit-user-select:none; }
   .mkbrief>summary.mkbrief-head:hover{ background:var(--chip); }
   .mkbrief>summary.mkbrief-head:focus{ outline:none; }
   .mkbrief>summary.mkbrief-head:focus-visible{ outline:2px solid var(--accent2); outline-offset:-2px; }
   .mkbrief>summary.mkbrief-head::-webkit-details-marker{ display:none; }
-  .mkbrief-hint{ margin-left:auto; font-size:13px; color:var(--muted); font-weight:600; flex:0 0 auto; }
+  .mkbrief-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); font-weight:600; flex:0 0 auto; }
   .mkbrief-hint::after{ content:'펼쳐보기 ▾'; }
   .mkbrief[open] .mkbrief-hint::after{ content:'접기 ▴'; }
   .mkbrief-calrow{ position:relative; margin-top:8px; }
-  .mkbrief-cal{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:13px; font-weight:700; padding:4px 10px; border-radius:8px; cursor:pointer; }
+  .mkbrief-cal{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:8px; cursor:pointer; }
   .mkbrief-cal:hover{ border-color:var(--accent2); color:var(--text); }
   .mkbrief-calpop{ position:absolute; top:30px; left:0; z-index:30; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px; width:248px; box-shadow:0 8px 28px rgba(0,0,0,.32); }
   .mkcal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-  .mkcal-title{ font-size:14px; font-weight:800; color:var(--text); }
-  .mkcal-nav{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--text); width:24px; height:24px; border-radius:7px; cursor:pointer; font-size:15px; line-height:1; }
+  .mkcal-title{ font-size:13px; font-weight:800; color:var(--text); }
+  .mkcal-nav{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--text); width:24px; height:24px; border-radius:7px; cursor:pointer; font-size:14px; line-height:1; }
   .mkcal-nav:hover{ border-color:var(--accent2); }
   .mkcal-dow{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:3px; }
-  .mkcal-dow span{ text-align:center; font-size:12px; color:var(--muted); }
+  .mkcal-dow span{ text-align:center; font-size:10px; color:var(--muted); }
   .mkcal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
-  .mkcal-d{ appearance:none; border:0; background:transparent; color:var(--muted); font-size:13px; height:28px; border-radius:7px; cursor:default; }
+  .mkcal-d{ appearance:none; border:0; background:transparent; color:var(--muted); font-size:12px; height:28px; border-radius:7px; cursor:default; }
   .mkcal-d.has{ background:var(--accent2soft); color:var(--accent2text); font-weight:800; cursor:pointer; }
   .mkcal-d.has:hover{ background:var(--accent2); color:#fff; }
   .mkcal-d.mkcal-empty{ visibility:hidden; }
-  .mkcal-note{ margin-top:8px; font-size:12px; color:var(--muted); }
+  .mkcal-note{ margin-top:8px; font-size:10.5px; color:var(--muted); }
   .mkbrief-axis{ display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 12px; }
-  .mkbax-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:13px; font-weight:700; padding:5px 13px; border-radius:999px; cursor:pointer; transition:background .12s,color .12s,border-color .12s; }
+  .mkbax-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12px; font-weight:700; padding:5px 13px; border-radius:999px; cursor:pointer; transition:background .12s,color .12s,border-color .12s; }
   .mkbax-tab:hover:not([disabled]){ border-color:var(--accent2); color:var(--text); }
   .mkbax-tab[aria-selected="true"]{ background:var(--accent2); border-color:var(--accent2); color:#fff; }
   .mkbax-tab[disabled]{ opacity:.4; cursor:not-allowed; }
@@ -611,7 +611,7 @@
             <text class="idg-s idg-mono" x="380" y="90" text-anchor="middle">build_dashboard</text>
             <text class="idg-s" x="380" y="103" text-anchor="middle">시간축·갭·매출</text>
             <text class="idg-tai" x="531" y="72" text-anchor="middle">AI 분석</text>
-            <text class="idg-sai idg-mono" x="531" y="90" text-anchor="middle">Opus 4.8</text>
+            <text class="idg-sai idg-mono" x="531" y="90" text-anchor="middle">Opus 5.5</text>
             <text class="idg-sai" x="531" y="103" text-anchor="middle">시장 브리핑</text>
             <text class="idg-t" x="682" y="72" text-anchor="middle">출력</text>
             <text class="idg-s" x="682" y="90" text-anchor="middle">대시보드</text>
@@ -643,7 +643,7 @@
     <div class="mkbrief-tabs" id="mkbriefTabs" role="tablist" aria-label="시장 브리핑 탭"></div>
     <div class="mkbrief-axis" id="mkbriefAxis" role="tablist" aria-label="시간축 탭"></div>
     <div class="mkbrief-body" id="mkbriefBody"></div>
-    <p class="mkbrief-foot">AI(Opus)가 주요 시장과 지역을 주 · 월 · 분기 단위로 분석하고, 매주 월요일에 갱신합니다.</p>
+    <p class="mkbrief-foot">AI(Claude Opus 5.5)가 주요 시장과 지역을 주 · 월 · 분기 단위로 분석하고, 매주 월요일에 갱신합니다.</p>
   </details>
 
   <h2 class="sectitle" id="secTitleChart">순위 추이</h2>
