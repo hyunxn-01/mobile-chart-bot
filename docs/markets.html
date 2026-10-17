@@ -809,13 +809,12 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ if(ty
 Chart.defaults.font.family = "'NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif";   // 2026-10-18 나눔스퀘어(사용자 결정)
 const TICKC = '#6b6a64';   // 2026-10-18 어두운 화면 제거 — 항상 밝은 화면 눈금색   // 캔버스는 CSS 변수를 못 읽어 화면 설정으로 고른다
 function fmtTick(s){ s=String(s); let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m) return (+m[2])+'/'+(+m[3]); m=s.match(/^(\d{4})-(\d{2})$/); if(m) return (+m[2])+'월'; return s; }
-// 세로축 제목을 가로 글씨로 축 왼쪽 가운데에(덱 그래프 규칙과 같은 자리). 그림 왼쪽 여백은 차트 옵션 layout.padding.left
+// 세로축 제목을 가로 글씨로 축 위 왼쪽에(2026-10-18, 그 전에는 축 왼쪽 가운데였는데 왼쪽 여백 때문에 그래프가 좁아졌다). 위 여백은 차트 옵션 layout.padding.top
 Chart.register({ id:'yTitleH', afterDraw(c){
   if(!c.canvas || c.canvas.id!=='chart') return;
-  const lines = chartMode==='genre' ? ['점유율','(%)'] : ['순위','(위가 1위)'];
-  const ctx=c.ctx, a=c.chartArea; ctx.save(); ctx.font='600 '+(isMobile()?12:13)+'px '+Chart.defaults.font.family; ctx.fillStyle=TICKC;
-  ctx.textAlign='left'; ctx.textBaseline='middle'; const y0=(a.top+a.bottom)/2-(lines.length-1)*9;
-  lines.forEach((s,i)=> ctx.fillText(s, 2, y0+i*18)); ctx.restore(); } });
+  const t = chartMode==='genre' ? '점유율 (%)' : '순위 (위가 1위)';   // 2026-10-18 사용자 "차트크기 줄지않고 점유율 잘보이게": 축 왼쪽 가운데(여백 46~58px) 대신 축 위 왼쪽에 한 줄
+  const ctx=c.ctx, a=c.chartArea; ctx.save(); ctx.font='700 '+(isMobile()?12:13)+'px '+Chart.defaults.font.family; ctx.fillStyle=TICKC;
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic'; ctx.fillText(t, 2, a.top-11); ctx.restore(); } });
 // 장르 차트의 선 끝 이름(C안의 genreEndLabels)은 2026-10-18 사용자 결정으로 없앴다 — 게임 차트와 같게 선 색만 바뀐다.
 
 // 2026-10-16 설명 문구(가안) 도우미: ⓘ 표시 · 기간 이름 · 조사(와/과)
@@ -1855,7 +1854,7 @@ function init(full){
     type:'line',
     data:{ labels:DATA.timeframes.daily.labels, datasets:buildDatasets() },
     options:{
-      responsive:true, maintainAspectRatio:false, animation:false, layout:{ padding:{ left:(MOB?46:58), right:0 } },
+      responsive:true, maintainAspectRatio:false, animation:false, layout:{ padding:{ left:4, right:0, top:26 } },
       interaction:{ mode:'nearest', intersect:false, axis:'xy' },
       plugins:{ legend:{display:false},
         tooltip:{ filter:(it)=> it.parsed.y!=null,
