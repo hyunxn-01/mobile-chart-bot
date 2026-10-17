@@ -9,7 +9,7 @@
 
 - **두 개의 차트 수집**: Apple iTunes RSS로 한국 게임 **매출(Top Grossing)** 차트와 **인기(Top Free)** 차트를 매일 Top 100까지 수집합니다.
 - **다중 시간축 분석**: 일별 순위와 주·월·분기·년 기간 평균을 함께 제공합니다.
-- **AI 인사이트(Opus 4.8)**: Claude Opus 4.8(적응형 사고 + effort=max)이 차트 추세를 분석합니다. 같은 기간 차트의 인사이트는 일관되게 유지됩니다.
+- **AI 인사이트(Opus 5.5)**: Claude Opus 5.5(적응형 사고 + effort=high)가 차트 추세를 분석합니다. 같은 기간 차트의 인사이트는 일관되게 유지됩니다.
 - **자동 리포트**: 매일 시간축별 엑셀 첨부 + 이메일 발송, 대시보드 바로가기 버튼 포함.
 - **웹 대시보드**: 시간축 탭 + 게임 선택 강조 + 순위 이력 표 + **매출/인기 토글** + **퍼블리셔별 차트 장악력** 뷰. 확대·드래그 이동 지원.
 
@@ -74,9 +74,11 @@ mobile-chart-bot/
 ## 기술 스택
 
 - **Python 3.11**
-- **Claude API** (`claude-opus-4-8`, 적응형 사고 + effort=max, 스트리밍 호출) — AI 인사이트 생성
+- **Claude API** (`claude-opus-5-5`, 적응형 사고 + effort=high, 스트리밍 호출) — AI 인사이트 생성
 - **Chart.js + chartjs-plugin-zoom** — 대시보드 시각화
 - **GitHub Pages** — 대시보드 호스팅
 - **GitHub Actions** — 실행 환경 + 데이터 커밋
 - **cron-job.org** — 외부 스케줄 트리거
 - **Gmail SMTP** — 리포트 발송
+
+관련 지식: [[chartbot-개요구조]]

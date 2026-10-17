@@ -40,7 +40,7 @@ GMAIL_APP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD')
 RECIPIENT_EMAIL = os.environ.get('RECIPIENT_EMAIL')
 
 # === AI 분석 모델 (변경 시 이 한 줄만 수정) ===
-CLAUDE_MODEL = 'claude-opus-4-8'
+CLAUDE_MODEL = 'claude-opus-5-5'
 # 게임명 한글 변환용 모델(저비용·캐시). 음차/표기 변환은 호출이 작고 결과는 캐시돼 비용 미미.
 TRANSLATE_MODEL = 'claude-sonnet-4-6'
 # 적응형 사고 강도: high(기본)=거의 항상 깊게 사고하되 max보다 사고토큰 절감(비용↓, 품질 거의 동일). 값: low/medium/high/max.
@@ -869,7 +869,7 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
             if axis_key in prev_axes:
                 axes[axis_key] = prev_axes[axis_key]
             continue
-        axes[axis_key] = {'generated': now_s, 'text': text, 'pv': AXIS_PV, 'history': _axis_hist(prev)}
+        axes[axis_key] = {'generated': now_s, 'text': text, 'pv': AXIS_PV, 'model': CLAUDE_MODEL, 'history': _axis_hist(prev)}
         print(f'[OK] {scope_label} · {axis_label} 브리핑 생성')
     return axes
 
@@ -1028,7 +1028,7 @@ def build_global_brief(collected):
             if axis_key in prev_axes:
                 g_axes[axis_key] = prev_axes[axis_key]
             continue
-        g_axes[axis_key] = {'generated': now_s, 'text': text, 'pv': AXIS_PV, 'history': _axis_hist(prev)}
+        g_axes[axis_key] = {'generated': now_s, 'text': text, 'pv': AXIS_PV, 'model': CLAUDE_MODEL, 'history': _axis_hist(prev)}
         print(f'[OK] 글로벌 · {axis_label} 브리핑 생성(sources={len(subs)})')
     if not g_axes:
         print('[INFO] 글로벌 브리핑 스킵(하위 분석 없음)'); return
@@ -1383,7 +1383,7 @@ def _filter_sources(text):
 
 
 def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, web_search=False, usage_label='', thinking_off=False):
-    """Claude API 호출 (Opus 4.8 적응형 사고 + effort 최대).
+    """Claude API 호출 (Opus 5.5 적응형 사고 + effort=high).
     응답은 thinking 블록 뒤 text 블록 → text만 추출. 일시 오류 시 지수 백오프 재시도.
     web_search=True면 신뢰 도메인(TRUSTED_DOMAINS) 안에서만 웹검색 도구 사용 + 비신뢰 링크 후처리 제거.
     마지막 시도는 사고 옵션을 빼고(파라미터 문제 대비 안전망) 호출. 모두 실패 시 None."""
@@ -1401,9 +1401,11 @@ def call_claude_with_retry(prompt, max_tokens=MAX_OUTPUT_TOKENS, max_retries=4, 
                 if use_allowed:  # 크롤러 비접근 도메인으로 400 나면 use_allowed=False → 무제한 검색+사후필터
                     _tool['allowed_domains'] = TRUSTED_DOMAINS
                 kwargs['tools'] = [_tool]
-            if attempt < max_retries and not thinking_off:  # 마지막 시도 전까지는 적응형 사고 + 최대 effort(thinking_off=요약 경량화)
+            if attempt < max_retries and not thinking_off:  # 마지막 시도 전까지는 적응형 사고 + 높은 effort(thinking_off=요약 경량화)
                 kwargs['thinking'] = {'type': 'adaptive'}
                 kwargs['output_config'] = {'effort': THINKING_EFFORT}
+            elif thinking_off and attempt < max_retries:  # Opus 5.5는 사고를 끌 수 없음(disabled는 400) → effort low로 가볍게
+                kwargs['output_config'] = {'effort': 'low'}
             # 스트리밍 필수: max effort + 큰 max_tokens는 10분 초과 가능 → stream 사용
             with client.messages.stream(**kwargs) as stream:
                 final = stream.get_final_message()
@@ -1560,7 +1562,7 @@ def _insight_signature(ch):
 
 
 def generate_timeframe_insight(name, ch, chart_used):
-    """시간축 한 개의 인사이트(Opus 4.8·적응형 사고). 비교 불가면 고정 문구."""
+    """시간축 한 개의 인사이트(Opus 5.5·적응형 사고). 비교 불가면 고정 문구."""
     if not ch.get('comparable'):
         return f"비교 가능한 데이터가 아직 부족합니다. 기간이 더 쌓이면 {name}선 분석이 시작됩니다."
     top_changes = sorted(ch.get('rank_changes', []), key=lambda x: -abs(x['change']))[:15]
