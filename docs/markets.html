@@ -1582,10 +1582,10 @@ function gopBuildTicks(){
     h+='<span class="goptraj-tick" style="left:'+pct.toFixed(2)+'%"><i></i>'+(showLab?'<em>'+lab+'</em>':'')+'</span>'; }
   el.innerHTML=h;
 }
-// 2026-10-18 자동 재생(사용자 결정): 진입 맵의 기간 추이를 첫 달부터 마지막 달까지 천천히 앞으로 재생하고, 끝에서 잠깐 멈춘 뒤 빠르게 처음으로 되감아 다시 첫 달부터(무한 반복).
+// 2026-10-18 자동 재생(사용자 결정): 진입 맵의 기간 추이를 첫 달부터 마지막 달까지 처음에서 잠깐 멈춘 뒤 천천히 앞으로 재생하고, 끝에서 잠깐 멈춘 뒤 빠르게 처음으로 되감아 다시(무한 반복).
 // 사용자가 이 구간의 재생 단추 · 슬라이더 · 기간 목록 · 원을 누르면 멈춘다(재생 중 표시는 '❚❚ 정지'라 그 단추를 누르면 바로 멈춘다). 휴대폰과 '동작 줄이기' 설정에서는 돌리지 않는다.
 // 타이머는 수동 재생과 같은 _gopTraj.timer를 쓰므로, 슬라이더 · 기간 변경 · 시장 변경이 부르는 gopStop()이 그대로 자동 재생도 멈춘다. 시장이 바뀌면 setupGopTraj가 다시 시작한다.
-var GDEMO={stopped:false, t0:0, hold:1200, back:600};
+var GDEMO={stopped:false, t0:0, hold:1200, back:600, startHold:1200};
 function gopDemoAllowed(){ return !GDEMO.stopped && !isMobile() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
 function gopDemoStart(){
   if(!gopDemoAllowed() || !_gopTraj.on || !_gopTraj.geom) return;
@@ -1597,10 +1597,11 @@ function gopDemoTick(now){
   if(!gopDemoAllowed() || !_gopTraj.on){ gopStop(); return; }
   var G=_gopTraj.geom, sl=document.getElementById('goptrajSlider'); if(!G||!sl){ gopStop(); return; }
   if(!GDEMO.t0) GDEMO.t0=now;
-  var span=G.eIdx-G.sIdx, dur=Math.max(6000, span*2500), el=now-GDEMO.t0, f;
-  if(el<dur) f=el/dur;                                                              // 천천히 앞으로
-  else if(el<dur+GDEMO.hold) f=1;                                                   // 끝에서 1.2초 멈춤
-  else if(el<dur+GDEMO.hold+GDEMO.back) f=1-(el-dur-GDEMO.hold)/GDEMO.back;         // 0.6초 만에 빠르게 처음으로 되감기
+  var span=G.eIdx-G.sIdx, dur=Math.max(6000, span*2500), sh=GDEMO.startHold, el=now-GDEMO.t0, f;
+  if(el<sh) f=0;                                                                    // 처음에서 1.2초 멈춤
+  else if(el<sh+dur) f=(el-sh)/dur;                                                 // 천천히 앞으로
+  else if(el<sh+dur+GDEMO.hold) f=1;                                                // 끝에서 1.2초 멈춤
+  else if(el<sh+dur+GDEMO.hold+GDEMO.back) f=1-(el-sh-dur-GDEMO.hold)/GDEMO.back;   // 0.6초 만에 빠르게 처음으로 되감기
   else { GDEMO.t0=now; f=0; }                                                       // 다시 처음부터(무한 반복)
   sl.value=Math.round(f*1000); gopRenderTraj(G.sIdx+f*span);
   _gopTraj.timer=requestAnimationFrame(gopDemoTick);
