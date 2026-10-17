@@ -94,6 +94,8 @@
   .aib-more:hover{ background:var(--accent2); color:#fff; }
   .aib-sec-key .aib-more{ background:var(--bg); border:1px solid var(--accent2); }  /* 강조카드: 버튼 배경이 카드(accent2soft)와 겹쳐 안 보이는 문제 → 배경색+강조 테두리로 대비 */
   .aib-h::before{ content:''; width:4px; height:13px; background:var(--accent2text); border-radius:2px; flex:0 0 auto; }
+  .aib-ht{ flex:1 1 auto; }
+  .aib-h .aib-more{ margin:0; padding:3px 10px; font-size:12px; flex:0 0 auto; }   /* 2026-10-18 L4 */
   .aib-p{ font-size:12.5px; color:var(--text); line-height:1.65; margin:5px 0; }
   .aib-li{ font-size:12.5px; color:var(--text); line-height:1.6; margin:4px 0 4px 14px; position:relative; }
   .aib-li::before{ content:'·'; position:absolute; left:-10px; color:var(--accent2text); }
@@ -118,7 +120,8 @@
   .tab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
   .tab:disabled{ opacity:.4; cursor:not-allowed; }
   .hint{ font-size:13px; color:var(--muted); margin:6px 0 10px; }
-  .hintrow{ display:flex; align-items:center; gap:12px; justify-content:space-between; margin:10px 0 12px; }
+  .hintrow{ display:flex; align-items:center; gap:6px 14px; justify-content:flex-start; flex-wrap:wrap; margin:10px 0 12px; }   /* 2026-10-18 L2 · L6 */
+  .hintrow .search{ margin:0 0 0 auto; max-width:260px; }
   .hintrow .hint{ margin:0; }
   .resetzoom{ font:inherit; font-size:13.5px; padding:6px 12px; border:1px solid var(--line);
     background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; white-space:nowrap; }
@@ -169,7 +172,7 @@
   .sectitle{ font-size:17px; font-weight:600; margin:0 0 4px; }
   .sec-mkt{ display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700; color:#b45309; background:transparent; border:2px solid #b45309; border-radius:8px; padding:3px 3px 3px 11px; margin-left:10px; vertical-align:3px; white-space:nowrap; }   /* 2026-10-18 사용자 "배경 무색으로 되돌리고 다른색으로 테두리": 바탕 없음, 주황 2px 테두리(파란 제목과 구별) */
   .sec-mkt-pin{ font-size:12.5px; font-weight:700; opacity:.9; }
-  .sec-mkt-sel{ appearance:none; -webkit-appearance:none; border:0; background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%23b45309' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 6px center; color:#b45309; font:inherit; font-size:14px; font-weight:800; padding:3px 26px 3px 4px; cursor:pointer; max-width:260px; }
+  .sec-mkt-sel{ appearance:none; -webkit-appearance:none; border:0; background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%23b45309' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 6px center; color:#b45309; font:inherit; font-size:14px; font-weight:800; padding:3px 26px 3px 4px; cursor:pointer; width:124px; text-overflow:ellipsis; }   /* 2026-10-18 L8: 폭 고정 */
   .sec-mkt-sel option{ color:var(--text); background:var(--bg); font-weight:600; }
   .sec-mkt:hover{ background:rgba(180,83,9,.08); }
   .sec-mkt-sel:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
@@ -212,7 +215,7 @@
   .mtab{ font:inherit; font-size:14px; padding:6px 12px; border:1px solid var(--line); background:var(--bg); color:var(--text); border-radius:8px; cursor:pointer; }
   .mtab[aria-selected="true"]{ background:var(--text); color:var(--bg); border-color:var(--text); }
   td.gapdl{ color:#e07c12; font-weight:600; } td.gaprev{ color:#16a34a; font-weight:600; }
-  .movergrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .movergrid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px 18px; }   /* 2026-10-18 L7: 2×2로 열을 넓혀 이름이 잘리지 않게 */
   .movercol h3{ font-size:14px; margin:0 0 6px; font-weight:600; }
   .moverlist{ display:flex; flex-direction:column; gap:4px; }
   .moveritem{ font-size:13.5px; padding:5px 8px; border:1px solid var(--line); border-radius:7px; background:var(--panel); display:flex; gap:6px; align-items:center; }
@@ -225,16 +228,28 @@
   @media (max-width:820px){ .movergrid{ grid-template-columns:1fr 1fr; } }
   .pubcontrols{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:0 0 12px; }
   .pubcontrols .pubsearch{ margin:0; flex:0 1 300px; max-width:300px; }
+  .srcrow .pubsearch{ margin:0 0 0 auto; flex:0 1 240px; max-width:240px; }
+  .srcrow .periodtabs{ margin:0; }
   .pubcontrols .periodtabs{ margin:0; }
-  .pubscroll{ overflow:auto; max-height:520px; border:1px solid var(--line); border-radius:10px; }
+  .pubscroll{ overflow:auto; max-height:760px; border:1px solid var(--line); border-radius:10px; }   /* 2026-10-18 L1: 행이 낮아져 열 곳 넘게 보이게 */
   .pubtable{ border-collapse:separate; border-spacing:0; font-size:14px; width:100%; }
   .pubtable th, .pubtable td{ padding:9px 14px; border-bottom:1px solid var(--line); white-space:nowrap;
     font-variant-numeric:tabular-nums; text-align:center; }
   .pubtable thead th{ position:sticky; top:0; z-index:1; background:var(--panel); color:var(--muted); font-weight:500; }
   .pubtable td.pname, .pubtable th.pname{ text-align:left; font-weight:500; }
-  .pubtable td.pgames{ text-align:left; white-space:normal; min-width:280px; }
+  .pubtable td.pgames{ text-align:left; white-space:normal; }
+  #aggout .pubtable{ table-layout:fixed; }   /* 2026-10-18 L1: 퍼블리셔 표는 열 폭을 정해 게임 칩 열을 넓게(44%), 가로 넘침 없음 */
+  #aggout .pubtable th:first-child{ width:44px; }
+  #aggout .pubtable th.pname:not(:last-child){ width:22%; }   /* 퍼블리셔 이름 열 */
+  #aggout .pubtable th:last-child{ width:44%; }   /* 게임 칩 열(머리 class가 pname이라 마지막 열로 지정) */
+  #aggout .pubtable td.pname{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pubtable td.pgames .pubchip{ display:inline-flex; align-items:center; margin:2px 4px 2px 0; }
+  .pubtable td.pgames .pubchips-more{ display:contents; }
+  .pubmore{ font:inherit; font-size:12px; font-weight:700; color:var(--accent); background:var(--bg); border:1px solid var(--accent); border-radius:999px; padding:2px 9px; cursor:pointer; margin:2px 0; vertical-align:middle; }
   .pubrow{ cursor:pointer; }
-  .pubrow:hover td{ background:var(--chip); }
+  .pubrow:hover td{ background:rgba(37,99,235,.07); }   /* 2026-10-18 D6: 누를 수 있는 행은 옅은 파랑 */
+  .pubrow td.pname{ color:var(--accent); font-weight:700; }
+  .pubtable td, .histtable td, .gl-meta, .cmp-cell, .gmgrid{ font-variant-numeric:tabular-nums; }   /* 2026-10-18 D3: 글꼴이 지원하면 숫자 폭 고정 */
   .pubtable th.sortable{ cursor:pointer; user-select:none; }
   .pubtable th.sortable:hover{ color:var(--text); }
   .pubtable th .sarr{ opacity:.3; font-size:10px; margin-left:3px; }
@@ -254,7 +269,15 @@
   .gop-wrap{ overflow-x:auto; }
   .gop-wrap svg{ display:block; max-width:none; width:100%; height:auto; }
   .gop-line{ stroke:var(--line); }
-  .gop-axis{ fill:var(--muted); }
+  .gop-axis{ fill:#6b6a64; font-weight:600; }   /* 2026-10-18 D1: 축 캡션 진하게 */
+  .gq-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0 6px; }   /* 2026-10-18 L5: 진입 맵 요약 2×2 */
+  .gq-cell{ border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:var(--bg); min-width:0; }
+  .gq-t{ font-size:13px; font-weight:800; display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+  .gq-chips{ display:flex; flex-wrap:wrap; gap:5px; }
+  .gq-chip{ font-size:12.5px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:3px 9px; line-height:1.5; }
+  .gq-chip b{ font-weight:800; }
+  .gq-none, .gq-more{ font-size:12.5px; color:var(--muted); align-self:center; }
+  @media (max-width:560px){ .gq-grid{ grid-template-columns:1fr; } }
   .gop-lab{ fill:var(--text); paint-order:stroke; stroke:var(--bg); stroke-width:2.6px; stroke-linejoin:round; }
   .gop-pt .gop-hlab{ fill:var(--text); font-size:12px; paint-order:stroke; stroke:var(--bg); stroke-width:2.8px; stroke-linejoin:round; opacity:0; pointer-events:none; transition:opacity .08s; }
   .gop-pt:hover .gop-hlab{ opacity:1; }
@@ -264,7 +287,8 @@
   .gop-sw{ width:10px; height:10px; border-radius:50%; flex:0 0 auto; opacity:.7; }
   .goptraj-toggle{ font-size:13.5px; font-weight:700; border:1px solid var(--accent2); background:var(--accent2soft); color:var(--accent2text); border-radius:8px; padding:6px 13px; cursor:pointer; margin-top:2px; }
   .goptraj-toggle[aria-pressed="true"]{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
-  .goptraj-ctrl{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0 2px; }
+  .goptraj-ctrl{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:6px 0 2px; }
+  #goptrajbar{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }   /* 2026-10-18 L2: 기간 막대와 슬라이더를 한 줄에 */
   .goptraj-lab{ font-size:13px; font-weight:700; color:var(--muted); }
   .goptraj-date{ font-size:13.5px; font-weight:600; padding:5px 9px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--text); }
   .goptraj-arr{ color:var(--muted); font-weight:700; }
@@ -272,7 +296,7 @@
   .goptraj-play:hover{ background:var(--accent); color:#fff; }
   .goptraj-daylab{ font-size:12.5px; font-weight:700; color:var(--muted); margin-left:4px; }
   .goptraj-day{ font-size:16px; font-weight:800; color:var(--accent2text); font-family:ui-monospace,Menlo,Consolas,monospace; }
-  .goptraj-slider-row{ position:relative; margin:16px 6px 34px; }
+  .goptraj-slider-row{ position:relative; flex:1 1 320px; margin:8px 6px 30px; }
   .goptraj-slider{ -webkit-appearance:none; appearance:none; width:100%; height:11px; border-radius:6px; background:var(--accent2soft); border:1.5px solid var(--accent2); outline:none; cursor:pointer; }
   .goptraj-slider::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:26px; height:26px; border-radius:50%; background:var(--accent2); border:3px solid var(--bg); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:grab; margin-top:-9px; }
   .goptraj-slider::-moz-range-thumb{ width:24px; height:24px; border-radius:50%; background:var(--accent2); border:3px solid var(--bg); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:grab; }
@@ -282,7 +306,7 @@
   .goptraj-tick i{ display:block; width:1.5px; height:6px; background:var(--line); margin:0 auto 2px; }
   .goptraj-tick em{ font-style:normal; white-space:nowrap; }
   #gopsec.traj-on #gopout .gop-wrap{ display:none; }
-  .goptraj-cap{ font-size:12px; color:var(--muted); flex-basis:100%; margin:3px 0 0; line-height:1.4; }
+  .goptraj-cap{ display:inline-flex; align-items:center; margin:0; }
   .gop-insight{ margin:13px 0 0; border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:11px 14px; }   /* #13: 기회맵 시사점 */
   .gopi-h{ font-size:13px; font-weight:700; color:var(--accent2text); margin-bottom:8px; }
   .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:14px; line-height:1.6; color:var(--text); padding:3px 0; }
@@ -338,7 +362,7 @@
   .navsrc{ flex:1; font:inherit; font-size:13px; font-weight:500; padding:5px 0; border:1px solid var(--line); background:var(--bg); color:var(--muted); border-radius:6px; cursor:pointer; }
   .navsrc[aria-selected="true"]{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .navsrc:disabled{ opacity:.4; cursor:not-allowed; }
-  .site-footer{ margin-top:56px; padding-top:22px; border-top:1px solid var(--line); text-align:center; color:var(--muted); }
+  .site-footer{ margin-top:56px; padding-top:22px; border-top:1px solid var(--line); text-align:left; color:var(--muted); }   /* 2026-10-18 D2: 본문과 같은 왼쪽 정렬 */
   .site-footer .sf-by{ font-size:14px; }
   .site-footer .sf-by b{ color:var(--text); font-weight:600; }
   .site-footer .sf-sub{ font-size:13px; margin-top:6px; }
@@ -443,7 +467,8 @@
   .mkbar .mksel{ appearance:none; -webkit-appearance:none; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:9px 34px 9px 13px; font-size:15px; font-weight:600; cursor:pointer; min-width:150px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
   .mkbar .mksel:hover{ border-color:var(--accent); }
   .mkbar .mksel:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-weak,rgba(80,130,255,.18)); }
-  .cmoderow{ display:flex; align-items:center; gap:12px; margin:6px 0 12px; flex-wrap:wrap; }
+  .cmoderow{ display:flex; align-items:center; gap:12px; margin:6px 0 10px; flex-wrap:wrap; }
+  .cmoderow .tabs{ margin:0; }
   .cmode-wrap{ display:inline-flex; gap:0; border:1px solid var(--line); border-radius:11px; padding:3px; background:var(--panel); }
   .cmode{ appearance:none; border:0; background:transparent; color:var(--muted); font-size:14.5px; font-weight:700; padding:7px 16px; border-radius:8px; cursor:pointer; transition:all .12s; }
   .cmode:hover{ color:var(--text); }
@@ -490,7 +515,7 @@
   .mkbrief-head{ display:flex; align-items:center; gap:8px; margin-bottom:0; }
   .mkbrief-badge{ font-size:13.5px; font-weight:700; color:var(--accent2text); }
   .mkbrief-date{ font-size:12.5px; font-weight:400; color:var(--muted); }
-  .mkbrief-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; margin-bottom:13px; }   /* 과거기록 버튼(헤더)과 시장 탭 사이 간격 */
+  .mkbrief-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; margin-bottom:8px; }   /* 과거기록 버튼(헤더)과 시장 탭 사이 간격 */
   .mkbrief-tab{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:9px; cursor:pointer; transition:all .12s; }
   .mkbrief-tab:hover{ color:var(--text); border-color:var(--accent2); }
   .mkbrief-tab[aria-selected="true"]{ background:var(--accent2); color:#fff; border-color:var(--accent2); }
@@ -511,8 +536,11 @@
   .mkbrief-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); font-weight:600; flex:0 0 auto; }
   .mkbrief-hint::after{ content:'펼쳐보기 ▾'; }
   .mkbrief[open] .mkbrief-hint::after{ content:'접기 ▴'; }
-  .mkbrief-calrow{ position:relative; margin-top:8px; }
-  .mkbrief-cal{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:8px; cursor:pointer; }
+  .mkbrief-calrow{ position:relative; margin:0; }
+  .mkbrief-row2{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:2px 0 12px; }
+  .mkbrief-row2 .mkbrief-axis{ margin:0; }
+  .mkbrief-row2 .mkbrief-calpop{ left:auto; right:0; }
+  .mkbrief-cal{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; padding:5px 12px; border-radius:999px; cursor:pointer; }   /* 2026-10-18 D4: 보조 단추 모양 통일(더 보기 단추와 같게) */
   .mkbrief-cal:hover{ border-color:var(--accent2); color:var(--text); }
   .mkbrief-calpop{ position:absolute; top:30px; left:0; z-index:30; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px; width:248px; box-shadow:0 8px 28px rgba(0,0,0,.32); }
   .mkcal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
@@ -641,26 +669,24 @@
       <span class="mkbrief-date" id="mkbriefDate"></span>
       <span class="mkbrief-hint"></span>
     </summary>
-    <div class="mkbrief-calrow">
-      <button class="mkbrief-cal" id="mkbriefCalBtn" type="button" hidden>📅 과거 기록</button>
-      <div class="mkbrief-calpop" id="mkbriefCalPop" hidden></div>
-    </div>
     <div class="mkbrief-tabs" id="mkbriefTabs" role="tablist" aria-label="시장 브리핑 탭"></div>
-    <div class="mkbrief-axis" id="mkbriefAxis" role="tablist" aria-label="시간축 탭"></div>
+    <div class="mkbrief-row2">   <!-- 2026-10-18 L4: 기간 탭과 과거 기록 단추를 한 줄에 -->
+      <div class="mkbrief-axis" id="mkbriefAxis" role="tablist" aria-label="시간축 탭"></div>
+      <div class="mkbrief-calrow">
+        <button class="mkbrief-cal" id="mkbriefCalBtn" type="button" hidden>📅 과거 기록</button>
+        <div class="mkbrief-calpop" id="mkbriefCalPop" hidden></div>
+      </div>
+    </div>
     <div class="mkbrief-body" id="mkbriefBody"></div>
     <p class="mkbrief-foot">AI(Claude Opus 5.5)가 주요 시장과 지역을 주 · 월 · 분기 단위로 분석하고, 매주 월요일에 갱신합니다.</p>
   </details>
 
   <h2 class="sectitle" id="secTitleChart">순위 추이</h2>
-  <div class="cmoderow">
+  <div class="cmoderow">   <!-- 2026-10-18 L2: 차트 보기 · 차트 종류 · 기간 탭을 한 줄에 -->
     <div class="cmode-wrap" role="tablist" aria-label="차트 보기">
       <button class="cmode" data-cmode="genre" role="tab" aria-selected="true">장르 차트</button>
       <button class="cmode" data-cmode="game" role="tab" aria-selected="false">게임 차트</button>
     </div>
-    <span class="cmode-hint" id="cmodeHint">게임마다 순위의 변화</span>
-  </div>
-  <div class="srcrow">
-    <span class="srclabel">차트 종류</span>
     <div class="stabs" role="tablist" aria-label="차트 종류">
       <button class="stab" role="tab" data-src="grossing" aria-selected="true">매출 (Top Grossing)</button>
       <button class="stab" role="tab" data-src="free" aria-selected="false">인기 (Top Free)</button>
@@ -674,6 +700,7 @@
     </div>
   </div>
   <div class="hintrow">
+    <span class="cmode-hint" id="cmodeHint">게임마다 순위의 변화입니다.</span>
     <p class="hint sub cap" id="charthint"><span class="ci">회색 선은 전체 게임이며, 휠로 확대하고 끌어서 옮길 수 있습니다.</span><span class="ci"><span class="cact">▸ 목록에서 게임을 누르면 색과 이름</span></span></p>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
@@ -745,7 +772,7 @@
   </section>
 
   <div class="pubsec" id="gopsec">
-    <h2>장르 진입 맵 <span style="font-size:13px;font-weight:500;color:var(--muted)">· 매출 규모와 1위 집중도</span></h2>
+    <h2>장르 진입 맵</h2>
     <p class="sub cap" id="gopsub"></p>
     <div id="goptrajbar" class="goptraj-bar"></div>
     <div id="goptrajwrap" hidden></div>
@@ -754,15 +781,11 @@
 
   <div class="pubsec" id="aggsec">
     <h2 id="aggtitle">퍼블리셔별 차트 점유</h2>
-    <div class="srcrow">
-      <span class="srclabel">집계 기준</span>
+    <div class="srcrow">   <!-- 2026-10-18 L2: 집계 기준 · 검색 · 기간을 한 줄에 -->
       <div class="stabs" role="tablist" aria-label="집계 기준">
         <button class="stab" role="tab" data-agg="developer" aria-selected="true">퍼블리셔</button>
         <button class="stab" role="tab" data-agg="genre" aria-selected="false">장르</button>
       </div>
-    </div>
-    <p class="sub cap" id="aggsub"></p>
-    <div class="pubcontrols">
       <input class="search pubsearch" id="aggsearch" type="search" placeholder="이름·게임 검색" aria-label="집계 검색">
       <div class="periodtabs" id="aggperiod" role="tablist" aria-label="집계 기간">
         <button class="ptab" data-days="" aria-selected="true">전체</button>
@@ -773,13 +796,16 @@
         <button class="ptab" data-days="365">1년</button>
       </div>
     </div>
+    <p class="sub cap" id="aggsub"></p>
     <div id="aggout"></div>
   </div>
 
   <div class="pubsec" id="gapsec">
     <h2>매출 · 인기 갭</h2>
-    <p class="sub cap" id="gapsub"></p>
-    <div class="row tblsearch"><input class="search" id="gapsearch" type="search" placeholder="게임 검색" aria-label="갭 게임 검색"></div>
+    <div class="hintrow">   <!-- 2026-10-18 L6: 검색 상자를 설명 줄 오른쪽에 -->
+      <p class="sub cap" id="gapsub" style="margin:0"></p>
+      <input class="search" id="gapsearch" type="search" placeholder="게임 검색" aria-label="갭 게임 검색">
+    </div>
     <div id="gapout"></div>
   </div>
 
@@ -1138,13 +1164,9 @@ function renderGenreLegend(){
       '<span class="gl-meta">'+(r.share!=null?r.share+'%':'–')+'</span>'+
       '<span class="gl-meta gl-rev">'+(r.rev!=null?r.rev+'%':'–')+'</span>'+
       '</button>';
-  const _navSel=document.getElementById('countrySelNav');   // #6: 장르차트 시장 드롭다운(헤더/네비와 동기)
-  const _mktOpts=_navSel?_navSel.innerHTML:'', _curMkt=_navSel?_navSel.value:'';
-  let html='<div class="gl-mkt" style="display:flex;align-items:center;gap:8px;margin:0 0 9px;"><label for="genreMktSel" style="font-size:12px;font-weight:700;color:var(--muted);flex:0 0 auto;">시장</label><select id="genreMktSel" aria-label="장르 차트 시장 선택" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:12.5px;font-weight:600;">'+_mktOpts+'</select></div>'+
-    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출 '+dinfo('추정 매출 비중: 순위가 높을수록 매출이 크다는 가정으로 차트 순위에서 거꾸로 계산한 값입니다. 실제 매출이 아니며, 과금 방식 · 나라별 결제 금액 · 웹 상점 매출은 반영하지 않습니다.')+'</span></div>';
+  let html='<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출 '+dinfo('추정 매출 비중: 순위가 높을수록 매출이 크다는 가정으로 차트 순위에서 거꾸로 계산한 값입니다. 실제 매출이 아니며, 과금 방식 · 나라별 결제 금액 · 웹 상점 매출은 반영하지 않습니다.')+'</span></div>';
   groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
   el.innerHTML=html;
-  { const _ms=document.getElementById('genreMktSel'); if(_ms){ if(_curMkt) _ms.value=_curMkt; _ms.addEventListener('change',ev=>{ if(typeof loadMarket==='function') loadMarket(ev.target.value); }); } }   // #6: 시장 변경 동기
   el.querySelectorAll('.gl-item').forEach(b=> b.addEventListener('click',()=> toggleGenre(b.dataset.genre)));
   el.hidden=false; demoStart();
 }
@@ -1211,7 +1233,7 @@ function setChartMode(mode){
     if(tabsEl) tabsEl.style.display='none';
     if(panelEl) panelEl.style.display=''; setPanelMode('genre');
     if(secT) secT.textContent='장르 추이'; markSectionMarkets();
-    if(hint) hint.textContent='상위 100위 안에서 장르마다 차지하는 비율의 변화';
+    if(hint) hint.textContent='상위 100위 안에서 장르마다 차지하는 비율의 변화입니다.';
     if(charthint) charthint.innerHTML='<span class="ci">선은 최근 7일 평균이며, '+(isMobile()?'＋/－ 단추로 확대하고 아래 막대로 옮길 수 있습니다':'휠로 확대하고 끌어서 옮길 수 있습니다')+'.</span><span class="ci"><span class="cact">▸ 목록에서 장르를 누르면 선에 색</span></span>';
     const banner=document.getElementById('banner'); if(banner) banner.style.display='none';
     { const hs=document.getElementById('histsec'); if(hs) hs.style.display='none'; const nh=document.getElementById('navHist'); if(nh) nh.style.display='none'; }   // #7: 순위이력은 게임차트에서만
@@ -1230,7 +1252,7 @@ function setChartMode(mode){
     if(panelEl) panelEl.style.display=''; setPanelMode('game');
     if(secT) secT.textContent='순위 추이'; markSectionMarkets();
     { const hs=document.getElementById('histsec'); if(hs) hs.style.display=''; const nh=document.getElementById('navHist'); if(nh) nh.style.display=''; }   // #7: 게임차트에서 순위이력 표시
-    if(hint) hint.textContent='게임마다 순위의 변화';
+    if(hint) hint.textContent='게임마다 순위의 변화입니다.';
     if(charthint) charthint.innerHTML=isMobile()?CHARTHINT_GAME_MOB:CHARTHINT_GAME;
     chart.options.scales.x.stacked=false; chart.options.scales.y.stacked=false;  // 누적 해제(게임 라인)
     y.reverse=true; y.min=1; y.max=100; if(y.title) y.title.text='순위 (위가 1위)'; if(y.ticks){ y.ticks.stepSize=10; y.ticks.callback=undefined; }
@@ -1295,6 +1317,7 @@ function selectChart(key){
 
 let aggKind='developer', aggPeriod=null;  // 집계 종류(developer|genre)·기간(일수,null=전체)
 let gapSort={k:'gap',dir:-1}, aggSort={k:'rank',dir:1};
+function togglePubChips(btn){ const more=btn.previousElementSibling; if(!more) return; const open=more.hidden; more.hidden=!open; btn.textContent=open?'접기':'+'+more.children.length+'개'; }   // 2026-10-18 L1
 function sortTh(label,k,state,extra){ const on=state.k===k; const arr=on?(state.dir>0?'▲':'▼'):'↕'; return '<th class="sortable'+(on?' sorton':'')+(extra?' '+extra:'')+'" data-k="'+k+'">'+esc(label)+'<span class="sarr">'+arr+'</span></th>'; }
 
 function aggregate(keyName, periodDays){
@@ -1361,7 +1384,9 @@ function renderAgg(keyName, period, els, labelName){
     list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
-      const chips=e.games.map(g=>`<span class="pubchip">${newBadge(g.app_id)}<span class="gdname" data-aid="${esc(g.app_id)}">${esc(g.title)}</span>${g.rank!=null?' · '+g.rank+'위':''}</span>`).join('');
+      const chipHTML=g=>`<span class="pubchip">${newBadge(g.app_id)}<span class="gdname" data-aid="${esc(g.app_id)}">${esc(g.title)}</span>${g.rank!=null?' · '+g.rank+'위':''}</span>`;
+      const CH=6;   // 2026-10-18 L1: 칩은 여섯 개까지 보이고 나머지는 '+N개'로 펼친다
+      const chips=e.games.slice(0,CH).map(chipHTML).join('')+(e.games.length>CH?'<span class="pubchips-more" hidden>'+e.games.slice(CH).map(chipHTML).join('')+'</span><button type="button" class="pubmore" onclick="event.stopPropagation(); togglePubChips(this)">+'+(e.games.length-CH)+'개</button>':'');
       h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
         `<td>${rank}</td><td class="pname">${esc(e.key)}</td><td>${e.num_games}</td>`+
         `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td><td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
@@ -1543,7 +1568,7 @@ function gopBgSvg(G){
   s+='<text x="'+(G.PR-7)+'" y="'+(G.padT+15)+'" text-anchor="end" font-size="11" font-weight="700" fill="#94a3b8">매출 큰 장르 · 1위 집중도 높음</text>';
   s+='<text x="'+(G.padL+7)+'" y="'+(G.PB-8)+'" font-size="11" font-weight="700" fill="#2563eb">매출 작은 장르 · 여러 게임 경쟁</text>';
   s+='<text x="'+(G.PR-7)+'" y="'+(G.PB-8)+'" text-anchor="end" font-size="11" font-weight="700" fill="#e07c12">매출 작은 장르 · 1위 집중도 높음</text>';
-  s+='<text class="gop-axis" x="'+(G.padL+G.plotW/2)+'" y="'+(G.H-14)+'" text-anchor="middle" font-size="11">← 매출을 여러 게임이 나눠 가짐　　1위 집중도　　1위 게임에 쏠림 →</text>';
+  s+='<text class="gop-axis" x="'+(G.padL+G.plotW/2)+'" y="'+(G.H-14)+'" text-anchor="middle" font-size="12.5">← 매출을 여러 게임이 나눠 가짐　　1위 집중도　　1위 게임에 쏠림 →</text>';
   s+='<text class="gop-axis" x="6" y="'+(G.padT+G.plotH/2-10)+'" font-size="12.5" font-weight="600"><tspan x="6">↑ 매출 규모</tspan></text>';
   return s;
 }
@@ -1665,7 +1690,7 @@ function setupGopTraj(){
     pick('goptrajEnd', last)+
     '<button type="button" class="goptraj-play" id="goptrajPlay">▶ 재생</button>'+
     '<span class="goptraj-daylab">현재</span><span class="goptraj-day" id="goptrajDay">'+gopFmtLabel(last)+'</span>'+
-    '<span class="goptraj-cap">흐린 원은 시작 '+(U==='월'?'달':U)+', 진한 원은 지금 '+(U==='월'?'달':U)+'입니다. 원에 마우스를 올리면 수치가 나옵니다.'+dinfo((U==='월'?'달':U)+'마다 평균 순위로 계산합니다(차트 탭과 같은 기준).'+(part?' 첫 달('+gopFmtLabel(labels[0])+')은 '+String(((FULL.charts.grossing.timeframes.daily||{}).labels||[''])[0]).slice(8,10).replace(/^0/,'')+'일부터 수집한 일부 기간이라 기본 기간에서 뺐고, 목록에서 고를 수 있습니다.':''))+'</span></div>'+
+    '<span class="goptraj-cap">'+dinfo('흐린 원은 시작 '+(U==='월'?'달':U)+', 진한 원은 지금 '+(U==='월'?'달':U)+'입니다. 원에 마우스를 올리면 수치가 나옵니다. '+(U==='월'?'달':U)+'마다 평균 순위로 계산합니다(차트 탭과 같은 기준).'+(part?' 첫 달('+gopFmtLabel(labels[0])+')은 '+String(((FULL.charts.grossing.timeframes.daily||{}).labels||[''])[0]).slice(8,10).replace(/^0/,'')+'일부터 수집한 일부 기간이라 기본 기간에서 뺐고, 목록에서 고를 수 있습니다.':''))+'</span></div>'+
     '<div class="goptraj-slider-row"><input type="range" class="goptraj-slider" id="goptrajSlider" min="0" max="1000" value="1000" aria-label="기간 안에서 '+U+' 이동"><div class="goptraj-ticks" id="goptrajTicks"></div></div>';
   document.getElementById('goptrajStart').addEventListener('change', gopTrajRangeChange);
   document.getElementById('goptrajEnd').addEventListener('change', gopTrajRangeChange);
@@ -1708,7 +1733,7 @@ function renderGenreOpp(){
   s+='<text x="'+(PR-7)+'" y="'+(padT+15)+'" text-anchor="end" font-size="11" font-weight="700" fill="#94a3b8">매출 큰 장르 · 1위 집중도 높음</text>';
   s+='<text x="'+(padL+7)+'" y="'+(PB-8)+'" font-size="11" font-weight="700" fill="#2563eb">매출 작은 장르 · 여러 게임 경쟁</text>';
   s+='<text x="'+(PR-7)+'" y="'+(PB-8)+'" text-anchor="end" font-size="11" font-weight="700" fill="#e07c12">매출 작은 장르 · 1위 집중도 높음</text>';
-  s+='<text class="gop-axis" x="'+(padL+plotW/2)+'" y="'+(H-14)+'" text-anchor="middle" font-size="11">← 매출을 여러 게임이 나눠 가짐　　1위 집중도　　1위 게임에 쏠림 →</text>';
+  s+='<text class="gop-axis" x="'+(padL+plotW/2)+'" y="'+(H-14)+'" text-anchor="middle" font-size="12.5">← 매출을 여러 게임이 나눠 가짐　　1위 집중도　　1위 게임에 쏠림 →</text>';
   s+='<text class="gop-axis" x="6" y="'+(padT+plotH/2-10)+'" font-size="12.5" font-weight="600"><tspan x="6">↑ 매출 규모</tspan></text>';
   const bigSet=new Set(gs.slice().sort((a,b)=>b.rev-a.rev).slice(0,8).map(g=>g.genre));   // 매출 상위 8개(큰 버블)만 상시 라벨, 나머지는 hover 시 표기
   gs.forEach(g=>{ const cx=xOf(g.top1), cy=yOf(g.revp), r=rOf(g.n), col=zoneOf(g);
@@ -1731,9 +1756,8 @@ function renderGenreOpp(){
   s+='</svg></div>';
   // PM 인사이트 — 사분면 구조 서술(매출 규모 × 1위 집중도 × 점유 모멘텀). 추천 아님
   { const momS=g=> (g.mom!=null && g.mom>=0.3)?' · <span class="aibup">점유 상승</span>' : (g.mom!=null && g.mom<=-0.3)?' · <span class="aibdn">점유 하락</span>' : '';
-    const fmtR=arr=>arr.slice(0,3).map(g=>esc(g.genre)+'(매출 점유 '+g.revp+'% · 1위 집중도 '+g.top1+'%'+momS(g)+')').join(' · ');
-    const fmtF=arr=>arr.slice(0,3).map(g=>esc(g.genre)+'(1위 집중도 '+g.top1+'%'+(g.topGame?' · 1위 게임 '+esc(g.topGame):'')+')').join(' · ');
-    const fmt=arr=>arr.slice(0,3).map(g=>esc(g.genre)).join(' · ');
+    const chip=(g,withTop)=>'<span class="gq-chip"><b>'+esc(g.genre)+'</b> 매출 점유 '+g.revp+'% · 1위 집중도 '+g.top1+'%'+(withTop&&g.topGame?' · 1위 '+esc(g.topGame):'')+momS(g)+'</span>';   // 2026-10-18 L5: 2×2 격자 칩
+    const cell=(title,col,arr,withTop)=>'<div class="gq-cell"><div class="gq-t"><span class="gop-sw" style="background:'+col+'"></span>'+title+'</div><div class="gq-chips">'+(arr.length?arr.slice(0,6).map(g=>chip(g,withTop)).join('')+(arr.length>6?'<span class="gq-more">외 '+(arr.length-6)+'개</span>':''):'<span class="gq-none">해당 없음</span>')+'</div></div>';
     const opp=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=> b.revp-a.revp);
     const fort=gs.filter(g=> g.revp>=RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);
     const niche=gs.filter(g=> g.revp<RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);
@@ -1741,10 +1765,7 @@ function renderGenreOpp(){
     const topRev=gs.slice().sort((a,b)=>b.revp-a.revp)[0];
     let ins='<div class="gop-insight"><div class="gopi-h">장르별 매출 · 1위 집중도 요약</div>';
     if(topRev) ins+='<div class="gopi-row"><span class="gopi-k">매출 1위 장르</span><span><b>'+esc(topRev.genre)+'</b> (매출 점유 '+topRev.revp+'%)</span></div>';
-    ins+='<div class="gopi-row"><span class="gop-sw" style="background:#16a34a"></span><span><b>매출 큰 장르 · 여러 게임 경쟁</b>: <b>'+(opp.length?fmtR(opp):'해당 없음')+'</b></span></div>';
-    if(fort.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#64748b"></span><span><b>매출 큰 장르 · 1위 집중도 높음</b>: <b>'+fmtF(fort)+'</b></span></div>';
-    if(niche.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#e07c12"></span><span><b>매출 작은 장르 · 1위 집중도 높음</b>: <b>'+fmtR(niche)+'</b></span></div>';
-    if(small.length) ins+='<div class="gopi-row"><span class="gop-sw" style="background:#2563eb"></span><span><b>매출 작은 장르 · 여러 게임 경쟁</b>: <b>'+fmt(small)+'</b></span></div>';
+    ins+='<div class="gq-grid">'+cell('매출 큰 장르 · 여러 게임 경쟁','#16a34a',opp,false)+cell('매출 큰 장르 · 1위 집중도 높음','#64748b',fort,true)+cell('매출 작은 장르 · 여러 게임 경쟁','#2563eb',small,false)+cell('매출 작은 장르 · 1위 집중도 높음','#e07c12',niche,true)+'</div>';   // 그림의 네 모서리와 같은 자리 · 색
     ins+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">읽는 법</span><span>색과 위치는 장르의 매출 규모와 1위 집중도를 보여 줄 뿐, 진입 추천이 아닙니다. 진입 여부는 총 시장 규모, 자사 IP, 경쟁사 대응을 따로 보고 판단합니다.</span></div>';
     ins+='</div>'; s+=ins;
   }
@@ -2186,7 +2207,7 @@ function renderMarketBrief(text){
       if(dm>=0){ const cut=dm+20; const head=s0.slice(0,cut).replace(/[\s\-–—]+$/,'').trim(), t=s0.slice(cut).replace(/^[\s\-–—]+/,'').trim();
         if(head&&t.length>=25) return {sum:head, rest:[t].concat(rest)}; }
       return {sum:s0, rest}; };
-    const card=(c,o)=>{ let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h">'+inline(c.title)+'</div>'; const sp=sumSplit(c.bullets); if(sp.rest.length){ h+='<div class="aib-sum">'+bl(sp.sum)+'</div><div class="aib-detail" hidden>'+sp.rest.map(bl).join('')+'</div><button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>'; } else { h+=bl(sp.sum); } return h+'</div>'; };   // 접힘=요약(첫 문장)만 / 자세히=분석(카드별 토글)
+    const card=(c,o)=>{ const sp=sumSplit(c.bullets); let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h"><span class="aib-ht">'+inline(c.title)+'</span>'+(sp.rest.length?'<button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>':'')+'</div>'; if(sp.rest.length){ h+='<div class="aib-sum">'+bl(sp.sum)+'</div><div class="aib-detail" hidden>'+sp.rest.map(bl).join('')+'</div>'; } else { h+=bl(sp.sum); } return h+'</div>'; };   // 2026-10-18 L4: '자세히'는 제목 줄 오른쪽   // 접힘=요약(첫 문장)만 / 자세히=분석(카드별 토글)
     let html='';
     strat.forEach(c=> html+=card(c,{key:true}));   // 전략/시사점: 맨 위·강조
     rest.forEach(c=> html+=card(c,{}));
