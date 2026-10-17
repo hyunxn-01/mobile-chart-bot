@@ -308,7 +308,7 @@
   .goptraj-tick em{ font-style:normal; white-space:nowrap; }
   #gopsec.traj-on #gopout .gop-wrap{ display:none; }
   .goptraj-cap{ display:inline-flex; align-items:center; margin:0; }
-  .gop-insight{ margin:13px 0 0; border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:11px 14px; }   /* #13: 기회맵 시사점 */
+  .gop-insight{ margin:13px 0 0; border:1px solid #cfdcf8; border-radius:12px; background:#eef4ff; padding:11px 14px; }   /* 2026-10-18 사용자 "인사이트 카드들이 본문이랑 구분이 안가 살짝 배경에 색을": 옅은 파랑 바탕 */   /* #13: 기회맵 시사점 */
   .gopi-h{ font-size:13px; font-weight:700; color:var(--accent2text); margin-bottom:8px; }
   .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:14px; line-height:1.6; color:var(--text); padding:3px 0; }
   .gopi-row .gop-sw{ margin-top:6px; }
@@ -1352,7 +1352,7 @@ function aggregate(keyName, periodDays){
 
 function pmCallout(rows){
   const rs=rows.filter(Boolean).map(r=>'<div class="gopi-row"><span class="gopi-k">'+r[0]+'</span><span>'+r[1]+'</span></div>').join('');
-  return rs?('<div class="gop-insight pm-top"><div class="gopi-h">PM 관점</div>'+rs+'</div>'):'';   // 2026-10-16: 구간 요점을 표 위에
+  return rs?('<div class="gop-insight pm-top"><div class="gopi-h">인사이트</div>'+rs+'</div>'):'';   // 2026-10-16: 구간 요점을 표 위에
 }
 function renderAgg(keyName, period, els, labelName){
   const tf=(DATA.timeframes&&DATA.timeframes.daily)||{labels:[]};
