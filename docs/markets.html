@@ -1139,8 +1139,42 @@ function renderGenreLegend(){
   el.innerHTML=html;
   { const _ms=document.getElementById('genreMktSel'); if(_ms){ if(_curMkt) _ms.value=_curMkt; _ms.addEventListener('change',ev=>{ if(typeof loadMarket==='function') loadMarket(ev.target.value); }); } }   // #6: 시장 변경 동기
   el.querySelectorAll('.gl-item').forEach(b=> b.addEventListener('click',()=> toggleGenre(b.dataset.genre)));
-  el.hidden=false;
+  el.hidden=false; demoStart();
 }
+// 2026-10-18 자동 시연(사용자 결정): 장르를 실제로 누르기 전까지 목록 위에서부터 한 장르씩 2.5초 간격으로 '누른 것처럼' 보여 준다(무한 반복).
+// 휠 · 끌기 · 시장 바꾸기로는 멈추지 않고(게임 차트를 보는 동안은 쉼), 목록의 장르를 실제로 누르거나 다른 경로(진입 맵)로 장르를 고르면 멈춘다.
+// 휴대폰과 운영체제의 '동작 줄이기' 설정에서는 돌리지 않는다. 기본 화면 중립 규칙은 유지 — 시연이 멈추면 사용자가 고른 장르만 남는다.
+const DEMO={timer:null, idx:-1, cur:null, stopped:false, userScrollUntil:0, first:true};
+function demoAllowed(){ return !DEMO.stopped && !isMobile() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function demoRows(){ const el=document.getElementById('genreLegend'); if(!el||el.hidden) return []; return [...el.querySelectorAll('.gl-item')].filter(b=> b.dataset.genre && b.dataset.genre!=='장르 없음'); }
+function demoReveal(row){   // 목록 안에서만 보이게 밀어 준다(페이지는 움직이지 않음). 사용자가 목록을 휠로 넘긴 뒤 6초는 손대지 않는다
+  if(Date.now()<DEMO.userScrollUntil) return;
+  let sc=row.parentElement; while(sc && sc!==document.body){ const o=getComputedStyle(sc).overflowY; if((o==='auto'||o==='scroll') && sc.scrollHeight>sc.clientHeight+2) break; sc=sc.parentElement; }
+  if(!sc || sc===document.body) return;
+  const r=row.getBoundingClientRect(), b=sc.getBoundingClientRect();
+  if(r.top<b.top) sc.scrollTop+=r.top-b.top-6; else if(r.bottom>b.bottom) sc.scrollTop+=r.bottom-b.bottom+6;
+}
+function demoStep(){
+  if(!demoAllowed()){ demoPause(); return; }
+  if(chartMode!=='genre' || !chart) return;
+  const ae=document.activeElement; if(ae && ae.id==='genreMktSel') return;   // 시장 목록을 열어 둔 동안은 다시 그리지 않음
+  if(genreSel.length && !(genreSel.length===1 && genreSel[0]===DEMO.cur)){ demoStop(false); return; }   // 사용자가 다른 경로로 장르를 골랐다
+  const rows=demoRows(); if(!rows.length) return;
+  DEMO.idx=(DEMO.idx+1)%rows.length; const g=rows[DEMO.idx].dataset.genre; DEMO.cur=g;
+  genreSel=[g]; chart.data.datasets=genreDatasets(); chart.update(); renderGenreLegend();
+  const on=document.querySelector('#genreLegend .gl-item.on'); if(on) demoReveal(on);
+}
+function demoStart(){
+  if(DEMO.timer || !demoAllowed()) return;
+  if(genreSel.length){ DEMO.stopped=true; return; }   // 이미 고른 장르가 있으면(진입 맵에서 온 경우) 시연하지 않음
+  DEMO.timer=setInterval(demoStep, 2500);
+  if(DEMO.first){ DEMO.first=false; setTimeout(()=>{ if(DEMO.timer) demoStep(); }, 1500); }
+}
+function demoPause(){ if(DEMO.timer){ clearInterval(DEMO.timer); DEMO.timer=null; } }
+function demoStop(clear){ DEMO.stopped=true; demoPause(); if(clear && DEMO.cur && genreSel.length===1 && genreSel[0]===DEMO.cur) genreSel=[]; DEMO.cur=null; }
+{ const gl=document.getElementById('genreLegend'); if(gl){
+  gl.addEventListener('click', e=>{ if(e.target.closest && e.target.closest('.gl-item')) demoStop(true); }, true);   // 실제 클릭: 시연 선택을 비운 뒤 줄의 토글이 사용자 장르만 켠다
+  gl.addEventListener('wheel', ()=>{ DEMO.userScrollUntil=Date.now()+6000; }, {passive:true}); } }
 function toggleGenre(g){
   const i=genreSel.indexOf(g);
   if(i>=0) genreSel.splice(i,1); else genreSel.push(g);
@@ -1548,6 +1582,33 @@ function gopBuildTicks(){
     h+='<span class="goptraj-tick" style="left:'+pct.toFixed(2)+'%"><i></i>'+(showLab?'<em>'+lab+'</em>':'')+'</span>'; }
   el.innerHTML=h;
 }
+// 2026-10-18 자동 재생(사용자 결정): 진입 맵의 기간 추이를 첫 달부터 마지막 달까지 천천히 앞으로 재생하고, 끝에서 잠깐 멈춘 뒤 빠르게 처음으로 되감아 다시 첫 달부터(무한 반복).
+// 사용자가 이 구간의 재생 단추 · 슬라이더 · 기간 목록 · 원을 누르면 멈춘다(재생 중 표시는 '❚❚ 정지'라 그 단추를 누르면 바로 멈춘다). 휴대폰과 '동작 줄이기' 설정에서는 돌리지 않는다.
+// 타이머는 수동 재생과 같은 _gopTraj.timer를 쓰므로, 슬라이더 · 기간 변경 · 시장 변경이 부르는 gopStop()이 그대로 자동 재생도 멈춘다. 시장이 바뀌면 setupGopTraj가 다시 시작한다.
+var GDEMO={stopped:false, t0:0, hold:1200, back:600};
+function gopDemoAllowed(){ return !GDEMO.stopped && !isMobile() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function gopDemoStart(){
+  if(!gopDemoAllowed() || !_gopTraj.on || !_gopTraj.geom) return;
+  gopStop(); GDEMO.t0=0;
+  var p=document.getElementById('goptrajPlay'); if(p) p.textContent='❚❚ 정지';
+  _gopTraj.timer=requestAnimationFrame(gopDemoTick);
+}
+function gopDemoTick(now){
+  if(!gopDemoAllowed() || !_gopTraj.on){ gopStop(); return; }
+  var G=_gopTraj.geom, sl=document.getElementById('goptrajSlider'); if(!G||!sl){ gopStop(); return; }
+  if(!GDEMO.t0) GDEMO.t0=now;
+  var span=G.eIdx-G.sIdx, dur=Math.max(6000, span*2500), el=now-GDEMO.t0, f;
+  if(el<dur) f=el/dur;                                                              // 천천히 앞으로
+  else if(el<dur+GDEMO.hold) f=1;                                                   // 끝에서 1.2초 멈춤
+  else if(el<dur+GDEMO.hold+GDEMO.back) f=1-(el-dur-GDEMO.hold)/GDEMO.back;         // 0.6초 만에 빠르게 처음으로 되감기
+  else { GDEMO.t0=now; f=0; }                                                       // 다시 처음부터(무한 반복)
+  sl.value=Math.round(f*1000); gopRenderTraj(G.sIdx+f*span);
+  _gopTraj.timer=requestAnimationFrame(gopDemoTick);
+}
+function gopDemoStop(){ GDEMO.stopped=true; }
+{ var _gs=document.getElementById('gopsec'); if(_gs){
+  _gs.addEventListener('pointerdown', function(e){ if(e.target.closest && e.target.closest('#goptrajbar, .gop-pt, #goptrajToggle')) gopDemoStop(); }, true);   // 실제 조작: 그 뒤의 단추 · 슬라이더 처리가 gopStop()을 부른다
+  _gs.addEventListener('keydown', function(e){ if(e.target.closest && e.target.closest('#goptrajbar')) gopDemoStop(); }, true); } }
 function gopStop(){ if(_gopTraj.timer){ cancelAnimationFrame(_gopTraj.timer); _gopTraj.timer=null; } var p=document.getElementById('goptrajPlay'); if(p) p.textContent='▶ 재생'; }
 function gopPlay(){
   var p=document.getElementById('goptrajPlay'), sl=document.getElementById('goptrajSlider'), G=_gopTraj.geom; if(!G||!sl) return;
@@ -1601,7 +1662,7 @@ function setupGopTraj(){
   document.getElementById('goptrajSlider').addEventListener('input', function(){ gopStop(); gopRenderTraj(gopSliderT()); });
   document.getElementById('goptrajPlay').addEventListener('click', gopPlay);
   _gopTraj.on=true; if(sec)sec.classList.add('traj-on'); if(o)o.hidden=false; if(tw)tw.hidden=false;
-  gopTrajRangeChange();
+  gopTrajRangeChange(); gopDemoStart();
 }
 
 function renderGenreOpp(){
