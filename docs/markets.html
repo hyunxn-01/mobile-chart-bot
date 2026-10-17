@@ -13,23 +13,16 @@
     --accent:#2563eb; --chip:#eef1f6; --srcblue:#0284c7; --srcbluesoft:#e0f2fe;
     --accent2:#6d5fe0; --accent2soft:#ecebfb; --accent2text:#5b4ec9;
   }
-  @media (prefers-color-scheme: dark){
-    :root{ --bg:#1a1a18; --panel:#242421; --line:#37362f; --text:#ececea; --muted:#a3a29a; --chip:#2c2f36; --accent2:#6f5fe8; --accent2soft:#322c4d; --accent2text:#a99bf5; --srcblue:#38bdf8; --srcbluesoft:#0c2f44; }
-  }
   *{ box-sizing:border-box; }
   [hidden]{ display:none !important; }   /* 근본·일반 해결: 클래스가 display(flex 등)를 줘도 hidden 속성이 항상 이김. 개별 [hidden] 패치를 일반화. */
   body{ margin:0; background:var(--bg); color:var(--text);
     font-family:'NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
     line-height:1.5; }
-  .wrap{ max-width:1560px; margin:0 auto; padding:20px 22px 72px; }
+  .wrap{ max-width:1280px; margin:0 auto; padding:20px 22px 72px; }   /* 2026-10-18 A안: 본문 폭 1280 */
   header h1{ font-size:20px; font-weight:600; margin:0 0 4px; }
   .meta{ font-size:14px; color:var(--muted); margin:0 0 10px; }
+.meta:empty{ display:none; }   /* 2026-10-18 사용자 결정: 갱신 줄을 두지 않는다(오류 때만 글이 들어간다) */
 .subtitle{ font-size:15px; color:var(--muted); margin:0 0 8px; line-height:1.5; }
-.kpis{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; margin:0 0 18px; }
-.kpi{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:9px 12px 8px; display:flex; flex-direction:column; gap:2px; min-width:0; }
-.kpi b{ font-size:20px; font-weight:800; color:var(--text); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.kpi span{ font-size:12.5px; font-weight:700; color:var(--muted); }
-.kpi i{ font-style:normal; font-size:12px; color:var(--muted); }
   .meta b{ color:var(--text); font-weight:600; }
   .titlerow{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
   .toradar{ display:inline-flex; align-items:center; gap:6px; background:var(--accent); color:#fff; border:1px solid var(--accent); border-radius:8px; padding:6px 13px; font-size:14px; font-weight:700; text-decoration:none; line-height:1; }
@@ -141,7 +134,6 @@
   .cact{ background:rgba(37,99,235,0.13); color:#3b82f6; font-weight:600; border-radius:6px; padding:2px 9px; white-space:nowrap; }
   .banner{ font-size:14px; color:#9a5b00; background:#fff5e6; border:1px solid #f3d9a6;
     padding:8px 12px; border-radius:8px; margin:0 0 12px; }
-  @media (prefers-color-scheme: dark){ .banner{ color:#f0c074; background:#2e2616; border-color:#4a3c1d; } }
   .layout{ display:flex; gap:18px; align-items:flex-start; }
   .chartbox{ flex:1 1 auto; min-width:0; }
   .canvas-wrap{ position:relative; width:100%; height:520px; }
@@ -175,8 +167,8 @@
   .gitem.out[aria-pressed="true"]{ opacity:1; }
   .empty{ font-size:14px; color:var(--muted); padding:10px 4px; }
   .sectitle{ font-size:17px; font-weight:600; margin:0 0 4px; }
-  .sec-mkt{ font-size:13px; font-weight:600; color:var(--accent2text); background:var(--accent2soft); border-radius:6px; padding:1px 8px; margin-left:9px; vertical-align:2px; white-space:nowrap; }
-  .histsec{ margin-top:34px; padding-top:30px; border-top:1px solid var(--line); }
+  .sec-mkt{ font-size:13px; font-weight:700; color:var(--accent); background:transparent; border:1px solid var(--accent); border-radius:6px; padding:1px 8px; margin-left:9px; vertical-align:2px; white-space:nowrap; }
+  .histsec{ margin-top:36px; padding-top:30px; border-top:1px solid var(--line); }
   .histsec h2{ font-size:17px; font-weight:600; margin:0 0 4px; }
   .histsec .sub{ font-size:13.5px; color:var(--muted); margin:0 0 10px; }
   .histscroll{ overflow:auto; max-height:640px; border:1px solid var(--line); border-radius:10px; }
@@ -204,7 +196,7 @@
     border-radius:8px; cursor:pointer; font-weight:500; }
   .stab[aria-selected="true"]{ background:var(--accent); color:#fff; }
   .stab:disabled{ opacity:.45; cursor:not-allowed; }
-  .pubsec{ margin-top:34px; padding-top:30px; border-top:1px solid var(--line); }
+  .pubsec{ margin-top:36px; padding-top:30px; border-top:1px solid var(--line); }
   .pubsec h2{ font-size:17px; font-weight:600; margin:0 0 4px; }
   .pubsec .sub{ font-size:13.5px; color:var(--muted); margin:0 0 10px; }
   .pubsearch{ width:100%; max-width:320px; margin:0 0 12px; box-sizing:border-box; }
@@ -286,7 +278,7 @@
   .goptraj-tick em{ font-style:normal; white-space:nowrap; }
   #gopsec.traj-on #gopout .gop-wrap{ display:none; }
   .goptraj-cap{ font-size:12px; color:var(--muted); flex-basis:100%; margin:3px 0 0; line-height:1.4; }
-  .gop-insight{ margin:13px 0 0; border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:11px 14px; }   /* #13: 기회맵 시사점 */
+  .gop-insight{ margin:13px 0 0; border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:11px 14px; }   /* #13: 기회맵 시사점 */
   .gopi-h{ font-size:13px; font-weight:700; color:var(--accent2text); margin-bottom:8px; }
   .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:14px; line-height:1.6; color:var(--text); padding:3px 0; }
   .gopi-row .gop-sw{ margin-top:6px; }
@@ -467,7 +459,7 @@
   .glegend .gl-name{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .glegend .gl-meta{ font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
   .glegend .gl-rev{ color:var(--accent); font-weight:600; }
-  .cmpsec{ margin:20px 0 6px; }
+  .cmpsec{ margin:36px 0 6px; }
   .cmp-controls{ display:flex; align-items:center; gap:8px; margin:6px 0 11px; }
   .cmp-clabel{ font-size:13px; color:var(--muted); }
   .cmp-metric{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font:inherit; font-size:13.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all .12s; }
@@ -538,11 +530,11 @@
   /* ===== 2026-10-16 가시성·가독성(사용자 승인 — 견본 project/mobile-chart-bot/견본/2026-10-16-가시성-가독성/) =====
      글자 크기는 위 선언을 한 단계씩 올렸다(9~10.5→12 · 11→12.5 · 11.5·12→13 · 12.5→13.5 · 13→14 · 13.5→14.5 · 14→15 · 15→16 · 16→17).
      페이지 제목(header h1 20px)은 사용자 지시로 그대로 둔다. */
-  .sectitle, .histsec h2, .pubsec h2, .cmpsec h2{ font-size:20px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; }
+  .sectitle, .histsec h2, .pubsec h2, .cmpsec h2{ font-size:20px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; padding-left:12px; border-left:4px solid var(--accent); line-height:1.25; }   /* 2026-10-18 A안: 왼쪽 강조선 */
   .gopi-h{ font-size:13.5px; }
   .aibdn{ color:#e07c12; font-weight:600; }
   .gop-insight.pm-top{ margin:0 0 12px; }
-  @media (prefers-color-scheme: light){   /* 숫자·표시가 읽기 대비 4.5:1을 넘게(같은 계열의 진한 색) */
+  /* 숫자·표시가 읽기 대비 4.5:1을 넘게(같은 계열의 진한 색). 2026-10-18 사용자 결정으로 어두운 화면을 없애 항상 적용 */
     .aibup, .histtable td.up, td.gaprev, .watch-up, .hcell.up b, .gmevent-up{ color:#15803d; }
     td.gapdl, .aibdn{ color:#b45309; }
     .mv-upd{ color:#15803d; border-color:rgba(21,128,61,.5); }
@@ -550,11 +542,6 @@
     .gmevent-tag{ background:#15803d; }
     .mvd.up{ color:#166534; }
     .cact{ color:#1d4ed8; }
-  }
-  @media (prefers-color-scheme: dark){    /* 어두운 화면의 파란 글자 */
-    .intro-title, .intro-block h3, .glegend .gl-rev, .watchcard-rank, .goptraj-play, .pubtable th.sorton,
-    .pubrow[aria-pressed="true"] td.pname, .pubcard[aria-pressed="true"] .pubcard-head b, .site-footer a{ color:#60a5fa; }
-  }
   /* 표: 숫자는 오른쪽 정렬(이름·게임 목록·첫 칸은 왼쪽), 갭 표는 폭 880px */
   .pubtable th, .pubtable td{ text-align:right; }
   .pubtable td.pname, .pubtable th.pname, .pubtable td.pgames, .pubtable th.pgames, .pubtable th:first-child, .pubtable td:first-child{ text-align:left; }
@@ -593,7 +580,6 @@
       <select id="countrySel" class="mksel"><option>불러오는 중…</option></select>
     </div>
     <p class="meta" id="meta">불러오는 중…</p>
-    <div class="kpis" id="kpis" hidden></div>
   </header>
 
   <details class="intro">
@@ -820,7 +806,7 @@ const PALETTE = ['#2563eb','#dc2626','#16a34a','#d97706','#7c3aed','#0891b2','#d
 Chart.defaults.font.size = 13;
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ if(typeof chart!=='undefined' && chart) chart.update(); });   // 웹 글꼴이 늦게 오면 그래프 글자를 다시 그림
 Chart.defaults.font.family = "'NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif";   // 2026-10-18 나눔스퀘어(사용자 결정)
-const TICKC = matchMedia('(prefers-color-scheme: dark)').matches ? '#a3a29a' : '#6b6a64';   // 캔버스는 CSS 변수를 못 읽어 화면 설정으로 고른다
+const TICKC = '#6b6a64';   // 2026-10-18 어두운 화면 제거 — 항상 밝은 화면 눈금색   // 캔버스는 CSS 변수를 못 읽어 화면 설정으로 고른다
 function fmtTick(s){ s=String(s); let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m) return (+m[2])+'/'+(+m[3]); m=s.match(/^(\d{4})-(\d{2})$/); if(m) return (+m[2])+'월'; return s; }
 // 세로축 제목을 가로 글씨로 축 왼쪽 가운데에(덱 그래프 규칙과 같은 자리). 그림 왼쪽 여백은 차트 옵션 layout.padding.left
 Chart.register({ id:'yTitleH', afterDraw(c){
@@ -1255,8 +1241,7 @@ function applyChart(){
   });
   const m=document.getElementById('meta');
   const dr=DATA.date_range||[];
-  m.innerHTML=`갱신 ${FULL.generated_at||FULL.generated||''}`;   // 수집 기간 · 게임 수는 아래 요약 띠로(2026-10-18)
-  renderKpis();
+  m.textContent='';   // 2026-10-18 사용자 결정: 갱신 줄 · 요약 띠를 두지 않는다(꼬리말에 수집 방식이 있다)
   document.querySelectorAll('.tab').forEach(b=>{
     const tf=b.dataset.tf; const _empty=(((DATA.timeframes[tf]||{}).labels)||[]).length===0; b.disabled=_empty; b.title=_empty?('아직 완료된 '+b.textContent.trim()+' 구간이 없습니다. 기간이 쌓이면 자동으로 활성화됩니다'):'';
   });
@@ -1396,23 +1381,6 @@ function renderAggSection(){
   renderAgg(aggKind, aggPeriod, {sub:document.getElementById('aggsub'), wrap:document.getElementById('aggout'), search:document.getElementById('aggsearch')}, isPub?'퍼블리셔':'장르');
 }
 
-// 2026-10-18 첫 화면 요약 띠(사용자 승인): 화면에 이미 있는 값만 모아 칸 여섯 개로 — 수집 기간 · 시장 수 · 이 시장의 게임 수 · 신규 진입과 이탈 · 급등과 급락 · 매출 1위 장르
-let _kpiMov=null;   // renderMovers가 채운다 {entered, exited, up, down, label}
-function renderKpis(){
-  const el=document.getElementById('kpis'); if(!el || typeof DATA==='undefined' || !DATA || !FULL) return;
-  const dr=DATA.date_range||[];
-  const sel=document.getElementById('countrySel'); const nMk=sel?[...sel.options].filter(o=>o.value && o.value!=='').length:0;
-  const gl=((FULL.charts&&FULL.charts.grossing&&FULL.charts.grossing.genres&&FULL.charts.grossing.genres.list)||[]).filter(g=> g.genre && g.genre!=='미상' && g.genre!=='장르 없음');
-  const topG=gl.map(g=>({genre:g.genre, revp:Math.round((g.games||[]).reduce((t,x)=>t+(revShare(x.app_id)||0),0)*1000)/10})).sort((a,b)=>b.revp-a.revp)[0];   // 장르 목록의 '매출' 칸과 같은 계산
-  const mv=_kpiMov;
-  const k=(v,l,sub)=>'<div class="kpi"><b>'+v+'</b><span>'+l+'</span>'+(sub?'<i>'+sub+'</i>':'')+'</div>';
-  el.innerHTML = k(esc(String(DATA.num_days||0))+'일', '수집 기간', esc((dr[0]||'')+' ~ '+(dr[1]||'')))
-    + k(nMk+'곳', '시장', '주요 시장 · 지역 · 개별 국가')
-    + k(esc(String(DATA.num_games||0))+'개', '이 시장의 게임', esc(DATA.chart_used||'')+' 차트에 든 게임')
-    + (mv ? k(mv.entered+' · '+mv.exited, '신규 진입 · 이탈', mv.label) + k(mv.up+' · '+mv.down, '급등 · 급락', mv.label) : '')
-    + (topG ? k(esc(topG.genre), '매출 1위 장르', '매출 점유 '+esc(String(topG.revp))+'%') : '');
-  el.hidden=false;
-}
 let moversTf='daily', moversExpanded=false;
 const MOVE_BASE={daily:8,weekly:5,monthly:5,quarterly:5,yearly:5};
 function surgeTH(prev,now,base){ const best=Math.min(prev,now); const m=best<=10?0.5:best<=30?0.75:best<=60?1.0:1.5; return base*m; }
@@ -1455,7 +1423,7 @@ function renderGap(){
 function renderMovers(){
   const wrap=document.getElementById('moversout'), sub=document.getElementById('moversub');
   const tf=DATA.timeframes[moversTf]; const labels=(tf&&tf.labels)||[];
-  if(labels.length<2){ sub.textContent=''; wrap.innerHTML='<p class="empty">'+TF_LABEL[moversTf]+' 구간이 2개 이상 쌓이면 변화가 표시됩니다.</p>'; _kpiMov=null; renderKpis(); return; }
+  if(labels.length<2){ sub.textContent=''; wrap.innerHTML='<p class="empty">'+TF_LABEL[moversTf]+' 구간이 2개 이상 쌓이면 변화가 표시됩니다.</p>'; return; }
   const n=labels.length, ni=n-1, pi=n-2, ser=tf.series;
   const entered=[],exited=[],up=[],down=[];
   for(const aid in DATA.games){
@@ -1465,7 +1433,6 @@ function renderMovers(){
     else if(now!=null&&prev!=null){ const d=Math.round((prev-now)*10)/10; const th=surgeTH(prev,now,MOVE_BASE[moversTf]||5); if(d>=th) up.push({aid,now,prev,d}); else if(d<=-th) down.push({aid,now,prev,d}); }
   }
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
-  _kpiMov={entered:entered.length, exited:exited.length, up:up.length, down:down.length, label:({daily:'전일 대비',weekly:'전주 대비',monthly:'전월 대비',quarterly:'전분기 대비',yearly:'전년 대비'})[moversTf]||''}; renderKpis();   // 요약 띠의 급변 수
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
   const anyUpd=up.some(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; });
   sub.innerHTML=`<span class="ci">${mvLabel(moversTf,labels[pi])}${waGwa(mvLabel(moversTf,labels[pi]))} ${mvLabel(moversTf,labels[ni])}의 ${activeChart==='grossing'?'매출':'인기'} 차트를 비교했습니다.</span>`+(anyUpd?`<span class="ci"><span class="mv-upd">↻</span> 업데이트와 같은 시기에 오른 게임</span>`:``)+`<span class="ci">${dinfo('급등 · 급락 기준은 순위대와 기간마다 다릅니다. 상위권일수록 작은 변동도 급변으로 보고, 하루 기준은 8계단, 주 · 월 기준은 5계단입니다.')}</span>`;
