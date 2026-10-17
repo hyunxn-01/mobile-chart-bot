@@ -570,6 +570,10 @@
   .dinfo{ display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; border-radius:50%; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12px; font-weight:700; font-style:normal; line-height:1; cursor:pointer; margin-left:4px; vertical-align:middle; }
   .dinfo:hover, .dinfo:focus-visible{ border-color:var(--muted); color:var(--text); outline:none; }
   .dinfo-pop{ display:block; flex-basis:100%; margin:4px 0 2px; padding:6px 10px; border-radius:8px; background:var(--panel); border:1px solid var(--line); color:var(--text); font-size:13px; font-style:normal; font-weight:400; line-height:1.55; }
+  /* 2026-10-18 사용자 "매출에 I 눌러도 아무것도 안나와": 표 머리(장르 목록 · 갭 표)의 ⓘ도 누르면 펼침 — 좁은 칸 안이라 머리 줄 아래에 띄운다 */
+  .gl-head .dinfo-pop{ position:absolute; left:8px; right:8px; top:calc(100% + 3px); margin:0; z-index:3; text-align:left; white-space:normal; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+  .pubtable th{ position:relative; }
+  .pubtable th .dinfo-pop{ position:absolute; right:0; top:calc(100% + 2px); width:320px; max-width:70vw; margin:0; text-align:left; white-space:normal; z-index:3; box-shadow:0 2px 8px rgba(0,0,0,.08); }
 </style>
 </head>
 <body>
@@ -1137,7 +1141,7 @@ function renderGenreLegend(){
   const _navSel=document.getElementById('countrySelNav');   // #6: 장르차트 시장 드롭다운(헤더/네비와 동기)
   const _mktOpts=_navSel?_navSel.innerHTML:'', _curMkt=_navSel?_navSel.value:'';
   let html='<div class="gl-mkt" style="display:flex;align-items:center;gap:8px;margin:0 0 9px;"><label for="genreMktSel" style="font-size:12px;font-weight:700;color:var(--muted);flex:0 0 auto;">시장</label><select id="genreMktSel" aria-label="장르 차트 시장 선택" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:12.5px;font-weight:600;">'+_mktOpts+'</select></div>'+
-    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r" title="추정 매출 비중: 순위가 높을수록 매출이 크다는 가정으로 차트 순위에서 거꾸로 계산한 값입니다. 실제 매출이 아니며, 과금 방식 · 나라별 결제 금액 · 웹 상점 매출은 반영하지 않습니다.">매출 ⓘ</span></div>';
+    '<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출 '+dinfo('추정 매출 비중: 순위가 높을수록 매출이 크다는 가정으로 차트 순위에서 거꾸로 계산한 값입니다. 실제 매출이 아니며, 과금 방식 · 나라별 결제 금액 · 웹 상점 매출은 반영하지 않습니다.')+'</span></div>';
   groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
   el.innerHTML=html;
   { const _ms=document.getElementById('genreMktSel'); if(_ms){ if(_curMkt) _ms.value=_curMkt; _ms.addEventListener('change',ev=>{ if(typeof loadMarket==='function') loadMarket(ev.target.value); }); } }   // #6: 시장 변경 동기
@@ -1161,6 +1165,7 @@ function demoStep(){
   if(!demoAllowed()){ demoPause(); return; }
   if(chartMode!=='genre' || !chart) return;
   const ae=document.activeElement; if(ae && ae.id==='genreMktSel') return;   // 시장 목록을 열어 둔 동안은 다시 그리지 않음
+  if(document.querySelector('#genreLegend .dinfo-pop')) return;   // 목록 머리의 ⓘ 풀이를 펼쳐 둔 동안도 다시 그리지 않음(다시 그리면 풀이가 사라진다)
   if(genreSel.length && !(genreSel.length===1 && genreSel[0]===DEMO.cur)){ demoStop(false); return; }   // 사용자가 다른 경로로 장르를 골랐다
   const rows=demoRows(); if(!rows.length) return;
   DEMO.idx=(DEMO.idx+1)%rows.length; const g=rows[DEMO.idx].dataset.genre; DEMO.cur=g;
@@ -1413,7 +1418,7 @@ function renderGap(){
   view.sort((a,b)=>{ if(k==='title') return dir*String(a.title).localeCompare(String(b.title),'ko'); return dir*((a[k]||0)-(b[k]||0)); });
   sub.innerHTML=`<span class="ci">매출 순위와 인기 순위가 크게 다른 게임입니다(두 차트에 모두 든 ${total}개).</span><span class="ci"><span class="cdot" style="background:#e07c12"></span> 인기보다 매출이 낮음 &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출보다 인기가 낮음</span><span class="ci"><span class="cact">▸ 행을 누르면 그래프에 표시</span></span>`;
   if(!view.length){ wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
-  let h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+sortTh('게임','title',gapSort,'pname')+sortTh('매출 순위','gr',gapSort)+sortTh('인기 순위','fr',gapSort)+sortTh('갭 ⓘ','gap',gapSort).replace('<th ','<th title="매출 순위에서 인기 순위를 뺀 값입니다. 양수면 인기에 비해 매출이 낮습니다." ')+'</tr></thead><tbody>';
+  let h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+sortTh('게임','title',gapSort,'pname')+sortTh('매출 순위','gr',gapSort)+sortTh('인기 순위','fr',gapSort)+sortTh('갭','gap',gapSort).replace('>갭<', '>갭 '+dinfo('매출 순위에서 인기 순위를 뺀 값입니다. 양수면 인기에 비해 매출이 낮습니다.')+'<')+'</tr></thead><tbody>';
   view.forEach(r=>{
     const cls=r.gap>0?'gapdl':(r.gap<0?'gaprev':'');
     h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${newBadge(r.aid)}${esc(r.title)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
