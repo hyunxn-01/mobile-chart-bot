@@ -167,7 +167,9 @@
   .gitem.out[aria-pressed="true"]{ opacity:1; }
   .empty{ font-size:14px; color:var(--muted); padding:10px 4px; }
   .sectitle{ font-size:17px; font-weight:600; margin:0 0 4px; }
-  .sec-mkt{ font-size:13px; font-weight:700; color:var(--accent); background:transparent; border:1px solid var(--accent); border-radius:6px; padding:1px 8px; margin-left:9px; vertical-align:2px; white-space:nowrap; }
+  .sec-mkt{ display:inline-flex; align-items:center; gap:3px; font-size:13px; font-weight:700; color:var(--accent); background:transparent; border:1px solid var(--accent); border-radius:6px; padding:1px 2px 1px 8px; margin-left:9px; vertical-align:2px; white-space:nowrap; }
+  .sec-mkt-sel{ appearance:none; -webkit-appearance:none; border:0; background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 4px center; color:var(--accent); font:inherit; font-weight:700; padding:2px 20px 2px 2px; cursor:pointer; max-width:240px; }
+  .sec-mkt-sel:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
   .histsec{ margin-top:36px; padding-top:30px; border-top:1px solid var(--line); }
   .histsec h2{ font-size:17px; font-weight:600; margin:0 0 4px; }
   .histsec .sub{ font-size:13.5px; color:var(--muted); margin:0 0 10px; }
@@ -1377,7 +1379,7 @@ function renderAgg(keyName, period, els, labelName){
 
 function renderAggSection(){
   const isPub = aggKind==='developer';
-  const t=document.getElementById('aggtitle'); if(t) t.textContent = isPub ? '퍼블리셔별 차트 점유' : '장르별 차트 점유';
+  const t=document.getElementById('aggtitle'); if(t) t.textContent = isPub ? '퍼블리셔별 차트 점유' : '장르별 차트 점유'; markSectionMarkets();   // 제목을 다시 쓰면 시장 선택도 다시 붙인다
   renderAgg(aggKind, aggPeriod, {sub:document.getElementById('aggsub'), wrap:document.getElementById('aggout'), search:document.getElementById('aggsearch')}, isPub?'퍼블리셔':'장르');
 }
 
@@ -2113,14 +2115,16 @@ let MK_BRIEF_MARKET=null; const MK_MARKET_CACHE={};  // 현재 브리핑의 시�
 let MK_BRIEF_JSON=null, MK_CAL_MONTH=null;  // 현재 브리핑 원본(axes 포함) · 달력 표시 월
 let MK_BRIEF_AXIS='weekly';  // 현재 선택된 시간축
 const MK_BRIEF_AXES=[['weekly','주간'],['monthly','월간'],['quarterly','분기'],['yearly','연간']];
-function markSectionMarkets(){
+function markSectionMarkets(){   // 2026-10-18 사용자 "시장변경이 필요한 본문섹션들에 … 시장변경란": 구간 제목의 시장 칩을 바로 바꿀 수 있는 드롭다운으로
   const sel=document.getElementById('countrySel');
-  const nm=(sel&&sel.selectedOptions&&sel.selectedOptions[0])?sel.selectedOptions[0].textContent.trim():'';
-  if(!nm) return;
+  if(!sel || !sel.options.length) return;
+  const cur=(typeof MK_CC!=='undefined' && MK_CC) ? MK_CC : sel.value;
   document.querySelectorAll('h2').forEach(h=>{
     if(h.closest && h.closest('#mkbrief, #gameModal, .gmodal, #cmpsec')) return;  // 섹션 제목만(모달·브리핑·시장비교 제외 — 후자는 cross-market)
-    let c=h.querySelector('.sec-mkt'); if(!c){ c=document.createElement('span'); c.className='sec-mkt'; h.appendChild(c); }
-    c.textContent='📍 '+nm;
+    let c=h.querySelector('.sec-mkt');
+    if(!c){ c=document.createElement('span'); c.className='sec-mkt'; c.innerHTML='<span class="sec-mkt-pin" aria-hidden="true">📍</span><select class="sec-mkt-sel" aria-label="이 구간의 시장 바꾸기"></select>'; h.appendChild(c);
+      c.querySelector('select').addEventListener('change', e=>{ if(typeof loadMarket==='function') loadMarket(e.target.value); }); }
+    const s=c.querySelector('select'); if(s.innerHTML!==sel.innerHTML) s.innerHTML=sel.innerHTML; s.value=cur;
   });
 }
 function loadBriefsIndex(){
