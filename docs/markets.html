@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>모바일 게임 차트 대시보드</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 <style>
@@ -18,11 +19,17 @@
   *{ box-sizing:border-box; }
   [hidden]{ display:none !important; }   /* 근본·일반 해결: 클래스가 display(flex 등)를 줘도 hidden 속성이 항상 이김. 개별 [hidden] 패치를 일반화. */
   body{ margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    font-family:'NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
     line-height:1.5; }
   .wrap{ max-width:1560px; margin:0 auto; padding:20px 22px 72px; }
   header h1{ font-size:20px; font-weight:600; margin:0 0 4px; }
-  .meta{ font-size:14px; color:var(--muted); margin:0 0 16px; }
+  .meta{ font-size:14px; color:var(--muted); margin:0 0 10px; }
+.subtitle{ font-size:15px; color:var(--muted); margin:0 0 8px; line-height:1.5; }
+.kpis{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; margin:0 0 18px; }
+.kpi{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:9px 12px 8px; display:flex; flex-direction:column; gap:2px; min-width:0; }
+.kpi b{ font-size:20px; font-weight:800; color:var(--text); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.kpi span{ font-size:12.5px; font-weight:700; color:var(--muted); }
+.kpi i{ font-style:normal; font-size:12px; color:var(--muted); }
   .meta b{ color:var(--text); font-weight:600; }
   .titlerow{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
   .toradar{ display:inline-flex; align-items:center; gap:6px; background:var(--accent); color:#fff; border:1px solid var(--accent); border-radius:8px; padding:6px 13px; font-size:14px; font-weight:700; text-decoration:none; line-height:1; }
@@ -61,7 +68,7 @@
   .intro-diagram{ grid-column:1/-1; margin:0 0 4px; }
   .intro-diagram svg{ width:100%; height:auto; max-width:780px; display:block; margin:0 auto; }
   .intro-diagram .idg-cap{ text-align:center; font-size:12.5px; color:var(--muted); margin:7px 0 0; }
-  .idg text{ font-family:system-ui,-apple-system,'Segoe UI',sans-serif; }
+  .idg text{ font-family:'NanumSquare',system-ui,-apple-system,'Segoe UI',sans-serif; }
   .idg-frame{ fill:none; stroke:var(--line); stroke-width:1.2; }
   .idg-pill{ fill:var(--accent); }
   .idg-box{ fill:var(--panel); stroke:var(--line); stroke-width:1.2; }
@@ -580,11 +587,13 @@
       <h1>다국가 시장 · 장르 차트 대시보드</h1>
       <div class="maker"><span class="maker-label">MADE BY</span><span class="maker-name">김동현</span><span class="msep">·</span><span class="maker-mail"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>hyunxn_01@naver.com</span></div>
     </div>
+    <p class="subtitle">주요 시장 앱스토어의 매출 · 인기 차트를 매일 수집해 추세 · 장르 · 퍼블리셔 · 급변을 읽는 사업PM 대시보드</p>
     <div class="mkbar">
       <label class="mklabel" for="countrySel">시장 선택</label>
       <select id="countrySel" class="mksel"><option>불러오는 중…</option></select>
     </div>
     <p class="meta" id="meta">불러오는 중…</p>
+    <div class="kpis" id="kpis" hidden></div>
   </header>
 
   <details class="intro">
@@ -798,7 +807,9 @@
   </div>
 
   <footer class="site-footer">
-    <div class="sf-sub">수집 · 집계 · 시각화 프로그램을 모두 직접 만들었습니다</div>
+    <div class="sf-sub">데이터: Apple App Store 매출 · 인기 차트(iTunes RSS, 시장별 상위 100위). 매일 07:37에 자동으로 수집합니다(GitHub Actions).</div>
+    <div class="sf-sub">AI 시장 브리핑: Claude Opus 5.5, 매주 월요일 갱신. 추정 매출은 차트 순위로 거꾸로 계산한 상대값이며 실제 금액이 아닙니다.</div>
+    <div class="sf-sub">수집 · 집계 · 시각화 프로그램을 모두 직접 만들었습니다. 만든 사람 김동현 (hyunxn_01@naver.com)</div>
   </footer>
 </div>
 
@@ -807,7 +818,8 @@ const PALETTE = ['#2563eb','#dc2626','#16a34a','#d97706','#7c3aed','#0891b2','#d
   '#ea580c','#0d9488','#4f46e5','#b91c1c','#15803d','#a16207','#9333ea','#0e7490','#be185d','#c2410c'];
 // ===== 2026-10-16 가시성·가독성: 차트 글자·눈금·세로축 제목·장르 선 끝 이름 =====
 Chart.defaults.font.size = 13;
-Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif";
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ if(typeof chart!=='undefined' && chart) chart.update(); });   // 웹 글꼴이 늦게 오면 그래프 글자를 다시 그림
+Chart.defaults.font.family = "'NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif";   // 2026-10-18 나눔스퀘어(사용자 결정)
 const TICKC = matchMedia('(prefers-color-scheme: dark)').matches ? '#a3a29a' : '#6b6a64';   // 캔버스는 CSS 변수를 못 읽어 화면 설정으로 고른다
 function fmtTick(s){ s=String(s); let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m) return (+m[2])+'/'+(+m[3]); m=s.match(/^(\d{4})-(\d{2})$/); if(m) return (+m[2])+'월'; return s; }
 // 세로축 제목을 가로 글씨로 축 왼쪽 가운데에(덱 그래프 규칙과 같은 자리). 그림 왼쪽 여백은 차트 옵션 layout.padding.left
@@ -1180,6 +1192,7 @@ function toggleGenre(g){
   if(i>=0) genreSel.splice(i,1); else genreSel.push(g);
   if(chart){ chart.data.datasets=genreDatasets(); chart.update(); }
   renderGenreLegend();
+  urlWith({genre: genreSel.length?genreSel[0]:null});
 }
 function hideGenreLegend(){ const el=document.getElementById('genreLegend'); if(el) el.hidden=true; }
 function setPanelMode(mode){   // 오른쪽 패널 내용: 게임=검색·목록, 장르=장르 범례(차트는 항상 왼쪽)
@@ -1190,7 +1203,7 @@ function setPanelMode(mode){   // 오른쪽 패널 내용: 게임=검색·목록
 function setChartMode(mode){
   if(!chart || mode===chartMode) return;
   if(mode==='genre' && !Object.keys(genreSeries().genres).length) return; // 데이터 없으면 무시
-  chartMode=mode;
+  chartMode=mode; urlWith({mode: mode==='game'?'game':null});
   document.querySelectorAll('[data-cmode]').forEach(b=> b.setAttribute('aria-selected', String(b.dataset.cmode===mode)));
   const tabsEl=document.getElementById('tabs');
   const panelEl=document.querySelector('.panel');
@@ -1242,7 +1255,8 @@ function applyChart(){
   });
   const m=document.getElementById('meta');
   const dr=DATA.date_range||[];
-  m.innerHTML=`<b>${DATA.chart_used||'차트'}</b> · 수집 <b>${DATA.num_days}</b>일 (${dr[0]||''} ~ ${dr[1]||''}) · 게임 <b>${DATA.num_games}</b>개 · 갱신 ${FULL.generated_at||FULL.generated||''}`;
+  m.innerHTML=`갱신 ${FULL.generated_at||FULL.generated||''}`;   // 수집 기간 · 게임 수는 아래 요약 띠로(2026-10-18)
+  renderKpis();
   document.querySelectorAll('.tab').forEach(b=>{
     const tf=b.dataset.tf; const _empty=(((DATA.timeframes[tf]||{}).labels)||[]).length===0; b.disabled=_empty; b.title=_empty?('아직 완료된 '+b.textContent.trim()+' 구간이 없습니다. 기간이 쌓이면 자동으로 활성화됩니다'):'';
   });
@@ -1382,6 +1396,23 @@ function renderAggSection(){
   renderAgg(aggKind, aggPeriod, {sub:document.getElementById('aggsub'), wrap:document.getElementById('aggout'), search:document.getElementById('aggsearch')}, isPub?'퍼블리셔':'장르');
 }
 
+// 2026-10-18 첫 화면 요약 띠(사용자 승인): 화면에 이미 있는 값만 모아 칸 여섯 개로 — 수집 기간 · 시장 수 · 이 시장의 게임 수 · 신규 진입과 이탈 · 급등과 급락 · 매출 1위 장르
+let _kpiMov=null;   // renderMovers가 채운다 {entered, exited, up, down, label}
+function renderKpis(){
+  const el=document.getElementById('kpis'); if(!el || typeof DATA==='undefined' || !DATA || !FULL) return;
+  const dr=DATA.date_range||[];
+  const sel=document.getElementById('countrySel'); const nMk=sel?[...sel.options].filter(o=>o.value && o.value!=='').length:0;
+  const gl=((FULL.charts&&FULL.charts.grossing&&FULL.charts.grossing.genres&&FULL.charts.grossing.genres.list)||[]).filter(g=> g.genre && g.genre!=='미상' && g.genre!=='장르 없음');
+  const topG=gl.map(g=>({genre:g.genre, revp:Math.round((g.games||[]).reduce((t,x)=>t+(revShare(x.app_id)||0),0)*1000)/10})).sort((a,b)=>b.revp-a.revp)[0];   // 장르 목록의 '매출' 칸과 같은 계산
+  const mv=_kpiMov;
+  const k=(v,l,sub)=>'<div class="kpi"><b>'+v+'</b><span>'+l+'</span>'+(sub?'<i>'+sub+'</i>':'')+'</div>';
+  el.innerHTML = k(esc(String(DATA.num_days||0))+'일', '수집 기간', esc((dr[0]||'')+' ~ '+(dr[1]||'')))
+    + k(nMk+'곳', '시장', '주요 시장 · 지역 · 개별 국가')
+    + k(esc(String(DATA.num_games||0))+'개', '이 시장의 게임', esc(DATA.chart_used||'')+' 차트에 든 게임')
+    + (mv ? k(mv.entered+' · '+mv.exited, '신규 진입 · 이탈', mv.label) + k(mv.up+' · '+mv.down, '급등 · 급락', mv.label) : '')
+    + (topG ? k(esc(topG.genre), '매출 1위 장르', '매출 점유 '+esc(String(topG.revp))+'%') : '');
+  el.hidden=false;
+}
 let moversTf='daily', moversExpanded=false;
 const MOVE_BASE={daily:8,weekly:5,monthly:5,quarterly:5,yearly:5};
 function surgeTH(prev,now,base){ const best=Math.min(prev,now); const m=best<=10?0.5:best<=30?0.75:best<=60?1.0:1.5; return base*m; }
@@ -1424,7 +1455,7 @@ function renderGap(){
 function renderMovers(){
   const wrap=document.getElementById('moversout'), sub=document.getElementById('moversub');
   const tf=DATA.timeframes[moversTf]; const labels=(tf&&tf.labels)||[];
-  if(labels.length<2){ sub.textContent=''; wrap.innerHTML='<p class="empty">'+TF_LABEL[moversTf]+' 구간이 2개 이상 쌓이면 변화가 표시됩니다.</p>'; return; }
+  if(labels.length<2){ sub.textContent=''; wrap.innerHTML='<p class="empty">'+TF_LABEL[moversTf]+' 구간이 2개 이상 쌓이면 변화가 표시됩니다.</p>'; _kpiMov=null; renderKpis(); return; }
   const n=labels.length, ni=n-1, pi=n-2, ser=tf.series;
   const entered=[],exited=[],up=[],down=[];
   for(const aid in DATA.games){
@@ -1434,6 +1465,7 @@ function renderMovers(){
     else if(now!=null&&prev!=null){ const d=Math.round((prev-now)*10)/10; const th=surgeTH(prev,now,MOVE_BASE[moversTf]||5); if(d>=th) up.push({aid,now,prev,d}); else if(d<=-th) down.push({aid,now,prev,d}); }
   }
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
+  _kpiMov={entered:entered.length, exited:exited.length, up:up.length, down:down.length, label:({daily:'전일 대비',weekly:'전주 대비',monthly:'전월 대비',quarterly:'전분기 대비',yearly:'전년 대비'})[moversTf]||''}; renderKpis();   // 요약 띠의 급변 수
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
   const anyUpd=up.some(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; });
   sub.innerHTML=`<span class="ci">${mvLabel(moversTf,labels[pi])}${waGwa(mvLabel(moversTf,labels[pi]))} ${mvLabel(moversTf,labels[ni])}의 ${activeChart==='grossing'?'매출':'인기'} 차트를 비교했습니다.</span>`+(anyUpd?`<span class="ci"><span class="mv-upd">↻</span> 업데이트와 같은 시기에 오른 게임</span>`:``)+`<span class="ci">${dinfo('급등 · 급락 기준은 순위대와 기간마다 다릅니다. 상위권일수록 작은 변동도 급변으로 보고, 하루 기준은 8계단, 주 · 월 기준은 5계단입니다.')}</span>`;
@@ -1905,6 +1937,7 @@ function init(full){
   switchTf('daily');
   updateSourceTabs();
   if(_wantGenre) setChartMode('genre');   // 이전 국가에서 장르 보던 중이면 새 국가에도 장르 유지
+  applyUrlState();
 }
 
 function setupPanelToggle(){
@@ -2302,9 +2335,19 @@ function selectBrief(bk){
   }).catch(()=>{ if(body) body.innerHTML='<p class="empty">브리핑을 불러오지 못했습니다.</p>'; });
 }
 const MK_CCN={kr:'한국',us:'미국',jp:'일본',cn:'중국',tw:'대만',gb:'영국',de:'독일',fr:'프랑스',ca:'캐나다',au:'호주',it:'이탈리아',es:'스페인',nl:'네덜란드',ru:'러시아',se:'스웨덴',sa:'사우디',ae:'UAE',eg:'이집트',tr:'터키',br:'브라질',mx:'멕시코',ar:'아르헨티나',co:'콜롬비아',id:'인도네시아',th:'태국',vn:'베트남',ph:'필리핀',my:'말레이시아',sg:'싱가포르',in:'인도',pk:'파키스탄',bd:'방글라데시'};
+// 2026-10-18 보기 상태를 주소에(사용자 승인): ?mk=시장&mode=game|genre&genre=장르 이름 + #구간. 주소로 열면 그 상태로 시작하고, 시장 · 차트 종류 · 장르를 바꾸면 주소를 바꿔 둔다(기록은 쌓지 않음).
+function urlWith(p){ const q=new URLSearchParams(location.search); for(const k in p){ if(p[k]==null||p[k]==='') q.delete(k); else q.set(k,p[k]); } const qs=q.toString(); try{ history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash); }catch(e){} }
+let _urlApplied=false;
+function applyUrlState(){   // init 끝에서 한 번: 주소의 mode · genre · #구간을 적용
+  if(_urlApplied) return; _urlApplied=true;
+  const q=new URLSearchParams(location.search); const g=q.get('genre'), mode=q.get('mode');
+  if(g && typeof genreSeries==='function' && genreSeries().genres && genreSeries().genres[g]){ genreSel=[g]; if(chartMode!=='genre') setChartMode('genre'); else { if(chart){ chart.data.datasets=genreDatasets(); chart.update(); } renderGenreLegend(); } }
+  else if(mode==='game' && chartMode!=='game') setChartMode('game');
+  if(location.hash){ const t=document.getElementById(location.hash.slice(1)); if(t) setTimeout(()=>t.scrollIntoView({block:'start'}), 300); }
+}
 let MK_CC=null;
 function loadMarket(cc){
-  MK_CC=cc;
+  MK_CC=cc; urlWith({mk:cc});
   { const s1=document.getElementById('countrySel'), s2=document.getElementById('countrySelNav'); if(s1) s1.value=cc; if(s2) s2.value=cc; }  // 헤더·네비 동기
   fetch('./markets/'+cc+'.json?_='+Date.now(), {cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error(cc+' '+r.status); return r.json(); })
     .then(init)
@@ -2421,6 +2464,7 @@ fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'}).then(r=>r.json()
     sel.innerHTML=html;
     const hasKr=[...sel.options].some(o=>o.value==='kr');
     first=hasKr?'kr':((sel.options[0]||{}).value||'kr');
+    { const want=new URLSearchParams(location.search).get('mk'); if(want && [...sel.options].some(o=>o.value===want)) first=want; }   // 주소의 시장으로 시작
     sel.value=first;
     sel.addEventListener('change',e=>loadMarket(e.target.value));
     const navSel=document.getElementById('countrySelNav');   // 네비 시장 선택(헤더와 동일 옵션)
