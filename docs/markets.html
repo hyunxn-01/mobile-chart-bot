@@ -19,6 +19,9 @@
     font-family:'NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
     line-height:1.5; }
   .wrap{ max-width:1344px; margin:0 auto; padding:20px 22px 72px; }   /* 2026-10-18 A안 본문 폭 1280 → 같은 날 밤 사용자 "빨간 선 길이만큼 넓혀줘": 본문 1300 + 좌우 여백 22 */
+  body{ background:#f3f4f6; }   /* 2026-10-18 밤 사용자 "그림자형이 좋아보여"(견본 2026-10-18-구간카드): 페이지 바탕은 연한 회색, 구간은 흰 카드 + 옅은 그림자. 브리핑 카드만 회색 바탕 유지 */
+  .seccard, .histsec, .cmpsec, .pubsec{ background:#fff; border:1px solid #eceef1; border-radius:14px; padding:18px 20px 20px; box-shadow:0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.06); }
+  .seccard{ margin-top:16px; }
   header h1{ font-size:20px; font-weight:600; margin:0 0 4px; }
   .meta{ font-size:14px; color:var(--muted); margin:0 0 10px; }
 .meta:empty{ display:none; }   /* 2026-10-18 사용자 결정: 갱신 줄을 두지 않는다(오류 때만 글이 들어간다) */
@@ -35,7 +38,7 @@
   .maker .msep{ color:var(--line); }
   .maker-mail{ color:var(--muted); display:inline-flex; align-items:center; gap:5px; }
   .maker-mail svg{ flex:0 0 auto; }
-  .intro{ background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:0 0 16px; }
+  .intro{ background:#fff; border:1px solid #eceef1; border-radius:14px; margin:0 0 16px; box-shadow:0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.06); }   /* 2026-10-18 밤 카드 구성: 회색 → 흰 카드 */
   .intro-title{ white-space:nowrap; }   /* 2026-10-18 D7 휴대폰 재측정: '프로젝트 소개'가 낱말 가운데서 줄 바뀜 */
   .intro>summary{ cursor:pointer; padding:12px 16px; font-size:14.5px; font-weight:600; color:var(--text); list-style:none; display:flex; align-items:center; gap:8px; border-radius:12px; user-select:none; -webkit-user-select:none; }
   .intro>summary:hover{ background:var(--chip); }
@@ -177,7 +180,7 @@
   .sec-mkt-sel option{ color:var(--text); background:var(--bg); font-weight:600; }
   .sec-mkt:hover{ background:rgba(180,83,9,.08); }
   .sec-mkt-sel:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
-  .histsec{ margin-top:36px; padding-top:30px; border-top:1px solid var(--line); }
+  .histsec{ margin-top:16px; }   /* 2026-10-18 밤 카드 구성: 위 구분선 대신 카드 간격 */
   .histsec h2{ font-size:17px; font-weight:600; margin:0 0 4px; }
   .histsec .sub{ font-size:13.5px; color:var(--muted); margin:0 0 10px; }
   .histscroll{ overflow:auto; max-height:640px; border:1px solid var(--line); border-radius:10px; }
@@ -205,7 +208,7 @@
     border-radius:8px; cursor:pointer; font-weight:500; }
   .stab[aria-selected="true"]{ background:var(--accent); color:#fff; }
   .stab:disabled{ opacity:.45; cursor:not-allowed; }
-  .pubsec{ margin-top:36px; padding-top:30px; border-top:1px solid var(--line); }
+  .pubsec{ margin-top:16px; }   /* 2026-10-18 밤 카드 구성: 위 구분선 대신 카드 간격 */
   .pubsec h2{ font-size:17px; font-weight:600; margin:0 0 4px; }
   .pubsec .sub{ font-size:13.5px; color:var(--muted); margin:0 0 10px; }
   .pubsearch{ width:100%; max-width:320px; margin:0 0 12px; box-sizing:border-box; }
@@ -345,7 +348,7 @@
   .pubcard-stats{ font-size:13.5px; color:var(--muted); margin:0 0 7px; font-variant-numeric:tabular-nums; }
   .pubcard-games{ display:flex; flex-wrap:wrap; }
   .pubcards{ max-height:330px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:8px; }
-  .chapnav{ position:fixed; left:max(14px, calc(50% - 824px)); top:96px; width:132px; display:flex; flex-direction:column; gap:2px; z-index:60; padding:7px; border:1px solid var(--line); border-radius:11px; background:var(--panel); }
+  .chapnav{ position:fixed; left:max(14px, calc(50% - 824px)); top:96px; width:132px; display:flex; flex-direction:column; gap:2px; z-index:60; padding:7px; border:1px solid #e3e5e9; border-radius:11px; background:var(--panel); }
   .chaptitle{ font-size:12px; font-weight:600; letter-spacing:.05em; color:var(--muted); padding:3px 9px 6px; }
   .chapdot{ display:flex; align-items:center; gap:9px; cursor:pointer; text-decoration:none; padding:6px 9px; border-radius:7px; transition:background .12s; }
   .chapdot::before{ content:''; width:7px; height:7px; border-radius:50%; background:var(--muted); opacity:.45; flex:0 0 auto; transition:all .15s; }
@@ -363,7 +366,7 @@
   .navsrc{ flex:1; font:inherit; font-size:13px; font-weight:500; padding:5px 0; border:1px solid var(--line); background:var(--bg); color:var(--muted); border-radius:6px; cursor:pointer; }
   .navsrc[aria-selected="true"]{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .navsrc:disabled{ opacity:.4; cursor:not-allowed; }
-  .site-footer{ margin-top:56px; padding-top:22px; border-top:1px solid var(--line); text-align:left; color:var(--muted); }   /* 2026-10-18 D2: 본문과 같은 왼쪽 정렬 */
+  .site-footer{ margin-top:28px; padding-top:12px; border-top:0; text-align:left; color:var(--muted); }   /* 2026-10-18 D2: 본문과 같은 왼쪽 정렬 · 밤 카드 구성: 위 선 없음 */
   .site-footer .sf-by{ font-size:14px; }
   .site-footer .sf-by b{ color:var(--text); font-weight:600; }
   .site-footer .sf-sub{ font-size:13px; margin-top:6px; }
@@ -440,6 +443,7 @@
   @media (max-width:820px){
     .zoombtns{ display:flex; }
     .wrap{ padding:14px 14px 40px; }
+    .seccard, .histsec, .cmpsec, .pubsec{ padding:12px 12px 14px; border-radius:12px; }   /* 2026-10-18 밤 카드 구성: 휴대폰은 안쪽 여백 축소 */
     .layout{ flex-direction:column; gap:14px; }
     .panel{ flex:1 1 auto; width:100%; }
     .chartbox{ width:calc(100% - 8px); }
@@ -491,7 +495,7 @@
   .glegend .gl-name{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .glegend .gl-meta{ font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
   .glegend .gl-rev{ color:var(--accent); font-weight:600; }
-  .cmpsec{ margin:36px 0 6px; }
+  .cmpsec{ margin:16px 0 0; }   /* 2026-10-18 밤 카드 구성 */
   .cmp-controls{ display:flex; align-items:center; gap:8px; margin:6px 0 11px; }
   .cmp-clabel{ font-size:13px; color:var(--muted); }
   .cmp-metric{ appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--muted); font:inherit; font-size:13.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all .12s; }
@@ -512,7 +516,7 @@
   .cmp-cell{ appearance:none; margin:0; padding:7px 6px; border:0; border-bottom:1px solid var(--line); border-right:1px solid var(--line); font:inherit; font-size:13px; font-variant-numeric:tabular-nums; text-align:center; color:var(--text); cursor:pointer; min-width:62px; }
   .cmp-cell:hover{ outline:2px solid var(--accent); outline-offset:-2px; position:relative; z-index:1; }
   .cmp-empty{ padding:22px 16px; color:var(--muted); font-size:14px; }
-  .mkbrief{ margin:0 0 16px; padding:0; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
+  .mkbrief{ margin:0 0 16px; padding:0; border:1px solid #eceef1; border-radius:14px; background:var(--panel); box-shadow:0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.06); }   /* 2026-10-18 밤 카드 구성: 모서리 · 그림자만 맞추고 바탕은 사용자 지시로 회색 그대로 */
   .mkbrief>:not(summary){ padding-left:16px; padding-right:16px; }
   .mkbrief-head{ display:flex; align-items:center; gap:8px; margin-bottom:0; }
   .mkbrief-badge{ font-size:13.5px; font-weight:700; color:var(--accent2text); }
@@ -683,6 +687,26 @@
     <p class="mkbrief-foot">AI(Claude Opus 5.5)가 주요 시장과 지역을 주 · 월 · 분기 단위로 분석하고, 매주 월요일에 갱신합니다.</p>
   </details>
 
+  <nav class="chapnav" id="chapnav" aria-label="섹션 바로가기">
+    <div class="navmkt-wrap">
+      <label class="navmkt-label" for="countrySelNav">시장</label>
+      <select id="countrySelNav" class="navmkt" aria-label="시장 선택"></select>
+    </div>
+    <div class="chaptitle">섹션</div>
+    <a class="chapdot active" data-target="chartsec" href="#chartsec"><span class="chaplabel">순위 추이</span></a>
+    <a class="chapdot" id="navHist" data-target="histsec" href="#histsec" style="display:none"><span class="chaplabel">순위 이력</span></a>
+    <a class="chapdot" data-target="cmpsec" href="#cmpsec"><span class="chaplabel">시장 비교</span></a>
+    <a class="chapdot" data-target="gopsec" href="#gopsec"><span class="chaplabel">장르 진입 맵</span></a>
+    <a class="chapdot" data-target="aggsec" href="#aggsec"><span class="chaplabel">퍼블리셔 · 장르</span></a>
+    <a class="chapdot" data-target="gapsec" href="#gapsec"><span class="chaplabel">매출 · 인기 갭</span></a>
+    <a class="chapdot" data-target="moversec" href="#moversec"><span class="chaplabel">진입 · 이탈 · 급변</span></a>
+    <a class="chapdot" data-target="watchsec" href="#watchsec"><span class="chaplabel">지속 상승</span></a>
+    <div class="navsrc-wrap" role="tablist" aria-label="차트 종류">
+      <button class="navsrc" data-src="grossing" aria-selected="true">매출</button>
+      <button class="navsrc" data-src="free" aria-selected="false">인기</button>
+    </div>
+  </nav>
+  <div class="seccard" id="chartcard">   <!-- 2026-10-18 밤 카드 구성: 순위 추이 제목 · 조작 줄 · 그래프를 한 카드로. 왼쪽 메뉴는 고정 위치라 카드 밖 -->
   <h2 class="sectitle" id="secTitleChart">순위 추이</h2>
   <div class="cmoderow">   <!-- 2026-10-18 L2: 차트 보기 · 차트 종류 · 기간 탭을 한 줄에 -->
     <div class="cmode-wrap" role="tablist" aria-label="차트 보기">
@@ -707,25 +731,6 @@
   </div>
   <div class="banner" id="banner" style="display:none"></div>
 
-  <nav class="chapnav" id="chapnav" aria-label="섹션 바로가기">
-    <div class="navmkt-wrap">
-      <label class="navmkt-label" for="countrySelNav">시장</label>
-      <select id="countrySelNav" class="navmkt" aria-label="시장 선택"></select>
-    </div>
-    <div class="chaptitle">섹션</div>
-    <a class="chapdot active" data-target="chartsec" href="#chartsec"><span class="chaplabel">순위 추이</span></a>
-    <a class="chapdot" id="navHist" data-target="histsec" href="#histsec" style="display:none"><span class="chaplabel">순위 이력</span></a>
-    <a class="chapdot" data-target="cmpsec" href="#cmpsec"><span class="chaplabel">시장 비교</span></a>
-    <a class="chapdot" data-target="gopsec" href="#gopsec"><span class="chaplabel">장르 진입 맵</span></a>
-    <a class="chapdot" data-target="aggsec" href="#aggsec"><span class="chaplabel">퍼블리셔 · 장르</span></a>
-    <a class="chapdot" data-target="gapsec" href="#gapsec"><span class="chaplabel">매출 · 인기 갭</span></a>
-    <a class="chapdot" data-target="moversec" href="#moversec"><span class="chaplabel">진입 · 이탈 · 급변</span></a>
-    <a class="chapdot" data-target="watchsec" href="#watchsec"><span class="chaplabel">지속 상승</span></a>
-    <div class="navsrc-wrap" role="tablist" aria-label="차트 종류">
-      <button class="navsrc" data-src="grossing" aria-selected="true">매출</button>
-      <button class="navsrc" data-src="free" aria-selected="false">인기</button>
-    </div>
-  </nav>
   <div class="layout" id="chartsec">
     <div class="chartbox">
       <div class="canvas-wrap">
@@ -751,6 +756,7 @@
       </div>
     </aside>
   </div>
+  </div>   <!-- /chartcard -->
 
   <div class="histsec" id="histsec" style="display:none">
     <h2>선택 게임 순위 이력</h2>
