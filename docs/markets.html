@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>모바일 게임 차트 대시보드</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">   <!-- 2026-10-18 밤 사용자 "제목들은 나눔스퀘어로 본문들은 노토산스로": 본문 글꼴 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 <style>
@@ -16,13 +18,14 @@
   *{ box-sizing:border-box; }
   [hidden]{ display:none !important; }   /* 근본·일반 해결: 클래스가 display(flex 등)를 줘도 hidden 속성이 항상 이김. 개별 [hidden] 패치를 일반화. */
   body{ margin:0; background:var(--bg); color:var(--text);
-    font-family:'NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    font-family:'Noto Sans KR','NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;   /* 2026-10-18 밤: 본문은 노토 산스, 제목은 아래 규칙으로 나눔스퀘어 */
     line-height:1.5; }
   .wrap{ max-width:1344px; margin:0 auto; padding:20px 22px 72px; }   /* 2026-10-18 A안 본문 폭 1280 → 같은 날 밤 사용자 "빨간 선 길이만큼 넓혀줘": 본문 1300 + 좌우 여백 22 */
   body{ background:#f3f4f6; }   /* 2026-10-18 밤 사용자 "그림자형이 좋아보여"(견본 2026-10-18-구간카드): 페이지 바탕은 연한 회색, 구간은 흰 카드 + 옅은 그림자. 브리핑 카드만 회색 바탕 유지 */
   .seccard, .histsec, .cmpsec, .pubsec{ background:#fff; border:1px solid #eceef1; border-radius:14px; padding:18px 20px 20px; box-shadow:0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.06); }
   .seccard{ margin-top:16px; }
   header h1{ font-size:20px; font-weight:600; margin:0 0 4px; }
+  h1, h2, h3, .sectitle, .intro-title, .aib-h, .gopi-h, .chaptitle, .mkbrief-head{ font-family:'NanumSquare','Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif; }   /* 2026-10-18 밤 사용자: 제목(페이지 · 구간 · 소개 항목 · 브리핑 카드 · 요약/인사이트 머리 · 왼쪽 메뉴 '섹션' · 브리핑 머리줄)은 나눔스퀘어 */
   .meta{ font-size:14px; color:var(--muted); margin:0 0 10px; }
 .meta:empty{ display:none; }   /* 2026-10-18 사용자 결정: 갱신 줄을 두지 않는다(오류 때만 글이 들어간다) */
 .subtitle{ font-size:15px; color:var(--muted); margin:0 0 8px; line-height:1.5; }
@@ -872,7 +875,8 @@ const PALETTE = ['#2563eb','#dc2626','#16a34a','#d97706','#7c3aed','#0891b2','#d
 // ===== 2026-10-16 가시성·가독성: 차트 글자·눈금·세로축 제목·장르 선 끝 이름 =====
 Chart.defaults.font.size = 13;
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ if(typeof chart!=='undefined' && chart) chart.update(); });   // 웹 글꼴이 늦게 오면 그래프 글자를 다시 그림
-Chart.defaults.font.family = "'NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif";   // 2026-10-18 나눔스퀘어(사용자 결정)
+Chart.defaults.font.family = "'Noto Sans KR','NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif";   // 2026-10-18 나눔스퀘어(사용자 결정) → 같은 날 밤 본문 글꼴 노토 산스로(그래프 글자는 본문)
+if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ try{ if(window.chart) chart.update('none'); }catch(e){} }); }   // 글꼴이 늦게 오면 그래프 글자를 한 번 다시 그린다
 const TICKC = '#6b6a64';   // 2026-10-18 어두운 화면 제거 — 항상 밝은 화면 눈금색   // 캔버스는 CSS 변수를 못 읽어 화면 설정으로 고른다
 function fmtTick(s){ s=String(s); let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m) return (+m[2])+'/'+(+m[3]); m=s.match(/^(\d{4})-(\d{2})$/); if(m) return (+m[2])+'월'; return s; }
 // 세로축 제목을 가로 글씨로 축 위 왼쪽에(2026-10-18, 그 전에는 축 왼쪽 가운데였는데 왼쪽 여백 때문에 그래프가 좁아졌다). 위 여백은 차트 옵션 layout.padding.top
