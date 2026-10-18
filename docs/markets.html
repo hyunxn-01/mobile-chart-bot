@@ -571,6 +571,7 @@
      글자 크기는 위 선언을 한 단계씩 올렸다(9~10.5→12 · 11→12.5 · 11.5·12→13 · 12.5→13.5 · 13→14 · 13.5→14.5 · 14→15 · 15→16 · 16→17).
      페이지 제목(header h1 20px)은 사용자 지시로 그대로 둔다. */
   .sectitle, .histsec h2, .pubsec h2, .cmpsec h2{ font-size:20px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; padding:0; color:var(--accent); line-height:1.25; }   /* 2026-10-18 밤 사용자 "구분감이 생겼으니까 제목은 배경색말고 글자색변경으로 강조": 띠 제거, 파란 글자(견본 2026-10-18-구간제목 8안) */   /* 2026-10-18 A안의 왼쪽 강조선 → 같은 날 밤 사용자 "3안이 좋을거같아": 제목 줄 전체 옅은 파랑 띠(견본 2026-10-18-구간제목 3안) */
+  .sectitle::before, .histsec h2::before, .pubsec h2::before, .cmpsec h2::before{ content:''; display:inline-block; width:5px; height:18px; border-radius:3px; background:var(--accent); margin-right:9px; vertical-align:-2px; }   /* 2026-10-18 밤 사용자 "ai시장브리핑 카드들 제목 앞에 제목강조처럼 좀 모서리가 부드러운 제목강조를 섹션에 추가하자": 브리핑 카드 표식(.aib-h::before 4×13 · 모서리 2)의 비율로 5×18 · 모서리 3, 제목 글자와 같은 파랑 */
   .gopi-h{ font-size:13.5px; }
   .aibdn{ color:#e07c12; font-weight:600; }
   .gop-insight.pm-top{ margin:0 0 12px; }
