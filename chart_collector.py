@@ -664,15 +664,17 @@ def _axis_hist(prev, cap=12):
     return out[:cap]
 
 
-def _prior_signal(prev, cap=300):
-    """직전 브리핑에서 검증할 가치가 있는 신호(움직임·PM 시사점·진출 전략·횡단 신호)만 짧게 추출.
+def _prior_signal(prev, cap=300, heads=('움직임', 'PM 시사점', '진출 전략', '횡단 신호')):
+    """직전 브리핑에서 검증할 가치가 있는 신호(기본: 움직임·PM 시사점·진출 전략·횡단 신호)만 짧게 추출.
+    heads: 찾을 항목 제목. 2026-10-19 글로벌 마지막 항목을 '진출 전략' → '핵심 시사점'으로 바꿔 글로벌 호출만 둘 다 넘긴다(시장별 기본값 불변).
     연속성 참조용·저비중 — 프롬프트에 '검증하되 반복 말라'로 주입. cite/링크 태그 정리·길이 캡."""
     import re as _re
     t = (prev or {}).get('text') or ''
     if not t or '## ' not in t:
         return ''
     picks = []
-    for m in _re.finditer(r'##\s*(움직임|PM 시사점|진출 전략|횡단 신호)\s*\n(.+?)(?=\n##|\Z)', t, _re.S):
+    _hp = '|'.join(_re.escape(h) for h in heads)
+    for m in _re.finditer(r'##\s*(' + _hp + r')\s*\n(.+?)(?=\n##|\Z)', t, _re.S):
         body = _re.sub(r'\s+', ' ', _re.sub(r'<[^>]+>|\[([^\]]+)\]\([^)]+\)', r'\1', m.group(2))).strip()
         if body:
             picks.append(f"{m.group(1)}: {body}")
@@ -1005,16 +1007,16 @@ def build_global_brief(collected):
             continue
         win = _AXIS_WIN.get(axis_label, axis_label)
         body = '\n\n'.join(f"# {label} 분석\n{tx}" for label, tx in subs)
-        _gp = _prior_signal(prev)
+        _gp = _prior_signal(prev, heads=('진출 전략', '핵심 시사점', '횡단 신호'))   # 2026-10-19: 지난주 글로벌은 '진출 전략', 이번 주부터 '핵심 시사점'
         _gpb = (f"\n\n(직전 '{axis_label}' 글로벌 메모(저비중·연속성 검증용) {_gp}\n→ 달라진 점이 있으면 '## 전 시장 공통 흐름'에 현재 사실로만 반영하라('지난 분석/저번' 자기참조 금지, 반복·복붙·새 항목 금지). 현재 분석이 우선이다.") if _gp else ""
         prompt = (f"다음은 같은 기간 App Store 게임 매출 차트를, 주요 시장은 개별·중소규모는 지역으로 묶어 '{axis_label}'({win}) 시간축으로 분석한 결과다.\n\n{body}\n\n"
                   f"위 '{axis_label}' 분석들을 토대로 종합하여, 게임 사업 PM이 전 세계를 횡단해 읽을 '{axis_label}'({win}) 헤드라인을 아래 4개 항목으로 써라. "
                   + _ANALYSIS_INSTR +
-                  "## 전 시장 공통 흐름\n## 시장별 차이\n## IP·퍼블리셔\n## 진출 전략\n\n"
+                  "## 전 시장 공통 흐름\n## 시장별 차이\n## IP·퍼블리셔\n## 핵심 시사점\n\n"
                   "각 항목 내용 가이드. 전 시장 공통 흐름: 여러 시장·지역에서 동시에 강한 게임·장르. "
                   "시장별 차이: 주요 시장 간·지역 간 장르 구성 대비. IP·퍼블리셔: 여러 시장을 관통하는 글로벌 IP·퍼블리셔. "
-                  "진출 전략: 다음 진출·벤치마크 시장 결론(가장 중요). "
-                  "쓰기 전에 '진출 전략'을 먼저 정하고, 앞 세 항목은 그 결론에 필요한 사실만 담는다(결론과 무관한 나열 금지). 판단·권고는 '진출 전략'에만 쓰고, 각 불릿 끝에 근거가 된 사실을 괄호로 한 구절 붙인다. "
+                  "핵심 시사점: 앞 세 항목의 사실에서 알 수 있는 판단과 다음 진출·벤치마크 시장 결론(가장 중요). "
+                  "쓰기 전에 '핵심 시사점'을 먼저 정하고, 앞 세 항목은 그 결론에 필요한 사실만 담는다(결론과 무관한 나열 금지). 판단·권고는 '핵심 시사점'에만 쓰고, 각 불릿 끝에 근거가 된 사실을 괄호로 한 구절 붙인다. "
                   "하위 분석에 없는 사실을 지어내지 말 것. 굵게(**)는 게임명·장르·퍼블리셔·국가/지역명에만. " + STYLE_RULES + _gpb + INDUSTRY_VOICE + (GROUNDING if axis_key == 'weekly' else ""))
         try:
             text = _gen_brief_2step(prompt, grounded=(axis_key == 'weekly'), usage_label=f"글로벌/{axis_label}")   # 2단계: 분석 생성→요약→병합
