@@ -566,7 +566,7 @@
   /* ===== 2026-10-16 가시성·가독성(사용자 승인 — 견본 project/mobile-chart-bot/견본/2026-10-16-가시성-가독성/) =====
      글자 크기는 위 선언을 한 단계씩 올렸다(9~10.5→12 · 11→12.5 · 11.5·12→13 · 12.5→13.5 · 13→14 · 13.5→14.5 · 14→15 · 15→16 · 16→17).
      페이지 제목(header h1 20px)은 사용자 지시로 그대로 둔다. */
-  .sectitle, .histsec h2, .pubsec h2, .cmpsec h2{ font-size:20px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; padding-left:12px; border-left:4px solid var(--accent); line-height:1.25; }   /* 2026-10-18 A안: 왼쪽 강조선 */
+  .sectitle, .histsec h2, .pubsec h2, .cmpsec h2{ font-size:20px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; padding:8px 14px; background:#e8effd; border-radius:10px; line-height:1.25; }   /* 2026-10-18 A안의 왼쪽 강조선 → 같은 날 밤 사용자 "3안이 좋을거같아": 제목 줄 전체 옅은 파랑 띠(견본 2026-10-18-구간제목 3안) */
   .gopi-h{ font-size:13.5px; }
   .aibdn{ color:#e07c12; font-weight:600; }
   .gop-insight.pm-top{ margin:0 0 12px; }
@@ -1937,6 +1937,7 @@ function init(full){
   switchTf('daily');
   updateSourceTabs();
   if(_wantGenre) setChartMode('genre');   // 이전 국가에서 장르 보던 중이면 새 국가에도 장르 유지
+  relinkBriefForMarket();   // 2026-10-18: 글로벌 브리핑이 시장 데이터보다 먼저 와서 게임 링크가 안 걸렸으면 지금 건다
   applyUrlState();
 }
 
@@ -2299,6 +2300,13 @@ function selectBriefAxis(ax){
   MK_BRIEF_AXIS=ax;
   document.querySelectorAll('#mkbriefAxis .mkbax-tab').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.ax===ax)));
   renderBriefAxis();
+}
+// 2026-10-18 사용자 "가끔씩 새로고침했을때 시장브리핑에 게임 링크가 안걸려": 글로벌 브리핑(작은 파일)이 시장 데이터(큰 파일)보다 먼저 오면 renderBriefAxis가 DATA 없이 그려
+// 게임 이름이 평문으로 남는다(같은 날 측정: 브리핑 0.94초 · 시장 1.18초 도착 → 링크 0개). 시장 데이터가 온 뒤(init 끝) 한 번 더 건다. 이미 걸린 이름은 linkifyGames가 건너뛴다.
+// 시장별 브리핑 탭은 Promise.all로 그 시장 데이터를 기다리므로 해당 없음(MK_BRIEF_MARKET이 있으면 그대로 둔다).
+function relinkBriefForMarket(){
+  const body=document.getElementById('mkbriefBody'); if(!body || !MK_BRIEF_JSON || MK_BRIEF_MARKET || typeof DATA==='undefined' || !DATA || !DATA.games) return;
+  try{ linkifyGames(body); }catch(_){ }
 }
 function renderBriefAxis(){
   const b=MK_BRIEF_JSON, body=document.getElementById('mkbriefBody'), dt=document.getElementById('mkbriefDate');
