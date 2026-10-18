@@ -311,7 +311,7 @@
   .goptraj-tick em{ font-style:normal; white-space:nowrap; }
   #gopsec.traj-on #gopout .gop-wrap{ display:none; }
   .goptraj-cap{ display:inline-flex; align-items:center; margin:0; }
-  .gop-insight{ margin:13px 0 0; border:2px solid var(--accent2); border-radius:12px; background:var(--bg); padding:11px 14px; }   /* 2026-10-18 밤 사용자 "좀 얇은거같긴하다": 1.5px(배율 1에서 1px로 그려짐) → 2px */   /* 2026-10-18 밤 사용자 "b안이 좋아보여"(견본 2026-10-18-요약카드, 보라 테두리): 제목 띠가 옅은 파랑이 되어 옅은 파랑 바탕과 구분이 약해짐 → 흰 바탕 + 보라 테두리. 아래 옛 설명은 같은 날 낮의 바탕색 결정 */   /* 2026-10-18 사용자 "인사이트 카드들이 본문이랑 구분이 안가 살짝 배경에 색을": 옅은 파랑 바탕 */   /* #13: 기회맵 시사점 */
+  .gop-insight{ margin:13px 0 0; border:1px solid #b7cbf2; border-radius:12px; background:#eef4ff; padding:11px 14px; }   /* 2026-10-18 밤 사용자 "보라색 태두리로 처리했던것들은 다시 배경색 연하게로" + "연한 태두리도 있었으면": 옅은 파랑 바탕 + 보이는 연한 파랑 테두리(낮의 #cfdcf8보다 한 단계 진함) */   /* 2026-10-18 밤 사용자 "좀 얇은거같긴하다": 1.5px(배율 1에서 1px로 그려짐) → 2px */   /* 2026-10-18 밤 사용자 "b안이 좋아보여"(견본 2026-10-18-요약카드, 보라 테두리): 제목 띠가 옅은 파랑이 되어 옅은 파랑 바탕과 구분이 약해짐 → 흰 바탕 + 보라 테두리. 아래 옛 설명은 같은 날 낮의 바탕색 결정 */   /* 2026-10-18 사용자 "인사이트 카드들이 본문이랑 구분이 안가 살짝 배경에 색을": 옅은 파랑 바탕 */   /* #13: 기회맵 시사점 */
   .gopi-h{ font-size:13px; font-weight:700; color:var(--accent2text); margin-bottom:8px; }
   .gopi-row{ display:flex; align-items:flex-start; gap:8px; font-size:14px; line-height:1.6; color:var(--text); padding:3px 0; }
   .gopi-row .gop-sw{ margin-top:6px; }
@@ -570,7 +570,7 @@
   /* ===== 2026-10-16 가시성·가독성(사용자 승인 — 견본 project/mobile-chart-bot/견본/2026-10-16-가시성-가독성/) =====
      글자 크기는 위 선언을 한 단계씩 올렸다(9~10.5→12 · 11→12.5 · 11.5·12→13 · 12.5→13.5 · 13→14 · 13.5→14.5 · 14→15 · 15→16 · 16→17).
      페이지 제목(header h1 20px)은 사용자 지시로 그대로 둔다. */
-  .sectitle, .histsec h2, .pubsec h2, .cmpsec h2{ font-size:20px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; padding:8px 14px; background:#e8effd; border-radius:10px; line-height:1.25; }   /* 2026-10-18 A안의 왼쪽 강조선 → 같은 날 밤 사용자 "3안이 좋을거같아": 제목 줄 전체 옅은 파랑 띠(견본 2026-10-18-구간제목 3안) */
+  .sectitle, .histsec h2, .pubsec h2, .cmpsec h2{ font-size:20px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; padding:0; color:var(--accent); line-height:1.25; }   /* 2026-10-18 밤 사용자 "구분감이 생겼으니까 제목은 배경색말고 글자색변경으로 강조": 띠 제거, 파란 글자(견본 2026-10-18-구간제목 8안) */   /* 2026-10-18 A안의 왼쪽 강조선 → 같은 날 밤 사용자 "3안이 좋을거같아": 제목 줄 전체 옅은 파랑 띠(견본 2026-10-18-구간제목 3안) */
   .gopi-h{ font-size:13.5px; }
   .aibdn{ color:#e07c12; font-weight:600; }
   .gop-insight.pm-top{ margin:0 0 12px; }
