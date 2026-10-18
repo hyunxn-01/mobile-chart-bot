@@ -545,6 +545,7 @@
   .mkbrief-hint{ margin-left:auto; font-size:11.5px; color:var(--muted); font-weight:600; flex:0 0 auto; }
   .mkbrief-hint::after{ content:'펼쳐보기 ▾'; }
   .mkbrief[open] .mkbrief-hint::after{ content:'접기 ▴'; }
+  .mkbrief.closing .mkbrief-hint::after, .intro.closing .intro-hint::after{ content:'펼쳐보기 ▾'; }   /* 2026-10-18 밤 접기 애니메이션: 접히는 동안 글자를 먼저 바꾼다 */
   .mkbrief-calrow{ position:relative; margin:0; }
   .mkbrief-row2{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:2px 0 12px; }
   .mkbrief-row2 .mkbrief-axis{ margin:0; }
@@ -2547,6 +2548,30 @@ function segInit(){
 segInit();
 addEventListener('resize', function(){ document.querySelectorAll('.seg').forEach(function(s){ if(s._seg) s._seg(); }); });
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ document.querySelectorAll('.seg').forEach(function(s){ if(s._seg) s._seg(); }); }); }
+// ===== 2026-10-18 밤 사용자 "프로젝트 소개랑 ai시장 브리핑 접고 펼치기할때 부드럽게 애니매이션 추가" → 두 details의 높이를 0.25초로 늘리고 줄인다 =====
+// 기본 동작(즉시 열림)을 막고 Web Animations API로 높이를 움직인다. 움직임 줄이기 설정이면 기본 동작 그대로. 움직이는 중에 다시 누르면 그 자리에서 반대로 간다.
+function detailsAnim(d){
+  var sum=d.querySelector(':scope > summary'); if(!sum) return;
+  var anim=null;
+  var done=function(){ d.style.height=''; d.style.overflow=''; d.classList.remove('closing'); anim=null; };
+  sum.addEventListener('click', function(e){
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    e.preventDefault();
+    var from=d.offsetHeight;                       // 움직이는 중이면 지금 높이에서 이어 간다
+    if(anim){ anim.cancel(); anim=null; }
+    d.style.overflow='hidden'; d.style.height=from+'px';
+    var to, opening;
+    if(d.open && !d.classList.contains('closing')){ opening=false; d.classList.add('closing'); to=sum.offsetHeight; }
+    else { opening=true; d.classList.remove('closing'); d.open=true; to=d.scrollHeight; }
+    anim=d.animate([{height:from+'px'},{height:to+'px'}],{duration:250, easing:'cubic-bezier(.2,.7,.2,1)'});
+    var settle=function(){ if(!opening) d.open=false; done(); };
+    anim.onfinish=settle;
+    anim.oncancel=function(){ anim=null; };
+    // 안전 장치: 보이지 않는 탭 등 애니메이션 시계가 멈춘 환경에서는 끝 이벤트가 안 오므로 0.4초 뒤 상태를 직접 정리한다
+    var guard=anim; setTimeout(function(){ if(anim===guard){ try{ guard.cancel(); }catch(e){} settle(); } }, 400);
+  });
+}
+['.intro','#mkbrief'].forEach(function(sel){ var d=document.querySelector(sel); if(d) detailsAnim(d); });
 </script>
 </body>
 </html>
