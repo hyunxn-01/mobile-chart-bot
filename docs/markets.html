@@ -2229,13 +2229,14 @@ function renderMarketBrief(text){
       if(hm){ seen=true; let title=hm[1].split(/\s+[—–-]\s+/)[0].trim(); if(/^진출\s*전략$/.test(title)) title='핵심 시사점';   // 2026-10-19 사용자: 글로벌의 '진출 전략'을 시장별과 같은 '핵심 시사점'으로(저장된 옛 브리핑 · 과거 기록도 같은 이름으로 보이게)
         cur={title, bullets:[]}; cards.push(cur); return; }
       if(!seen||!cur) return;   // '##' 전 준비멘트 무시
+      if(/^\**참고\**\s*[:：]/.test(t)) return;   // 2026-10-19: 글 끝 작성 과정 설명('참고: …' 줄)은 표시하지 않는다(앞 불릿 끝에 붙어 할 일처럼 보이던 문제). 불릿('- 참고 …')은 그대로
       const bm=t.match(/^[-•*]\s+(.*)$/);
       if(bm){ cur.bullets.push(bm[1]); }
       else if(cur.bullets.length){ cur.bullets[cur.bullets.length-1]+=(/^[,.)\]}%!?:;·、，。」]/.test(t)?'':' ')+t; }
       else { cur.bullets.push(t); }
     });
     if(!cards.length) return '<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>';
-    const isStrat=c=>/진출\s*전략|시사점|전략|실행\s*방안/.test(c.title);   // 전략·시사점·실행 방안 카드 = 두괄식 상단(2026-10-14 '실행 방안' 추가)
+    const isStrat=c=>/진출\s*전략|시사점|전략|실행\s*방안|눈여겨볼\s*게임/.test(c.title);   // 전략·시사점·실행 방안·눈여겨볼 게임 카드 = 두괄식 상단(2026-10-14 '실행 방안' 추가, 2026-10-19 '눈여겨볼 게임' 추가 — '실행 방안'은 10-19 생성분 지난 기록용으로 남김)
     const strat=cards.filter(isStrat), rest=cards.filter(c=>!isStrat(c));
     const bl=b=>'<div class="mkb-li">'+inline(b)+'</div>';
     // 요약(첫 불릿)이 여러 문장으로 길어지면 첫 문장만 요약, 나머지는 분석으로 내림(요약>분석 방지 · grounding 문장이 요약에 붙는 문제 보정). 110자 이하 단문 요약은 건드리지 않음.
