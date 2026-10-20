@@ -42,7 +42,9 @@ RECIPIENT_EMAIL = os.environ.get('RECIPIENT_EMAIL')
 # === AI 분석 모델 (변경 시 이 한 줄만 수정) ===
 CLAUDE_MODEL = 'claude-opus-5-5'
 # 게임명 한글 변환용 모델(저비용·캐시). 음차/표기 변환은 호출이 작고 결과는 캐시돼 비용 미미.
-TRANSLATE_MODEL = 'claude-sonnet-4-6'
+# 2026-10-20 Sonnet 4.6 → Sonnet 5.5(사용자 "다 최신 버전으로"). 5.5는 적응형 사고가 기본으로 켜져 있어(사고 끄기 disabled는 400) 호출에서 effort low로 가볍게 하고,
+# 사고도 max_tokens에 들어가므로 상한을 넉넉히(4000 → 8000). 응답은 블록 type으로 text만 읽는다.
+TRANSLATE_MODEL = 'claude-sonnet-5-5'
 # 적응형 사고 강도: high(기본)=거의 항상 깊게 사고하되 max보다 사고토큰 절감(비용↓, 품질 거의 동일). 값: low/medium/high/max.
 THINKING_EFFORT = 'high'
 # 출력 토큰 상한(사고+응답 합산). 사고가 길어도 응답이 잘리지 않게 넉넉히.
@@ -341,7 +343,7 @@ def translate_titles_kr(titles):
                   "한국 정식 서비스명이 있으면 그 이름을, 없으면 한글 음차로. 뜻 번역이 아니라 '게임 이름'만. "
                   "잘 모르면 한글 음차라도 반드시 한국어로. 출력은 JSON 객체 {\"원문\":\"한국어\"} 하나만, 다른 말 없이.\n\n" + listing)
         try:
-            msg = client.messages.create(model=TRANSLATE_MODEL, max_tokens=4000,
+            msg = client.messages.create(model=TRANSLATE_MODEL, max_tokens=8000, output_config={'effort': 'low'},
                                          messages=[{'role': 'user', 'content': prompt}])
             txt = next((b.text for b in msg.content if getattr(b, 'type', None) == 'text'), '') or ''
             s, e = txt.find('{'), txt.rfind('}')

@@ -195,7 +195,9 @@ def classify(app, api_genre=''):
     return (REMAP.get(g, '캐주얼') or '캐주얼'), '', 'fallback'
 
 
-AI_MODEL = 'claude-opus-4-8'
+# 2026-10-20 Opus 4.8 → Opus 5.5(사용자 "다 최신 버전으로"). Opus 5.5는 사고가 기본으로 켜져 있어 effort low · max_tokens 8000.
+# 참고: 지금 파이프라인(chart_collector · build_dashboard)은 장르를 AppMagic 기준으로 쓰고 이 폴백을 부르지 않는다.
+AI_MODEL = 'claude-opus-5-5'
 
 
 def ai_classify(items, client, model=AI_MODEL):
@@ -215,7 +217,7 @@ def ai_classify(items, client, model=AI_MODEL):
         f"[택소노미]\n{taxo}\n\n[게임] (인덱스\\t제목\\t개발사\\t앱스토어장르\\t설명)\n" + '\n'.join(lines) +
         "\n\n[출력] 각 줄 '인덱스|상위|서브'만(서브 없으면 '인덱스|상위|'). 설명·머리말 금지.")
     try:
-        msg = client.messages.create(model=model, max_tokens=3000,
+        msg = client.messages.create(model=model, max_tokens=8000, output_config={'effort': 'low'},
                                      messages=[{'role': 'user', 'content': prompt}])
         text = ''.join(getattr(b, 'text', '') for b in msg.content)
     except Exception as e:

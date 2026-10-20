@@ -75,6 +75,7 @@ mobile-chart-bot/
 
 - **Python 3.11**
 - **Claude API** (`claude-opus-5-5`, 적응형 사고 + effort=high, 스트리밍 호출) — AI 인사이트 생성
+- **Claude API** (`claude-sonnet-5-5`, effort=low) — 중국어 · 일본어 게임명 한글 표기(새 게임만, 결과는 캐시)
 - **Chart.js + chartjs-plugin-zoom** — 대시보드 시각화
 - **GitHub Pages** — 대시보드 호스팅
 - **GitHub Actions** — 실행 환경 + 데이터 커밋

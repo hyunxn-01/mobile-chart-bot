@@ -14,7 +14,7 @@
 | **목적** | 사업PM 포트폴리오의 시장 인텔리전스(Market Intelligence) 축 |
 | **실행 주기** | 매일 한국시간 오전 7시 37분 (cron-job.org 트리거) |
 | **출력** | 이메일 리포트 (평일=라이트 / 종합 보고일=엑셀 첨부) |
-| **AI 모델** | Claude Opus 5.5 (`claude-opus-5-5`, 코드 상단 `CLAUDE_MODEL` 상수로 관리. 2026-10-18에 Opus 4.8에서 교체) |
+| **AI 모델** | Claude Opus 5.5 (`claude-opus-5-5`, 코드 상단 `CLAUDE_MODEL` 상수로 관리. 2026-10-18에 Opus 4.8에서 교체). 중국어 · 일본어 게임명 한글 표기는 Claude Sonnet 5.5(`claude-sonnet-5-5`, `TRANSLATE_MODEL`, 2026-10-20에 Sonnet 4.6에서 교체) |
 | **월 운영비** | 약 $2 (Opus 4.7 · 하루 1회 호출 당시 추정). Opus 5.5 단가는 입력 $4 · 출력 $20 / 100만 토큰으로 Opus 4.8($5 · $25)보다 20% 낮다 |
 | **저장소** | GitHub Private 레포 |
 
