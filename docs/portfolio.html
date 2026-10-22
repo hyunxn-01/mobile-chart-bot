@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>김동현 · 포트폴리오</title>
+<!-- 2026-10-22 사용자 "포트폴리오를 링크로 제출하는 란이 크래프톤에는 있어서 링크하나에 버튼 2개 만들어서 유저동향 사이트랑 시장분석 대시보드 두개 버튼 있는것 만들어줘".
+     디자인은 포트폴리오 링크 PDF 9판의 링크 상자(연한 파란 바탕 · 굵은 파란 테두리 · 화살표 원)와 같게. 상자 전체가 링크다. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{ background:#f3f4f6; color:#1d1d1b; font-family:'Noto Sans KR',-apple-system,'Segoe UI','Malgun Gothic',sans-serif; }
+  h1,h2{ font-family:'NanumSquare','Noto Sans KR',sans-serif; }
+  .wrap{ max-width:760px; margin:0 auto; padding:56px 20px 40px; }
+  .kicker{ display:inline-block; font-size:12.5px; font-weight:700; color:#2563eb; letter-spacing:.14em; border:1px solid #b7cbf2; background:#eef4ff; border-radius:999px; padding:4px 12px; margin-bottom:14px; }
+  h1{ font-size:32px; margin:0 0 10px; letter-spacing:-.01em; line-height:1.25; }
+  .sub{ font-size:15px; color:#44433f; line-height:1.65; margin:0 0 14px; word-break:keep-all; }
+  .pcchip{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #b7cbf2; color:#1d4ed8; font-weight:800; font-size:13px; border-radius:999px; padding:5px 13px 5px 10px; margin-bottom:26px; }
+  .pcchip svg{ width:16px; height:16px; }
+  a.card{ display:flex; align-items:center; gap:18px; text-decoration:none; color:inherit; background:#eef4ff; border:2px solid #2563eb; border-radius:16px; padding:22px 22px 22px 24px; margin-bottom:16px; box-shadow:0 2px 4px rgba(37,99,235,.10), 0 10px 24px rgba(37,99,235,.18); transition:transform .15s ease, box-shadow .15s ease; }
+  a.card:hover{ transform:translateY(-2px); box-shadow:0 4px 8px rgba(37,99,235,.14), 0 14px 30px rgba(37,99,235,.24); }
+  a.card:focus-visible{ outline:3px solid #1d4ed8; outline-offset:3px; }
+  .body{ flex:1 1 auto; min-width:0; }
+  .tag{ display:inline-block; font-size:12px; font-weight:800; color:#fff; background:#6d5fe0; border-radius:7px; padding:3px 9px; margin-bottom:8px; }
+  h2{ font-size:21px; margin:0 0 6px; line-height:1.3; word-break:keep-all; }
+  .desc{ font-size:14px; line-height:1.6; color:#2b2b28; margin:0 0 8px; word-break:keep-all; }
+  .url{ font-size:13px; font-weight:700; color:#1d4ed8; text-decoration:underline; text-underline-offset:3px; overflow-wrap:anywhere; }
+  .go{ flex:0 0 auto; width:48px; height:48px; border-radius:50%; background:#2563eb; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 14px rgba(37,99,235,.35); }
+  .go svg{ width:24px; height:24px; }
+  .who{ margin-top:26px; font-size:13px; color:#44433f; }
+  .who b{ font-size:15px; color:#1d1d1b; margin-right:6px; }
+  @media (max-width:560px){ .wrap{ padding:32px 16px 28px; } h1{ font-size:26px; } a.card{ padding:18px; gap:12px; } h2{ font-size:18px; } .go{ width:40px; height:40px; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="kicker">포트폴리오</div>
+  <h1>김동현 · 게임 사업PM 포트폴리오</h1>
+  <p class="sub">직접 만들어 운영하고 있는 대시보드 두 개입니다. 버튼을 누르면 각 대시보드로 이동됩니다.</p>
+  <div class="pcchip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>PC 화면에서 보시는 것을 권장합니다</div>
+
+  <a class="card" href="https://hyunxn-01.github.io/game-voc-dashboard/" target="_blank" rel="noopener">
+    <div class="body">
+      <span class="tag">유저 동향</span>
+      <h2>게임 유저 VOC · 동향 대시보드</h2>
+      <p class="desc">로스트아크 국내 · 해외 커뮤니티 4곳의 글을 매주 모아 주제 · 감성 · 의견 유형으로 분류하고, 평시 대비 급증한 이슈를 찾습니다.</p>
+      <span class="url">hyunxn-01.github.io/game-voc-dashboard/</span>
+    </div>
+    <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  </a>
+
+  <a class="card" href="https://hyunxn-01.github.io/mobile-chart-bot/markets.html" target="_blank" rel="noopener">
+    <div class="body">
+      <span class="tag">시장 분석</span>
+      <h2>모바일 게임 다국가 시장분석 대시보드</h2>
+      <p class="desc">주요 시장 애플 앱스토어의 매출 · 인기 차트를 매일 수집해 추세 · 장르 · 퍼블리셔 · 급변을 읽습니다.</p>
+      <span class="url">hyunxn-01.github.io/mobile-chart-bot/markets.html</span>
+    </div>
+    <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  </a>
+
+  <div class="who"><b>김동현</b> hyunxn_01@naver.com</div>
+</main>
+</body>
+</html>
