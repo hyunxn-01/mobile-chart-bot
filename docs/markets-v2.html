@@ -650,11 +650,21 @@
   .intro{ box-shadow:none; border-color:var(--hair); }
   /* 위 고정 줄: 구간 바로가기(지금 보는 구간에 남색 밑줄 3px) · 시장 · 매출/인기.
      2026-10-24 밤 사용자 "밑에 강조색 두께를 조금 더 두껍게" · "화면상단에 틀고정 되면 배경색이생기면 좋을거같아"
-     → 밑줄 2px → 3px. 화면 위에 붙으면(.is-stuck, 줄 바로 앞 표지를 IntersectionObserver로 본다) 옅은 남색 회색(--panel) 바탕 + 그림자.
-     흰 바탕은 흰 카드 위에서 구분이 약했고, 남색 바탕은 바로 아래 보라 브리핑 머리띠와 강한 색이 겹쳐 옅은 남색 회색을 골랐다(견본 비교). */
+     → 밑줄 2px → 3px. 화면 위에 붙으면(.is-stuck, 줄 바로 앞 표지를 IntersectionObserver로 본다) 남색(--act) 바탕 + 그림자, 글자 · 밑줄은 흰색.
+     처음엔 옅은 남색 회색(--panel)이었으나 사용자 "진한색으로 해줘 아직도 구별이 안가네"로 남색으로 바꿨다(같은 날 밤). */
   .topnav{ position:sticky; top:0; z-index:80; background:var(--page); border-bottom:1px solid var(--hair); transition:background-color .2s ease, box-shadow .2s ease; }
-  .topnav.is-stuck{ background:var(--panel); box-shadow:0 2px 12px rgba(15,23,42,.12); }
-  .topnav.is-stuck .navsrc-wrap.seg{ background:#fff; }   /* 매출/인기 상자는 바탕(--panel)과 같은 색이라 붙었을 때는 흰색으로 */
+  .topnav.is-stuck{ background:var(--act); border-bottom-color:var(--act); box-shadow:0 2px 12px rgba(15,23,42,.22); }
+  .topnav.is-stuck .chaplabel, .topnav.is-stuck .navmkt-label{ color:rgba(255,255,255,.86); }
+  .topnav.is-stuck .chapdot:hover .chaplabel, .topnav.is-stuck .chapdot.active .chaplabel{ color:#fff; }
+  .topnav.is-stuck .chapdot.active{ border-bottom-color:#fff; }
+  .topnav.is-stuck .chapdot:focus-visible, .topnav.is-stuck .navmkt:focus-visible{ outline-color:#fff; }
+  .topnav.is-stuck .navmkt{ border-color:#fff; }
+  .topnav.is-stuck .navsrc-wrap.seg{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.3); }
+  .topnav.is-stuck .navsrc-wrap.seg > button{ color:rgba(255,255,255,.9); }
+  .topnav.is-stuck .navsrc-wrap.seg > button:hover:not(:disabled){ color:#fff; }
+  .topnav.is-stuck .navsrc-wrap.seg > button[aria-selected="true"]{ background:#fff; color:var(--act); }
+  .topnav.is-stuck .navsrc-wrap.seg.seg-ready > button[aria-selected="true"]{ background:transparent; }
+  .topnav.is-stuck .navsrc-wrap .seg-pill{ background:#fff; }
   .topnav-sentinel{ height:1px; margin-bottom:-1px; }
   @media (prefers-reduced-motion: reduce){ .topnav{ transition:none; } }
   .topnav-in{ max-width:1344px; margin:0 auto; padding:0 22px; display:flex; align-items:stretch; gap:16px; min-height:52px; }
