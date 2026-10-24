@@ -648,12 +648,19 @@
   .wrap-head header{ padding-bottom:14px; }
   .maker-label{ font-size:12px; }
   .intro{ box-shadow:none; border-color:var(--hair); }
-  /* 위 고정 줄: 구간 바로가기(지금 보는 구간에 남색 밑줄) · 시장 · 매출/인기 */
-  .topnav{ position:sticky; top:0; z-index:80; background:var(--page); border-bottom:1px solid var(--hair); }
+  /* 위 고정 줄: 구간 바로가기(지금 보는 구간에 남색 밑줄 3px) · 시장 · 매출/인기.
+     2026-10-24 밤 사용자 "밑에 강조색 두께를 조금 더 두껍게" · "화면상단에 틀고정 되면 배경색이생기면 좋을거같아"
+     → 밑줄 2px → 3px. 화면 위에 붙으면(.is-stuck, 줄 바로 앞 표지를 IntersectionObserver로 본다) 옅은 남색 회색(--panel) 바탕 + 그림자.
+     흰 바탕은 흰 카드 위에서 구분이 약했고, 남색 바탕은 바로 아래 보라 브리핑 머리띠와 강한 색이 겹쳐 옅은 남색 회색을 골랐다(견본 비교). */
+  .topnav{ position:sticky; top:0; z-index:80; background:var(--page); border-bottom:1px solid var(--hair); transition:background-color .2s ease, box-shadow .2s ease; }
+  .topnav.is-stuck{ background:var(--panel); box-shadow:0 2px 12px rgba(15,23,42,.12); }
+  .topnav.is-stuck .navsrc-wrap.seg{ background:#fff; }   /* 매출/인기 상자는 바탕(--panel)과 같은 색이라 붙었을 때는 흰색으로 */
+  .topnav-sentinel{ height:1px; margin-bottom:-1px; }
+  @media (prefers-reduced-motion: reduce){ .topnav{ transition:none; } }
   .topnav-in{ max-width:1344px; margin:0 auto; padding:0 22px; display:flex; align-items:stretch; gap:16px; min-height:52px; }
   .chaplinks{ display:flex; align-items:stretch; flex:1 1 auto; min-width:0; overflow-x:auto; scrollbar-width:none; }
   .chaplinks::-webkit-scrollbar{ display:none; }
-  .topnav .chapdot{ display:flex; align-items:center; padding:0 10px; margin-bottom:-1px; text-decoration:none; border-bottom:2px solid transparent; border-radius:0; background:none; white-space:nowrap; transition:none; }
+  .topnav .chapdot{ display:flex; align-items:center; padding:0 10px; margin-bottom:-1px; text-decoration:none; border-bottom:3px solid transparent; border-radius:0; background:none; white-space:nowrap; transition:none; }
   .topnav .chapdot::before{ display:none; }
   .topnav .chaplabel{ font-size:14px; font-weight:600; color:var(--ink2); }
   .topnav .chapdot:hover{ background:none; }
@@ -817,6 +824,7 @@
     <p class="meta" id="meta">불러오는 중…</p>
   </header>
 </div>
+<div class="topnav-sentinel" id="topnavSentinel" aria-hidden="true"></div>   <!-- 2026-10-24 밤: 위 고정 줄이 화면 위에 붙었는지 아는 표지 -->
 <nav class="chapnav topnav" id="chapnav" aria-label="구간 바로가기">   <!-- 2026-10-24 재디자인: 왼쪽 메뉴를 위 고정 줄로. 클래스 · id(chapdot · countrySelNav · navsrc)는 기존 코드가 그대로 쓴다 -->
   <div class="topnav-in">
     <div class="chaplinks">
@@ -2832,6 +2840,9 @@ function renderWeekly(){
   board.innerHTML=h;
 }
 document.addEventListener('click', e=>{ const b=e.target.closest && e.target.closest('.wk-mk'); if(!b) return; const cc=b.getAttribute('data-mk'); if(cc && cc!==MK_CC){ loadMarket(cc); renderWeekly(); } });
+// 위 고정 줄이 화면 위에 붙으면 바탕색 · 그림자(2026-10-24 밤 사용자 "화면상단에 틀고정 되면 배경색이생기면 좋을거같아"). 줄 바로 앞 표지가 화면 위로 사라지면 붙은 것이다
+(function(){ const mark=document.getElementById('topnavSentinel'), nav=document.getElementById('chapnav'); if(!mark || !nav || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(es=>{ es.forEach(e=>nav.classList.toggle('is-stuck', !e.isIntersecting && e.boundingClientRect.top<0)); }).observe(mark); })();
 </script>
 </body>
 </html>
