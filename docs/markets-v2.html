@@ -637,7 +637,7 @@
      글자 #0F172A · 보조 #475569 · 선 #CBD5E1 · 바탕 #F8FAFC · 옅은 판 #E9EEF5 · 판 #FFF(조작하는 표 · 그래프) ·
      남색 #1E3A5F(--act: 누르는 것 · 고른 것, 흰 바탕 11.5:1) · 금색 #A16207(1위 큰 숫자에만, 흰 바탕 4.9:1) · 빨강 #C8372F(순위 상승만, 흰 바탕 5.2:1). 하락은 보조 회색.
      옛 파랑 --accent(아래 구간의 제목 · 단추 · 표의 누르는 이름)도 남색을 따른다. 그대로 두는 것: 보라(--accent2, '보기 종류' 전환 단추, 10-18 사용자 결정),
-     인사이트 칸의 옅은 파랑(10-18 사용자 결정), 구간 시장 선택의 주황 테두리, 데이터 색(시장 · 장르 · 진입 맵 사분면 · 그래프 선). AI 브리핑의 보라 상자는 첫 화면 글로 바뀌었다. */
+     인사이트 칸의 옅은 파랑(10-18 사용자 결정), 구간 시장 선택의 주황 테두리, 데이터 색(시장 · 장르 · 진입 맵 사분면 · 그래프 선). AI 브리핑은 맨 위 흰 판 + 보라 머리띠(10-24 밤 사용자 "2안이 좋아보여", 보라는 10-18의 브리핑 보라). */
   :root{ --ink:#0F172A; --ink2:#475569; --hair:#CBD5E1; --page:#F8FAFC; --act:#1E3A5F; --gold:#A16207; --up:#C8372F; --upbg:#FBECEA; --dnbg:#EEF0F3;
     --text:#0F172A; --muted:#475569; --line:#CBD5E1; --panel:#E9EEF5; --accent:var(--act); }
   /* 숫자로 박힌 파랑을 누르는 색으로: '시장 이름을 누르면' 안내 칩 · 누를 수 있는 표 행의 마우스 올림 */
@@ -670,8 +670,8 @@
   .topnav .navsrc-wrap.seg{ display:inline-flex; flex:0 0 auto; flex-wrap:nowrap; margin:0; padding:3px; border:1px solid var(--line); }
   .topnav .navsrc-wrap.seg > button{ flex:0 0 auto; padding:5px 14px; }
   #weeksec, #mkbrief, .seccard, .histsec, .cmpsec, .pubsec, #chartsec{ scroll-margin-top:66px; }
-  /* 주요 시장 주간 순위(첫 화면의 강조 한 곳): 1위는 금색 큰 숫자, 나머지는 조용히 */
-  .weeksec{ margin-top:22px; }
+  /* 주요 시장 주간 순위(AI 브리핑 다음 구간): 1위는 금색 큰 숫자, 나머지는 조용히 */
+  .weeksec{ margin-top:30px; }
   .wk-head{ display:flex; align-items:center; gap:6px 16px; flex-wrap:wrap; margin:0 0 10px; }
   .wk-head h2, .ai-head h2{ font-size:20px; font-weight:800; color:var(--ink); margin:0; letter-spacing:-.01em; line-height:1.3; }
   .wk-cap{ margin:0; font-size:14px; color:var(--ink2); display:inline-flex; align-items:center; flex-wrap:wrap; gap:2px 6px; }
@@ -734,15 +734,26 @@
     .wk-hint{ margin-left:0; }
     .wk-swipe{ display:block; margin:6px 0 0; font-size:12px; color:var(--ink2); text-align:center; }
   }
-  /* AI 시장 브리핑: 상자 없이 첫 화면 글로. 글자 크기는 2026-10-18 사용자 결정("너무 커" → 본문 14px · 카드 제목 15px · 탭 12.5px)대로 두고, 요약 한 줄은 굵기로만 구분한다 */
-  .aiblock{ margin-top:30px; }
+  /* AI 시장 브리핑(화면의 코어): 맨 위 흰 판 + 보라 머리띠. 2026-10-24 밤 사용자 "ai 브리핑은 요약과 자세히는 유지하자. 그리고 브리핑 섹션을 좀더 강조하고싶어
+     우리 대시보드의 코어 요소니까" → 견본 3안 중 "2안이 좋아보여"(보라는 10-18의 브리핑 보라). 항목은 종전 카드(요약 한 줄 + 자세히), 핵심 항목은 위 줄에 넓게.
+     글자 크기는 2026-10-18 사용자 결정("너무 커" → 본문 14px · 카드 제목 15px · 탭 12.5px) 그대로. 판에 overflow:hidden을 주지 않는다(과거 기록 달력이 판 밖으로 나가도 잘리지 않게) */
+  .aiblock{ margin-top:22px; }
   .aiblock[hidden]{ display:none !important; }
-  .ai-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:10px 16px; flex-wrap:wrap; }
-  .ai-sub{ margin:4px 0 0; font-size:13px; color:var(--ink2); }
+  #mkbrief.aiblock{ background:#fff; border:1px solid var(--hair); border-radius:14px; box-shadow:0 1px 2px rgba(15,23,42,.05), 0 10px 28px rgba(15,23,42,.08); }
+  .ai-head{ display:flex; align-items:center; justify-content:space-between; gap:10px 16px; flex-wrap:wrap; background:var(--accent2text); padding:16px 20px; border-radius:13px 13px 0 0; }
+  #mkbrief .ai-head h2{ color:#fff; }
+  .ai-sub{ margin:4px 0 0; font-size:13px; color:rgba(255,255,255,.88); }
   .ai-date:has(#mkbriefDate:empty){ display:none; }
   .aiblock .mkbrief-row2{ margin:0; gap:10px; }
   .aiblock .mkbrief-axis.seg{ margin:0; }
-  #mkbrief .mkbrief-tabs{ margin:12px 0 18px; gap:6px; }
+  #mkbrief .ai-head .seg{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.3); }
+  #mkbrief .ai-head .seg > button{ color:rgba(255,255,255,.9); }
+  #mkbrief .ai-head .seg > button:hover:not(:disabled){ color:#fff; }
+  #mkbrief .ai-head .seg > button[aria-selected="true"]{ background:#fff; color:var(--accent2text); }
+  #mkbrief .ai-head .seg.seg-ready > button[aria-selected="true"]{ background:transparent; }
+  #mkbrief .ai-head .seg .seg-pill{ background:#fff; }
+  #mkbrief .ai-head .mkbrief-cal{ background:#fff; color:var(--ink); border-color:#fff; }
+  #mkbrief .mkbrief-tabs{ margin:0; padding:14px 20px 12px; gap:6px; }
   #mkbrief .mkbrief-tab{ background:#fff; border:1px solid var(--hair); color:var(--ink2); font-size:12.5px; padding:6px 12px; border-radius:8px; }
   #mkbrief .mkbrief-tab:hover{ border-color:var(--act); color:var(--ink); }
   #mkbrief .mkbrief-tab[aria-selected="true"]{ background:var(--act); border-color:var(--act); color:#fff; }
@@ -752,28 +763,12 @@
   #mkbrief .mkcal-d.has{ background:var(--panel); color:var(--act); }
   #mkbrief .mkcal-d.has:hover{ background:var(--act); color:#fff; }
   #mkbrief .mkcal-dow span, #mkbrief .mkcal-note{ font-size:12px; }
-  #mkbrief .mkbrief-body{ font-size:14px; line-height:1.7; }
-  .aif-top{ display:grid; grid-template-columns:minmax(0,7fr) minmax(0,5fr); gap:20px 56px; }
-  .aif-top.solo{ grid-template-columns:minmax(0,1fr); max-width:900px; }
-  .aif-h{ font-family:'NanumSquare','Noto Sans KR',sans-serif; font-size:15px; font-weight:800; color:var(--ink); margin:0 0 8px; }
-  .aif-lead{ font-size:14px; font-weight:700; line-height:1.6; color:var(--ink); margin:0 0 10px; }
-  .aif-list{ list-style:none; margin:0; padding:0; }
-  .aif-list li{ position:relative; padding-left:14px; margin:0 0 7px; font-size:14px; line-height:1.7; color:var(--ink); }
-  .aif-list li::before{ content:''; position:absolute; left:2px; top:.72em; width:5px; height:5px; border-radius:50%; background:#8A93A3; }
-  .aif-more{ appearance:none; border:1px solid var(--hair); background:#fff; color:var(--ink2); font:inherit; font-size:13px; font-weight:700; padding:5px 12px; border-radius:999px; cursor:pointer; margin-top:2px; }
-  .aif-more:hover{ border-color:var(--act); color:var(--act); }
-  .aif-more:focus-visible{ outline:2px solid var(--act); outline-offset:2px; }
-  .aif-rest{ margin-top:22px; border-top:1px solid var(--hair); }
-  .aif-rest > summary{ list-style:none; cursor:pointer; display:flex; align-items:baseline; gap:10px; padding:12px 0; font-size:14px; font-weight:700; color:var(--ink); user-select:none; -webkit-user-select:none; }
-  .aif-rest > summary::-webkit-details-marker{ display:none; }
-  .aif-rest > summary:focus-visible{ outline:2px solid var(--act); outline-offset:2px; border-radius:4px; }
-  .aif-rest-n{ font-weight:400; color:var(--ink2); font-size:13px; }
-  .aif-rest > summary::after{ content:'펼쳐보기 ▾'; margin-left:auto; flex:0 0 auto; font-size:13px; font-weight:600; color:var(--ink2); }
-  .aif-rest[open] > summary::after{ content:'접기 ▴'; }
-  .aif-rest.closing > summary::after{ content:'펼쳐보기 ▾'; }
-  .aif-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:0 56px; padding-bottom:6px; }
-  #mkbrief .aib-sec{ background:none; border:0; border-top:1px solid var(--hair); border-radius:0; padding:12px 0 8px; margin:0; }
-  #mkbrief .aib-h{ font-size:15px; color:var(--ink); }
+  #mkbrief .mkbrief-body{ font-size:14px; line-height:1.7; padding:0 20px 20px; }
+  #mkbrief .aib-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap:12px; }
+  #mkbrief .aib-row-key{ grid-template-columns:repeat(auto-fit, minmax(min(380px, 100%), 1fr)); margin-bottom:12px; }
+  #mkbrief .aib-sec{ background:#fff; border:1px solid var(--hair); border-radius:10px; padding:13px 16px 12px; margin:0; }
+  #mkbrief .aib-sec-key{ background:var(--accent2soft); border-color:transparent; }
+  #mkbrief .aib-h{ font-size:15px; color:var(--ink); margin:0 0 6px; }
   #mkbrief .aib-h::before{ display:none; }
   #mkbrief .mkb-li::before{ background:#8A93A3; }
   #mkbrief strong{ color:var(--ink); font-weight:700; }
@@ -785,7 +780,9 @@
   #mkbrief .aib-srctag{ font-size:12px; color:var(--act); background:var(--panel); }
   #mkbrief .aib-srctag:hover{ background:var(--act); color:#fff; }
   #mkbrief .empty{ font-size:14px; }
-  @media (max-width:980px){ .aif-top, .aif-grid{ grid-template-columns:minmax(0,1fr); } }
+  @media (max-width:620px){ .ai-head{ padding:14px; } #mkbrief .mkbrief-tabs{ padding:12px 14px 10px; } #mkbrief .mkbrief-body{ padding:0 14px 14px; }
+    #mkbrief .mkbrief-row2 .mkbrief-calpop{ left:0; right:auto; }   /* 휴대폰은 '과거 기록' 단추가 왼쪽으로 내려와, 달력을 단추 왼쪽 끝에 맞춘다(오른쪽 맞춤이면 화면 왼쪽 밖으로 나감) */
+  }
   /* 순위 상승 · 하락 색(이 화면 전체): 상승 빨강, 하락은 보조 회색 — 한국 차트 · 증시 관례. 업데이트 표시(↻)는 회색 테두리 */
   .mvd.up{ color:var(--up); background:var(--upbg); }
   .mvd.down{ color:var(--ink2); background:var(--dnbg); }
@@ -823,8 +820,8 @@
 <nav class="chapnav topnav" id="chapnav" aria-label="구간 바로가기">   <!-- 2026-10-24 재디자인: 왼쪽 메뉴를 위 고정 줄로. 클래스 · id(chapdot · countrySelNav · navsrc)는 기존 코드가 그대로 쓴다 -->
   <div class="topnav-in">
     <div class="chaplinks">
-      <a class="chapdot active" data-target="weeksec" href="#weeksec"><span class="chaplabel">주간 순위</span></a>
-      <a class="chapdot" data-target="mkbrief" href="#mkbrief"><span class="chaplabel">AI 브리핑</span></a>
+      <a class="chapdot active" data-target="mkbrief" href="#mkbrief"><span class="chaplabel">AI 브리핑</span></a>
+      <a class="chapdot" data-target="weeksec" href="#weeksec"><span class="chaplabel">주간 순위</span></a>
       <a class="chapdot" data-target="chartcard" href="#chartcard"><span class="chaplabel">순위 추이</span></a>
       <a class="chapdot" id="navHist" data-target="histsec" href="#histsec" style="display:none"><span class="chaplabel">순위 이력</span></a>
       <a class="chapdot" data-target="cmpsec" href="#cmpsec"><span class="chaplabel">시장 비교</span></a>
@@ -891,17 +888,7 @@
     </div>
   </details>
 
-  <section class="weeksec" id="weeksec" aria-labelledby="wkTitle">   <!-- 2026-10-24 재디자인: 첫 화면 강조 한 곳. 주요 다섯 시장의 주간 1위 · 2 · 3위 · 급등 · 신규 진입 -->
-    <div class="wk-head">
-      <h2 id="wkTitle">주요 시장 주간 순위</h2>
-      <p class="wk-cap" id="wkCap">불러오는 중…</p>
-      <span class="wk-hint cap"><span class="cact">▸ 시장 이름을 누르면 아래 구간이 그 시장으로</span></span>
-    </div>
-    <div class="wk-board" id="wkBoard"></div>
-    <p class="wk-swipe" aria-hidden="true">← 옆으로 밀어서 보기 →</p>
-  </section>
-
-  <section class="aiblock" id="mkbrief" hidden aria-labelledby="aiTitle">   <!-- 2026-10-24 재디자인: 회색 · 보라 브리핑 카드 → 상자 없는 첫 화면 글. 핵심 시사점(왼쪽) · 눈여겨볼 게임(오른쪽), 나머지 항목은 '브리핑 전체 보기' 안에 -->
+  <section class="aiblock" id="mkbrief" hidden aria-labelledby="aiTitle">   <!-- 2026-10-24 밤 사용자 "2안이 좋아보여": 화면의 코어라 맨 위. 흰 판 + 보라 머리띠, 항목은 요약 + 자세히 카드(핵심 항목은 위 줄) -->
     <div class="ai-head">
       <div class="ai-tl">
         <h2 id="aiTitle">AI 시장 브리핑</h2>
@@ -917,6 +904,16 @@
     </div>
     <div class="mkbrief-tabs" id="mkbriefTabs" role="tablist" aria-label="브리핑 시장"></div>
     <div class="mkbrief-body" id="mkbriefBody"></div>
+  </section>
+
+  <section class="weeksec" id="weeksec" aria-labelledby="wkTitle">   <!-- 2026-10-24 재디자인: 주요 다섯 시장의 주간 1위 · 2 · 3위 · 급등 · 신규 진입(10-24 밤부터 AI 브리핑 다음) -->
+    <div class="wk-head">
+      <h2 id="wkTitle">주요 시장 주간 순위</h2>
+      <p class="wk-cap" id="wkCap">불러오는 중…</p>
+      <span class="wk-hint cap"><span class="cact">▸ 시장 이름을 누르면 아래 구간이 그 시장으로</span></span>
+    </div>
+    <div class="wk-board" id="wkBoard"></div>
+    <p class="wk-swipe" aria-hidden="true">← 옆으로 밀어서 보기 →</p>
   </section>
 
   <div class="seccard" id="chartcard">   <!-- 2026-10-18 밤 카드 구성: 순위 추이 제목 · 조작 줄 · 그래프를 한 카드로. 왼쪽 메뉴는 고정 위치라 카드 밖 -->
@@ -2439,19 +2436,11 @@ function renderMarketBrief(text){
         if(head&&t.length>=25) return {sum:head, rest:[t].concat(rest)}; }
       return {sum:s0, rest}; };
     const card=(c,o)=>{ const sp=sumSplit(c.bullets); let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h"><span class="aib-ht">'+inline(c.title)+'</span>'+(sp.rest.length?'<button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>':'')+'</div>'; if(sp.rest.length){ h+='<div class="aib-sum">'+bl(sp.sum)+'</div><div class="aib-detail" hidden>'+sp.rest.map(bl).join('')+'</div>'; } else { h+=bl(sp.sum); } return h+'</div>'; };   // 2026-10-18 L4: '자세히'는 제목 줄 오른쪽   // 접힘=요약(첫 문장)만 / 자세히=분석(카드별 토글)
-    // 2026-10-24 재디자인: 첫 화면은 '핵심 시사점'(왼쪽, 요약 한 줄 + 불릿 셋, 나머지는 더 보기)과 '눈여겨볼 게임'(오른쪽).
-    // 오른쪽은 지난 기록이면 '실행 방안'(10-19 생성분), 글로벌이면 '시장별 차이'. 나머지 항목은 '브리핑 전체 보기' 안에 종전 카드(자세히 단추)로 둔다.
-    let main=cards.find(c=>/시사점|진출\s*전략/.test(c.title))||null;
-    let side=cards.find(c=>/눈여겨볼\s*게임|실행\s*방안/.test(c.title))||cards.find(c=>/시장별\s*차이/.test(c.title))||null;
-    if(!main){ main=strat[0]||cards[0]; if(side===main) side=null; }
-    const others=cards.filter(c=>c!==main && c!==side);
-    const li=b=>'<li>'+inline(b)+'</li>';
-    const list=(arr,show)=>'<ul class="aif-list">'+arr.slice(0,show).map(li).join('')+'</ul>'+(arr.length>show?'<ul class="aif-list aif-extra" hidden>'+arr.slice(show).map(li).join('')+'</ul><button type="button" class="aif-more" aria-expanded="false">나머지 '+(arr.length-show)+'개 보기 ▾</button>':'');
-    const ms=sumSplit(main.bullets);
-    let html='<div class="aif-top'+(side?'':' solo')+'"><div class="aif-main"><h3 class="aif-h">'+inline(main.title)+'</h3>'+(ms.sum?'<p class="aif-lead">'+inline(ms.sum)+'</p>':'')+list(ms.rest,3)+'</div>';
-    if(side) html+='<div class="aif-side"><h3 class="aif-h">'+inline(side.title)+'</h3>'+list(side.bullets,4)+'</div>';
-    html+='</div>';
-    if(others.length) html+='<details class="aif-rest"><summary>브리핑 전체 보기 <span class="aif-rest-n">'+others.map(c=>esc(c.title)).join(' · ')+'</span></summary><div class="aif-grid">'+others.map(c=>card(c,{})).join('')+'</div></details>';
+    // 2026-10-24 밤 사용자 "ai 브리핑은 요약과 자세히는 유지하자": 모든 항목을 종전 카드(요약 한 줄 + 자세히 단추)로 보인다.
+    // 핵심 항목(시사점 · 눈여겨볼 게임 · 실행 방안)은 위 줄에 넓게, 나머지 항목은 아래 줄에 나란히.
+    let html='';
+    if(strat.length) html+='<div class="aib-row aib-row-key">'+strat.map(c=>card(c,{key:true})).join('')+'</div>';
+    if(rest.length) html+='<div class="aib-row">'+rest.map(c=>card(c,{})).join('')+'</div>';
     return html;
   }
   const cards=[]; let cur=null;
@@ -2495,7 +2484,7 @@ function selectBriefDate(date){
   const o=curAxisObj(); if(!o) return;
   const text=briefTextForDate(o,date); if(text==null) return;
   const body=document.getElementById('mkbriefBody'), dt=document.getElementById('mkbriefDate');
-  if(body){ body.innerHTML=renderMarketBrief(text); aifWire(body);
+  if(body){ body.innerHTML=renderMarketBrief(text);
     const gsrc=(MK_BRIEF_MARKET&&MK_BRIEF_MARKET.charts&&MK_BRIEF_MARKET.charts.grossing&&MK_BRIEF_MARKET.charts.grossing.games)?MK_BRIEF_MARKET.charts.grossing:((typeof DATA!=='undefined'&&DATA&&DATA.games)?DATA:null);
     if(gsrc){ const sD=DATA; DATA=gsrc; try{ linkifyGames(body); }catch(_){ } finally { DATA=sD; } } }
   const cur=String(o.generated||'').slice(0,10);
@@ -2552,7 +2541,7 @@ function renderBriefAxis(){
   { const cp=document.getElementById('mkbriefCalPop'); if(cp) cp.hidden=true; }
   renderBriefCalBtn();
   if(!o||!o.text){ if(body) body.innerHTML='<p class="empty">이 기간은 아직 데이터가 부족합니다. 기간이 완료되면 분석이 자동 생성됩니다.</p>'; if(dt) dt.textContent=''; return; }
-  if(body){ body.innerHTML=renderMarketBrief(o.text); aifWire(body);
+  if(body){ body.innerHTML=renderMarketBrief(o.text);
     const gsrc=(MK_BRIEF_MARKET&&MK_BRIEF_MARKET.charts&&MK_BRIEF_MARKET.charts.grossing&&MK_BRIEF_MARKET.charts.grossing.games)?MK_BRIEF_MARKET.charts.grossing:((typeof DATA!=='undefined'&&DATA&&DATA.games)?DATA:null);
     if(gsrc){ const sD=DATA; DATA=gsrc; try{ linkifyGames(body); }catch(_){ } finally { DATA=sD; } } }
   if(dt) dt.textContent=(String(o.generated||'').split(' ')[0]||'')+(b&&b.basis==='hierarchical'?' · 지역 종합':'');
@@ -2843,9 +2832,6 @@ function renderWeekly(){
   board.innerHTML=h;
 }
 document.addEventListener('click', e=>{ const b=e.target.closest && e.target.closest('.wk-mk'); if(!b) return; const cc=b.getAttribute('data-mk'); if(cc && cc!==MK_CC){ loadMarket(cc); renderWeekly(); } });
-// 브리핑 글의 '나머지 N개 보기'와 '브리핑 전체 보기'(접기 애니메이션은 프로젝트 소개와 같은 detailsAnim)
-function aifWire(body){ body.querySelectorAll('details.aif-rest').forEach(d=>{ if(!d._anim){ d._anim=1; detailsAnim(d); } }); }
-document.addEventListener('click', e=>{ const b=e.target.closest && e.target.closest('.aif-more'); if(!b) return; const ex=b.previousElementSibling; if(!ex || !ex.classList.contains('aif-extra')) return; const open=ex.hidden; ex.hidden=!open; b.setAttribute('aria-expanded', String(open)); b.textContent=open ? '접기 ▴' : ('나머지 '+ex.children.length+'개 보기 ▾'); });
 </script>
 </body>
 </html>
