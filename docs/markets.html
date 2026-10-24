@@ -687,70 +687,83 @@
   .topnav .navsrc-wrap.seg{ display:inline-flex; flex:0 0 auto; flex-wrap:nowrap; margin:0; padding:3px; border:1px solid var(--line); }
   .topnav .navsrc-wrap.seg > button{ flex:0 0 auto; padding:5px 14px; }
   #weeksec, #mkbrief, .seccard, .histsec, .cmpsec, .pubsec, #chartsec{ scroll-margin-top:66px; }
-  /* 주요 시장 주간 순위(AI 브리핑 다음 구간): 1위는 금색 큰 숫자, 나머지는 조용히 */
+  /* 주요 시장 주간 순위(AI 브리핑 다음 구간) — 2026-10-25 시장별 카드(견본 project/mobile-chart-bot/견본/2026-10-25-주간순위-가독성/).
+     사용자 "기존거 주요 시장 주간 순위 부분을 좀 가시성, 가독성을 높여볼 수 있어?" → "모바일2안이 좋아보이는데 이걸 pc에도 적용못해? 시장별 칸 레이아웃은 고정으로 해줘 보기 좋게"
+     → "가로선은 끝까지 잇지는말고 섹션구분만 해줘" → "1위 숫자도 넣어줘" · "제작사 ... 처리로 끊어줘" → "좋아 라이브에 이렇게 반영해줘".
+     시장마다 카드 한 장(칸 머리 · 1위 · 2위 · 3위 · 급등 · 신규 진입). 1100px 이상은 다섯 카드를 한 줄에 고정, 그보다 좁으면 옆으로 밀어 본다.
+     641px 이상은 다섯 카드의 같은 항목이 같은 높이에서 시작한다(카드마다 여섯 줄을 보드의 줄에 맞춤, CSS subgrid). 휴대폰은 카드마다 제 높이.
+     1 · 2 · 3위 숫자는 한 열(1은 금색), 1위가 바뀌었는지는 배지, 급등 · 신규 진입은 항목 이름과 숫자를 한 줄로, 제작사는 한 줄(넘치면 …),
+     가로 구분선은 항목 사이에만 카드 안쪽 여백까지, 고른 시장은 남색 칸 머리(흰 글자), 12px 글자 없음. */
   .weeksec{ margin-top:30px; }
   .wk-head{ display:flex; align-items:center; gap:6px 16px; flex-wrap:wrap; margin:0 0 10px; }
   .wk-head h2, .ai-head h2{ font-size:20px; font-weight:800; color:var(--ink); margin:0; letter-spacing:-.01em; line-height:1.3; }
   .wk-cap{ margin:0; font-size:14px; color:var(--ink2); display:inline-flex; align-items:center; flex-wrap:wrap; gap:2px 6px; }
   .wk-hint{ margin-left:auto; font-size:13px; }
-  .wk-board{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); background:#fff; border:1px solid var(--hair); border-radius:12px; }
-  .wk-col{ min-width:0; padding:14px 16px 14px; border-left:1px solid var(--hair); }
-  .wk-col:first-child{ border-left:0; border-radius:12px 0 0 12px; }
-  .wk-col:last-child{ border-radius:0 12px 12px 0; }
-  .wk-col.is-sel{ box-shadow:inset 0 3px 0 var(--act); }
+  .wk-board{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); grid-template-rows:repeat(6, auto); background:#fff; border:1px solid var(--hair); border-radius:12px; overflow:hidden; }
+  .wk-col{ display:grid; grid-row:1 / span 6; grid-template-rows:subgrid; min-width:0; border-left:1px solid var(--hair); }
+  .wk-col.is-first{ border-left:0; }
+  .wk-c{ --px:16px; --py:12px; position:relative; min-width:0; padding:var(--py) var(--px); }   /* 폭별 여백은 변수만 바꾼다(칸별 여백 규칙과 우선순위가 엉키지 않게) */
+  .wk-c2::before, .wk-cup::before, .wk-cnw::before{ content:''; position:absolute; top:0; left:var(--px); right:var(--px); height:1px; background:#E2E8F0; }   /* 항목 사이 구분선은 카드 안쪽 여백까지만(카드 끝까지 잇지 않음) */
+  .wk-ch{ padding:0; background:#F1F5F9; }
   .wk-mk{ appearance:none; border:0; background:none; padding:0; margin:0; cursor:pointer; font-family:'NanumSquare','Noto Sans KR',sans-serif; font-size:16px; font-weight:800; color:var(--ink); line-height:1.3; }
-  .wk-mk:hover{ color:var(--act); }
-  .wk-col.is-sel .wk-mk{ color:var(--act); }
   .wk-mk:focus-visible, .wk-btn:focus-visible{ outline:2px solid var(--act); outline-offset:2px; border-radius:4px; }
-  .wk-first{ display:grid; grid-template-columns:30px 44px minmax(0,1fr); align-items:start; gap:10px; margin:12px 0 10px; min-height:100px; }   /* 1위 칸 높이를 맞춰 2 · 3위 줄이 다섯 시장에서 같은 높이에 오게 */
-  .wk-n1{ font-family:'NanumSquare','Noto Sans KR',sans-serif; font-size:44px; font-weight:800; line-height:1; color:var(--gold); text-align:center; font-variant-numeric:tabular-nums; }
-  .wk-ic{ width:44px; height:44px; border-radius:10px; object-fit:cover; background:var(--chip); border:1px solid var(--hair); display:block; }
-  .wk-ic-s{ width:24px; height:24px; border-radius:6px; object-fit:cover; background:var(--chip); border:1px solid var(--hair); display:block; }
-  .wk-ph{ display:flex; align-items:center; justify-content:center; color:var(--ink2); font-size:12px; font-weight:700; }
-  .wk-fi{ min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .wk-board .wk-mk{ display:block; width:100%; padding:10px 16px 9px; text-align:left; font-size:17px; font-weight:800; line-height:1.3; color:var(--ink); }
+  .wk-ch .wk-mk:hover{ color:var(--act); text-decoration:underline; text-underline-offset:3px; }
+  .wk-col.is-sel .wk-ch{ background:var(--act); }
+  .wk-col.is-sel .wk-ch .wk-mk{ color:#fff; }
+  .wk-c1{ padding-top:calc(var(--py) + 2px); }
+  .wk-c2{ padding-bottom:3px; }
+  .wk-c3{ padding-top:5px; }
+  .wk-ph{ display:flex; align-items:center; justify-content:center; color:var(--ink2); font-size:13px; font-weight:700; }
   .wk-btn{ appearance:none; border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; text-align:left; cursor:pointer; min-width:0; max-width:100%; display:block; }
   .wk-name{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:15px; font-weight:700; line-height:1.35; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
   .wk-btn:hover .wk-name{ color:var(--act); }
-  .wk-pub{ font-size:12px; color:var(--ink2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .wk-meta{ font-size:12px; color:var(--ink2); font-variant-numeric:tabular-nums; word-break:keep-all; }
-  .wk-rest{ list-style:none; margin:0; padding:4px 0 0; border-top:1px solid var(--hair); }
-  .wk-rest li{ display:grid; grid-template-columns:30px 24px minmax(0,1fr); align-items:center; gap:10px; padding:5px 0; }
-  .wk-n{ font-family:'NanumSquare','Noto Sans KR',sans-serif; font-size:16px; font-weight:800; color:var(--ink2); text-align:center; font-variant-numeric:tabular-nums; }
-  .wk-rest .wk-name, .wk-mvg .wk-name{ -webkit-line-clamp:1; font-size:14px; font-weight:600; }
-  .wk-moves{ border-top:1px solid var(--hair); margin-top:5px; padding-top:9px; display:grid; gap:9px; }
-  .wk-mv{ min-width:0; }
-  .wk-mvh{ display:flex; align-items:baseline; gap:6px; font-size:12px; font-weight:700; color:var(--ink2); }
-  .wk-up{ font-size:15px; font-weight:800; color:var(--up); font-variant-numeric:tabular-nums; }
-  .wk-rr{ margin-left:auto; font-size:12px; font-weight:600; color:var(--ink2); font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .wk-mvg{ display:grid; grid-template-columns:24px minmax(0,1fr); align-items:center; gap:8px; margin-top:4px; }
-  .wk-none{ font-size:13px; color:var(--ink2); margin-top:4px; }
-  .wk-load{ font-size:13px; color:var(--ink2); margin:12px 0 0; }
-  @media (max-width:1179px){   /* 다섯 칸이 좁아지면 시장마다 한 줄: 시장 · 1위 · 급등 · 신규 진입 */
-    .wk-board{ grid-template-columns:minmax(0,1fr); }
-    .wk-col{ border-left:0; border-top:1px solid var(--hair); display:grid; grid-template-columns:64px minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr); align-items:center; gap:10px 18px; padding:12px 16px; border-radius:0; }
-    .wk-col:first-child{ border-top:0; border-radius:12px 12px 0 0; }
-    .wk-col:last-child{ border-radius:0 0 12px 12px; }
-    .wk-col.is-sel{ box-shadow:inset 3px 0 0 var(--act); }
-    .wk-first{ margin:0; grid-template-columns:26px 40px minmax(0,1fr); align-items:center; min-height:0; }
-    .wk-n1{ font-size:34px; }
-    .wk-ic{ width:40px; height:40px; }
-    .wk-rest{ display:none; }
-    .wk-moves{ display:contents; }
-    .wk-load{ grid-column:2/-1; margin:0; }
-  }
+  .wk-board .wk-name{ font-size:15px; font-weight:600; line-height:1.35; -webkit-line-clamp:2; color:var(--ink); }
+  .wk-first{ --icl:44px; display:grid; grid-template-columns:16px var(--icl) minmax(0,1fr); column-gap:8px; align-items:start; }
+  .wk-n1{ height:var(--icl); display:flex; align-items:center; justify-content:center; font-family:'NanumSquare','Noto Sans KR',sans-serif; font-size:24px; font-weight:800; line-height:1; color:var(--gold); font-variant-numeric:tabular-nums; }   /* 1위 숫자: 2 · 3위 숫자와 같은 왼쪽 열에, 금색으로 한 단계 크게 */
+  .wk-ic{ width:var(--icl); height:var(--icl); border-radius:11px; object-fit:cover; background:var(--chip); border:1px solid var(--hair); display:block; }
+  .wk-ic-s{ width:28px; height:28px; border-radius:7px; object-fit:cover; background:var(--chip); border:1px solid var(--hair); display:block; flex:none; }
+  .wk-ic.wk-ph, .wk-ic-s.wk-ph{ display:flex; }
+  .wk-fi{ min-width:0; margin-left:4px; }   /* 아이콘과 이름 사이 12px */
+  .wk-first .wk-name{ font-size:17px; font-weight:800; line-height:1.3; -webkit-line-clamp:3; }
+  .wk-pub{ display:block; margin-top:2px; font-size:13px; line-height:1.35; color:var(--ink2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }   /* 제작사는 한 줄, 넘치면 …(전체 이름은 마우스를 올리면) */
+  .wk-st{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; margin-top:6px; font-size:13px; line-height:1.4; color:var(--ink); }
+  .wk-badge{ display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:6px; font-size:13px; font-weight:700; white-space:nowrap; }
+  .wk-badge.is-new{ background:var(--upbg); color:#B42318; }   /* 1위가 바뀐 시장: 빨강 계열(순위 상승 색), 바탕 위 대비 5:1 이상 */
+  .wk-badge.is-run{ background:var(--panel); color:var(--act); }   /* 지켜 온 1위: 남색 */
+  .wk-avg{ font-size:13px; color:var(--ink2); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .wk-row{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .wk-row .wk-btn{ flex:1 1 auto; }
+  .wk-n{ flex:none; width:16px; margin-right:-2px; text-align:center; font-family:'NanumSquare','Noto Sans KR',sans-serif; font-size:16px; font-weight:800; color:var(--ink2); font-variant-numeric:tabular-nums; }   /* 숫자 열 16px + 8px: 1위 칸과 같은 자리에 아이콘이 오게 */
+  .wk-n:empty{ display:none; }
+  .wk-num{ display:flex; align-items:baseline; flex-wrap:wrap; gap:2px 8px; margin-bottom:6px; font-variant-numeric:tabular-nums; }
+  .wk-lab{ font-size:13px; font-weight:700; color:var(--ink2); }   /* '급등 ▲49 83→34위' · '신규 진입 20위'처럼 숫자 앞 같은 줄 */
+  .wk-up{ font-size:18px; font-weight:800; line-height:1.15; color:var(--up); }
+  .wk-nwr{ font-size:18px; font-weight:800; line-height:1.15; color:var(--ink); }
+  .wk-rr{ font-size:14px; font-weight:600; color:var(--ink2); white-space:nowrap; }
+  .wk-none{ margin:0; font-size:13px; line-height:1.4; color:var(--ink2); }
   .wk-swipe{ display:none; }
-  @media (max-width:620px){   /* 휴대폰: 시장 다섯 칸을 옆으로 밀어 본다(다음 칸이 조금 보이게 80%). 세로로 쌓으면 첫 화면이 1,000px 가까이 된다 */
-    .wk-board{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
-    .wk-col{ flex:0 0 80%; display:block; scroll-snap-align:start; border-top:0; border-left:1px solid var(--hair); padding:12px 14px; border-radius:0; }
-    .wk-col:first-child{ border-left:0; border-radius:12px 0 0 12px; }
-    .wk-col:last-child{ border-radius:0 12px 12px 0; }
-    .wk-col.is-sel{ box-shadow:inset 0 3px 0 var(--act); }
-    .wk-first{ margin:10px 0 8px; align-items:start; min-height:96px; }
-    .wk-rest{ display:block; }
-    .wk-moves{ display:grid; }
-    .wk-hint{ margin-left:0; }
-    .wk-swipe{ display:block; margin:6px 0 0; font-size:12px; color:var(--ink2); text-align:center; }
+  @media (min-width:1100px) and (max-width:1279px){   /* 카드 폭이 약 210 ~ 245px라 1위 아이콘 · 숫자 · 이름을 한 단계 줄여 이름이 잘리지 않게 */
+    .wk-c{ --px:14px; }
+    .wk-board .wk-mk{ padding-left:14px; padding-right:14px; }
+    .wk-first{ --icl:40px; }
+    .wk-ic{ border-radius:10px; }
+    .wk-n1{ font-size:22px; }
+    .wk-first .wk-name{ font-size:15px; }
   }
+  @media (max-width:1099px){   /* 노트북 일부 · 태블릿 · 휴대폰: 같은 카드를 옆으로 밀어 본다(카드 폭은 화면의 84%, 최대 330px) */
+    .wk-board{ grid-template-columns:repeat(5, min(84%, 330px)); overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
+    .wk-col{ scroll-snap-align:start; }
+    .wk-c{ --px:14px; --py:10px; }
+    .wk-first{ --icl:48px; }
+    .wk-board .wk-mk{ padding:10px 14px 9px; }
+    .wk-swipe{ display:block; margin:6px 0 0; font-size:13px; color:var(--ink2); text-align:center; }
+  }
+  @media (max-width:640px){   /* 휴대폰: 한 번에 카드 한 장이 보이므로 카드끼리 줄을 맞추지 않는다(가장 긴 카드에 맞춰 빈 칸이 생기지 않게) */
+    .wk-board{ display:flex; }
+    .wk-col{ display:flex; flex-direction:column; flex:0 0 min(84%, 330px); }
+  }
+  @media (max-width:620px){ .wk-hint{ margin-left:0; } }
   /* AI 시장 브리핑(화면의 코어): 맨 위 흰 판 + 보라 머리띠. 2026-10-24 밤 사용자 "ai 브리핑은 요약과 자세히는 유지하자. 그리고 브리핑 섹션을 좀더 강조하고싶어
      우리 대시보드의 코어 요소니까" → 견본 3안 중 "2안이 좋아보여"(보라는 10-18의 브리핑 보라). 항목은 종전 카드(요약 한 줄 + 자세히), 핵심 항목은 위 줄에 넓게.
      글자 크기는 2026-10-18 사용자 결정("너무 커" → 본문 14px · 카드 제목 15px · 탭 12.5px) 그대로. 판에 overflow:hidden을 주지 않는다(과거 기록 달력이 판 밖으로 나가도 잘리지 않게) */
@@ -924,7 +937,7 @@
     <div class="mkbrief-body" id="mkbriefBody"></div>
   </section>
 
-  <section class="weeksec" id="weeksec" aria-labelledby="wkTitle">   <!-- 2026-10-24 재디자인: 주요 다섯 시장의 주간 1위 · 2 · 3위 · 급등 · 신규 진입(10-24 밤부터 AI 브리핑 다음) -->
+  <section class="weeksec" id="weeksec" aria-labelledby="wkTitle">   <!-- 2026-10-24 재디자인: 주요 다섯 시장의 주간 1위 · 2 · 3위 · 급등 · 신규 진입(10-24 밤부터 AI 브리핑 다음). 2026-10-25 시장별 카드(견본 2026-10-25-주간순위-가독성) -->
     <div class="wk-head">
       <h2 id="wkTitle">주요 시장 주간 순위</h2>
       <p class="wk-cap" id="wkCap">불러오는 중…</p>
@@ -2821,31 +2834,39 @@ function wkCompute(full, key){
 }
 function wkIcon(g, cls){ const t=(g && g.title)||'?'; return (g && g.icon) ? '<img class="'+cls+'" src="'+esc(g.icon)+'" alt="" referrerpolicy="no-referrer" loading="lazy">' : '<span class="'+cls+' wk-ph" aria-hidden="true">'+esc(t.slice(0,1))+'</span>'; }
 function wkName(aid, cc, g){ const t=(g && g.title)||aid; return '<button type="button" class="gdname wk-btn" data-aid="'+esc(aid)+'" data-mk="'+cc+'" title="'+esc(t)+'"><span class="wk-name">'+esc(t)+'</span></button>'; }
+function wkFirst(r, cc){   // 1위 칸: 금색 1 · 아이콘 · 이름 · 제작사(한 줄, 넘치면 …) · 배지(새 1위 / N주째 1위) · 직전 주 · 주 평균
+  const t0=r.top[0], g0=r.G[t0.aid]||{};
+  const st = r.streak>1
+    ? '<span class="wk-badge is-run">'+(r.streak>=r.L.length ? ('수집한 '+r.L.length+'주 내내 1위') : (r.streak+'주째 1위'))+'</span>'
+    : '<span class="wk-badge is-new">새 1위</span>'+(r.prevPos ? '<span>직전 주 '+r.prevPos+'위</span>' : '');
+  return '<div class="wk-first"><span class="wk-n1" aria-label="1위">1</span>'+wkIcon(g0,'wk-ic')+'<div class="wk-fi">'+wkName(t0.aid, cc, g0)
+    +(g0.developer ? '<span class="wk-pub" title="'+esc(g0.developer)+'">'+esc(g0.developer)+'</span>' : '')
+    +'<div class="wk-st">'+st+'<span class="wk-avg">주 평균 '+(Math.round(t0.r*10)/10).toFixed(1)+'위</span></div></div></div>';
+}
+function wkRow(aid, cc, G, k){ const g=G[aid]||{}; return '<div class="wk-row"><span class="wk-n">'+k+'</span>'+wkIcon(g,'wk-ic-s')+wkName(aid, cc, g)+'</div>'; }
 function renderWeekly(){
   const board=document.getElementById('wkBoard'), cap=document.getElementById('wkCap'); if(!board) return;
   const key=(activeChart==='free')?'free':'grossing', kname=(key==='free')?'인기':'매출';
   let capSet=false, h='';
-  WK_MKTS.forEach(([cc, nm])=>{
+  WK_MKTS.forEach(([cc, nm], i)=>{
     const sel=(cc===MK_CC), full=wkSrc(cc), r=full ? wkCompute(full, key) : null;
-    h+='<div class="wk-col'+(sel?' is-sel':'')+'" role="group" aria-label="'+nm+'">';
-    h+='<button type="button" class="wk-mk" data-mk="'+cc+'" aria-pressed="'+sel+'">'+nm+'</button>';
-    if(!full){ h+='<p class="wk-load">불러오는 중…</p></div>'; return; }
-    if(!r || r.short || !r.top.length){ h+='<p class="wk-load">주간 데이터가 아직 부족합니다.</p></div>'; return; }
+    h+='<div class="wk-col'+(sel?' is-sel':'')+(i===0?' is-first':'')+'" role="group" aria-label="'+nm+'">';   // 카드 한 장 = 여섯 칸(머리 · 1위 · 2위 · 3위 · 급등 · 신규 진입)
+    h+='<div class="wk-c wk-ch"><button type="button" class="wk-mk" data-mk="'+cc+'" aria-pressed="'+sel+'">'+nm+'</button></div>';
+    if(!full || !r || r.short || !r.top.length){
+      h+='<div class="wk-c wk-c1"><p class="wk-none">'+(!full ? '불러오는 중…' : '주간 데이터가 아직 부족합니다.')+'</p></div><div class="wk-c wk-c2"></div><div class="wk-c wk-c3"></div><div class="wk-c wk-cup"></div><div class="wk-c wk-cnw"></div></div>';
+      return; }
     if(!capSet && cap){ capSet=true; const a=r.L[r.ni], b=r.L[r.pi];
       cap.innerHTML=esc(kname)+' 차트 · '+wkDay(a,0)+' ~ '+wkDay(a,6)+' 주간 평균 순위, 직전 주('+wkDay(b,0)+' ~ '+wkDay(b,6)+')와 비교'+dinfo('주간 순위는 그 주에 차트에 오른 날의 순위를 평균한 값입니다. 급등은 직전 주보다 오른 계단 수가 순위대별 기준(10위 안 2.5계단, 30위 안 3.75계단, 60위 안 5계단, 그 아래 7.5계단) 이상인 게임 가운데 가장 많이 오른 게임으로, 진입 · 이탈 · 급변 구간의 주별 급등과 같은 기준입니다. 신규 진입은 직전 주 차트에 없던 게임 가운데 순위가 가장 높은 게임입니다.'); }
-    const t0=r.top[0], g0=r.G[t0.aid]||{};
-    const run=r.streak>1 ? (r.streak>=r.L.length ? ('수집한 '+r.L.length+'주 내내 1위') : (r.streak+'주째 1위')) : ('새 1위'+(r.prevPos ? ' · 직전 주 '+r.prevPos+'위' : ''));
-    const meta='<span class="wk-meta">주 평균 '+(Math.round(t0.r*10)/10).toFixed(1)+'위</span><span class="wk-meta">'+run+'</span>';
-    h+='<div class="wk-first"><span class="wk-n1" aria-label="1위">1</span>'+wkIcon(g0,'wk-ic')+'<div class="wk-fi">'+wkName(t0.aid, cc, g0)+'<span class="wk-pub">'+esc(g0.developer||'')+'</span>'+meta+'</div></div>';
-    h+='<ol class="wk-rest">'+r.top.slice(1).map((t,i)=>{ const g=r.G[t.aid]||{}; return '<li><span class="wk-n">'+(i+2)+'</span>'+wkIcon(g,'wk-ic-s')+wkName(t.aid, cc, g)+'</li>'; }).join('')+'</ol>';
-    h+='<div class="wk-moves">';
-    if(r.up){ const g=r.G[r.up.aid]||{}, p=Math.round(r.up.prev), n=Math.round(r.up.now);
-      h+='<div class="wk-mv"><div class="wk-mvh">급등 <span class="wk-up">▲'+(p-n)+'</span><span class="wk-rr">'+p+'→'+n+'위</span></div><div class="wk-mvg">'+wkIcon(g,'wk-ic-s')+wkName(r.up.aid, cc, g)+'</div></div>'; }
-    else h+='<div class="wk-mv"><div class="wk-mvh">급등</div><p class="wk-none">기준을 넘은 게임이 없습니다.</p></div>';
-    if(r.nw){ const g=r.G[r.nw.aid]||{};
-      h+='<div class="wk-mv"><div class="wk-mvh">신규 진입<span class="wk-rr">'+Math.round(r.nw.now)+'위</span></div><div class="wk-mvg">'+wkIcon(g,'wk-ic-s')+wkName(r.nw.aid, cc, g)+'</div></div>'; }
-    else h+='<div class="wk-mv"><div class="wk-mvh">신규 진입</div><p class="wk-none">새로 들어온 게임이 없습니다.</p></div>';
-    h+='</div></div>';
+    h+='<div class="wk-c wk-c1">'+wkFirst(r, cc)+'</div>';
+    h+='<div class="wk-c wk-c2">'+(r.top[1] ? wkRow(r.top[1].aid, cc, r.G, 2) : '')+'</div>';
+    h+='<div class="wk-c wk-c3">'+(r.top[2] ? wkRow(r.top[2].aid, cc, r.G, 3) : '')+'</div>';
+    // 급등 · 신규 진입: 항목 이름과 숫자가 한 줄, 그 아래 게임 이름
+    if(r.up){ const p=Math.round(r.up.prev), n=Math.round(r.up.now);
+      h+='<div class="wk-c wk-cup"><div class="wk-num"><span class="wk-lab">급등</span><span class="wk-up">▲'+(p-n)+'</span><span class="wk-rr">'+p+'→'+n+'위</span></div>'+wkRow(r.up.aid, cc, r.G, '')+'</div>'; }
+    else h+='<div class="wk-c wk-cup"><div class="wk-num"><span class="wk-lab">급등</span></div><p class="wk-none">기준을 넘은 게임이 없습니다.</p></div>';
+    if(r.nw){ h+='<div class="wk-c wk-cnw"><div class="wk-num"><span class="wk-lab">신규 진입</span><span class="wk-nwr">'+Math.round(r.nw.now)+'위</span></div>'+wkRow(r.nw.aid, cc, r.G, '')+'</div>'; }
+    else h+='<div class="wk-c wk-cnw"><div class="wk-num"><span class="wk-lab">신규 진입</span></div><p class="wk-none">새로 들어온 게임이 없습니다.</p></div>';
+    h+='</div>';
   });
   board.innerHTML=h;
 }
