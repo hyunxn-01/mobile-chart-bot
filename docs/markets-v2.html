@@ -729,7 +729,7 @@
     .wk-hint{ margin-left:0; }
     .wk-swipe{ display:block; margin:6px 0 0; font-size:12px; color:var(--ink2); text-align:center; }
   }
-  /* AI 시장 브리핑: 상자 없이 첫 화면 글로. 글자 크기는 2026-10-18 사용자 결정(본문 14px)대로 키우지 않는다 */
+  /* AI 시장 브리핑: 상자 없이 첫 화면 글로. 글자 크기는 2026-10-18 사용자 결정("너무 커" → 본문 14px · 카드 제목 15px · 탭 12.5px)대로 두고, 요약 한 줄은 굵기로만 구분한다 */
   .aiblock{ margin-top:30px; }
   .aiblock[hidden]{ display:none !important; }
   .ai-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:10px 16px; flex-wrap:wrap; }
@@ -738,7 +738,7 @@
   .aiblock .mkbrief-row2{ margin:0; gap:10px; }
   .aiblock .mkbrief-axis.seg{ margin:0; }
   #mkbrief .mkbrief-tabs{ margin:12px 0 18px; gap:6px; }
-  #mkbrief .mkbrief-tab{ background:#fff; border:1px solid var(--hair); color:var(--ink2); font-size:13px; padding:6px 12px; border-radius:8px; }
+  #mkbrief .mkbrief-tab{ background:#fff; border:1px solid var(--hair); color:var(--ink2); font-size:12.5px; padding:6px 12px; border-radius:8px; }
   #mkbrief .mkbrief-tab:hover{ border-color:var(--blue); color:var(--ink); }
   #mkbrief .mkbrief-tab[aria-selected="true"]{ background:var(--blue); border-color:var(--blue); color:#fff; }
   #mkbrief .mkbrief-tab:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
@@ -750,8 +750,8 @@
   #mkbrief .mkbrief-body{ font-size:14px; line-height:1.7; }
   .aif-top{ display:grid; grid-template-columns:minmax(0,7fr) minmax(0,5fr); gap:20px 56px; }
   .aif-top.solo{ grid-template-columns:minmax(0,1fr); max-width:900px; }
-  .aif-h{ font-family:'NanumSquare','Noto Sans KR',sans-serif; font-size:16px; font-weight:800; color:var(--ink); margin:0 0 8px; }
-  .aif-lead{ font-size:15px; font-weight:700; line-height:1.6; color:var(--ink); margin:0 0 10px; }
+  .aif-h{ font-family:'NanumSquare','Noto Sans KR',sans-serif; font-size:15px; font-weight:800; color:var(--ink); margin:0 0 8px; }
+  .aif-lead{ font-size:14px; font-weight:700; line-height:1.6; color:var(--ink); margin:0 0 10px; }
   .aif-list{ list-style:none; margin:0; padding:0; }
   .aif-list li{ position:relative; padding-left:14px; margin:0 0 7px; font-size:14px; line-height:1.7; color:var(--ink); }
   .aif-list li::before{ content:''; position:absolute; left:2px; top:.72em; width:5px; height:5px; border-radius:50%; background:#8A93A3; }
