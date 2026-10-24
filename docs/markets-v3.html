@@ -853,6 +853,9 @@
   .nav-item{ display:flex; align-items:center; height:32px; padding:0 8px; border-radius:8px; color:var(--ink2); font-size:14px; text-decoration:none; transition:background-color .15s ease, color .15s ease; }
   .nav-item:hover{ background:var(--raised); color:var(--ink); }
   .nav-item[aria-current="page"]{ background:var(--active); color:var(--ink); font-weight:500; }
+  .nav-item .nav-clickme{ margin-left:auto; font-size:12px; padding:2px 9px; }   /* 정식판 'click me'(사용자 요소, 10-18 "프로젝트 소개에 CLICK ME 어디갔어?"로 되살림). 소개가 메뉴의 한 화면이 되어 메뉴 항목 옆으로 옮김. 모양 · 움직임은 정식판 .intro-clickme(검정 알약, 천천히 커졌다 작아짐, 동작 줄이기 설정이면 멈춤) */
+  .nav-item:hover .nav-clickme{ animation:none; }
+  .nav-item[aria-current="page"] .nav-clickme{ display:none; }   /* 정식판처럼 소개를 보는 동안은 숨김 */
   .who{ margin-top:auto; padding:12px 8px 0; border-top:1px solid var(--border); font-size:12px; color:var(--ink2); line-height:18px; }
   .who b{ display:block; color:var(--ink); font-size:13px; font-weight:500; }
   .who a{ color:inherit; text-decoration:underline; text-underline-offset:2px; }
@@ -1202,7 +1205,7 @@
     </nav>
     <p class="group-label">정보</p>
     <nav class="appnav" aria-label="정보">
-      <a class="nav-item" href="#about" data-nav="about">프로젝트 소개</a>
+      <a class="nav-item" href="#about" data-nav="about">프로젝트 소개<span class="intro-clickme nav-clickme" aria-hidden="true">click me</span></a>
     </nav>
     <div class="who"><b>김동현</b>만든 사람 · <a href="mailto:hyunxn_01@naver.com">hyunxn_01@naver.com</a><br>매일 07:37 수집 · 매출 · 인기 상위 100위</div>
   </aside>
