@@ -2714,7 +2714,7 @@ function selectBrief(bk){
   const mk = (type==='global') ? null : key;   // 이 브리핑이 가리키는 시장(주요국 cc / 지역키)
   const body=document.getElementById('mkbriefBody'), dt=document.getElementById('mkbriefDate');
   if(body) body.innerHTML='<p class="empty">불러오는 중…</p>';
-  const pBrief=fetch('./markets/'+file+'.json'+mkQ(), mkOpt()).then(r=>r.ok?r.json():null).catch(()=>null);   // 2026-10-26 P2-2: 갱신 시각 키로 받아 다시 방문하면 브라우저 저장본을 쓴다
+  const pBrief=IDX_READY.then(()=>fetch('./markets/'+file+'.json'+mkQ(), mkOpt())).then(r=>r.ok?r.json():null).catch(()=>null);   // 2026-10-26 P2-2: 갱신 시각 키로 받아 다시 방문하면 브라우저 저장본을 쓴다(index.json을 먼저 기다린다, 0.8초 넘으면 키 없이)
   const pMkt = mk ? mkFetch(mk).catch(()=>null) : Promise.resolve(null);
   { const cp=document.getElementById('mkbriefCalPop'); if(cp) cp.hidden=true; }   // 탭 바꾸면 달력 닫기
   Promise.all([pBrief, pMkt]).then(([b, mkt])=>{
@@ -2747,6 +2747,7 @@ let MK_CC=null;
 // 갱신되면 주소가 바뀌어 새로 받는다(전에는 매번 시각을 붙이고 저장도 막아 방문할 때마다 전부 다시 받았다). index.json 자체는 늘 새로 받는다.
 // 같은 시장을 두 곳에서 동시에 요청하면 한 번만 받는다(MK_INFLIGHT).
 const MK_INFLIGHT={};
+let _idxDone; const IDX_READY=Promise.race([new Promise(r=>{ _idxDone=r; }), new Promise(r=>setTimeout(r, 800))]);   // index.json(갱신 시각)을 받았거나 0.8초가 지나면 풀린다
 function mkQ(){ return WK_GEN ? '?v='+encodeURIComponent(WK_GEN) : '?_='+Date.now(); }
 function mkOpt(){ return WK_GEN ? {} : {cache:'no-store'}; }
 function mkFetch(cc){
@@ -2883,7 +2884,7 @@ fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'}).then(r=>r.json()
     const navSel=document.getElementById('countrySelNav');   // 네비 시장 선택(헤더와 동일 옵션)
     if(navSel){ navSel.innerHTML=html; navSel.value=first; navSel.addEventListener('change',e=>loadMarket(e.target.value)); }
   }
-  WK_GEN=idx.generated||'';   // 2026-10-26 P2-2: 시장 데이터 주소의 갱신 시각 키라 시장을 받기 전에 정한다
+  WK_GEN=idx.generated||''; if(_idxDone) _idxDone();   // 2026-10-26 P2-2: 시장 데이터 주소의 갱신 시각 키라 시장을 받기 전에 정한다
   loadMarket(first);
   wkLoad();   // 2026-10-24 재디자인: 주요 다섯 시장 주간 순위(2026-10-26부터 요약 파일 하나로)
 }).catch(e=>{ const m=document.getElementById('meta'); if(m) m.textContent='국가 목록을 불러오지 못했습니다: '+e.message; });
