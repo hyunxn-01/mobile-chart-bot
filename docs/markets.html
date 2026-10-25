@@ -2549,7 +2549,7 @@ function loadBriefsIndex(){
     if(el){
       el.innerHTML=MK_BRIEF_TABS.map(t=>'<button class="mkbrief-tab" role="tab" aria-selected="false" data-bk="'+t.type+':'+t.key+'">'+esc(t.name)+'</button>').join('');
       el.querySelectorAll('.mkbrief-tab').forEach(b=>{ b.addEventListener('click',()=>selectBrief(b.dataset.bk));
-        const k=b.dataset.bk.slice(b.dataset.bk.indexOf(':')+1); if(k!=='global') ['pointerenter','focus'].forEach(ev=>b.addEventListener(ev,()=>mkPrefetch(k))); });   // 2026-10-26 P2-2: 시장 탭에 마우스 · 키보드가 오면 그 시장 데이터를 미리 받는다
+        const k=b.dataset.bk.slice(b.dataset.bk.indexOf(':')+1); if(k!=='global') mkIntent(b, ()=>k); });   // 2026-10-26 P2-2: 시장 탭에 마우스가 0.35초 머물면 그 시장 데이터를 미리 받는다(지나가기만 하면 받지 않는다)
     }
     const sec=document.getElementById('mkbrief'); if(sec) sec.hidden=false;
     { const cb=document.getElementById('mkbriefCalBtn'); if(cb && !cb._bound){ cb._bound=1; cb.addEventListener('click',(e)=>{ e.stopPropagation(); openBriefCal(); }); } }
@@ -2758,6 +2758,13 @@ function mkFetch(cc){
   MK_INFLIGHT[cc]=p; return p;
 }
 function mkPrefetch(cc){ if(cc && !MK_MARKET_CACHE[cc] && !MK_INFLIGHT[cc]) mkFetch(cc).catch(()=>{}); }
+// 마우스가 한 곳에 0.35초 넘게 머물 때만 미리 받는다. 키보드로 지나가거나 마우스로 훑고 지나가면 받지 않는다(탭 줄을 훑기만 해도 시장 파일 여러 개 약 3MB를 받던 것, 2026-10-26 재측정)
+function mkIntent(root, ccOf){
+  let t=null, cur=null;
+  const stop=()=>{ if(t){ clearTimeout(t); t=null; } cur=null; };
+  root.addEventListener('pointerover', e=>{ if(e.pointerType && e.pointerType!=='mouse') return; const cc=ccOf(e.target); if(!cc){ stop(); return; } if(cc===cur) return; stop(); cur=cc; t=setTimeout(()=>{ t=null; mkPrefetch(cc); }, 350); });
+  root.addEventListener('pointerleave', stop);
+}
 function loadMarket(cc){
   MK_CC=cc; urlWith({mk:cc});
   { const s1=document.getElementById('countrySel'), s2=document.getElementById('countrySelNav'); if(s1) s1.value=cc; if(s2) s2.value=cc; }  // 헤더·네비 동기
@@ -2962,7 +2969,7 @@ function wkLoad(){
     .catch(wkLoadFull);
   renderWeekly();
   const board=document.getElementById('wkBoard');
-  if(board && !board._pf){ board._pf=1; const pf=e=>{ const c=e.target.closest && e.target.closest('.wk-col'); if(c && c.dataset.cc) mkPrefetch(c.dataset.cc); }; board.addEventListener('pointerover', pf); board.addEventListener('focusin', pf); }
+  if(board && !board._pf){ board._pf=1; mkIntent(board, t=>{ const c=t.closest && t.closest('.wk-col'); return c ? c.dataset.cc : null; }); }   // 카드에 마우스가 0.35초 머물면 그 시장 전체 데이터를 미리 받는다
 }
 function wkOnInit(full){ if(MK_CC && full && !MK_MARKET_CACHE[MK_CC]) MK_MARKET_CACHE[MK_CC]=full; renderWeekly(); }
 function wkDay(label, add){ const d=new Date(String(label)+'T00:00:00Z'); if(isNaN(d.getTime())) return String(label); d.setUTCDate(d.getUTCDate()+add); return (d.getUTCMonth()+1)+'/'+d.getUTCDate(); }
