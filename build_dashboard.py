@@ -456,6 +456,55 @@ def build_genre_audit(all_games):
     print(f"[OK] 장르 검수표(AppMagic): {len(rows)}게임 · 출처 {dict(src)} → genre_audit.json")
 
 
+# 2026-10-26 주간 순위 요약 파일(markets.html 맨 위 '주요 시장 주간 순위' 카드 전용). 대시보드는 이 파일로 다섯 시장의 카드를 그리고,
+# 파일이 없거나 index.json과 갱신 시각이 다르면 예전처럼 시장 파일 전체를 받아 계산한다(impeccable 점검 P2-2, 첫 방문에 받는 양 줄이기).
+# 카드 계산(markets.html의 wkCompute)이 쓰는 값만 남긴다: 마지막 두 주의 주간 순위, 주마다 1위였던 게임의 전체 주간 순위(연속 1위 주 수 계산용), 남긴 게임의 이름 · 제작사 · 아이콘.
+WEEKLY_LITE_MARKETS = MAJOR_MARKETS   # markets.html의 WK_MKTS와 같은 다섯 시장
+
+
+def weekly_lite_chart(chart):
+    w = ((chart or {}).get('timeframes') or {}).get('weekly') or {}
+    labels = w.get('labels') or []
+    series = w.get('series') or {}
+    games = (chart or {}).get('games') or {}
+    n = len(labels)
+    if n < 2:
+        return {'games': {}, 'timeframes': {'weekly': {'labels': labels, 'series': {}}}}
+    ni, pi = n - 1, n - 2
+    tops = set()   # 주마다 1위(그 주 평균 순위가 가장 낮은 게임, 같으면 먼저 나온 게임 — wkCompute의 weekTop과 같은 규칙)
+    for i in range(n):
+        best, ba = None, None
+        for aid, v in series.items():
+            x = v[i] if i < len(v) else None
+            if x is not None and (best is None or x < best):
+                best, ba = x, aid
+        if ba is not None:
+            tops.add(ba)
+    out_s, out_g = {}, {}
+    for aid, v in series.items():   # 원래 순서를 지킨다(같은 값이면 먼저 나온 게임을 고르는 규칙이 화면 계산과 같아지게)
+        now = v[ni] if ni < len(v) else None
+        prev = v[pi] if pi < len(v) else None
+        if aid in tops:
+            out_s[aid] = v
+        elif now is not None or prev is not None:
+            out_s[aid] = [None] * pi + [prev, now]
+        else:
+            continue
+        g = games.get(aid) or {}
+        out_g[aid] = {k: g[k] for k in ('title', 'developer', 'icon') if g.get(k)}
+    return {'games': out_g, 'timeframes': {'weekly': {'labels': labels, 'series': out_s}}}
+
+
+def build_weekly_lite(country_objs, generated):
+    out = {'generated': generated, 'markets': {}}
+    for cc in WEEKLY_LITE_MARKETS:
+        co = country_objs.get(cc)
+        if not co or not co.get('charts'):
+            continue
+        out['markets'][cc] = {'charts': {k: weekly_lite_chart(c) for k, c in co['charts'].items() if k in ('grossing', 'free')}}
+    return out
+
+
 def build_markets():
     """전 국가(개별) + 지역(합산) 마켓 → docs/markets/{key}.json + index.json + genre_matrix.json + genre_audit.json."""
     if not CHARTS_DIR.exists():
@@ -538,12 +587,20 @@ def build_markets():
         regions_idx.append({'key': key, 'name': name, 'type': 'region', 'members': members,
                             'num_days': g.get('num_days', 0), 'num_games': g.get('num_games', 0)})
         built[key] = (rm, name, 'region')
+    gen = datetime.now().strftime('%Y-%m-%d %H:%M')   # index.json과 주간 순위 요약 파일이 같은 갱신 시각을 쓴다(대시보드가 둘을 맞춰 본다)
     (MARKETS_OUT / 'index.json').write_text(
-        json.dumps({'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+        json.dumps({'generated': gen,
                     'majors': majors, 'regions': regions_idx, 'countries': singles,
                     # 하위호환: 옛 프론트가 읽던 평면 리스트도 유지(개별 국가 전체)
                     'countries_flat': [{'country': e['key']} for e in (majors + singles)]},
                    ensure_ascii=False), encoding='utf-8')
+    try:   # 2026-10-26 주간 순위 요약 파일. 실패해도 대시보드가 시장 파일로 대신 계산하므로 집계는 계속한다
+        lite = build_weekly_lite({cc: built[cc][0] for cc in WEEKLY_LITE_MARKETS if cc in built}, gen)
+        (MARKETS_OUT / 'weekly_lite.json').write_text(
+            json.dumps(lite, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        print(f"[OK] 주간 순위 요약: {len(lite['markets'])}시장 → weekly_lite.json")
+    except Exception as e:
+        print('[WARN] 주간 순위 요약 파일 실패(대시보드가 시장 파일로 대신 계산):', e)
     # 장르×시장 비교 매트릭스(히트맵용)
     matrix = build_genre_matrix(built)
     (MARKETS_OUT / 'genre_matrix.json').write_text(

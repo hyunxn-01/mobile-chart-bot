@@ -5,15 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>모바일 게임 다국가 시장분석 대시보드</title>
 <!-- 2026-10-24 재디자인 정식판: 견본 주소 markets-v2.html에서 다듬은 판(B안 1단계 + 색 2안 · AI 브리핑 강조 2안 · 위 고정 줄)을 2026-10-24 밤 사용자 "새판을 기존 주소로 옮겨줘 정식판으로"로 이 주소에 옮겼다. 장르 추이 아래 구간의 모양(2단계)은 아직이다. 설계안: 워크스페이스 pending/2026-10-24-차트봇-대시보드-재디자인-설계안.md, 기록: project/mobile-chart-bot/견본/2026-10-24-재디자인/README.md -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231E3A5F'/%3E%3Crect x='13' y='34' width='10' height='17' rx='2.5' fill='%23fff'/%3E%3Crect x='27' y='24' width='10' height='27' rx='2.5' fill='%23fff'/%3E%3Crect x='41' y='13' width='10' height='38' rx='2.5' fill='%23E9B949'/%3E%3C/svg%3E">   <!-- 2026-10-26 impeccable 점검 P3-4: 탭 아이콘(없어서 방문마다 /favicon.ico 요청이 404로 끝났다). 남색 바탕에 오르는 막대 셋, 가장 높은 막대는 1위 금색 계열 -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">   <!-- 2026-10-18 밤 사용자 "제목들은 나눔스퀘어로 본문들은 노토산스로": 본문 글꼴 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+<!-- 2026-10-26 impeccable 점검 P2-2: 그래프 스크립트(Chart.js · 확대 도구)는 본문 맨 아래 스크립트 바로 앞으로 옮겼다(받는 동안 화면 그리기가 멈추지 않게).
+     나눔스퀘어는 jsDelivr의 글꼴 목록 파일(font-display 없음 → 늦게 오면 제목이 최대 3초 안 보임) 대신 아래 @font-face로 같은 파일을 font-display:swap으로 선언한다. 쓰는 굵기 400 · 700 · 800만 -->
 <style>
+  @font-face{ font-family:'NanumSquare'; font-style:normal; font-weight:400; font-display:swap; src:url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/NanumSquareR.woff2) format('woff2'), url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/NanumSquareR.woff) format('woff'); }
+  @font-face{ font-family:'NanumSquare'; font-style:normal; font-weight:700; font-display:swap; src:url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/NanumSquareB.woff2) format('woff2'), url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/NanumSquareB.woff) format('woff'); }
+  @font-face{ font-family:'NanumSquare'; font-style:normal; font-weight:800; font-display:swap; src:url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/NanumSquareEB.woff2) format('woff2'), url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/NanumSquareEB.woff) format('woff'); }
+  /* 2026-10-26 impeccable 점검 P2-5: 색 값 이름을 한 곳에 모았다. 10-18의 옛 값 위에 10-24 재디자인('Research Lab / University Department' 팔레트, 사용자 "2안으로 해줘")이
+     같은 이름을 다시 정하던 두 겹을 합쳤고, 화면에 나오는 값은 그대로다. 새로 붙인 이름: --ink3(흐린 줄 글자, 옅은 판 위 4.7:1) · --up-ink(옅은 판 위 작은 상승 글자) · --new(신작 배지) */
   :root{
-    --bg:#ffffff; --panel:#f7f7f5; --line:#e5e4df; --text:#1d1d1b; --muted:#6b6a64;
-    --accent:#2563eb; --chip:#eef1f6; --srcblue:#0284c7; --srcbluesoft:#e0f2fe;
+    --ink:#0F172A; --ink2:#475569; --ink3:#5E6A7C; --hair:#CBD5E1; --page:#F8FAFC; --act:#1E3A5F; --gold:#A16207;
+    --up:#C8372F; --up-ink:#B42318; --upbg:#FBECEA; --dnbg:#EEF0F3; --new:#c81e3f;
+    --bg:#ffffff; --panel:#E9EEF5; --line:var(--hair); --text:var(--ink); --muted:var(--ink2); --accent:var(--act);
+    --chip:#eef1f6; --srcblue:#0284c7; --srcbluesoft:#e0f2fe;
     --accent2:#6d5fe0; --accent2soft:#ecebfb; --accent2text:#5b4ec9;
   }
   *{ box-sizing:border-box; }
@@ -44,6 +51,7 @@
   .maker-mail svg{ flex:0 0 auto; }
   .intro{ background:#fff; border:1px solid #eceef1; border-radius:14px; margin:0 0 16px; box-shadow:0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.06); }   /* 2026-10-18 밤 카드 구성: 회색 → 흰 카드 */
   .intro-title{ white-space:nowrap; }   /* 2026-10-18 D7 휴대폰 재측정: '프로젝트 소개'가 낱말 가운데서 줄 바뀜 */
+  h2.intro-title{ margin:0; font-size:inherit; line-height:inherit; }   /* 2026-10-26 P3-1: 제목 단계를 맞추려고 h2가 됐다(머리 제목 h1 다음이 바로 h3이던 것). 모양은 종전 그대로 */
   .intro>summary{ cursor:pointer; padding:12px 16px; font-size:14.5px; font-weight:600; color:var(--text); list-style:none; display:flex; align-items:center; gap:8px; border-radius:12px; user-select:none; -webkit-user-select:none; }
   .intro>summary:hover{ background:var(--chip); }
   .intro>summary:focus{ outline:none; }
@@ -109,8 +117,7 @@
   .aib-li::before{ content:'·'; position:absolute; left:-10px; color:var(--accent2text); }
   .aib-quote{ font-size:12.5px; color:var(--text); line-height:1.6; margin:6px 0; padding:7px 11px; background:var(--chip); border-radius:7px; }
   .aib-hr{ height:1px; background:var(--line); margin:12px 0; border:0; }
-  .aibup{ color:#16a34a; font-weight:600; }
-  .aibdn{ color:#dc2626; font-weight:600; }
+  .aibup, .aibdn{ font-weight:600; }   /* 색은 아래 「순위 상승 · 하락 색」 한 곳에서 */
   .aibrief-dates{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:2px 0 12px; }
   .aibrief-dlabel{ font-size:11px; color:var(--muted); font-weight:700; margin-right:2px; }
   .aibrief-dnote{ font-size:10.5px; color:var(--muted); }
@@ -142,7 +149,7 @@
   .cic{ font-size:14px; line-height:1; font-style:normal; }
   .sub.cap{ gap:4px 9px; font-size:13.5px; color:var(--muted); }
   .csep{ color:var(--line); }
-  .cact{ background:rgba(37,99,235,0.13); color:#3b82f6; font-weight:600; border-radius:6px; padding:2px 9px; white-space:nowrap; }
+  .cact{ font-weight:600; border-radius:6px; padding:2px 9px; white-space:nowrap; }   /* 색은 재디자인 부분(누르는 색 남색)에서 */
   .banner{ font-size:14px; color:#9a5b00; background:#fff5e6; border:1px solid #f3d9a6;
     padding:8px 12px; border-radius:8px; margin:0 0 12px; }
   .layout{ display:flex; gap:18px; align-items:flex-start; }
@@ -171,7 +178,7 @@
   .gname{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .gdev{ color:var(--muted); font-size:13px; }
   .grank{ flex:0 0 auto; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .newbadge{ display:inline-block; font-size:11.5px; font-weight:700; color:#fff; background:#e0455e; border-radius:5px; padding:1px 4px; margin-right:5px; vertical-align:middle; letter-spacing:.3px; }
+  .newbadge{ display:inline-block; font-size:11.5px; font-weight:700; color:#fff; background:var(--new); border-radius:5px; padding:1px 4px; margin-right:5px; vertical-align:middle; letter-spacing:.3px; }
   .grating{ flex:0 0 auto; font-size:12.5px; color:#e0a82e; white-space:nowrap; }
   .panelnote{ font-size:12.5px; color:var(--muted); margin:2px 2px 8px; line-height:1.45; }
   .gitem.out{ opacity:.5; }
@@ -179,7 +186,7 @@
   .empty{ font-size:14px; color:var(--muted); padding:10px 4px; }
   .sectitle{ font-size:17px; font-weight:600; margin:0 0 4px; }
   .sec-mkt{ display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700; color:#b45309; background:transparent; border:2px solid #b45309; border-radius:8px; padding:3px 3px 3px 11px; margin-left:10px; vertical-align:3px; white-space:nowrap; }   /* 2026-10-18 사용자 "배경 무색으로 되돌리고 다른색으로 테두리": 바탕 없음, 주황 2px 테두리(파란 제목과 구별) */
-  .sec-mkt-pin{ font-size:12.5px; font-weight:700; opacity:.9; }
+  .sec-mkt-pin{ font-size:12.5px; font-weight:700; }   /* 2026-10-26 P3-2: 반투명(.9)을 빼 흰 바탕 대비 4.2 → 5.0:1 */
   .sec-mkt-sel{ appearance:none; -webkit-appearance:none; border:0; background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%23b45309' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 6px center; color:#b45309; font:inherit; font-size:14px; font-weight:800; padding:3px 26px 3px 4px; cursor:pointer; width:124px; text-overflow:ellipsis; }   /* 2026-10-18 L8: 폭 고정 */
   .sec-mkt-sel option{ color:var(--text); background:var(--bg); font-weight:600; }
   .sec-mkt:hover{ background:rgba(180,83,9,.08); }
@@ -201,8 +208,7 @@
   .histtable thead .colorcol{ z-index:3; background:var(--panel); }
   .histtable .avg3m{ position:sticky; left:198px; z-index:2; background:var(--bg); box-shadow:1px 0 0 var(--line); }
   .histtable thead .avg3m{ z-index:3; background:var(--panel); }
-  .histtable td.up{ color:#16a34a; font-weight:600; }
-  .histtable td.down{ color:#dc2626; }
+  .histtable td.up{ font-weight:600; }
   .histtable td.na{ color:var(--muted); }
   .srcrow{ display:flex; align-items:center; gap:10px; margin:0 0 12px; flex-wrap:wrap; }
   .srcrow .tabs{ margin:0 0 0 8px; }
@@ -230,7 +236,6 @@
   .moveritem .mvg{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .moveritem .mvr{ flex:0 0 auto; color:var(--muted); font-size:13px; font-variant-numeric:tabular-nums; white-space:nowrap; }
   .moveritem .mvd{ flex:0 0 auto; min-width:44px; box-sizing:border-box; text-align:center; font-size:12.5px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; padding:2px 6px; border-radius:5px; }
-  .mvd.up{ color:#15803d; background:rgba(22,163,74,.15); } .mvd.down{ color:#b91c1c; background:rgba(220,38,38,.15); }
   .movers-more{ display:block; margin:12px auto 0; padding:7px 18px; font:inherit; font-size:13.5px; font-weight:600; color:var(--muted); background:var(--bg); border:1px solid var(--line); border-radius:999px; cursor:pointer; }
   .movers-more:hover{ border-color:var(--muted); color:var(--text); background:var(--chip); }
   @media (max-width:820px){ .movergrid{ grid-template-columns:1fr 1fr; } }
@@ -255,7 +260,7 @@
   .pubtable td.pgames .pubchips-more{ display:contents; }
   .pubmore{ font:inherit; font-size:12px; font-weight:700; color:var(--accent); background:var(--bg); border:1px solid var(--accent); border-radius:999px; padding:2px 9px; cursor:pointer; margin:2px 0; vertical-align:middle; }
   .pubrow{ cursor:pointer; }
-  .pubrow:hover td{ background:rgba(37,99,235,.07); }   /* 2026-10-18 D6: 누를 수 있는 행은 옅은 파랑 */
+  .pubrow:hover td{ background:rgba(30,58,95,.07); }   /* 2026-10-18 D6: 누를 수 있는 행은 옅은 색(10-24 재디자인부터 남색 계열) */
   .pubrow td.pname{ color:var(--accent); font-weight:700; }
   .pubtable td, .histtable td, .gl-meta, .cmp-cell, .gmgrid{ font-variant-numeric:tabular-nums; }   /* 2026-10-18 D3: 글꼴이 지원하면 숫자 폭 고정 */
   .pubtable th.sortable{ cursor:pointer; user-select:none; }
@@ -273,7 +278,7 @@
   .watch-traj{ font-size:13.5px; color:var(--muted); }
   .watch-traj b{ color:var(--text); font-variant-numeric:tabular-nums; }
   .watch-meta{ font-size:12.5px; color:var(--muted); margin-top:5px; display:flex; gap:10px; flex-wrap:wrap; }
-  .watch-up{ color:#16a34a; font-weight:700; }
+  .watch-up{ font-weight:700; }
   .gop-wrap{ overflow-x:auto; }
   .gop-wrap svg{ display:block; max-width:none; width:100%; height:auto; }
   .gop-line{ stroke:var(--line); }
@@ -282,7 +287,7 @@
   .gq-cell{ border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:var(--bg); min-width:0; }
   .gq-t{ font-size:13px; font-weight:800; display:flex; align-items:center; gap:6px; margin-bottom:6px; }
   .gq-chips{ display:flex; flex-wrap:wrap; gap:5px; }
-  .gq-chip{ font-size:12.5px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:3px 9px; line-height:1.5; }
+  .gq-chip{ font-size:12.5px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:5px 10px; line-height:1.5; }   /* 2026-10-26 P3-5: 위아래 여백 3 → 5px(글자가 테두리에 붙어 보이던 것) */
   .gq-chip b{ font-weight:800; }
   .gq-none, .gq-more{ font-size:12.5px; color:var(--muted); align-self:center; }
   @media (max-width:560px){ .gq-grid{ grid-template-columns:1fr; } }
@@ -309,6 +314,7 @@
   .goptraj-slider::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:26px; height:26px; border-radius:50%; background:var(--accent2); border:3px solid var(--bg); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:grab; margin-top:-9px; }
   .goptraj-slider::-moz-range-thumb{ width:24px; height:24px; border-radius:50%; background:var(--accent2); border:3px solid var(--bg); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:grab; }
   .goptraj-slider::-moz-range-track{ height:11px; border-radius:6px; background:var(--accent2soft); }
+  .goptraj-slider:focus-visible{ outline:2px solid var(--act); outline-offset:6px; }   /* 2026-10-26 P2-4: 키보드로 오면 보이게(전에는 outline:none만 있었다) */
   .goptraj-ticks{ position:absolute; left:0; right:0; top:15px; height:22px; pointer-events:none; }
   .goptraj-tick{ position:absolute; transform:translateX(-50%); font-size:12px; color:var(--muted); text-align:center; }
   .goptraj-tick i{ display:block; width:1.5px; height:6px; background:var(--line); margin:0 auto 2px; }
@@ -344,7 +350,7 @@
     border:1px solid var(--line); font-variant-numeric:tabular-nums; }
   .hcell i{ display:block; font-style:normal; font-size:12px; color:var(--muted); margin-bottom:1px; }
   .hcell b{ font-size:14px; font-weight:600; }
-  .hcell.up b{ color:#16a34a; } .hcell.down b{ color:#dc2626; } .hcell.na b{ color:var(--muted); font-weight:400; }
+  .hcell.na b{ color:var(--muted); font-weight:400; }
   .pubcard{ cursor:pointer; }
   .pubcard[aria-pressed="true"]{ border-color:var(--accent); }
   .pubcard[aria-pressed="true"] .pubcard-head b{ color:var(--accent); }
@@ -402,21 +408,38 @@
   .gmmeta-note{ font-size:12.5px; color:var(--muted); font-weight:400; }
   .gmmeta-notes{ margin-top:6px; padding-top:7px; border-top:1px solid var(--line); font-size:13px; color:var(--text); line-height:1.55; white-space:pre-line; max-height:104px; overflow:auto; }
   .gmmeta-notes-l{ font-size:12.5px; font-weight:700; color:var(--muted); display:block; margin-bottom:3px; }
-  .gmevent{ margin-top:10px; padding:10px 13px; background:rgba(22,163,74,0.10); border:1px solid rgba(22,163,74,0.38); border-radius:9px; font-size:13.5px; color:var(--text); }
-  .gmevent-tag{ font-size:12.5px; font-weight:700; color:#fff; background:#16a34a; border-radius:5px; padding:2px 7px; margin-right:6px; }
+  .gmevent{ margin-top:10px; padding:10px 13px; background:var(--panel); border:1px solid var(--hair); border-radius:9px; font-size:13.5px; color:var(--text); }
+  .gmevent-tag{ font-size:12.5px; font-weight:700; color:#fff; background:var(--ink2); border-radius:5px; padding:2px 7px; margin-right:6px; }
   .gmevent b{ font-variant-numeric:tabular-nums; }
-  .gmevent-up{ color:#16a34a; font-weight:700; }
+  .gmevent-up{ font-weight:700; }
   .gmevent-note{ font-size:12.5px; color:var(--muted); margin-top:5px; line-height:1.5; }
-  .mv-upd{ display:inline-block; margin-left:4px; font-size:12px; font-weight:700; color:#16a34a; border:1px solid rgba(22,163,74,.45); border-radius:4px; padding:0 4px; vertical-align:middle; cursor:help; }
+  .mv-upd{ display:inline-block; margin-left:4px; font-size:12px; font-weight:700; color:var(--ink2); border:1px solid var(--hair); border-radius:4px; padding:0 4px; vertical-align:middle; cursor:help; }
   .pubtable td.prev{ color:var(--text); font-variant-numeric:tabular-nums; }
   .gmmuted{ color:var(--muted); font-size:13px; }
   .gmspark{ margin-top:14px; border-top:1px solid var(--line); padding-top:12px; }
   .gmsparkt{ font-size:13px; color:var(--muted); margin-bottom:6px; }
   .gmspark svg{ width:100%; height:auto; display:block; }
-  .ginfo{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; width:18px; height:18px; border-radius:50%; border:1px solid var(--line); color:var(--muted); font-size:12.5px; cursor:pointer; margin-right:6px; vertical-align:middle; }
+  .ginfo{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; width:18px; height:18px; border-radius:50%; border:1px solid var(--line); color:var(--muted); font-size:12.5px; cursor:pointer; margin-right:6px; vertical-align:middle;
+    position:relative; appearance:none; -webkit-appearance:none; background:transparent; padding:0; font-family:inherit; line-height:1; }   /* 2026-10-26 P1-4: 갭 표의 ⓘ는 진짜 단추(button)가 됐다. 단추 기본 모양을 지워 종전 모양 그대로 */
   .gitem .ginfo{ margin-right:0; }
   .ginfo:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .gdname{ cursor:pointer; position:relative; }
+  /* 2026-10-26 P1-4: 표 · 목록에서 누를 수 있던 글자 · 행에 키보드 길을 냈다. 모양은 종전과 같고, 키보드로 오면 남색 테두리 */
+  .rowbtn, .thbtn{ appearance:none; -webkit-appearance:none; background:none; border:0; padding:0; margin:0; font:inherit; color:inherit; text-align:inherit; cursor:pointer; }
+  .rowbtn{ display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
+  .pname .rowbtn{ display:inline; }
+  #aggout .pubtable td.pname .rowbtn{ display:block; width:100%; }
+  .thbtn{ display:inline-flex; align-items:center; white-space:nowrap; }
+  /* 키보드 초점 테두리는 화면 전체에서 남색 2px(브라우저 기본 검은 테두리 대신). 남색 · 보라 바탕 위에서는 흰색 */
+  button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible, [role="button"]:focus-visible, [role="tab"]:focus-visible{ outline:2px solid var(--act); outline-offset:2px; }
+  #mkbrief .ai-head :focus-visible, .topnav.is-stuck :focus-visible{ outline-color:#fff; }
+  .gdname:focus-visible, .rowbtn:focus-visible, .thbtn:focus-visible, .ginfo:focus-visible, .pubcard:focus-visible, .watchcard:focus-visible{ outline:2px solid var(--act); outline-offset:2px; border-radius:4px; }
+  .pubcard:focus-visible, .watchcard:focus-visible{ border-radius:10px; }
+  .gop-clk:focus{ outline:none; }
+  .gop-clk:focus-visible circle{ stroke:var(--act); stroke-width:3.5; stroke-opacity:1; }
+  .gop-pt:focus-visible .gop-hlab{ opacity:1; }
+  .skiplink{ position:absolute; left:12px; top:-60px; z-index:300; background:var(--act); color:#fff; padding:9px 14px; border-radius:8px; font-size:14px; font-weight:700; text-decoration:none; }
+  .skiplink:focus{ top:10px; }
   .aib-src{ color:var(--accent2text); text-decoration:underline dotted; text-underline-offset:2px; }
   .aib-src:hover{ color:var(--accent2); text-decoration-style:solid; }
   /* 출처: 본문 각주 마커(¹) + 하단 출처 칩 — 링크를 본문 밖으로 분리 */
@@ -435,7 +458,7 @@
   .gdicon{ width:15px; height:15px; border-radius:4px; vertical-align:-3px; margin-right:4px; object-fit:cover; background:var(--chip); }   /* #14: 브리핑 게임명 옆 앱 아이콘 */
   .gdname:hover{ text-decoration:underline; }
   .gdname::after{ content:'상세보기'; position:absolute; left:0; top:-23px; font-size:12px; font-weight:600; background:var(--accent); color:#fff; padding:2px 7px; border-radius:5px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s; z-index:5; }
-  .gdname:hover::after{ opacity:1; }
+  .gdname:hover::after, .gdname:focus-visible::after{ opacity:1; }
   @media (max-width:560px){ .gmgrid{ grid-template-columns:repeat(2,1fr); } }
   @media (max-width:820px){ .gdname::after{ display:none; } }
   .zoombtns{ display:none; position:absolute; top:8px; right:8px; flex-direction:column; gap:5px; z-index:2; }
@@ -493,7 +516,8 @@
   .glegend .gl-item{ width:100%; text-align:left; font:inherit; font-size:14px; color:var(--text); cursor:pointer; background:transparent; border:1px solid transparent; border-radius:7px; padding:5px 8px; transition:background .12s, border-color .12s; }
   .glegend .gl-item:hover{ background:var(--chip); }
   .glegend .gl-item.on{ border-color:var(--line); background:var(--chip); font-weight:700; }
-  .glegend .gl-item.off{ opacity:.45; }
+  .glegend .gl-item.off .gl-name, .glegend .gl-item.off .gl-meta{ color:var(--ink3); font-weight:400; }   /* 2026-10-26 P1-3: 반투명(.45, 대비 2.0 ~ 2.9:1) 대신 흐린 글자색(옅은 판 위 4.7:1). 고른 장르만 색 · 굵게는 그대로 */
+  .glegend .gl-item.off .gl-dot{ opacity:.35; }
   .glegend .gl-dot{ width:10px; height:10px; border-radius:3px; }
   .glegend .gl-name{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .glegend .gl-meta{ font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
@@ -577,16 +601,11 @@
   .sectitle, .histsec h2, .pubsec h2, .cmpsec h2{ font-size:20px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em; padding:0; color:var(--accent); line-height:1.25; }   /* 2026-10-18 밤 사용자 "구분감이 생겼으니까 제목은 배경색말고 글자색변경으로 강조": 띠 제거, 파란 글자(견본 2026-10-18-구간제목 8안) */   /* 2026-10-18 A안의 왼쪽 강조선 → 같은 날 밤 사용자 "3안이 좋을거같아": 제목 줄 전체 옅은 파랑 띠(견본 2026-10-18-구간제목 3안) */
   .sectitle::before, .histsec h2::before, .pubsec h2::before, .cmpsec h2::before{ content:''; display:inline-block; width:5px; height:18px; border-radius:3px; background:var(--accent); margin-right:9px; vertical-align:-2px; }   /* 2026-10-18 밤 사용자 "ai시장브리핑 카드들 제목 앞에 제목강조처럼 좀 모서리가 부드러운 제목강조를 섹션에 추가하자": 브리핑 카드 표식(.aib-h::before 4×13 · 모서리 2)의 비율로 5×18 · 모서리 3, 제목 글자와 같은 파랑 */
   .gopi-h{ font-size:13.5px; }
-  .aibdn{ color:#e07c12; font-weight:600; }
   .gop-insight.pm-top{ margin:0 0 12px; }
-  /* 숫자·표시가 읽기 대비 4.5:1을 넘게(같은 계열의 진한 색). 2026-10-18 사용자 결정으로 어두운 화면을 없애 항상 적용 */
-    .aibup, .histtable td.up, td.gaprev, .watch-up, .hcell.up b, .gmevent-up{ color:#15803d; }
-    td.gapdl, .aibdn{ color:#b45309; }
-    .mv-upd{ color:#15803d; border-color:rgba(21,128,61,.5); }
-    .newbadge{ background:#c81e3f; }
-    .gmevent-tag{ background:#15803d; }
-    .mvd.up{ color:#166534; }
-    .cact{ color:#1d4ed8; }
+  /* 숫자·표시가 읽기 대비 4.5:1을 넘게(같은 계열의 진한 색). 2026-10-18 사용자 결정으로 어두운 화면을 없애 항상 적용.
+     2026-10-26 P2-5: 상승 · 하락 · 신작 · 업데이트 색은 아래 「순위 상승 · 하락 색」 한 곳으로 옮겼고, 여기에는 갭 표의 두 종류 색만 남는다 */
+    td.gaprev{ color:#15803d; }
+    td.gapdl{ color:#b45309; }
   /* 표: 숫자는 오른쪽 정렬(이름·게임 목록·첫 칸은 왼쪽), 갭 표는 폭 880px */
   .pubtable th, .pubtable td{ text-align:right; }
   .pubtable td.pname, .pubtable th.pname, .pubtable td.pgames, .pubtable th.pgames, .pubtable th:first-child, .pubtable td:first-child{ text-align:left; }
@@ -607,7 +626,10 @@
 
   /* 2026-10-16 설명 문구(가안): 계산 방식·한계는 ⓘ — 마우스를 올리면 풍선, 누르면 바로 아래 펼침(휴대폰) */
   .dinfo{ display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; border-radius:50%; border:1px solid var(--line); background:var(--bg); color:var(--muted); font-size:12px; font-weight:700; font-style:normal; line-height:1; cursor:pointer; margin-left:4px; vertical-align:middle; }
-  .dinfo:hover, .dinfo:focus-visible{ border-color:var(--muted); color:var(--text); outline:none; }
+  .dinfo{ position:relative; }
+  .dinfo:hover{ border-color:var(--muted); color:var(--text); }
+  .dinfo:focus{ outline:none; }
+  .dinfo:focus-visible{ border-color:var(--muted); color:var(--text); outline:2px solid var(--act); outline-offset:2px; }   /* 2026-10-26 P2-4: 키보드 초점은 남색 테두리(전에는 원 테두리 색만 바뀌었다) */
   .dinfo-pop{ display:block; flex-basis:100%; margin:4px 0 2px; padding:6px 10px; border-radius:8px; background:var(--panel); border:1px solid var(--line); color:var(--text); font-size:13px; font-style:normal; font-weight:400; line-height:1.55; }
   /* 2026-10-18 사용자 "매출에 I 눌러도 아무것도 안나와": 표 머리(장르 목록 · 갭 표)의 ⓘ도 누르면 펼침 — 좁은 칸 안이라 머리 줄 아래에 띄운다 */
   .gl-head .dinfo-pop{ position:absolute; left:8px; right:8px; top:calc(100% + 3px); margin:0; z-index:3; text-align:left; white-space:normal; box-shadow:0 2px 8px rgba(0,0,0,.08); }
@@ -617,7 +639,7 @@
      크기 13.5px · 5px 12px · 모서리 8, 테두리 상자 안 알약(.seg-pill)이 켜진 단추 아래로 미끄러진다. 색: 보기 종류는 보라(.seg-purple) · 지표는 파랑 · 기간은 검정(.seg-dark) */
   .seg{ position:relative; display:inline-flex; flex-wrap:wrap; gap:0; border:1px solid var(--line); border-radius:11px; padding:3px; background:var(--panel); margin:0; }
   .seg > button{ position:relative; z-index:1; appearance:none; border:0; background:transparent; color:var(--muted); font:inherit; font-size:13.5px; font-weight:700; padding:5px 12px; border-radius:8px; cursor:pointer; transition:color .15s; white-space:nowrap; flex:0 0 auto; box-shadow:none; }
-  .seg > button:hover:not(:disabled){ color:var(--text); }
+  .seg > button:hover:not(:disabled):not([aria-selected="true"]):not(.on){ color:var(--text); }   /* 2026-10-26 P1-1: 켜진 단추는 제외(마우스를 올리면 글자가 알약 바탕색과 같아져 안 보이던 것) */
   .seg > button:disabled{ opacity:.4; cursor:not-allowed; }
   .seg > button[aria-selected="true"], .seg > button.on{ color:#fff; background:var(--accent); }   /* 스크립트 전 폴백: 단추 자체를 채움 */
   .seg.seg-purple > button[aria-selected="true"], .seg.seg-purple > button.on{ background:var(--accent2); }
@@ -638,11 +660,9 @@
      남색 #1E3A5F(--act: 누르는 것 · 고른 것, 흰 바탕 11.5:1) · 금색 #A16207(1위 큰 숫자에만, 흰 바탕 4.9:1) · 빨강 #C8372F(순위 상승만, 흰 바탕 5.2:1). 하락은 보조 회색.
      옛 파랑 --accent(아래 구간의 제목 · 단추 · 표의 누르는 이름)도 남색을 따른다. 그대로 두는 것: 보라(--accent2, '보기 종류' 전환 단추, 10-18 사용자 결정),
      인사이트 칸의 옅은 파랑(10-18 사용자 결정), 구간 시장 선택의 주황 테두리, 데이터 색(시장 · 장르 · 진입 맵 사분면 · 그래프 선). AI 브리핑은 맨 위 흰 판 + 보라 머리띠(10-24 밤 사용자 "2안이 좋아보여", 보라는 10-18의 브리핑 보라). */
-  :root{ --ink:#0F172A; --ink2:#475569; --hair:#CBD5E1; --page:#F8FAFC; --act:#1E3A5F; --gold:#A16207; --up:#C8372F; --upbg:#FBECEA; --dnbg:#EEF0F3;
-    --text:#0F172A; --muted:#475569; --line:#CBD5E1; --panel:#E9EEF5; --accent:var(--act); }
-  /* 숫자로 박힌 파랑을 누르는 색으로: '시장 이름을 누르면' 안내 칩 · 누를 수 있는 표 행의 마우스 올림 */
+  /* 위 색 값은 2026-10-26부터 맨 위 :root 한 곳에서 정한다(두 번 정하던 것을 합침) */
+  /* 숫자로 박힌 파랑을 누르는 색으로: '시장 이름을 누르면' 안내 칩 */
   .cact{ background:var(--panel); background:color-mix(in srgb, var(--act) 12%, transparent); color:var(--act); }
-  .pubrow:hover td{ background:rgba(30,58,95,.07); }
   body{ background:var(--page); color:var(--ink); }
   .wrap-head{ padding-bottom:0; }
   .wrap-head header{ padding-bottom:14px; }
@@ -661,7 +681,7 @@
   .topnav.is-stuck .navmkt{ border-color:#fff; }
   .topnav.is-stuck .navsrc-wrap.seg{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.3); }
   .topnav.is-stuck .navsrc-wrap.seg > button{ color:rgba(255,255,255,.9); }
-  .topnav.is-stuck .navsrc-wrap.seg > button:hover:not(:disabled){ color:#fff; }
+  .topnav.is-stuck .navsrc-wrap.seg > button:hover:not(:disabled):not([aria-selected="true"]){ color:#fff; }   /* 켜진 단추(흰 알약 · 남색 글자)는 제외 */
   .topnav.is-stuck .navsrc-wrap.seg > button[aria-selected="true"]{ background:#fff; color:var(--act); }
   .topnav.is-stuck .navsrc-wrap.seg.seg-ready > button[aria-selected="true"]{ background:transparent; }
   .topnav.is-stuck .navsrc-wrap .seg-pill{ background:#fff; }
@@ -729,7 +749,7 @@
   .wk-pub{ display:block; margin-top:2px; font-size:13px; line-height:1.35; color:var(--ink2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }   /* 제작사는 한 줄, 넘치면 …(전체 이름은 마우스를 올리면) */
   .wk-st{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; margin-top:6px; font-size:13px; line-height:1.4; color:var(--ink); }
   .wk-badge{ display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:6px; font-size:13px; font-weight:700; white-space:nowrap; }
-  .wk-badge.is-new{ background:var(--upbg); color:#B42318; }   /* 1위가 바뀐 시장: 빨강 계열(순위 상승 색), 바탕 위 대비 5:1 이상 */
+  .wk-badge.is-new{ background:var(--upbg); color:var(--up-ink); }   /* 1위가 바뀐 시장: 빨강 계열(순위 상승 색), 바탕 위 대비 5:1 이상 */
   .wk-badge.is-run{ background:var(--panel); color:var(--act); }   /* 지켜 온 1위: 남색 */
   .wk-avg{ font-size:13px; color:var(--ink2); font-variant-numeric:tabular-nums; white-space:nowrap; }
   .wk-row{ display:flex; align-items:center; gap:10px; min-width:0; }
@@ -777,8 +797,8 @@
   .aiblock .mkbrief-row2{ margin:0; gap:10px; }
   .aiblock .mkbrief-axis.seg{ margin:0; }
   #mkbrief .ai-head .seg{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.3); }
-  #mkbrief .ai-head .seg > button{ color:rgba(255,255,255,.9); }
-  #mkbrief .ai-head .seg > button:hover:not(:disabled){ color:#fff; }
+  #mkbrief .ai-head .seg > button{ color:#fff; }   /* 2026-10-26 P3-2: 흰 글자 90% → 100%(보라 머리띠 위 대비 4.2 → 4.8:1) */
+  #mkbrief .ai-head .seg > button:hover:not(:disabled):not([aria-selected="true"]){ text-decoration:underline; text-underline-offset:3px; }   /* 2026-10-26 P1-1: 켜진 단추(흰 알약 · 보라 글자)는 제외. 이미 흰 글자라 밑줄로 반응 */
   #mkbrief .ai-head .seg > button[aria-selected="true"]{ background:#fff; color:var(--accent2text); }
   #mkbrief .ai-head .seg.seg-ready > button[aria-selected="true"]{ background:transparent; }
   #mkbrief .ai-head .seg .seg-pill{ background:#fff; }
@@ -814,13 +834,42 @@
     #mkbrief .mkbrief-row2 .mkbrief-calpop{ left:0; right:auto; }   /* 휴대폰은 '과거 기록' 단추가 왼쪽으로 내려와, 달력을 단추 왼쪽 끝에 맞춘다(오른쪽 맞춤이면 화면 왼쪽 밖으로 나감) */
   }
   /* 순위 상승 · 하락 색(이 화면 전체): 상승 빨강, 하락은 보조 회색 — 한국 차트 · 증시 관례. 업데이트 표시(↻)는 회색 테두리 */
+  /* 2026-10-26 P2-5: 상승 · 하락 색의 유일한 자리(전에는 초록 상승 · 빨강 하락 규칙이 위에 남아 진입 맵 요약 칩 · 브리핑 수치가 초록이었다).
+     옅은 판(--panel) 위 작은 글자는 한 단계 진한 빨강(--up-ink, 5.6:1). 업데이트 · 이벤트 표시는 회색(위 .mv-upd · .gmevent 선언) */
   .mvd.up{ color:var(--up); background:var(--upbg); }
   .mvd.down{ color:var(--ink2); background:var(--dnbg); }
-  .histtable td.up, .hcell.up b, .watch-up, .gmevent-up{ color:var(--up); }
-  .histtable td.down, .hcell.down b{ color:var(--ink2); }
-  .mv-upd{ color:var(--ink2); border-color:var(--hair); }
-  .gmevent{ background:var(--panel); border-color:var(--hair); }
-  .gmevent-tag{ background:var(--ink2); }
+  .histtable td.up, .hcell.up b{ color:var(--up); }
+  .watch-up, .gmevent-up, .aibup{ color:var(--up-ink); }
+  .histtable td.down, .hcell.down b, .aibdn{ color:var(--ink2); }
+  /* 2026-10-26 P2-3: 손가락으로 누르는 화면(pointer:coarse)에서 작은 단추의 눌리는 영역을 넓힌다. 보이는 크기는 그대로 두고 둘레만(ⓘ 18px → 30px 영역),
+     전환 단추 · 탭은 높이 36px */
+  @media (pointer:coarse){
+    .ginfo::after, .dinfo::after, .pubmore::after, .aib-more::after{ content:''; position:absolute; inset:-7px; }
+    .pubmore, .aib-more{ position:relative; }
+    .seg > button, .mkbrief-tab, .mkbrief-cal, .goptraj-play, .movers-more{ min-height:36px; }
+    .sec-mkt-sel{ min-height:30px; }
+  }
+  /* 2026-10-26 P1-4: 키보드로 그래프에 오면 ＋/－ 단추가 나타난다(휴대폰은 늘 보임). 마우스로 쓸 때는 휠 · 끌기 그대로라 보이지 않는다 */
+  @media (min-width:821px){
+    .zoombtns{ display:flex; opacity:0; pointer-events:none; }
+    .chartbox:focus-within .zoombtns{ opacity:1; pointer-events:auto; }
+  }
+  .zoombtns button:focus-visible{ outline:2px solid var(--act); outline-offset:2px; }
+  .chartbar:focus-visible{ outline:2px solid var(--act); outline-offset:3px; }
+  /* 2026-10-26 P2-1: 데이터가 오기 전에 AI 브리핑 · 주간 순위의 자리를 잡아 둔다(늦게 나타나며 아래 내용을 밀어 내던 것, 내용 밀림 점수 0.50).
+     높이는 2026-10-26 데이터로 다 그린 뒤 잰 값보다 조금 작게 잡았고, 다 그리면 is-loading을 뗀다 */
+  #mkbrief.is-loading #mkbriefAxis{ min-height:38px; }
+  #mkbrief.is-loading .mkbrief-tabs{ min-height:57px; }
+  #mkbrief.is-loading .mkbrief-body{ min-height:220px; }
+  #mkbrief .mkbrief-body > .empty{ margin:0; }   /* '불러오는 중…' 문단의 위 여백이 판 밖으로 번져(여백 겹침) 판 전체를 14px 내렸다가 글이 오면 올라가던 것 */
+  .wk-board.is-loading{ min-height:460px; }
+  @media (max-width:1099px){ #mkbrief.is-loading .mkbrief-body{ min-height:240px; } .wk-board.is-loading{ min-height:400px; } }
+  @media (max-width:820px){ #mkbrief.is-loading .mkbrief-tabs{ min-height:94px; } #mkbrief.is-loading .mkbrief-body{ min-height:260px; } }
+  @media (max-width:700px){ #mkbrief.is-loading .mkbrief-row2{ min-height:44px; } #mkbrief.is-loading .mkbrief-tabs{ min-height:100px; } #mkbrief.is-loading .mkbrief-body{ min-height:380px; } }
+  @media (max-width:640px){ .wk-board.is-loading{ min-height:390px; } }
+  @media (max-width:480px){ #mkbrief.is-loading .mkbrief-body{ min-height:470px; } #weeksec:has(.wk-board.is-loading) .wk-cap{ min-height:40px; } }
+  @media (max-width:414px){ #mkbrief.is-loading .mkbrief-tabs{ min-height:142px; } #weeksec:has(.wk-board.is-loading) .wk-cap{ min-height:61px; } }
+  @media (max-width:400px){ #mkbrief.is-loading .mkbrief-row2{ min-height:90px; } .wk-board.is-loading{ min-height:425px; } }
   @media (max-width:820px){
     .topnav-in{ padding:0 14px; gap:10px; min-height:50px; }
     .chaplinks{ display:none; }
@@ -832,6 +881,7 @@
 </style>
 </head>
 <body>
+<a class="skiplink" href="#main">본문으로 건너뛰기</a>   <!-- 2026-10-26 P3-1: 키보드 사용자가 위 고정 줄을 건너뛰는 첫 링크(Tab을 누를 때만 보인다) -->
 <div class="gmodal-bg" id="gmodalBg" hidden><div class="gmodal" role="dialog" aria-modal="true" aria-labelledby="gmtitle"><button class="gmclose" id="gmClose" aria-label="닫기">✕</button><div id="gmBody"></div></div></div>
 <div class="wrap wrap-head">
   <header>
@@ -844,7 +894,8 @@
       <label class="mklabel" for="countrySel">시장 선택</label>
       <select id="countrySel" class="mksel"><option>불러오는 중…</option></select>
     </div>
-    <p class="meta" id="meta">불러오는 중…</p>
+    <p class="meta" id="meta"></p>   <!-- 2026-10-26 P2-1: 처음 '불러오는 중…'이 있다가 데이터가 오면 빠지며 아래 전체가 밀려 올라갔다. 오류 때만 글이 들어간다 -->
+
   </header>
 </div>
 <div class="topnav-sentinel" id="topnavSentinel" aria-hidden="true"></div>   <!-- 2026-10-24 밤: 위 고정 줄이 화면 위에 붙었는지 아는 표지 -->
@@ -868,16 +919,17 @@
         <select id="countrySelNav" class="navmkt"></select>
       </div>
       <div class="navsrc-wrap seg" role="tablist" aria-label="차트 종류">
-        <button class="navsrc" data-src="grossing" aria-selected="true">매출</button>
-        <button class="navsrc" data-src="free" aria-selected="false">인기</button>
+        <button class="navsrc" role="tab" data-src="grossing" aria-selected="true">매출</button>
+        <button class="navsrc" role="tab" data-src="free" aria-selected="false">인기</button>
       </div>
     </div>
   </div>
 </nav>
 <div class="wrap">
+<main id="main">   <!-- 2026-10-26 P3-1: 본문 영역 표시(화면 읽기 프로그램이 본문으로 바로 간다) -->
 
   <details class="intro">
-    <summary><span class="intro-title">프로젝트 소개</span><span class="intro-sub">만든 이유 · 읽을 수 있는 정보 · 활용</span><span class="intro-clickme">click me</span><span class="intro-hint"></span></summary>
+    <summary><h2 class="intro-title">프로젝트 소개</h2><span class="intro-sub">만든 이유 · 읽을 수 있는 정보 · 활용</span><span class="intro-clickme">click me</span><span class="intro-hint"></span></summary>
     <div class="intro-body">
       <div class="intro-diagram">
         <svg viewBox="0 0 760 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="데이터는 수집, 누적, 집계, AI 분석, 출력 순으로 처리되며 매일 자동으로 실행됩니다">
@@ -919,7 +971,7 @@
     </div>
   </details>
 
-  <section class="aiblock" id="mkbrief" hidden aria-labelledby="aiTitle">   <!-- 2026-10-24 밤 사용자 "2안이 좋아보여": 화면의 코어라 맨 위. 흰 판 + 보라 머리띠, 항목은 요약 + 자세히 카드(핵심 항목은 위 줄) -->
+  <section class="aiblock is-loading" id="mkbrief" aria-labelledby="aiTitle">   <!-- 2026-10-26 P2-1: 처음부터 자리를 잡고(hidden 대신 is-loading), 브리핑 목록을 못 받으면 숨긴다 -->   <!-- 2026-10-24 밤 사용자 "2안이 좋아보여": 화면의 코어라 맨 위. 흰 판 + 보라 머리띠, 항목은 요약 + 자세히 카드(핵심 항목은 위 줄) -->
     <div class="ai-head">
       <div class="ai-tl">
         <h2 id="aiTitle">AI 시장 브리핑</h2>
@@ -943,7 +995,7 @@
       <p class="wk-cap" id="wkCap">불러오는 중…</p>
       <span class="wk-hint cap"><span class="cact">▸ 시장 이름을 누르면 아래 구간이 그 시장으로</span></span>
     </div>
-    <div class="wk-board" id="wkBoard"></div>
+    <div class="wk-board is-loading" id="wkBoard"></div>
     <p class="wk-swipe" aria-hidden="true">← 옆으로 밀어서 보기 →</p>
   </section>
 
@@ -958,7 +1010,7 @@
       <button class="stab" role="tab" data-src="grossing" aria-selected="true">매출 (Top Grossing)</button>
       <button class="stab" role="tab" data-src="free" aria-selected="false">인기 (Top Free)</button>
     </div>
-    <div class="tabs seg seg-dark" id="tabs" role="tablist">
+    <div class="tabs seg seg-dark" id="tabs" role="tablist" aria-label="기간">
       <button class="tab" role="tab" data-tf="daily" aria-selected="true">일별</button>
       <button class="tab" role="tab" data-tf="weekly" aria-selected="false">주별</button>
       <button class="tab" role="tab" data-tf="monthly" aria-selected="false">월별</button>
@@ -978,7 +1030,7 @@
         <canvas id="chart" role="img" aria-label="모바일 게임 순위 추이 꺾은선 그래프. 위쪽이 1위. 선택한 게임의 선이 강조됩니다."></canvas>
         <div class="zoombtns" id="zoombtns"><button id="zoomIn" type="button" aria-label="확대">＋</button><button id="zoomOut" type="button" aria-label="축소">－</button></div>
       </div>
-      <div class="chartbar" id="chartbar" title="막대를 끌면 보는 구간이 이동합니다"><div class="chartbar-thumb" id="chartthumb"></div></div>
+      <div class="chartbar" id="chartbar" title="막대를 끌면 보는 구간이 이동합니다" tabindex="0" role="scrollbar" aria-controls="chart" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="그래프에서 보는 구간(확대한 뒤 왼쪽 · 오른쪽 화살표로 옮김)"><div class="chartbar-thumb" id="chartthumb"></div></div>   <!-- 2026-10-26 P1-4: 키보드로도 옮긴다 -->
       <p class="viewhint" id="viewhint">전체 보기</p>
     </div>
     <aside class="panel">
@@ -988,7 +1040,7 @@
         <div class="row">
           <input class="search" id="search" type="search" placeholder="게임 검색 (이름·개발사)" aria-label="게임 검색">
         </div>
-        <p class="panelnote cap"><span class="ci"><span class="cchip" style="background:var(--chip);color:var(--text)">12</span> 최근 순위</span><span class="ci"><span style="color:#e0a82e;font-size:13px">★</span> 평점</span><span class="ci"><span class="cchip" style="background:#e0455e;color:#fff">신작</span> 출시 3개월 미만</span><span class="ci"><span class="cic" style="color:var(--muted)">↘</span> 차트 이탈</span></p>
+        <p class="panelnote cap"><span class="ci"><span class="cchip" style="background:var(--chip);color:var(--text)">12</span> 최근 순위</span><span class="ci"><span style="color:#e0a82e;font-size:13px">★</span> 평점</span><span class="ci"><span class="cchip" style="background:var(--new);color:#fff">신작</span> 출시 3개월 미만</span><span class="ci"><span class="cic" style="color:var(--muted)">↘</span> 차트 이탈</span></p>
         <div class="row" style="justify-content:space-between; margin-bottom:8px;">
           <span class="selcount" id="selcount" style="margin:0">선택된 게임 없음</span>
           <button class="clearbtn" id="clear">전체 해제</button>
@@ -1011,13 +1063,13 @@
     <div class="cmp-controls">
       <span class="cmp-clabel">기준</span>
       <div class="seg seg-purple" role="tablist" aria-label="기준">   <!-- 2026-10-18 밤 통일 전환 단추 -->
-        <button class="cmp-basis on" type="button" data-basis="market">시장 기준</button>
-        <button class="cmp-basis" type="button" data-basis="genre">장르 기준</button>
+        <button class="cmp-basis on" type="button" role="tab" aria-selected="true" data-basis="market">시장 기준</button>
+        <button class="cmp-basis" type="button" role="tab" aria-selected="false" data-basis="genre">장르 기준</button>
       </div>
       <span class="cmp-clabel" style="margin-left:12px">지표</span>
       <div class="seg" role="tablist" aria-label="지표">
-        <button class="cmp-metric on" type="button" data-metric="rev">추정 매출 점유</button>
-        <button class="cmp-metric" type="button" data-metric="pre">차트 점유(게임 수)</button>
+        <button class="cmp-metric on" type="button" role="tab" aria-selected="true" data-metric="rev">추정 매출 점유</button>
+        <button class="cmp-metric" type="button" role="tab" aria-selected="false" data-metric="pre">차트 점유(게임 수)</button>
       </div>
     </div>
     <div class="cmp-wrap"><div class="cmp-grid" id="cmpGrid"></div></div>
@@ -1041,12 +1093,12 @@
       </div>
       <input class="search pubsearch" id="aggsearch" type="search" placeholder="이름·게임 검색" aria-label="집계 검색">
       <div class="periodtabs seg seg-dark" id="aggperiod" role="tablist" aria-label="집계 기간">
-        <button class="ptab" data-days="" aria-selected="true">전체</button>
-        <button class="ptab" data-days="7">1주</button>
-        <button class="ptab" data-days="30">1달</button>
-        <button class="ptab" data-days="90">3개월</button>
-        <button class="ptab" data-days="180">6개월</button>
-        <button class="ptab" data-days="365">1년</button>
+        <button class="ptab" role="tab" data-days="" aria-selected="true">전체</button>
+        <button class="ptab" role="tab" data-days="7" aria-selected="false">1주</button>
+        <button class="ptab" role="tab" data-days="30" aria-selected="false">1달</button>
+        <button class="ptab" role="tab" data-days="90" aria-selected="false">3개월</button>
+        <button class="ptab" role="tab" data-days="180" aria-selected="false">6개월</button>
+        <button class="ptab" role="tab" data-days="365" aria-selected="false">1년</button>
       </div>
     </div>
     <p class="sub cap" id="aggsub"></p>
@@ -1066,11 +1118,11 @@
     <h2>진입 · 이탈 · 급변</h2>
     <p class="sub cap" id="moversub"></p>
     <div class="periodtabs seg seg-dark" id="moverstf" role="tablist" aria-label="변화 시간축">
-      <button class="mtab" data-tf="daily" aria-selected="true">일별</button>
-      <button class="mtab" data-tf="weekly" aria-selected="false">주별</button>
-      <button class="mtab" data-tf="monthly" aria-selected="false">월별</button>
-      <button class="mtab" data-tf="quarterly" aria-selected="false">분기별</button>
-      <button class="mtab" data-tf="yearly" aria-selected="false">연별</button>
+      <button class="mtab" role="tab" data-tf="daily" aria-selected="true">일별</button>
+      <button class="mtab" role="tab" data-tf="weekly" aria-selected="false">주별</button>
+      <button class="mtab" role="tab" data-tf="monthly" aria-selected="false">월별</button>
+      <button class="mtab" role="tab" data-tf="quarterly" aria-selected="false">분기별</button>
+      <button class="mtab" role="tab" data-tf="yearly" aria-selected="false">연별</button>
     </div>
     <div id="moversout"></div>
   </div>
@@ -1081,6 +1133,7 @@
     <div id="watchout"></div>
   </div>
 
+  </main>
   <footer class="site-footer">
     <div class="sf-sub">데이터: Apple App Store 매출 · 인기 차트(iTunes RSS, 시장별 상위 100위). 매일 07:37에 자동으로 수집합니다(GitHub Actions).</div>
     <div class="sf-sub">AI 시장 브리핑: Claude Opus 5.5, 매주 월요일 갱신. 추정 매출은 차트 순위로 거꾸로 계산한 상대값이며 실제 금액이 아닙니다.</div>
@@ -1088,12 +1141,13 @@
   </footer>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 <script>
 const PALETTE = ['#2563eb','#dc2626','#16a34a','#d97706','#7c3aed','#0891b2','#db2777','#65a30d',
   '#ea580c','#0d9488','#4f46e5','#b91c1c','#15803d','#a16207','#9333ea','#0e7490','#be185d','#c2410c'];
 // ===== 2026-10-16 가시성·가독성: 차트 글자·눈금·세로축 제목·장르 선 끝 이름 =====
 Chart.defaults.font.size = 13;
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ if(typeof chart!=='undefined' && chart) chart.update(); });   // 웹 글꼴이 늦게 오면 그래프 글자를 다시 그림
 Chart.defaults.font.family = "'Noto Sans KR','NanumSquare',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif";   // 2026-10-18 나눔스퀘어(사용자 결정) → 같은 날 밤 본문 글꼴 노토 산스로(그래프 글자는 본문)
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ try{ if(window.chart) chart.update('none'); }catch(e){} }); }   // 글꼴이 늦게 오면 그래프 글자를 한 번 다시 그린다
 const TICKC = '#6b6a64';   // 2026-10-18 어두운 화면 제거 — 항상 밝은 화면 눈금색   // 캔버스는 CSS 변수를 못 읽어 화면 설정으로 고른다
@@ -1111,6 +1165,30 @@ function dinfo(t){ return '<i class="dinfo" role="button" tabindex="0" aria-labe
 function dinfoToggle(t){ const host=t.closest('.ci')||t; const nx=host.nextElementSibling; if(nx && nx.classList.contains('dinfo-pop')){ nx.remove(); return; } const p=document.createElement('span'); p.className='dinfo-pop'; p.textContent=t.getAttribute('title')||''; host.after(p); }
 document.addEventListener('click', e=>{ const t=e.target.closest && e.target.closest('.dinfo'); if(!t) return; e.preventDefault(); e.stopPropagation(); dinfoToggle(t); }, true);
 document.addEventListener('keydown', e=>{ if(e.key!=='Enter' && e.key!==' ') return; const t=e.target.closest && e.target.closest('.dinfo'); if(!t) return; e.preventDefault(); dinfoToggle(t); });
+// 2026-10-26 impeccable 점검 P1-4 · P1-5 · P3-1: 키보드 길과 키보드 위치 유지
+// ① role="button"인 글자 · 카드 · 진입 맵 원은 Enter · Space로 누른다(ⓘ는 바로 위 처리가 먼저 받는다).
+// ② role="tab" 묶음은 왼쪽 · 오른쪽 화살표(Home · End)로 옆 단추를 고른다.
+// ③ 다시 그리는 목록 · 표는 data-fk(키보드 위치를 되찾는 표시)로 같은 단추에 초점을 돌려준다(전에는 다시 그리면 초점이 문서 처음으로 빠졌다).
+document.addEventListener('keydown', e=>{
+  if(e.defaultPrevented || (e.key!=='Enter' && e.key!==' ')) return;
+  const t=e.target; if(!t || !t.matches || !t.matches('[role="button"]:not(button):not(a)')) return;
+  e.preventDefault(); t.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true, view:window}));
+});
+document.addEventListener('keydown', e=>{
+  if(['ArrowRight','ArrowLeft','ArrowDown','ArrowUp','Home','End'].indexOf(e.key)<0 || e.altKey || e.ctrlKey || e.metaKey) return;
+  const t=e.target; if(!t || !t.matches || !t.matches('[role="tab"]')) return;
+  const list=t.closest('[role="tablist"]'); if(!list) return;
+  const live=()=>[...list.querySelectorAll('[role="tab"]')].filter(b=>!b.disabled && b.offsetParent!==null);
+  const tabs=live(); let i=tabs.indexOf(t); if(i<0) return;
+  if(e.key==='Home') i=0; else if(e.key==='End') i=tabs.length-1; else i=(i+((e.key==='ArrowRight'||e.key==='ArrowDown')?1:-1)+tabs.length)%tabs.length;
+  e.preventDefault(); tabs[i].click(); (live()[i]||tabs[i]).focus();
+});
+function gdAttrs(aid, title){ return ' role="button" tabindex="0" data-fk="g:'+esc(aid)+'" aria-label="'+esc(title)+' 상세 보기"'; }   // 게임 이름(상세 창 열기)을 키보드로
+function setHTMLKeepFocus(el, html){
+  const a=document.activeElement, k=(a && el.contains(a) && a.getAttribute) ? a.getAttribute('data-fk') : null;
+  el.innerHTML=html;
+  if(k){ const n=[...el.querySelectorAll('[data-fk]')].find(x=>x.getAttribute('data-fk')===k); if(n) try{ n.focus({preventScroll:true}); }catch(_){ } }
+}
 function mvLabel(tf, s){ s=String(s||''); let m;
   if(tf==='weekly' && (m=s.match(/^\d{4}-(\d{2})-(\d{2})$/))) return (+m[1])+'/'+(+m[2])+' 주';
   if((m=s.match(/^\d{4}-Q(\d)$/))) return m[1]+'분기';
@@ -1175,6 +1253,9 @@ function restyle(){
   renderList();
   renderHistory();
   renderAggSection();
+  // 2026-10-26 P1-4: 다시 그리지 않는 갭 표 · 지속 상승 카드의 '눌림' 표시를 지금 고른 게임에 맞춘다(화면 읽기 프로그램용)
+  document.querySelectorAll('#gapout .pubrow').forEach(r=>{ const b=r.querySelector('.rowbtn'); if(b) b.setAttribute('aria-pressed', String(selected.includes(r.dataset.aids))); });
+  document.querySelectorAll('#watchout .watchcard').forEach(c=> c.setAttribute('aria-pressed', String(selected.includes(c.dataset.aid))));
 }
 
 function switchTf(tf){
@@ -1211,6 +1292,7 @@ function renderList(){
     return norm(g.title).includes(q) || norm(g.developer).includes(q);
   });
   if(!rows.length){ list.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
+  const _a=document.activeElement, _fk=(_a && list.contains(_a)) ? _a.getAttribute('data-fk') : null;   // 2026-10-26 P1-5: 다시 그린 뒤 키보드 위치를 되찾는다
   list.innerHTML='';
   rows.forEach(aid=>{
     const g=DATA.games[aid];
@@ -1220,7 +1302,7 @@ function renderList(){
     const rankHtml = st.inChart ? `${st.lastRank}위`
       : st.seen ? `${st.daysAgo}일 전 이탈` : '-';
     const btn=document.createElement('button');
-    btn.className='gitem'+(st.inChart?'':' out'); btn.setAttribute('aria-pressed', String(sel));
+    btn.className='gitem'+(st.inChart?'':' out'); btn.setAttribute('aria-pressed', String(sel)); btn.setAttribute('data-fk','gi:'+aid);
     const rt=ratingStr(aid);
     btn.innerHTML=`<span class="sw" style="background:${c||'#c9c8c2'}"></span>`+
       `<span class="ginfo" data-aid="${aid}" title="상세 보기" role="button" aria-label="상세 보기">ⓘ</span>`+
@@ -1230,6 +1312,7 @@ function renderList(){
     btn.addEventListener('click',()=> toggle(aid));
     list.appendChild(btn);
   });
+  if(_fk){ const n=[...list.querySelectorAll('[data-fk]')].find(x=>x.getAttribute('data-fk')===_fk); if(n) try{ n.focus({preventScroll:true}); }catch(_){ } }
 }
 
 function avg3m(aid){ const s=(DATA.timeframes.daily.series[aid]||[]); const recent=s.slice(-90).filter(v=>v!=null); if(!recent.length) return null; return Math.round(recent.reduce((a,b)=>a+b,0)/recent.length*10)/10; }
@@ -1243,7 +1326,7 @@ function renderHistory(){
     wrap.innerHTML='<p class="empty">위 그래프에서 게임을 선택하면, 그 게임의 '+TF_LABEL[activeTf]+' 순위 이력이 여기에 표로 표시됩니다.</p>';
     return;
   }
-  sub.innerHTML = `<span class="ci"><b>${TF_LABEL[activeTf]}</b> 단위로 본 순위입니다. 위 그래프에서 고른 단위를 따릅니다.</span><span class="ci"><span style="color:#16a34a">▲</span> 상승 &nbsp; <span style="color:#dc2626">▼</span> 하락</span>`;
+  sub.innerHTML = `<span class="ci"><b>${TF_LABEL[activeTf]}</b> 단위로 본 순위입니다. 위 그래프에서 고른 단위를 따릅니다.</span><span class="ci"><span style="color:var(--up)">▲</span> 상승 &nbsp; <span style="color:var(--ink2)">▼</span> 하락</span>`;   // 2026-10-26 P1-2: 범례 색을 칸 색(상승 빨강 · 하락 회색)에 맞췄다. 전에는 초록 상승 · 빨강 하락으로 칸과 반대였다
   const labels=tf.labels;
   let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th><th class="colorcol" title="그래프 색"></th><th class="avg3m" title="최근 3개월 평균 순위">3개월<br>평균</th>';
   labels.forEach(l=> h+=`<th>${esc(l)}</th>`);
@@ -1251,7 +1334,7 @@ function renderHistory(){
   selected.forEach(aid=>{
     const c=colorFor(aid), s=tf.series[aid]||[];
     const av=avg3m(aid);
-    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}">${newBadge(aid)}<span class="gdname" data-aid="${esc(aid)}">${esc(DATA.games[aid].title)}</span></td><td class="colorcol"><span class="cbar" style="background-color:${c}"></span></td><td class="avg3m">${av!=null?av+'위':'–'}</td>`;
+    h+=`<tr><td class="gcol" title="${esc(DATA.games[aid].title)}">${newBadge(aid)}<span class="gdname"${gdAttrs(aid, DATA.games[aid].title)} data-aid="${esc(aid)}">${esc(DATA.games[aid].title)}</span></td><td class="colorcol"><span class="cbar" style="background-color:${c}"></span></td><td class="avg3m">${av!=null?av+'위':'–'}</td>`;
     s.forEach((v,i)=>{
       let cls='na';
       if(v!=null){
@@ -1265,7 +1348,7 @@ function renderHistory(){
     h+='</tr>';
   });
   h+='</tbody></table></div>';
-  wrap.innerHTML=h;
+  setHTMLKeepFocus(wrap, h);
 }
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -1290,6 +1373,7 @@ function updateScrollbar(){
   thumb.style.left=(cmin/denom*100)+'%';
   thumb.style.width=Math.max(5,(cmax-cmin)/denom*100)+'%';
   const out=(min<=0 && max>=total-1);
+  { const span=Math.max(0,denom-(cmax-cmin)); bar.setAttribute('aria-valuenow', String(span>0?Math.round(cmin/span*100):0)); }   // 2026-10-26 P1-4: 키보드 · 화면 읽기 프로그램용 위치(0 ~ 100)
   bar.style.opacity = out ? '0.6' : '1';
   if(chart.canvas) chart.canvas.style.cursor = out ? 'default' : 'grab';
   if(hint){ const L=chart.data.labels;
@@ -1307,13 +1391,24 @@ function setupScrollbar(){
     let nmin=dr.min+d, nmax=dr.max+d;
     if(nmin<0){nmin=0;nmax=dr.span;} if(nmax>denom()){nmax=denom();nmin=denom()-dr.span;}
     chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar(); });
-  const end=()=>{dr=null;}; thumb.addEventListener('pointerup',end); thumb.addEventListener('pointercancel',end);
+  const end=()=>{dr=null;}; thumb.addEventListener('pointerup',end); thumb.addEventListener('pointercancel',end); thumb.addEventListener('lostpointercapture',end);   // 2026-10-26: 끌다가 붙잡기가 풀려도 끌기 상태를 정리
   bar.addEventListener('pointerdown',e=>{ if(e.target===thumb) return;
     const x=chart.scales.x; const cmin=Math.max(0,x.min==null?0:x.min), cmax=Math.min(tot()-1,x.max==null?tot()-1:x.max), span=cmax-cmin;
     const rect=bar.getBoundingClientRect(); const frac=(e.clientX-rect.left)/rect.width;
     let nmin=frac*denom()-span/2, nmax=nmin+span;
     if(nmin<0){nmin=0;nmax=span;} if(nmax>denom()){nmax=denom();nmin=denom()-span;}
     chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar(); });
+  // 2026-10-26 P1-4: 키보드로 보는 구간 옮기기(왼쪽 · 오른쪽 화살표는 보는 폭의 10%, Home · End는 처음 · 끝, + · -는 확대 · 축소)
+  bar.addEventListener('keydown',e=>{
+    if(e.key==='+'||e.key==='='){ e.preventDefault(); zoomChart(1.5); return; }
+    if(e.key==='-'){ e.preventDefault(); zoomChart(1/1.5); return; }
+    if(['ArrowLeft','ArrowRight','Home','End'].indexOf(e.key)<0) return;
+    const x=chart.scales.x; const cmin=Math.max(0,x.min==null?0:x.min), cmax=Math.min(tot()-1,x.max==null?tot()-1:x.max), span=cmax-cmin;
+    if(span>=denom()) return;   // 전체 보기에서는 옮길 것이 없다
+    e.preventDefault();
+    let nmin = e.key==='Home' ? 0 : e.key==='End' ? denom()-span : cmin+(e.key==='ArrowRight'?1:-1)*Math.max(1,span*0.1);
+    if(nmin<0) nmin=0; if(nmin+span>denom()) nmin=denom()-span;
+    chart.zoomScale('x',{min:nmin,max:nmin+span},'none'); updateScrollbar(); });
 }
 
 function setupChartDrag(){
@@ -1411,7 +1506,7 @@ function renderGenreLegend(){
   const groups=[{t:'주력 장르 · 매출 점유 20% 이상',rows:[]},{t:'중간 장르 · 매출 점유 5~20%',rows:[]},{t:'소형 장르 · 매출 점유 5% 미만',rows:[]}];
   rows.forEach(r=> groups[tier(r)].rows.push(r));
   groups.forEach(grp=> grp.rows.sort((a,b)=> a.g==='장르 없음'?1 : b.g==='장르 없음'?-1 : (b.rev||0)-(a.rev||0)));   // '장르 없음'은 그룹 내 맨 아래
-  const rowHTML=r=> '<button type="button" class="gl-item gl-cols'+(r.on?' on':(any?' off':''))+'" data-genre="'+esc(r.g)+'" aria-pressed="'+r.on+'">'+
+  const rowHTML=r=> '<button type="button" class="gl-item gl-cols'+(r.on?' on':(any?' off':''))+'" data-genre="'+esc(r.g)+'" data-fk="gl:'+esc(r.g)+'" aria-pressed="'+r.on+'">'+
       '<span class="gl-dot" style="background:'+r.col+'"></span>'+
       '<span class="gl-name">'+esc(r.g)+'</span>'+
       '<span class="gl-meta">'+(r.n!=null?r.n:'–')+'</span>'+
@@ -1420,7 +1515,7 @@ function renderGenreLegend(){
       '</button>';
   let html='<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출 '+dinfo('추정 매출 비중: 순위가 높을수록 매출이 크다는 가정으로 차트 순위에서 거꾸로 계산한 값입니다. 실제 매출이 아니며, 과금 방식 · 나라별 결제 금액 · 웹 상점 매출은 반영하지 않습니다.')+'</span></div>';
   groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
-  el.innerHTML=html;
+  setHTMLKeepFocus(el, html);   // 2026-10-26 P1-5: 키보드로 장르를 누르면 그 단추에 초점이 남는다
   el.querySelectorAll('.gl-item').forEach(b=> b.addEventListener('click',()=> toggleGenre(b.dataset.genre)));
   el.hidden=false; demoStart();
 }
@@ -1442,6 +1537,7 @@ function demoStep(){
   if(chartMode!=='genre' || !chart) return;
   const ae=document.activeElement; if(ae && ae.id==='genreMktSel') return;   // 시장 목록을 열어 둔 동안은 다시 그리지 않음
   if(document.querySelector('#genreLegend .dinfo-pop')) return;   // 목록 머리의 ⓘ 풀이를 펼쳐 둔 동안도 다시 그리지 않음(다시 그리면 풀이가 사라진다)
+  if(ae && ae.closest && ae.closest('#genreLegend')) return;   // 2026-10-26 P1-5: 키보드 위치가 목록 안에 있는 동안도 다시 그리지 않음(다시 그리면 위치가 목록 앞으로 되돌아가 Tab으로 목록을 지나갈 수 없었다)
   if(genreSel.length && !(genreSel.length===1 && genreSel[0]===DEMO.cur)){ demoStop(false); return; }   // 사용자가 다른 경로로 장르를 골랐다
   const rows=demoRows(); if(!rows.length) return;
   DEMO.idx=(DEMO.idx+1)%rows.length; const g=rows[DEMO.idx].dataset.genre; DEMO.cur=g;
@@ -1573,7 +1669,8 @@ function selectChart(key){
 let aggKind='developer', aggPeriod=null;  // 집계 종류(developer|genre)·기간(일수,null=전체)
 let gapSort={k:'gap',dir:-1}, aggSort={k:'rank',dir:1};
 function togglePubChips(btn){ const more=btn.previousElementSibling; if(!more) return; const open=more.hidden; more.hidden=!open; btn.textContent=open?'접기':'+'+more.children.length+'개'; }   // 2026-10-18 L1
-function sortTh(label,k,state,extra){ const on=state.k===k; const arr=on?(state.dir>0?'▲':'▼'):'↕'; return '<th class="sortable'+(on?' sorton':'')+(extra?' '+extra:'')+'" data-k="'+k+'">'+esc(label)+'<span class="sarr">'+arr+'</span></th>'; }
+function sortTh(label,k,state,extra,after){ const on=state.k===k; const arr=on?(state.dir>0?'▲':'▼'):'↕';   // 2026-10-26 P1-4: 정렬 머리는 안에 진짜 단추(키보드로 정렬), 지금 정렬은 aria-sort. after는 단추 뒤에 붙는 것(ⓘ)
+  return '<th class="sortable'+(on?' sorton':'')+(extra?' '+extra:'')+'" data-k="'+k+'"'+(on?' aria-sort="'+(state.dir>0?'ascending':'descending')+'"':'')+'><button type="button" class="thbtn" data-fk="th:'+k+'">'+esc(label)+'<span class="sarr" aria-hidden="true">'+arr+'</span></button>'+(after||'')+'</th>'; }
 
 function aggregate(keyName, periodDays){
   const tf=(DATA.timeframes&&DATA.timeframes.daily)||{labels:[],series:{}};
@@ -1628,7 +1725,7 @@ function renderAgg(keyName, period, els, labelName){
     list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
-      h+=`<div class="pubcard pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
+      h+=`<div class="pubcard pubrow" role="button" tabindex="0" data-fk="pc:${esc(e.key)}" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
         `<div class="pubcard-head"><span class="prank">#${rank}</span><b>${esc(e.key)}</b></div>`+
         `<div class="pubcard-stats">게임 ${e.num_games}개 · 최고 ${e.best_rank!=null?e.best_rank+'위':'–'} · 평균 ${e.avg_rank!=null?e.avg_rank+'위':'–'}${showRev?' · 추정 매출 '+(Math.round(e.games.reduce((s,g)=>s+(revShare(g.app_id)||0),0)*1000)/10)+'%':''}</div></div>`;
     });
@@ -1639,11 +1736,11 @@ function renderAgg(keyName, period, els, labelName){
     list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
-      const chipHTML=g=>`<span class="pubchip">${newBadge(g.app_id)}<span class="gdname" data-aid="${esc(g.app_id)}">${esc(g.title)}</span>${g.rank!=null?' · '+g.rank+'위':''}</span>`;
+      const chipHTML=g=>`<span class="pubchip">${newBadge(g.app_id)}<span class="gdname"${gdAttrs(g.app_id, g.title)} data-aid="${esc(g.app_id)}">${esc(g.title)}</span>${g.rank!=null?' · '+g.rank+'위':''}</span>`;
       const CH=6;   // 2026-10-18 L1: 칩은 여섯 개까지 보이고 나머지는 '+N개'로 펼친다
       const chips=e.games.slice(0,CH).map(chipHTML).join('')+(e.games.length>CH?'<span class="pubchips-more" hidden>'+e.games.slice(CH).map(chipHTML).join('')+'</span><button type="button" class="pubmore" onclick="event.stopPropagation(); togglePubChips(this)">+'+(e.games.length-CH)+'개</button>':'');
       h+=`<tr class="pubrow" data-aids="${esc(aids.join(','))}" aria-pressed="${allSel}">`+
-        `<td>${rank}</td><td class="pname">${esc(e.key)}</td><td>${e.num_games}</td>`+
+        `<td>${rank}</td><td class="pname"><button type="button" class="rowbtn" data-fk="pr:${esc(e.key)}" aria-pressed="${allSel}" title="${esc(e.key)}">${esc(e.key)}</button></td><td>${e.num_games}</td>`+
         `<td>${e.best_rank!=null?e.best_rank+'위':'–'}</td><td>${e.avg_rank!=null?e.avg_rank:'–'}</td>`+
         `${showRev?'<td class="prev">'+(Math.round(e.games.reduce((s,g)=>s+(revShare(g.app_id)||0),0)*1000)/10)+'%</td>':''}`+
         `<td class="pgames">${chips}</td></tr>`;
@@ -1651,7 +1748,7 @@ function renderAgg(keyName, period, els, labelName){
     h+='</tbody></table></div>';
   }
   { const top3=full.slice(0,3); const totG=full.reduce((a,e)=>a+(e.num_games||0),0); const t3G=top3.reduce((a,e)=>a+(e.num_games||0),0); const gShare=totG?Math.round(t3G/totG*100):0; const names='<b>'+top3.map(e=>esc(e.key)).join(' · ')+'</b>'; let rd,imp; if(showRev){ const totR=full.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const t3R=top3.reduce((a,e)=>a+e.games.reduce((x,g)=>x+(revShare(g.app_id)||0),0),0); const rShare=totR?Math.round(t3R/totR*100):0; const diag=(rShare-gShare>=12)?('적은 게임으로 매출의 큰 몫을 차지하는 <b>과점</b>이며, 소수 IP에 매출이 집중된 시장입니다.'):((gShare-rShare>=12)?'매출 비중보다 게임 수 비중이 큽니다. 게임 수로 경쟁하는 시장입니다.':'게임 수 비중과 매출 비중이 비슷합니다.'); rd=['점유', '상위 3개 '+labelName+'('+names+')가 게임 수로는 <b>'+gShare+'%</b>, 추정 매출로는 <b>'+rShare+'%</b>를 차지합니다. '+diag]; imp=['볼 포인트', (rShare-gShare>=12)?('신규 진입 시 경쟁 상대는 게임 수가 아니라 상위 '+labelName+'의 라이브 운영과 과금 설계입니다. 그 '+labelName+'의 수익 모델과 업데이트 주기를 벤치마크 대상으로 봅니다.'):('점유가 분산되어 있어 특정 '+labelName+'보다 시장 전체의 경쟁 강도를 봅니다.')]; } else { const conc=gShare>=55?('소수 '+labelName+'에 집중된 시장입니다.'):(gShare>=35?'집중도는 중간입니다.':'분산된 시장입니다.'); rd=['점유', '상위 3개 '+labelName+'('+names+')가 차트의 <b>'+gShare+'%</b>를 차지합니다. '+conc]; imp=['볼 포인트','인기 차트는 신규 유입을 보여 줍니다. 상위 3개 '+labelName+'의 비중이 높으면 신작이 진입할 자리가 적은지, 낮으면 순위 교체가 빠른지를 봅니다.']; } h=pmCallout([rd,imp])+h; }
-  els.wrap.innerHTML=h;
+  setHTMLKeepFocus(els.wrap, h);
   els.wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(aggSort.k===kk) aggSort.dir*=-1; else aggSort={k:kk, dir:(kk==='best_rank'||kk==='avg_rank'||kk==='key')?1:-1}; renderAggSection(); }));
   els.wrap.querySelectorAll('.pubrow').forEach(row=>{
     row.addEventListener('click',()=>{
@@ -1698,14 +1795,14 @@ function renderGap(){
   view.sort((a,b)=>{ if(k==='title') return dir*String(a.title).localeCompare(String(b.title),'ko'); return dir*((a[k]||0)-(b[k]||0)); });
   sub.innerHTML=`<span class="ci">매출 순위와 인기 순위가 크게 다른 게임입니다(두 차트에 모두 든 ${total}개).</span><span class="ci"><span class="cdot" style="background:#e07c12"></span> 인기보다 매출이 낮음 &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출보다 인기가 낮음</span><span class="ci"><span class="cact">▸ 행을 누르면 그래프에 표시</span></span>`;
   if(!view.length){ wrap.innerHTML='<p class="empty">검색 결과가 없습니다.</p>'; return; }
-  let h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+sortTh('게임','title',gapSort,'pname')+sortTh('매출 순위','gr',gapSort)+sortTh('인기 순위','fr',gapSort)+sortTh('갭','gap',gapSort).replace('>갭<', '>갭 '+dinfo('매출 순위에서 인기 순위를 뺀 값입니다. 양수면 인기에 비해 매출이 낮습니다.')+'<')+'</tr></thead><tbody>';
+  let h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+sortTh('게임','title',gapSort,'pname')+sortTh('매출 순위','gr',gapSort)+sortTh('인기 순위','fr',gapSort)+sortTh('갭','gap',gapSort,'',' '+dinfo('매출 순위에서 인기 순위를 뺀 값입니다. 양수면 인기에 비해 매출이 낮습니다.'))+'</tr></thead><tbody>';
   view.forEach(r=>{
     const cls=r.gap>0?'gapdl':(r.gap<0?'gaprev':'');
-    h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><span class="ginfo" data-aid="${esc(r.aid)}" title="상세 보기">ⓘ</span>${newBadge(r.aid)}${esc(r.title)}</td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;
+    h+=`<tr class="pubrow" data-aids="${esc(r.aid)}"><td class="pname"><button type="button" class="ginfo" data-aid="${esc(r.aid)}" data-fk="gi:${esc(r.aid)}" title="상세 보기" aria-label="${esc(r.title)} 상세 보기">ⓘ</button>${newBadge(r.aid)}<button type="button" class="rowbtn" data-fk="gr:${esc(r.aid)}" aria-pressed="${selected.includes(r.aid)}">${esc(r.title)}</button></td><td>${r.gr}위</td><td>${r.fr}위</td><td class="${cls}">${r.gap>0?'+':''}${r.gap}</td></tr>`;   // 2026-10-26 P1-4: ⓘ와 게임 이름이 진짜 단추(키보드로 상세 · 그래프 표시)
   });
   h+='</tbody></table></div>';
   { const TH=20; const dl=rows.filter(r=>r.gap>=TH).sort((a,b)=>b.gap-a.gap); const rv=rows.filter(r=>r.gap<=-TH).sort((a,b)=>a.gap-b.gap); const big=rows.slice().sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap))[0]; let diag,point; if(rv.length>=dl.length*2&&rv.length>=3){ diag='인기 순위보다 매출 순위가 20계단 이상 높은 게임('+rv.length+'개)이 그 반대('+dl.length+'개)의 두 배 이상입니다. 다운로드 수보다 <b>이용자당 결제액으로 매출을 내는 시장</b>입니다.'; point='신규 진입 시 마케팅 유입보다 핵심 이용자의 잔존과 과금 설계가 중요한 시장인지 봅니다.'; } else if(dl.length>=rv.length*2&&dl.length>=3){ diag='매출 순위보다 인기 순위가 20계단 이상 높은 게임('+dl.length+'개)이 그 반대('+rv.length+'개)의 두 배 이상입니다. 다운로드는 많지만 <b>매출이 따라오지 않는 시장</b>입니다.'; point='다운로드는 많지만 매출이 낮은 게임의 수익 모델과 현지화에서 무엇이 부족한지 보고, 같은 시장에 들어갈 때 피할 점과 채울 자리를 찾습니다.'; } else if(dl.length||rv.length){ diag='매출 순위가 20계단 이상 높은 게임 '+rv.length+'개, 인기 순위가 20계단 이상 높은 게임 '+dl.length+'개로 비슷합니다.'; point='한쪽으로 치우치지 않아 순위 차이가 큰 개별 게임을 봅니다.'; } else { diag='순위 차이가 '+TH+'계단 이상인 게임이 거의 없습니다. 인기와 매출 순위가 대체로 일치합니다.'; point='순위 차이로 읽을 것이 적어 순위 자체와 추세를 봅니다.'; } const rs=[['성격', diag+((big&&Math.abs(big.gap)>=TH)?(' 순위 차이가 가장 큰 게임은 <b>'+esc(big.title)+'</b>(인기 '+big.fr+'위 · 매출 '+big.gr+'위)입니다.'):'')]]; rs.push(['볼 포인트', point]); h=pmCallout(rs)+h; }
-  wrap.innerHTML=h;
+  setHTMLKeepFocus(wrap, h);
   wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(gapSort.k===kk) gapSort.dir*=-1; else gapSort={k:kk, dir:(kk==='title'||kk==='gr'||kk==='fr')?1:-1}; renderGap(); }));
   wrap.querySelectorAll('.pubrow').forEach(row=> row.addEventListener('click',()=>{ const aid=row.dataset.aids; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
 }
@@ -1726,7 +1823,7 @@ function renderMovers(){
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
   const anyUpd=up.some(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; });
   sub.innerHTML=`<span class="ci">${mvLabel(moversTf,labels[pi])}${waGwa(mvLabel(moversTf,labels[pi]))} ${mvLabel(moversTf,labels[ni])}의 ${activeChart==='grossing'?'매출':'인기'} 차트를 비교했습니다.</span>`+(anyUpd?`<span class="ci"><span class="mv-upd">↻</span> 업데이트와 같은 시기에 오른 게임</span>`:``)+`<span class="ci">${dinfo('급등 · 급락 기준은 순위대와 기간마다 다릅니다. 상위권일수록 작은 변동도 급변으로 보고, 하루 기준은 8계단, 주 · 월 기준은 5계단입니다.')}</span>`;
-  const nm=aid=>newBadge(aid)+'<span class="gdname" data-aid="'+esc(aid)+'">'+esc((DATA.games[aid]||{}).title||aid)+'</span>';
+  const nm=aid=>{ const t=(DATA.games[aid]||{}).title||aid; return newBadge(aid)+'<span class="gdname"'+gdAttrs(aid, t)+' data-aid="'+esc(aid)+'">'+esc(t)+'</span>'; };
   const LIMIT = moversExpanded?9999:10;
   const col=(title,arr,fmt)=>`<div class="movercol"><h3>${title} (${arr.length})</h3><div class="moverlist">${arr.slice(0,LIMIT).map(fmt).join('')||'<div class="moveritem">없음</div>'}</div></div>`;
   let h='<div class="movergrid">';
@@ -1739,7 +1836,7 @@ function renderMovers(){
   const maxN=Math.max(entered.length,exited.length,up.length,down.length);
   if(maxN>10) h+='<button class="movers-more" id="moversMore">'+(moversExpanded?'접기 ▴':('전체 보기 ▾ · 최대 '+maxN+'개'))+'</button>';
   { const updCnt=up.filter(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; }).length; const surgePct=up.length?Math.round(updCnt/up.length*100):0; const gc={}; up.forEach(e=>{ const gg=(DATA.games[e.aid]||{}).genre; if(gg) gc[gg]=(gc[gg]||0)+1; }); const topG=Object.keys(gc).sort((a,b)=>gc[b]-gc[a])[0]; const topGn=topG?gc[topG]:0; let diag; if(up.length>=3&&surgePct>=50) diag='이번 급등 '+up.length+'개 중 <b>'+surgePct+'%</b>가 앱 업데이트와 같은 시기에 일어났습니다. 순위 변동의 주된 원인은 신작보다 <b>라이브 운영과 이벤트</b>입니다.'; else if(up.length>=3) diag='급등 중 업데이트와 같은 시기인 것은 '+surgePct+'%에 그칩니다. 시즌 · 외부 유입 · 마케팅 등 업데이트 외 요인의 영향이 큰 것으로 보입니다.'; else diag='이번 기간은 급등이 적어 순위가 비교적 안정적입니다.'; const rs=[['원인', diag]]; if(topG&&topGn>=Math.max(2,Math.ceil(up.length*0.3))) rs.push(['집중 장르', '급등 '+up.length+'개 중 '+topGn+'개가 <b>'+esc(topG)+'</b> 장르입니다. 이 장르에서 이벤트나 신작이 활발합니다.']); rs.push(['볼 포인트', surgePct>=50?'노출을 얻는 데 신작 출시보다 업데이트와 이벤트 시점이 중요한지 봅니다.':'업데이트 외에 어떤 요인이 순위를 움직이는지 추가로 봅니다.']); h=pmCallout(rs)+h; }
-  wrap.innerHTML=h;
+  setHTMLKeepFocus(wrap, h);
   const mb=document.getElementById('moversMore'); if(mb) mb.addEventListener('click',()=>{ moversExpanded=!moversExpanded; renderMovers(); });
 }
 
@@ -1768,11 +1865,11 @@ function renderWatch(){
   let h='<div class="watchgrid">';
   top.forEach((r,i)=>{
     const wk = r.wHas ? (r.wImp>0?'<span class="watch-up">주간 ▲'+r.wImp+'</span>':(r.wImp===0?'<span>주간 유지</span>':'<span>주간 ▼'+Math.abs(r.wImp)+'</span>')) : '';
-    h+='<div class="watchcard" data-aid="'+esc(r.aid)+'"><div class="watchcard-head"><span class="watchcard-rank">#'+(i+1)+'</span>'+newBadge(r.aid)+'<span class="gdname" data-aid="'+esc(r.aid)+'">'+esc((DATA.games[r.aid]||{}).title||r.aid)+'</span></div><div class="watch-traj">'+r.days+'일 전 <b>'+r.dStart+'위</b> → 현재 <b>'+r.dEnd+'위</b> <span class="watch-up">▲'+r.dImp+'</span></div><div class="watch-meta"><span>상승 '+r.ups+'일 · 하락 '+r.downs+'일</span>'+wk+'</div></div>';
+    h+='<div class="watchcard" role="button" tabindex="0" data-fk="wc:'+esc(r.aid)+'" aria-pressed="'+selected.includes(r.aid)+'" data-aid="'+esc(r.aid)+'"><div class="watchcard-head"><span class="watchcard-rank">#'+(i+1)+'</span>'+newBadge(r.aid)+'<span class="gdname" data-aid="'+esc(r.aid)+'">'+esc((DATA.games[r.aid]||{}).title||r.aid)+'</span></div><div class="watch-traj">'+r.days+'일 전 <b>'+r.dStart+'위</b> → 현재 <b>'+r.dEnd+'위</b> <span class="watch-up">▲'+r.dImp+'</span></div><div class="watch-meta"><span>상승 '+r.ups+'일 · 하락 '+r.downs+'일</span>'+wk+'</div></div>';
   });
   h+='</div>';
   { const newCnt=out.filter(r=>!!newBadge(r.aid)).length; const estCnt=out.length-newCnt; const ch=newCnt>estCnt?'신작의 상승이 더 많습니다':(estCnt>newCnt?'기존작의 상승이 더 많습니다':'신작과 기존작이 비슷합니다'); h=pmCallout([['성격', '급등 목록에는 없지만 며칠째 꾸준히 오르는 게임이 <b>'+out.length+'개</b>입니다. 신작 '+newCnt+'개 · 기존작 '+estCnt+'개로 '+ch+'. 상승 1순위는 <b>'+esc((DATA.games[top[0].aid]||{}).title||top[0].aid)+'</b>('+top[0].dImp+'계단 상승)입니다.'], ['볼 포인트', '상위 게임보다 급등 목록 밖에서 꾸준히 오른 게임들을 다음 분기의 경쟁 · 벤치마크 대상 후보로 미리 봅니다.']])+h; }
-  wrap.innerHTML=h;
+  setHTMLKeepFocus(wrap, h);   // 2026-10-26 P1-4: 카드는 키보드로 눌러 그래프에 표시(안의 게임 이름은 마우스로 상세)
   wrap.querySelectorAll('.watchcard').forEach(c=> c.addEventListener('click',()=>{ const aid=c.dataset.aid; if(!aid||!DATA.games[aid]) return; const i=selected.indexOf(aid); if(i>=0) selected.splice(i,1); else selected.push(aid); restyle(); }));
 }
 // ===== 버블맵 기간 추이(기간 스크럽) — 프론트 계산, 백엔드 무관 =====
@@ -1849,17 +1946,17 @@ function gopAnchorsPaths(G){
 }
 function gopRenderTraj(t){
   var G=_gopTraj.geom; if(!G) return; var labels=gopRefs().labels;
-  var s='<div class="gop-wrap"><svg viewBox="0 0 '+G.W+' '+G.H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="기간 추이 버블맵">';
-  s+=gopBgSvg(G);
-  s+=gopAnchorsPaths(G);
-  var cur=gopInterp(G,t);
+  var cur=gopInterp(G,t), pts='';
   var labSet={}; Object.keys(cur).sort(function(a,b){return cur[b].revp-cur[a].revp;}).slice(0,8).forEach(function(g){labSet[g]=1;});
   Object.keys(cur).forEach(function(g){ var v=cur[g]; if(v.n<0.3&&v.revp<0.2) return; var col=G.zoneOf(v.top1,v.revp), cx=G.xOf(v.top1), cy=G.yOf(v.revp), r=G.rOf(v.n);
-    s+='<g class="gop-pt gop-clk" data-g="'+esc(g)+'" style="cursor:pointer"><circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.62" stroke="'+col+'" stroke-width="1.5"><title>'+esc(g)+' · 매출 점유 '+v.revp.toFixed(1)+'% · 1위 집중도 '+Math.round(v.top1)+'% · 게임 '+Math.round(v.n)+'개 · 누르면 게임 목록</title></circle>';
-    if(labSet[g]) s+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="10">'+esc(g)+'</text>'; else s+='<text class="gop-hlab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'">'+esc(g)+'</text>';
-    s+='</g>'; });
-  s+='</svg></div>';
-  var w=document.getElementById('goptrajwrap'); if(w) w.innerHTML=s;
+    pts+='<g class="gop-pt gop-clk" data-g="'+esc(g)+'" tabindex="0" role="button" data-fk="gb:'+esc(g)+'" aria-label="'+esc(g)+' 게임 목록 보기" style="cursor:pointer"><circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.62" stroke="'+col+'" stroke-width="1.5"><title>'+esc(g)+' · 매출 점유 '+v.revp.toFixed(1)+'% · 1위 집중도 '+Math.round(v.top1)+'% · 게임 '+Math.round(v.n)+'개 · 누르면 게임 목록</title></circle>';
+    if(labSet[g]) pts+='<text class="gop-lab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'" font-size="10">'+esc(g)+'</text>'; else pts+='<text class="gop-hlab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'">'+esc(g)+'</text>';
+    pts+='</g>'; });
+  // 2026-10-26 P1-7: 배경 · 시작/끝 원은 기간이 바뀔 때만 그리고, 매 프레임은 움직이는 원 묶음(.gop-live)만 바꾼다(전에는 그림 전체를 매 프레임 다시 그렸다)
+  var w=document.getElementById('goptrajwrap'); if(!w) return;
+  var live=(w._geom===G) ? w.querySelector('.gop-live') : null;
+  if(live) setHTMLKeepFocus(live, pts);
+  else { w.innerHTML='<div class="gop-wrap"><svg viewBox="0 0 '+G.W+' '+G.H+'" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="기간 추이 버블맵">'+gopBgSvg(G)+gopAnchorsPaths(G)+'<g class="gop-live">'+pts+'</g></svg></div>'; w._geom=G; }
   var dd=Math.round(t), dEl=document.getElementById('goptrajDay'); if(dEl) dEl.textContent=gopFmtLabel(labels[dd]);
 }
 function gopSliderT(){ var sl=document.getElementById('goptrajSlider'), G=_gopTraj.geom; if(!G||!sl) return 0; return G.sIdx+(+sl.value)/1000*(G.eIdx-G.sIdx); }
@@ -1874,17 +1971,22 @@ function gopBuildTicks(){
 // 2026-10-18 자동 재생(사용자 결정): 진입 맵의 기간 추이를 첫 달부터 마지막 달까지 처음에서 잠깐 멈춘 뒤 천천히 앞으로 재생하고, 끝에서 잠깐 멈춘 뒤 빠르게 처음으로 되감아 다시(무한 반복).
 // 사용자가 이 구간의 재생 단추 · 슬라이더 · 기간 목록 · 원을 누르면 멈춘다(재생 중 표시는 '❚❚ 정지'라 그 단추를 누르면 바로 멈춘다). 휴대폰과 '동작 줄이기' 설정에서는 돌리지 않는다.
 // 타이머는 수동 재생과 같은 _gopTraj.timer를 쓰므로, 슬라이더 · 기간 변경 · 시장 변경이 부르는 gopStop()이 그대로 자동 재생도 멈춘다. 시장이 바뀌면 setupGopTraj가 다시 시작한다.
-var GDEMO={stopped:false, t0:0, hold:1200, back:600, startHold:1200};
+var GDEMO={stopped:false, t0:0, hold:1200, back:600, startHold:1200, vis:false, paused:false, lastF:null};
 function gopDemoAllowed(){ return !GDEMO.stopped && !isMobile() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
 function gopDemoStart(){
   if(!gopDemoAllowed() || !_gopTraj.on || !_gopTraj.geom) return;
-  gopStop(); GDEMO.t0=0;
+  gopStop(); GDEMO.t0=0; GDEMO.lastF=null; GDEMO.paused=false;
   var p=document.getElementById('goptrajPlay'); if(p) p.textContent='❚❚ 정지';
   _gopTraj.timer=requestAnimationFrame(gopDemoTick);
 }
+// 2026-10-26 P1-7: 자동 재생은 진입 맵이 화면에 보일 때만 돈다(전에는 화면 밖에서도 매 프레임 다시 그려 맨 위에서 가만히 있어도 8초 중 약 8초 동안 브라우저가 바빴다).
+// 보이지 않으면 다음 프레임을 예약하지 않고 쉬고, 다시 보이면 처음부터 재생한다. 재생 방식(2026-10-18 사용자 결정)은 그대로다.
+(function(){ var sec=document.getElementById('gopsec'); if(!sec || !('IntersectionObserver' in window)){ GDEMO.vis=true; return; }
+  new IntersectionObserver(function(es){ es.forEach(function(e){ GDEMO.vis=e.isIntersecting; if(GDEMO.vis && GDEMO.paused){ GDEMO.paused=false; gopDemoStart(); } }); }, {rootMargin:'120px 0px'}).observe(sec); })();
 function gopDemoTick(now){
   if(!gopDemoAllowed() || !_gopTraj.on){ gopStop(); return; }
   var G=_gopTraj.geom, sl=document.getElementById('goptrajSlider'); if(!G||!sl){ gopStop(); return; }
+  if(!GDEMO.vis){ _gopTraj.timer=null; GDEMO.paused=true; return; }
   if(!GDEMO.t0) GDEMO.t0=now;
   var span=G.eIdx-G.sIdx, dur=Math.max(6000, span*2500), sh=GDEMO.startHold, el=now-GDEMO.t0, f;
   if(el<sh) f=0;                                                                    // 처음에서 1.2초 멈춤
@@ -1892,13 +1994,15 @@ function gopDemoTick(now){
   else if(el<sh+dur+GDEMO.hold) f=1;                                                // 끝에서 1.2초 멈춤
   else if(el<sh+dur+GDEMO.hold+GDEMO.back) f=1-(el-sh-dur-GDEMO.hold)/GDEMO.back;   // 0.6초 만에 빠르게 처음으로 되감기
   else { GDEMO.t0=now; f=0; }                                                       // 다시 처음부터(무한 반복)
-  sl.value=Math.round(f*1000); gopRenderTraj(G.sIdx+f*span);
+  if(f!==GDEMO.lastF){ GDEMO.lastF=f; sl.value=Math.round(f*1000); gopRenderTraj(G.sIdx+f*span); }   // 2026-10-26 P1-7: 처음 · 끝에서 멈춘 동안은 같은 그림이라 다시 그리지 않는다
   _gopTraj.timer=requestAnimationFrame(gopDemoTick);
 }
 function gopDemoStop(){ GDEMO.stopped=true; }
 { var _gs=document.getElementById('gopsec'); if(_gs){
   _gs.addEventListener('pointerdown', function(e){ if(e.target.closest && e.target.closest('#goptrajbar, .gop-pt, #goptrajToggle')) gopDemoStop(); }, true);   // 실제 조작: 그 뒤의 단추 · 슬라이더 처리가 gopStop()을 부른다
-  _gs.addEventListener('keydown', function(e){ if(e.target.closest && e.target.closest('#goptrajbar')) gopDemoStop(); }, true); } }
+  _gs.addEventListener('keydown', function(e){ if(e.target.closest && e.target.closest('#goptrajbar')) gopDemoStop(); }, true);
+  _gs.addEventListener('focusin', function(e){ if(e.target.closest && e.target.closest('#goptrajwrap')){ gopDemoStop(); gopStop(); } });   // 2026-10-26 P1-4: 키보드로 원에 오면 재생을 멈춘다(원을 누른 것과 같은 조작). 재생 중에는 원이 매 프레임 다시 그려져 키보드 위치를 잃는다
+} }
 function gopStop(){ if(_gopTraj.timer){ cancelAnimationFrame(_gopTraj.timer); _gopTraj.timer=null; } var p=document.getElementById('goptrajPlay'); if(p) p.textContent='▶ 재생'; }
 function gopPlay(){
   var p=document.getElementById('goptrajPlay'), sl=document.getElementById('goptrajSlider'), G=_gopTraj.geom; if(!G||!sl) return;
@@ -1937,8 +2041,9 @@ function setupGopTraj(){
   if(labels.length<3){ bar.innerHTML=''; if(sec)sec.classList.remove('traj-on'); if(o)o.hidden=false; if(tw)tw.hidden=true; _gopTraj.on=false; return; }
   var mon=GOP_UNIT==='monthly', U=mon?'월':'주', part=gopFirstPartial();
   var first=labels[(part&&labels.length>=4)?1:0], last=labels[labels.length-1];   // 반쪽 첫 달은 완료 월이 3개 이상 남을 때만 기본에서 뺀다
-  var pick=function(id,val){ if(!mon) return '<input type="date" class="goptraj-date" id="'+id+'" min="'+labels[0]+'" max="'+last+'" value="'+val+'">';
-    return '<select class="goptraj-date" id="'+id+'">'+labels.map(function(l,i){ return '<option value="'+l+'"'+(l===val?' selected':'')+'>'+gopFmtLabel(l)+((part&&i===0)?' (일부)':'')+'</option>'; }).join('')+'</select>'; };   // 월 라벨(YYYY-MM)은 날짜 입력에 안 맞아 목록으로 고른다
+  var pick=function(id,val){ var al=' aria-label="'+(id==='goptrajStart'?'시작 ':'끝 ')+(mon?'달':'주')+'"';   // 2026-10-26 P3-1: 이름표가 없던 날짜 선택
+    if(!mon) return '<input type="date" class="goptraj-date" id="'+id+'"'+al+' min="'+labels[0]+'" max="'+last+'" value="'+val+'">';
+    return '<select class="goptraj-date" id="'+id+'"'+al+'>'+labels.map(function(l,i){ return '<option value="'+l+'"'+(l===val?' selected':'')+'>'+gopFmtLabel(l)+((part&&i===0)?' (일부)':'')+'</option>'; }).join('')+'</select>'; };   // 월 라벨(YYYY-MM)은 날짜 입력에 안 맞아 목록으로 고른다
   bar.innerHTML='<div class="goptraj-ctrl"><span class="goptraj-lab">기간</span>'+
     pick('goptrajStart', first)+
     '<span class="goptraj-arr">→</span>'+
@@ -1976,7 +2081,7 @@ function renderGenreOpp(){
   const CONC=50, RY=med(gs.map(g=>g.revp));                                            // 집중도 50%=분산/독식 경계, 매출 중앙값=큰돈/작은돈 경계
   const xM=xOf(CONC), yM=yOf(RY);
   const zoneOf=g=>{ const big=g.revp>=RY, frag=g.top1<CONC; if(big&&frag) return '#16a34a'; if(big&&!frag) return '#64748b'; if(!big&&frag) return '#2563eb'; return '#e07c12'; };
-  let s='<div class="gop-wrap"><svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="장르 진입 맵: 매출 규모 대 1위 집중도 버블 차트">';
+  let s='<div class="gop-wrap"><svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="장르 진입 맵: 매출 규모 대 1위 집중도 버블 차트">';
   s+='<rect x="'+padL+'" y="'+padT+'" width="'+(xM-padL)+'" height="'+(yM-padT)+'" fill="#16a34a" opacity="0.09"/>';
   s+='<rect x="'+xM+'" y="'+padT+'" width="'+(PR-xM)+'" height="'+(yM-padT)+'" fill="#64748b" opacity="0.09"/>';
   s+='<rect x="'+padL+'" y="'+yM+'" width="'+(xM-padL)+'" height="'+(PB-yM)+'" fill="#2563eb" opacity="0.05"/>';
@@ -1993,7 +2098,7 @@ function renderGenreOpp(){
   const bigSet=new Set(gs.slice().sort((a,b)=>b.rev-a.rev).slice(0,8).map(g=>g.genre));   // 매출 상위 8개(큰 버블)만 상시 라벨, 나머지는 hover 시 표기
   gs.forEach(g=>{ const cx=xOf(g.top1), cy=yOf(g.revp), r=rOf(g.n), col=zoneOf(g);
     const tip=esc(g.genre)+' · 매출 점유 '+g.revp+'% · 1위 집중도 '+g.top1+'% · 게임 '+g.n+'개';
-    s+='<g class="gop-pt gop-clk" data-g="'+esc(g.genre)+'" style="cursor:pointer"><circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.5" stroke="'+col+'" stroke-width="1.3"><title>'+tip+' · 누르면 게임 목록</title></circle>';
+    s+='<g class="gop-pt gop-clk" data-g="'+esc(g.genre)+'" tabindex="0" role="button" data-fk="gs:'+esc(g.genre)+'" aria-label="'+esc(g.genre)+' 게임 목록 보기" style="cursor:pointer"><circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+col+'" fill-opacity="0.5" stroke="'+col+'" stroke-width="1.3"><title>'+tip+' · 누르면 게임 목록</title></circle>';
     if(!bigSet.has(g.genre)) s+='<text class="gop-hlab" x="'+(cx+r+3).toFixed(1)+'" y="'+(cy+3).toFixed(1)+'">'+esc(g.genre)+'</text>';
     s+='</g>'; });
   // 큰 버블(매출 상위)만 상시 라벨 — 충돌 회피(매출순 배치·세로/좌측 이동)
@@ -2024,7 +2129,7 @@ function renderGenreOpp(){
     ins+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">읽는 법</span><span>색과 위치는 장르의 매출 규모와 1위 집중도를 보여 줄 뿐, 진입 추천이 아닙니다. 진입 여부는 총 시장 규모, 자사 IP, 경쟁사 대응을 따로 보고 판단합니다.</span></div>';
     ins+='</div>'; s+=ins;
   }
-  wrap.innerHTML=s;
+  setHTMLKeepFocus(wrap, s);
   const opp2=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=>b.revp-a.revp).slice(0,3).map(x=>x.genre);
   if(sub) sub.innerHTML='<span class="ci">위로 갈수록 매출이 크고, 오른쪽으로 갈수록 1위 게임에 매출이 쏠린 장르입니다. 원 크기는 게임 수입니다.</span><span class="ci">'+dinfo('매출 규모는 차트 순위로 거꾸로 계산한 추정치입니다. 1위 집중도는 그 장르 매출에서 1위 게임이 차지하는 비율입니다.')+'</span>';
 }
@@ -2068,6 +2173,7 @@ function linkifyGames(root){
     while((m=rx.exec(text))){
       if(m.index>last) frag.appendChild(document.createTextNode(text.slice(last,m.index)));
       const sp=document.createElement('span'); sp.className='gdname'; sp.setAttribute('data-aid',map[m[0]]);
+      sp.setAttribute('role','button'); sp.setAttribute('tabindex','0'); sp.setAttribute('aria-label', m[0]+' 상세 보기');   // 2026-10-26 P1-4: 브리핑 속 게임 이름도 키보드로 상세
       const _g=DATA.games[map[m[0]]]; if(_g && _g.icon){ const _im=document.createElement('img'); _im.className='gdicon'; _im.src=_g.icon; _im.alt=''; _im.setAttribute('referrerpolicy','no-referrer'); _im.loading='lazy'; sp.appendChild(_im); }   // #14: 게임명 옆 앱 아이콘
       sp.appendChild(document.createTextNode(m[0]));
       frag.appendChild(sp); last=m.index+m[0].length;
@@ -2308,14 +2414,28 @@ function openGameDetail(aid){
     eventH+
     metaH+
     '<div class="gmspark"><div class="gmsparkt">순위 추이</div>'+gmSpark(series)+'</div>';
-  const bg=document.getElementById('gmodalBg'); bg.hidden=false; document.body.style.overflow='hidden';
+  gmShow();
+}
+// 2026-10-26 P1-6: 상세 창을 열면 키보드 위치를 창의 닫기 단추로 옮기고, Tab은 창 안에서만 돌며, 닫으면 창을 연 단추로 돌려준다(전에는 위치가 창 뒤 페이지에 남았다)
+let _gmLast=null;
+function gmShow(){
+  const bg=document.getElementById('gmodalBg'); if(!bg) return;
+  if(bg.hidden) _gmLast=document.activeElement;
+  bg.hidden=false; document.body.style.overflow='hidden';
+  const c=document.getElementById('gmClose'); if(c) try{ c.focus({preventScroll:true}); }catch(_){ }
 }
 (function(){
   const bg=document.getElementById('gmodalBg'); if(!bg) return;
-  const close=()=>{ bg.hidden=true; document.body.style.overflow=''; };
+  const close=()=>{ bg.hidden=true; document.body.style.overflow=''; const l=_gmLast; _gmLast=null; if(l && l.isConnected && l.focus) try{ l.focus({preventScroll:true}); }catch(_){ } };
   document.getElementById('gmClose').addEventListener('click',close);
   bg.addEventListener('click',e=>{ if(e.target===bg) close(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!bg.hidden) close(); });
+  bg.addEventListener('keydown',e=>{ if(e.key!=='Tab') return;
+    const f=[...bg.querySelectorAll('button,[href],select,input,[tabindex]:not([tabindex="-1"])')].filter(x=>!x.disabled && x.offsetParent!==null); if(!f.length) return;
+    const a=document.activeElement, first=f[0], last=f[f.length-1];
+    if(e.shiftKey && (a===first || !bg.contains(a))){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && (a===last || !bg.contains(a))){ e.preventDefault(); first.focus(); } });
+  document.addEventListener('focusin',e=>{ if(!bg.hidden && !bg.contains(e.target)){ const c=document.getElementById('gmClose'); if(c) try{ c.focus({preventScroll:true}); }catch(_){ } } });
   document.addEventListener('click',e=>{ const el=e.target.closest&&e.target.closest('.gdname,.ginfo,.gg-row'); if(el&&el.getAttribute('data-aid')){ e.stopPropagation(); e.preventDefault(); const aid=el.getAttribute('data-aid');
     const _mk=el.getAttribute('data-mk'); if(_mk){ openGameDetailInMarket(aid, _mk); return; }   // 히트맵/버블 장르목록: 그 시장 맥락으로 상세
     const inBrief = el.closest && el.closest('#mkbrief');
@@ -2331,6 +2451,13 @@ function openGameDetail(aid){
 // ===== 장르 게임 목록 모달(히트맵 칸·버블 클릭 → 그 시장·장르 게임들) =====
 function openGameDetailInMarket(aid, marketKey){
   var bm = (marketKey && marketKey===MK_CC && FULL) ? FULL : MK_MARKET_CACHE[marketKey];
+  if(!bm && marketKey && marketKey!==MK_CC){   // 2026-10-26 P2-2: 주간 순위 카드는 요약 파일로 그려 그 시장 전체 데이터가 아직 없을 수 있다 → 받은 뒤 연다
+    var body=document.getElementById('gmBody');
+    if(body){ body.innerHTML='<p class="empty" id="gmtitle">게임 정보를 불러오는 중…</p>'; gmShow(); }
+    mkFetch(marketKey).then(function(){ if(MK_MARKET_CACHE[marketKey]) openGameDetailInMarket(aid, marketKey); })
+      .catch(function(){ if(body) body.innerHTML='<p class="empty" id="gmtitle">데이터를 불러오지 못했습니다.</p>'; });
+    return;
+  }
   if(bm && bm.charts && bm.charts.grossing && bm.charts.grossing.games && bm.charts.grossing.games[aid]){
     var sF=FULL, sD=DATA; FULL=bm; DATA=bm.charts.grossing; _gwCache=null;   // 그 시장 맥락으로 상세(현재 차트 시장 안 바꿈)
     try{ openGameDetail(aid); } finally { FULL=sF; DATA=sD; _gwCache=null; }
@@ -2339,13 +2466,13 @@ function openGameDetailInMarket(aid, marketKey){
 function openGenreGames(marketKey, marketName, genre){
   var bg=document.getElementById('gmodalBg'), body=document.getElementById('gmBody'); if(!bg||!body) return;
   var bm = (marketKey===MK_CC && FULL) ? FULL : MK_MARKET_CACHE[marketKey];
-  var head='<div style="margin-bottom:6px"><div style="font-size:15px;font-weight:700">'+esc(marketName||marketKey)+' · '+esc(genre)+'</div><div id="ggsub" style="font-size:12px;color:var(--muted);margin-top:2px">게임 목록 불러오는 중…</div></div>';
+  var head='<div style="margin-bottom:6px"><div id="gmtitle" style="font-size:15px;font-weight:700">'+esc(marketName||marketKey)+' · '+esc(genre)+'</div><div id="ggsub" style="font-size:12px;color:var(--muted);margin-top:2px">게임 목록 불러오는 중…</div></div>';
   if(!bm){
-    body.innerHTML=head; bg.hidden=false; document.body.style.overflow='hidden';
-    fetch('./markets/'+marketKey+'.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){ if(j){ MK_MARKET_CACHE[marketKey]=j; openGenreGames(marketKey, marketName, genre); } else { var s=document.getElementById('ggsub'); if(s) s.textContent='데이터를 불러오지 못했습니다'; } }).catch(function(){ var s=document.getElementById('ggsub'); if(s) s.textContent='데이터를 불러오지 못했습니다'; });
+    body.innerHTML=head; gmShow();
+    mkFetch(marketKey).then(function(j){ if(j){ openGenreGames(marketKey, marketName, genre); } else { var s=document.getElementById('ggsub'); if(s) s.textContent='데이터를 불러오지 못했습니다'; } }).catch(function(){ var s=document.getElementById('ggsub'); if(s) s.textContent='데이터를 불러오지 못했습니다'; });
     return;
   }
-  var G=bm.charts&&bm.charts.grossing; if(!G){ body.innerHTML=head; bg.hidden=false; document.body.style.overflow='hidden'; return; }
+  var G=bm.charts&&bm.charts.grossing; if(!G){ body.innerHTML=head; gmShow(); return; }
   var entry=((G.genres&&G.genres.list)||[]).filter(function(e){ return (e.genre||'').trim()===genre; })[0];
   var rows='', count=0;
   var sF=FULL, sD=DATA; FULL=bm; DATA=G; _gwCache=null;
@@ -2358,10 +2485,10 @@ function openGenreGames(marketKey, marketName, genre){
       return '<button type="button" class="gg-row" data-aid="'+esc(x.aid)+'" data-mk="'+esc(marketKey)+'" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-top:0.5px solid var(--line);padding:8px 2px;cursor:pointer;color:var(--text);font:inherit"><span style="min-width:36px;font-size:12px;color:var(--muted)">'+x.rank+'위</span>'+ic+'<span style="flex:1;font-size:13px">'+esc(x.title)+'</span><span style="font-size:12px;color:var(--muted);white-space:nowrap">'+rv+'</span></button>';
     }).join('');
   } finally { FULL=sF; DATA=sD; _gwCache=null; }
-  head='<div style="margin-bottom:6px"><div style="font-size:15px;font-weight:700">'+esc(marketName||marketKey)+' · '+esc(genre)+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">이 시장의 '+esc(genre)+' 게임 '+count+'개 · 매출 순</div></div>';
+  head='<div style="margin-bottom:6px"><div id="gmtitle" style="font-size:15px;font-weight:700">'+esc(marketName||marketKey)+' · '+esc(genre)+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">이 시장의 '+esc(genre)+' 게임 '+count+'개 · 매출 순</div></div>';
   var foot='<p style="font-size:11.5px;color:var(--muted);margin:10px 0 0">게임을 누르면 순위 추이와 추정 매출 상세로 이동합니다</p>';
   body.innerHTML = head + (rows ? ('<div>'+rows+'</div>') : '<p style="color:var(--muted);padding:12px 0">이 시장 상위 차트에는 이 장르 게임이 없습니다.</p>') + foot;
-  bg.hidden=false; document.body.style.overflow='hidden';
+  gmShow();
 }
 document.addEventListener('click', function(e){ var el=e.target.closest && e.target.closest('#gopsec .gop-clk[data-g]'); if(el){ var g=el.getAttribute('data-g'); var opt=document.querySelector('#countrySel option:checked'); openGenreGames(MK_CC, (opt&&opt.textContent)||MK_CC, g); } });
 
@@ -2406,7 +2533,7 @@ function markSectionMarkets(){   // 2026-10-18 사용자 "시장변경이 필요
   if(!sel || !sel.options.length) return;
   const cur=(typeof MK_CC!=='undefined' && MK_CC) ? MK_CC : sel.value;
   document.querySelectorAll('h2').forEach(h=>{
-    if(h.closest && h.closest('#mkbrief, #weeksec, #gameModal, .gmodal, #cmpsec')) return;   // 2026-10-24: 주간 순위(#weeksec)도 여러 시장이라 제외  // 섹션 제목만(모달·브리핑·시장비교 제외 — 후자는 cross-market)
+    if(h.closest && h.closest('#mkbrief, #weeksec, #gameModal, .gmodal, #cmpsec, .intro')) return;   // 2026-10-26: 프로젝트 소개 제목(h2)도 제외   // 2026-10-24: 주간 순위(#weeksec)도 여러 시장이라 제외  // 섹션 제목만(모달·브리핑·시장비교 제외 — 후자는 cross-market)
     let c=h.querySelector('.sec-mkt');
     if(!c){ c=document.createElement('span'); c.className='sec-mkt'; c.innerHTML='<span class="sec-mkt-pin">시장</span><select class="sec-mkt-sel" aria-label="이 구간의 시장 바꾸기"></select>'; h.appendChild(c);
       c.querySelector('select').addEventListener('change', e=>{ if(typeof loadMarket==='function') loadMarket(e.target.value); }); }
@@ -2414,19 +2541,21 @@ function markSectionMarkets(){   // 2026-10-18 사용자 "시장변경이 필요
   });
 }
 function loadBriefsIndex(){
+  const _hide=()=>{ const s=document.getElementById('mkbrief'); if(s){ s.hidden=true; s.classList.remove('is-loading'); } };   // 2026-10-26 P2-1: 처음부터 자리를 잡고, 브리핑 목록을 못 받으면 숨긴다
   fetch('./markets/briefs_index.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(idx=>{
-    if(!idx||!Array.isArray(idx.tabs)||!idx.tabs.length) return;
+    if(!idx||!Array.isArray(idx.tabs)||!idx.tabs.length){ _hide(); return; }
     MK_BRIEF_TABS=[{type:'global',key:'global',name:'글로벌'}].concat(idx.tabs);
     const el=document.getElementById('mkbriefTabs');
     if(el){
-      el.innerHTML=MK_BRIEF_TABS.map(t=>'<button class="mkbrief-tab" role="tab" data-bk="'+t.type+':'+t.key+'">'+esc(t.name)+'</button>').join('');
-      el.querySelectorAll('.mkbrief-tab').forEach(b=>b.addEventListener('click',()=>selectBrief(b.dataset.bk)));
+      el.innerHTML=MK_BRIEF_TABS.map(t=>'<button class="mkbrief-tab" role="tab" aria-selected="false" data-bk="'+t.type+':'+t.key+'">'+esc(t.name)+'</button>').join('');
+      el.querySelectorAll('.mkbrief-tab').forEach(b=>{ b.addEventListener('click',()=>selectBrief(b.dataset.bk));
+        const k=b.dataset.bk.slice(b.dataset.bk.indexOf(':')+1); if(k!=='global') ['pointerenter','focus'].forEach(ev=>b.addEventListener(ev,()=>mkPrefetch(k))); });   // 2026-10-26 P2-2: 시장 탭에 마우스 · 키보드가 오면 그 시장 데이터를 미리 받는다
     }
     const sec=document.getElementById('mkbrief'); if(sec) sec.hidden=false;
     { const cb=document.getElementById('mkbriefCalBtn'); if(cb && !cb._bound){ cb._bound=1; cb.addEventListener('click',(e)=>{ e.stopPropagation(); openBriefCal(); }); } }
     document.addEventListener('click',(e)=>{ const pop=document.getElementById('mkbriefCalPop'); if(pop && !pop.hidden && e.target.closest && !e.target.closest('#mkbriefCalPop') && !e.target.closest('#mkbriefCalBtn')) pop.hidden=true; });
     selectBrief('global:global');
-  }).catch(()=>{});
+  }).catch(_hide);
 }
 function toggleBriefDetail(btn){ const card=btn.closest('.aib-sec'); if(!card) return; const willExpand=btn.getAttribute('data-open')!=='1'; const sum=card.querySelector('.aib-sum'), ana=card.querySelector('.aib-detail'); if(sum) sum.hidden=willExpand; if(ana) ana.hidden=!willExpand; btn.setAttribute('data-open', willExpand?'1':'0'); btn.textContent=willExpand?'접기 ▴':'자세히 ▾'; }
 function renderMarketBrief(text){
@@ -2585,22 +2714,21 @@ function selectBrief(bk){
   const mk = (type==='global') ? null : key;   // 이 브리핑이 가리키는 시장(주요국 cc / 지역키)
   const body=document.getElementById('mkbriefBody'), dt=document.getElementById('mkbriefDate');
   if(body) body.innerHTML='<p class="empty">불러오는 중…</p>';
-  const pBrief=fetch('./markets/'+file+'.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
-  const pMkt = mk ? (MK_MARKET_CACHE[mk] ? Promise.resolve(MK_MARKET_CACHE[mk])
-                     : fetch('./markets/'+mk+'.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{ if(j) MK_MARKET_CACHE[mk]=j; return j; }).catch(()=>null))
-                  : Promise.resolve(null);
+  const pBrief=fetch('./markets/'+file+'.json'+mkQ(), mkOpt()).then(r=>r.ok?r.json():null).catch(()=>null);   // 2026-10-26 P2-2: 갱신 시각 키로 받아 다시 방문하면 브라우저 저장본을 쓴다
+  const pMkt = mk ? mkFetch(mk).catch(()=>null) : Promise.resolve(null);
   { const cp=document.getElementById('mkbriefCalPop'); if(cp) cp.hidden=true; }   // 탭 바꾸면 달력 닫기
   Promise.all([pBrief, pMkt]).then(([b, mkt])=>{
     if(bk!==mkBriefSel) return;                 // 그 사이 다른 탭 누르면 무시
     MK_BRIEF_MARKET = mkt;                       // 이 브리핑의 시장 데이터(클릭 상세에 사용)
     MK_BRIEF_JSON = b;                           // 원본(axes·history 포함)
+    { const s=document.getElementById('mkbrief'); if(s) s.classList.remove('is-loading'); }   // 2026-10-26 P2-1: 이 처리 안에서 바로 그리므로(같은 순간에 화면이 바뀜) 잡아 둔 자리를 여기서 푼다
     if(!body) return;
     const avail = MK_BRIEF_AXES.filter(a=>briefAxisObj(b,a[0]));   // 완료된 시간축만
     if(!avail.length){ const ax=document.getElementById('mkbriefAxis'); if(ax) ax.innerHTML=''; body.innerHTML='<p class="empty">이 시장의 브리핑이 아직 없습니다. 데이터가 쌓이면 생성됩니다.</p>'; if(dt) dt.textContent=''; renderBriefCalBtn(); return; }
     if(!avail.some(a=>a[0]===MK_BRIEF_AXIS)) MK_BRIEF_AXIS=avail[0][0];   // 현재 축이 없으면 첫 사용가능 축으로
     renderBriefAxisTabs(b);                       // 시간축 탭(완료된 축만 활성)
     renderBriefAxis();                            // 본문 + 달력 버튼 + 날짜
-  }).catch(()=>{ if(body) body.innerHTML='<p class="empty">브리핑을 불러오지 못했습니다.</p>'; });
+  }).catch(()=>{ if(body) body.innerHTML='<p class="empty">브리핑을 불러오지 못했습니다.</p>'; const s=document.getElementById('mkbrief'); if(s) s.classList.remove('is-loading'); });
 }
 const MK_CCN={kr:'한국',us:'미국',jp:'일본',cn:'중국',tw:'대만',gb:'영국',de:'독일',fr:'프랑스',ca:'캐나다',au:'호주',it:'이탈리아',es:'스페인',nl:'네덜란드',ru:'러시아',se:'스웨덴',sa:'사우디',ae:'UAE',eg:'이집트',tr:'터키',br:'브라질',mx:'멕시코',ar:'아르헨티나',co:'콜롬비아',id:'인도네시아',th:'태국',vn:'베트남',ph:'필리핀',my:'말레이시아',sg:'싱가포르',in:'인도',pk:'파키스탄',bd:'방글라데시'};
 // 2026-10-18 보기 상태를 주소에(사용자 승인): ?mk=시장&mode=game|genre&genre=장르 이름 + #구간. 주소로 열면 그 상태로 시작하고, 시장 · 차트 종류 · 장르를 바꾸면 주소를 바꿔 둔다(기록은 쌓지 않음).
@@ -2615,12 +2743,25 @@ function applyUrlState(){   // init 끝에서 한 번: 주소의 mode · genre �
   if(location.hash){ const t=document.getElementById(location.hash.slice(1)); if(t) setTimeout(()=>t.scrollIntoView({block:'start'}), 300); }
 }
 let MK_CC=null;
+// 2026-10-26 P2-2: 시장 데이터는 index.json의 갱신 시각(WK_GEN)을 붙여 받는다. 데이터는 하루 한 번 바뀌므로 같은 날 다시 방문하면 브라우저 저장본을 쓰고,
+// 갱신되면 주소가 바뀌어 새로 받는다(전에는 매번 시각을 붙이고 저장도 막아 방문할 때마다 전부 다시 받았다). index.json 자체는 늘 새로 받는다.
+// 같은 시장을 두 곳에서 동시에 요청하면 한 번만 받는다(MK_INFLIGHT).
+const MK_INFLIGHT={};
+function mkQ(){ return WK_GEN ? '?v='+encodeURIComponent(WK_GEN) : '?_='+Date.now(); }
+function mkOpt(){ return WK_GEN ? {} : {cache:'no-store'}; }
+function mkFetch(cc){
+  if(MK_MARKET_CACHE[cc]) return Promise.resolve(MK_MARKET_CACHE[cc]);
+  if(MK_INFLIGHT[cc]) return MK_INFLIGHT[cc];
+  const p=fetch('./markets/'+cc+'.json'+mkQ(), mkOpt()).then(r=>{ if(!r.ok) throw new Error(cc+' '+r.status); return r.json(); })
+    .then(j=>{ MK_MARKET_CACHE[cc]=j; delete MK_INFLIGHT[cc]; return j; }, e=>{ delete MK_INFLIGHT[cc]; throw e; });
+  MK_INFLIGHT[cc]=p; return p;
+}
+function mkPrefetch(cc){ if(cc && !MK_MARKET_CACHE[cc] && !MK_INFLIGHT[cc]) mkFetch(cc).catch(()=>{}); }
 function loadMarket(cc){
   MK_CC=cc; urlWith({mk:cc});
   { const s1=document.getElementById('countrySel'), s2=document.getElementById('countrySelNav'); if(s1) s1.value=cc; if(s2) s2.value=cc; }  // 헤더·네비 동기
-  const _cached=MK_MARKET_CACHE[cc];   // 2026-10-24: 주간 순위 · 브리핑이 이미 받은 시장은 그 데이터를 쓴다
-  (_cached ? Promise.resolve(_cached) : fetch('./markets/'+cc+'.json?_='+Date.now(), {cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error(cc+' '+r.status); return r.json(); }))
-    .then(init)
+  mkFetch(cc)   // 2026-10-24: 주간 순위 · 브리핑이 이미 받은 시장은 그 데이터를 쓴다
+    .then(j=>{ if(MK_CC===cc) init(j); })   // 받는 사이 다른 시장을 고르면 늦게 온 쪽은 버린다
     .catch(e=>{ const m=document.getElementById('meta'); if(m) m.textContent='데이터를 불러오지 못했습니다: '+e.message; });
 }
 
@@ -2705,12 +2846,12 @@ function cmpJump(mk, g){
 }
 document.querySelectorAll('.cmp-metric').forEach(b=> b.addEventListener('click',()=>{
   cmpMetric=b.dataset.metric;
-  document.querySelectorAll('.cmp-metric').forEach(x=> x.classList.toggle('on', x===b));
+  document.querySelectorAll('.cmp-metric').forEach(x=>{ x.classList.toggle('on', x===b); x.setAttribute('aria-selected', String(x===b)); });   // 2026-10-26 P3-1: 탭 역할 · 고름 상태
   renderCmp();
 }));
 document.querySelectorAll('.cmp-basis').forEach(b=> b.addEventListener('click',()=>{
   cmpBasis=b.dataset.basis;
-  document.querySelectorAll('.cmp-basis').forEach(x=> x.classList.toggle('on', x===b));
+  document.querySelectorAll('.cmp-basis').forEach(x=>{ x.classList.toggle('on', x===b); x.setAttribute('aria-selected', String(x===b)); });
   renderCmp();
 }));
 loadMatrix();
@@ -2742,8 +2883,9 @@ fetch('./markets/index.json?_='+Date.now(), {cache:'no-store'}).then(r=>r.json()
     const navSel=document.getElementById('countrySelNav');   // 네비 시장 선택(헤더와 동일 옵션)
     if(navSel){ navSel.innerHTML=html; navSel.value=first; navSel.addEventListener('change',e=>loadMarket(e.target.value)); }
   }
+  WK_GEN=idx.generated||'';   // 2026-10-26 P2-2: 시장 데이터 주소의 갱신 시각 키라 시장을 받기 전에 정한다
   loadMarket(first);
-  WK_GEN=idx.generated||''; wkLoad();   // 2026-10-24 재디자인: 주요 다섯 시장 주간 순위(나머지 네 시장을 따로 받는다)
+  wkLoad();   // 2026-10-24 재디자인: 주요 다섯 시장 주간 순위(2026-10-26부터 요약 파일 하나로)
 }).catch(e=>{ const m=document.getElementById('meta'); if(m) m.textContent='국가 목록을 불러오지 못했습니다: '+e.message; });
 loadBriefsIndex();  // AI 시장 브리핑(국가 선택과 독립)
 // ===== 2026-10-18 밤 통일 전환 단추(.seg): 켜진 단추(aria-selected="true" 또는 .on) 아래로 알약(.seg-pill)이 미끄러진다 =====
@@ -2804,14 +2946,22 @@ function detailsAnim(d){
 // 데이터 계산은 기존 시장 JSON의 timeframes.weekly를 읽기만 한다. 지금 시장(FULL)은 init이 넘겨주고, 나머지 네 시장은 따로 받아 MK_MARKET_CACHE에 둔다(브리핑 · 게임 상세와 함께 씀).
 const WK_MKTS=[['kr','한국'],['us','미국'],['jp','일본'],['cn','중국'],['tw','대만']];
 let WK_GEN='';
-function wkSrc(cc){ return MK_MARKET_CACHE[cc] || ((cc===MK_CC && FULL) ? FULL : null); }
+// 2026-10-26 P2-2: 카드는 집계 단계가 만드는 요약 파일(markets/weekly_lite.json, build_dashboard.py의 build_weekly_lite)로 그린다.
+// 요약 파일에는 카드 계산(wkCompute)이 쓰는 값만 있다: 마지막 두 주의 주간 순위, 주마다 1위였던 게임의 전체 주간 순위, 그 게임들의 이름 · 제작사 · 아이콘.
+// 전에는 다른 네 시장의 전체 이력(약 1.15MB)을 받아 계산했다. 요약 파일이 없거나 index.json과 갱신 시각이 다르면 예전처럼 시장 파일을 받아 계산한다.
+// 요약은 카드 그리기에만 쓰고 MK_MARKET_CACHE(시장 전체 데이터)에는 넣지 않는다. 카드의 게임 이름 · 시장 이름을 누르면 그 시장 전체 데이터를 받는다(마우스 · 키보드가 카드에 오면 미리 받는다).
+let WK_LITE=null;
+function wkSrc(cc){ return MK_MARKET_CACHE[cc] || ((cc===MK_CC && FULL) ? FULL : null) || (WK_LITE && WK_LITE[cc]) || null; }
+function wkLoadFull(){
+  WK_MKTS.forEach(([cc])=>{ if(cc===MK_CC || MK_MARKET_CACHE[cc]) return; mkFetch(cc).then(()=>renderWeekly()).catch(()=>{}); });   // 지금 시장은 loadMarket이 받는다
+}
 function wkLoad(){
-  WK_MKTS.forEach(([cc])=>{
-    if(cc===MK_CC || MK_MARKET_CACHE[cc]) return;   // 지금 시장은 loadMarket이 받는다
-    fetch('./markets/'+cc+'.json?v='+encodeURIComponent(WK_GEN||String(Date.now()))).then(r=>r.ok?r.json():null)
-      .then(j=>{ if(j){ if(!MK_MARKET_CACHE[cc]) MK_MARKET_CACHE[cc]=j; renderWeekly(); } }).catch(()=>{});
-  });
+  fetch('./markets/weekly_lite.json'+mkQ(), mkOpt()).then(r=>r.ok?r.json():null)
+    .then(j=>{ if(j && j.markets && (!WK_GEN || j.generated===WK_GEN)){ WK_LITE=j.markets; renderWeekly(); } else wkLoadFull(); })
+    .catch(wkLoadFull);
   renderWeekly();
+  const board=document.getElementById('wkBoard');
+  if(board && !board._pf){ board._pf=1; const pf=e=>{ const c=e.target.closest && e.target.closest('.wk-col'); if(c && c.dataset.cc) mkPrefetch(c.dataset.cc); }; board.addEventListener('pointerover', pf); board.addEventListener('focusin', pf); }
 }
 function wkOnInit(full){ if(MK_CC && full && !MK_MARKET_CACHE[MK_CC]) MK_MARKET_CACHE[MK_CC]=full; renderWeekly(); }
 function wkDay(label, add){ const d=new Date(String(label)+'T00:00:00Z'); if(isNaN(d.getTime())) return String(label); d.setUTCDate(d.getUTCDate()+add); return (d.getUTCMonth()+1)+'/'+d.getUTCDate(); }
@@ -2833,7 +2983,7 @@ function wkCompute(full, key){
   return {L, ni, pi, G, top, streak, prevPos, up, nw};
 }
 function wkIcon(g, cls){ const t=(g && g.title)||'?'; return (g && g.icon) ? '<img class="'+cls+'" src="'+esc(g.icon)+'" alt="" referrerpolicy="no-referrer" loading="lazy">' : '<span class="'+cls+' wk-ph" aria-hidden="true">'+esc(t.slice(0,1))+'</span>'; }
-function wkName(aid, cc, g){ const t=(g && g.title)||aid; return '<button type="button" class="gdname wk-btn" data-aid="'+esc(aid)+'" data-mk="'+cc+'" title="'+esc(t)+'"><span class="wk-name">'+esc(t)+'</span></button>'; }
+function wkName(aid, cc, g){ const t=(g && g.title)||aid; return '<button type="button" class="gdname wk-btn" data-aid="'+esc(aid)+'" data-mk="'+cc+'" data-fk="wk:'+cc+':'+esc(aid)+'" aria-label="'+esc(t)+' 상세 보기" title="'+esc(t)+'"><span class="wk-name">'+esc(t)+'</span></button>'; }
 function wkFirst(r, cc){   // 1위 칸: 금색 1 · 아이콘 · 이름 · 제작사(한 줄, 넘치면 …) · 배지(새 1위 / N주째 1위) · 직전 주 · 주 평균
   const t0=r.top[0], g0=r.G[t0.aid]||{};
   const st = r.streak>1
@@ -2847,11 +2997,11 @@ function wkRow(aid, cc, G, k){ const g=G[aid]||{}; return '<div class="wk-row"><
 function renderWeekly(){
   const board=document.getElementById('wkBoard'), cap=document.getElementById('wkCap'); if(!board) return;
   const key=(activeChart==='free')?'free':'grossing', kname=(key==='free')?'인기':'매출';
-  let capSet=false, h='';
+  let capSet=false, h='', nReady=0;
   WK_MKTS.forEach(([cc, nm], i)=>{
-    const sel=(cc===MK_CC), full=wkSrc(cc), r=full ? wkCompute(full, key) : null;
-    h+='<div class="wk-col'+(sel?' is-sel':'')+(i===0?' is-first':'')+'" role="group" aria-label="'+nm+'">';   // 카드 한 장 = 여섯 칸(머리 · 1위 · 2위 · 3위 · 급등 · 신규 진입)
-    h+='<div class="wk-c wk-ch"><button type="button" class="wk-mk" data-mk="'+cc+'" aria-pressed="'+sel+'">'+nm+'</button></div>';
+    const sel=(cc===MK_CC), full=wkSrc(cc), r=full ? wkCompute(full, key) : null; if(full) nReady++;
+    h+='<div class="wk-col'+(sel?' is-sel':'')+(i===0?' is-first':'')+'" data-cc="'+cc+'" role="group" aria-label="'+nm+'">';   // 카드 한 장 = 여섯 칸(머리 · 1위 · 2위 · 3위 · 급등 · 신규 진입)
+    h+='<div class="wk-c wk-ch"><button type="button" class="wk-mk" data-mk="'+cc+'" data-fk="wkm:'+cc+'" aria-pressed="'+sel+'">'+nm+'</button></div>';
     if(!full || !r || r.short || !r.top.length){
       h+='<div class="wk-c wk-c1"><p class="wk-none">'+(!full ? '불러오는 중…' : '주간 데이터가 아직 부족합니다.')+'</p></div><div class="wk-c wk-c2"></div><div class="wk-c wk-c3"></div><div class="wk-c wk-cup"></div><div class="wk-c wk-cnw"></div></div>';
       return; }
@@ -2868,7 +3018,8 @@ function renderWeekly(){
     else h+='<div class="wk-c wk-cnw"><div class="wk-num"><span class="wk-lab">신규 진입</span></div><p class="wk-none">새로 들어온 게임이 없습니다.</p></div>';
     h+='</div>';
   });
-  board.innerHTML=h;
+  setHTMLKeepFocus(board, h);
+  if(nReady===WK_MKTS.length) board.classList.remove('is-loading');   // 2026-10-26 P2-1: 다섯 시장을 다 그리면 잡아 둔 자리를 푼다
 }
 document.addEventListener('click', e=>{ const b=e.target.closest && e.target.closest('.wk-mk'); if(!b) return; const cc=b.getAttribute('data-mk'); if(cc && cc!==MK_CC){ loadMarket(cc); renderWeekly(); } });
 // 위 고정 줄이 화면 위에 붙으면 바탕색 · 그림자(2026-10-24 밤 사용자 "화면상단에 틀고정 되면 배경색이생기면 좋을거같아"). 줄 바로 앞 표지가 화면 위로 사라지면 붙은 것이다
