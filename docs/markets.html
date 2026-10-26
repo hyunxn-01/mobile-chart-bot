@@ -2557,7 +2557,11 @@ function loadBriefsIndex(){
     selectBrief('global:global');
   }).catch(_hide);
 }
-function toggleBriefDetail(btn){ const card=btn.closest('.aib-sec'); if(!card) return; const willExpand=btn.getAttribute('data-open')!=='1'; const sum=card.querySelector('.aib-sum'), ana=card.querySelector('.aib-detail'); if(sum) sum.hidden=willExpand; if(ana) ana.hidden=!willExpand; btn.setAttribute('data-open', willExpand?'1':'0'); btn.textContent=willExpand?'접기 ▴':'자세히 ▾'; }
+// 2026-10-26 사용자 "같은 열 자세히보기는 하나 누르면 다 펴지게 해줘": 화면에서 같은 줄에 나란히 놓인 카드(.aib-row 안에서 위쪽 끝이 같은 카드)는 함께 펴고 접는다. 휴대폰처럼 한 줄에 카드가 하나면 그 카드만.
+function toggleBriefDetail(btn){ const card=btn.closest('.aib-sec'); if(!card) return; const willExpand=btn.getAttribute('data-open')!=='1';
+  const row=card.parentElement, top=card.getBoundingClientRect().top;
+  const peers=(row && row.classList.contains('aib-row')) ? Array.from(row.children).filter(c=>c.classList.contains('aib-sec') && Math.abs(c.getBoundingClientRect().top-top)<4) : [card];
+  peers.forEach(c=>{ const b=c.querySelector('.aib-more'); if(!b) return; const sum=c.querySelector('.aib-sum'), ana=c.querySelector('.aib-detail'); if(sum) sum.hidden=willExpand; if(ana) ana.hidden=!willExpand; b.setAttribute('data-open', willExpand?'1':'0'); b.textContent=willExpand?'접기 ▴':'자세히 ▾'; }); }
 function renderMarketBrief(text){
   // 고정 항목 브리핑: '## 제목' → 제목 카드(.aib-sec+.aib-h) + 불릿. ## 없으면 옛 불릿 카드 폴백.
   const raw=String(text||'');
