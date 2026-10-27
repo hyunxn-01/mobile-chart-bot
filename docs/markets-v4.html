@@ -896,6 +896,9 @@
   .gm-favrow{ display:flex; align-items:center; gap:10px; margin:-6px 0 14px; }
   .gm-favnote{ font-size:12.5px; color:var(--muted); }
 
+  /* 위 고정 줄: 바로가기가 둘(관심 게임 · 런칭 성적) 늘어 1440px에서 마지막 바로가기가 6px 잘려, 바로가기 좌우 여백을 10px → 6px로 줄인다(1280px까지 한 줄에 다 보이게, check_nav.py로 잼) */
+  .topnav .chapdot{ padding:0 6px; }
+
   /* F1 관심 게임 구간 */
   .favsec .fav-head{ display:flex; align-items:center; flex-wrap:wrap; gap:6px 12px; }
   .favsec .fav-head h2{ margin:0; }
@@ -924,7 +927,7 @@
   .fx-open:hover{ color:var(--act); text-decoration:underline; text-underline-offset:3px; }
   .fx-pub{ display:block; cursor:pointer; }
   .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-  .fav-share[hidden], .lc-panel[hidden], .cmp-review[hidden]{ display:none; }
+  .fav-share[hidden], .cmp-review[hidden]{ display:none; }
   #aggout .pubtable td.fx-pname{ white-space:nowrap; }
   #aggout .pubtable td.fx-pname .favbtn{ vertical-align:middle; margin:-6px 2px -6px -8px; }
   #aggout .pubtable td.fx-pname .rowbtn{ display:inline-block; width:calc(100% - 26px); vertical-align:middle; overflow:hidden; text-overflow:ellipsis; }
@@ -950,13 +953,18 @@
   .gmx-more{ appearance:none; margin-top:8px; border:1px solid var(--line); background:var(--bg); color:var(--act); font:inherit; font-size:13px; font-weight:700; padding:4px 12px; border-radius:999px; cursor:pointer; }
   .gmx-more:hover{ background:var(--chip); }
 
-  /* F4 출시 후 비교: 오른쪽 목록 */
+  /* F4 런칭 성적 비교: 순위 추이 아래 별도 구간(그래프 · 목록 판은 순위 추이와 같은 부품) */
+  .lcsec .canvas-wrap{ height:480px; }
+  .lc-aside{ padding:12px; }
+  .lc-search{ flex:1 1 160px; font-size:14px; padding:6px 10px; }
+  .lc-old{ font-size:13px; color:var(--ink2); line-height:1.6; margin:2px 0 8px; padding:8px 10px; background:var(--bg); border-radius:8px; }
+  .lc-old b{ color:var(--ink); }
   .lc-panel{ display:flex; flex-direction:column; gap:8px; }
   .lc-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
-  .lc-count{ font-size:13px; color:var(--muted); }
+  .lc-count{ font-size:13px; color:var(--muted); margin:2px 0 0; }
   .lc-genre{ font:inherit; font-size:13.5px; padding:4px 8px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--ink); max-width:190px; }
   .lc-note{ font-size:12.5px; color:var(--muted); margin:0; line-height:1.5; }
-  .lc-list{ height:330px; overflow-y:auto; display:flex; flex-direction:column; gap:3px; }
+  .lc-list{ height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:3px; }
   .lc-item{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; font:inherit; background:transparent; border:1px solid transparent; border-radius:8px; padding:6px 8px; cursor:pointer; color:var(--ink); }
   .lc-item:hover{ background:var(--chip); }
   .lc-item[aria-pressed="true"]{ border-color:var(--line); background:var(--bg); }
@@ -995,6 +1003,7 @@
   .crv-none{ font-size:13.5px; color:var(--muted); margin:0; }
   .crv-foot{ margin:12px 0 0; font-size:12.5px; color:var(--muted); }
   @media (max-width:1180px){ .crv-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
+  @media (max-width:820px){ .lcsec .canvas-wrap{ height:340px; } .lc-list{ height:auto; max-height:320px; } }
   @media (max-width:640px){ .crv-grid{ grid-template-columns:1fr; } .crv-h .crv-act{ margin-left:0; } .fav-tools{ margin-left:0; } .fx-nm .fx-open, .fx-sub{ max-width:180px; } }
   @media (pointer:coarse){ .favbtn{ width:36px; height:36px; } }
 </style>
@@ -1026,6 +1035,7 @@
       <a class="chapdot" data-target="favsec" href="#favsec"><span class="chaplabel">관심 게임</span></a>
       <a class="chapdot" data-target="chartcard" href="#chartcard"><span class="chaplabel">순위 추이</span></a>
       <a class="chapdot" id="navHist" data-target="histsec" href="#histsec" style="display:none"><span class="chaplabel">순위 이력</span></a>
+      <a class="chapdot" data-target="lcsec" href="#lcsec"><span class="chaplabel">런칭 성적</span></a>
       <a class="chapdot" data-target="cmpsec" href="#cmpsec"><span class="chaplabel">시장 비교</span></a>
       <a class="chapdot" data-target="gopsec" href="#gopsec"><span class="chaplabel">장르 진입 맵</span></a>
       <a class="chapdot" data-target="aggsec" href="#aggsec"><span class="chaplabel">퍼블리셔 · 장르</span></a>
@@ -1136,7 +1146,6 @@
     <div class="cmode-wrap seg seg-purple" role="tablist" aria-label="차트 보기">
       <button class="cmode" data-cmode="genre" role="tab" aria-selected="true">장르 차트</button>
       <button class="cmode" data-cmode="game" role="tab" aria-selected="false">게임 차트</button>
-      <button class="cmode" data-cmode="launch" role="tab" aria-selected="false">출시 후 비교</button>
     </div>
     <div class="stabs seg" role="tablist" aria-label="차트 종류">
       <button class="stab" role="tab" data-src="grossing" aria-selected="true">매출 (Top Grossing)</button>
@@ -1179,7 +1188,6 @@
         </div>
         <div class="list" id="list"></div>
       </div>
-      <div class="lc-panel" id="lcPanel" hidden></div>
     </aside>
   </div>
   </div>   <!-- /chartcard -->
@@ -1189,6 +1197,15 @@
     <p class="sub cap" id="histsub">위 그래프에서 게임을 선택하면, 그 게임의 순위 이력이 여기에 표로 나옵니다.</p>
     <div id="history"></div>
   </div>
+
+  <section class="pubsec lcsec" id="lcsec" aria-labelledby="lcTitle">   <!-- 2026-10-28 견본 F4: 런칭 성적 비교(사용자 "장르차트 게임차트랑 같이있으니까 조금 헷갈려" · "런칭 성적 비교는 어때?") -->
+    <h2 id="lcTitle">런칭 성적 비교</h2>
+    <p class="sub cap" id="lcsub"></p>
+    <div class="layout lc-layout">
+      <div class="chartbox"><div class="canvas-wrap"><canvas id="lcChart" role="img" aria-label="신작 런칭 성적 비교 꺾은선 그래프. 가로는 런칭일 기준 경과일(D+N), 세로는 순위이며 위가 1위입니다. 고른 게임은 색과 선 모양이 다릅니다."></canvas></div></div>
+      <aside class="panel lc-aside"><div class="lc-panel" id="lcPanel"></div></aside>
+    </div>
+  </section>
 
   <section class="cmpsec" id="cmpsec">
     <h2>시장 비교 · 장르 점유</h2>
@@ -3174,8 +3191,8 @@ document.addEventListener('click', e=>{ const b=e.target.closest && e.target.clo
 </script>
 <script>
 // ===== 2026-10-28 견본: 실무 활용 기능(설계안 pending/2026-10-28-차트봇-대시보드-실무활용-설계안.md 범위 B, 사용자 "B안(화면 + 요약 파일 하나)으로 진행해줘") =====
-// F1 관심 게임 · 퍼블리셔(브라우저 저장) · F2 상세 창 시장별 순위 · F3 목록 주소 공유 · F4 순위 추이의 '출시 후 비교' · F5 열지도 아래 장르 × 시장 검토 칸.
-// 정식판 함수(setChartMode · selectChart · restyle · init · applyUrlState · openGameDetail · renderCmp · renderAggSection)를 감싸서 더한다. 여러 나라 순위는 markets/xmarket_lite.json(매일 생성, 필요할 때만 받음).
+// F1 관심 게임 · 퍼블리셔(브라우저 저장) · F2 상세 창 시장별 순위 · F3 목록 주소 공유 · F4 런칭 성적 비교(별도 구간) · F5 열지도 아래 장르 × 시장 검토 칸.
+// 정식판 함수(selectChart · init · openGameDetail · renderCmp · renderAggSection)를 감싸서 더한다. 여러 나라 순위는 markets/xmarket_lite.json(매일 생성, 필요할 때만 받음).
 (function(){
 'use strict';
 const STAR='<svg class="favico" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.1 5.7L12 16.5l-5.1 2.8 1.1-5.7-4.3-4 5.8-.7z"/></svg>';
@@ -3185,6 +3202,12 @@ function mdShort(s){ const m=String(s||'').match(/^\d{4}-(\d{2})-(\d{2})/); retu
 function dayDiff(a,b){ return Math.round((Date.parse(a+'T00:00:00Z')-Date.parse(b+'T00:00:00Z'))/864e5); }
 function dateMinus(s,n){ const d=new Date(String(s)+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()-n); return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0'); }
 function shortT(t){ t=String(t||''); return t.length>16?t.slice(0,15)+'…':t; }
+function eunNeun(s){   // '은/는': 끝 글자의 받침으로 고른다. 영문 · 숫자는 읽는 소리로(M 엠 → 은, S 에스 → 는)
+  s=String(s||'').trim(); const ch=s.charAt(s.length-1), c=ch.charCodeAt(0);
+  if(c>=0xAC00 && c<=0xD7A3) return ((c-0xAC00)%28)?'은':'는';
+  if(/[lmnrLMNR0136780]/.test(ch)) return '은';
+  return '는';
+}
 function kindKey(){ return activeChart==='free'?'f':'g'; }
 function kindName(){ return activeChart==='free'?'인기':'매출'; }
 function mkName(mk){ const m=((typeof MATRIX!=='undefined'&&MATRIX&&MATRIX.markets)||[]).find(x=>x.key===mk); return (m&&m.name)||MK_CCN[mk]||mk; }
@@ -3436,10 +3459,13 @@ openGameDetail=function(aid){
   renderGmx(aid, false);
 };
 
-// ---------- F4 순위 추이의 '출시 후 비교' ----------
+// ---------- F4 런칭 성적 비교(순위 추이 아래 별도 구간, 그래프 따로) ----------
+// 2026-10-28 시험 주소 의견: 사용자 "출시후비교 좋은데 게임검색 있었으면 좋을거같고 그리고 장르차트 게임차트랑 같이있으니까 조금 헷갈려" · "런칭 성적 비교는 어때?"
+// → 순위 추이의 세 번째 단추에서 별도 구간으로 옮기고(그래프 따로), 이름 '런칭 성적 비교' · 가로축 D+N 표기 · 게임 검색을 더했다.
 const LC_PAL=['#2563eb','#d97706','#0d9488','#7c3aed','#db2777'];   // dataviz 색 검사 통과(이웃한 두 색의 색약 구별 거리 12.5 이상). 빨강은 '상승' 뜻이라 뺐다   taste-skill-ignore: 그래프 계열 색은 dataviz 검사 도구를 따른다(web-design-flow 「지침이 부딪힐 때」)
 const LC_DASH=[[],[7,4],[2,3],[10,3,2,3],[4,4]];                  // 색만으로 구별하지 않게 선 모양도 다르게
-const LC={sel:[], slot:{}, genre:'', saved:null, rows:null, msg:''};
+const LC={sel:[], slot:{}, genre:'', q:'', rows:null, msg:'', chart:null};
+const dN=d=>'D+'+d;
 function lcStart(){ const dr=DATA.date_range||[]; return dr[0]||((DATA.timeframes.daily.labels||[])[0]); }
 function lcRows(){
   const L=DATA.timeframes.daily.labels||[], S=DATA.timeframes.daily.series||{}, st=lcStart(), last=L[L.length-1], out=[];
@@ -3448,7 +3474,7 @@ function lcRows(){
     const s=S[aid]||[], days=dayDiff(last, rl), arr=new Array(days+1).fill(null); let first=null, best=null, sum=0, n=0;
     for(let i=0;i<L.length;i++){ const v=s[i]; if(v==null) continue; const d=dayDiff(L[i], rl); if(d<0||d>days) continue; arr[d]=v; if(first==null) first=d; if(best==null||v<best) best=v; if(d<30){ sum+=v; n++; } }
     if(first==null) continue;
-    out.push({aid, t:g.title_kr||g.title||aid, gen:g.genre||'', rl, days, arr, first, best, avg30:(days>=29&&n)?Math.round(sum/n*10)/10:null, cur:s[L.length-1]!=null?s[L.length-1]:null});
+    out.push({aid, t:g.title_kr||g.title||aid, dev:g.developer||'', gen:g.genre||'', rl, days, arr, first, best, avg30:(days>=29&&n)?Math.round(sum/n*10)/10:null, cur:s[L.length-1]!=null?s[L.length-1]:null});
   }
   out.sort((a,b)=> b.rl.localeCompare(a.rl) || a.best-b.best);
   return out;
@@ -3456,78 +3482,8 @@ function lcRows(){
 function lcSlotFree(){ for(let i=0;i<LC_PAL.length;i++){ if(!Object.values(LC.slot).includes(i)) return i; } return -1; }
 function lcAdd(aid){ if(LC.sel.includes(aid)) return true; if(LC.sel.length>=LC_PAL.length){ LC.msg='5개까지 고를 수 있습니다. 먼저 하나를 해제해 주세요.'; return false; } LC.sel.push(aid); LC.slot[aid]=lcSlotFree(); LC.msg=''; return true; }
 function lcRemove(aid){ const i=LC.sel.indexOf(aid); if(i>=0) LC.sel.splice(i,1); delete LC.slot[aid]; LC.msg=''; }
-function lcStyle(){
-  if(!chart || chartMode!=='launch') return;
-  const any=LC.sel.length>0;
-  chart.data.datasets.forEach(ds=>{ const s=LC.slot[ds.lcAid];
-    if(s!=null){ ds.borderColor=LC_PAL[s]; ds.borderWidth=2.5; ds.borderDash=LC_DASH[s]; ds.pointRadius=0; ds.pointHoverRadius=5; ds.pointBackgroundColor=LC_PAL[s]; ds.order=0; ds._lcOn=true; }
-    else { ds.borderColor=any?'rgba(130,130,125,0.14)':'rgba(130,130,125,0.30)'; ds.borderWidth=1; ds.borderDash=[]; ds.pointRadius=0; ds.order=any?2:1; ds._lcOn=false; } });
-  chart.update();
-}
-function lcBuildChart(){
-  const o=chart.options, x=o.scales.x, y=o.scales.y;
-  const rows=LC.rows.filter(r=>!LC.genre || r.gen===LC.genre || LC.sel.includes(r.aid));
-  const maxDay=Math.max(30, ...rows.map(r=>r.days));
-  chart.data.labels=Array.from({length:maxDay+1}, (_,i)=>i);
-  chart.data.datasets=rows.map(r=>({ lcAid:r.aid, label:r.t, data:r.arr.concat(new Array(Math.max(0, maxDay+1-r.arr.length)).fill(null)), borderColor:'rgba(130,130,125,0.30)', backgroundColor:'transparent', borderWidth:1, pointRadius:0, pointHoverRadius:4, spanGaps:false, tension:0.2 }));
-  x.ticks.callback=function(v){ return this.getLabelForValue(v)+'일'; };
-  x.title={display:true, text:'출시 후 일수', color:TICKC, font:{size:12}};
-  o.layout.padding=Object.assign({}, o.layout.padding, {right:isMobile()?8:136});
-  o.plugins.tooltip.callbacks.label=(c)=>`${c.dataset.label} · ${c.parsed.y}위`;
-  o.plugins.tooltip.callbacks.title=(items)=> items.length?('출시 후 '+items[0].label+'일'):'';
-  if(chart.resetZoom) chart.resetZoom();
-  { const y2=chart.options.scales.y; y2.reverse=true; y2.min=1; y2.max=100; if(y2.title){ y2.title.text='순위 (위가 1위)'; } if(y2.ticks){ y2.ticks.stepSize=10; y2.ticks.callback=undefined; } }   // resetZoom 뒤에는 설정 객체가 새로 만들어지므로 다시 읽어 순위 축을 정한다(장르 축 0~20이 남던 결함, 2026-10-28 견본 실측)
-  lcStyle(); updateScrollbar();
-}
-function lcEnter(){
-  if(!chart || !DATA) return;
-  chartMode='launch'; urlWith({mode:'launch'});
-  document.querySelectorAll('[data-cmode]').forEach(b=> b.setAttribute('aria-selected', String(b.dataset.cmode==='launch')));
-  const tabsEl=document.getElementById('tabs'); if(tabsEl) tabsEl.style.display='none';
-  const panelEl=document.querySelector('.panel'); if(panelEl) panelEl.style.display='';
-  const pb=document.getElementById('panelBody'), gl=document.getElementById('genreLegend'), lp=document.getElementById('lcPanel'), pl=document.getElementById('panelToggleLabel');
-  if(pb) pb.style.display='none'; if(gl) gl.hidden=true; if(lp) lp.hidden=false; if(pl) pl.textContent='신작 고르기';
-  { const hs=document.getElementById('histsec'); if(hs) hs.style.display='none'; const nh=document.getElementById('navHist'); if(nh) nh.style.display='none'; }
-  const secT=document.getElementById('secTitleChart'); if(secT) secT.textContent='출시 후 순위 비교'; markSectionMarkets();
-  const hint=document.getElementById('cmodeHint'); if(hint) hint.textContent='출시일을 0일로 맞춰 신작끼리 순위 변화를 비교합니다.';
-  const banner=document.getElementById('banner'); if(banner) banner.style.display='none';
-  const o=chart.options, x=o.scales.x;
-  if(!LC.saved) LC.saved={xcb:x.ticks.callback, xtitle:x.title?Object.assign({}, x.title):{display:false}, ttitle:o.plugins.tooltip.callbacks.title, pr:((o.layout&&o.layout.padding)||{}).right||0};
-  LC.rows=lcRows();
-  LC.sel=LC.sel.filter(a=>LC.rows.some(r=>r.aid===a)); Object.keys(LC.slot).forEach(a=>{ if(!LC.sel.includes(a)) delete LC.slot[a]; });
-  const ch=document.getElementById('charthint'); if(ch) ch.innerHTML='<span class="ci">회색 선은 '+mdShort(lcStart())+' 이후 출시한 게임 전체입니다.</span><span class="ci"><span class="cact">▸ 목록에서 게임을 누르면 색과 이름(5개까지)</span></span><span class="ci">'+dinfo('출시일은 앱스토어에 적힌 날짜입니다. 어떤 나라에 늦게 낸 게임은 그 나라 출시일과 다를 수 있어, 목록에 이 시장 차트에 처음 든 날을 함께 적었습니다.')+'</span>';
-  lcBuildChart(); renderLcPanel();
-}
-function lcLeave(){
-  if(chartMode!=='launch' || !chart) return;
-  const o=chart.options, x=o.scales.x;
-  if(LC.saved){ x.ticks.callback=LC.saved.xcb; x.title=LC.saved.xtitle; if(LC.saved.ttitle) o.plugins.tooltip.callbacks.title=LC.saved.ttitle; else delete o.plugins.tooltip.callbacks.title; o.layout.padding=Object.assign({}, o.layout.padding, {right:LC.saved.pr}); }
-  const lp=document.getElementById('lcPanel'); if(lp) lp.hidden=true;
-}
-function renderLcPanel(){
-  const lp=document.getElementById('lcPanel'); if(!lp || !LC.rows) return;
-  const rows=LC.rows, gens=[...new Set(rows.map(r=>r.gen).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'));
-  if(LC.genre && !gens.includes(LC.genre)) LC.genre='';
-  const vis=rows.filter(r=>!LC.genre || r.gen===LC.genre || LC.sel.includes(r.aid))
-    .sort((a,b)=>{ const sa=LC.slot[a.aid], sb=LC.slot[b.aid]; if((sa!=null)!==(sb!=null)) return sa!=null?-1:1; if(sa!=null) return sa-sb; return 0; });   // 고른 게임은 목록 맨 위(색 순서), 나머지는 최근 출시 순 그대로
-  let h='<div class="lc-top"><span class="lc-count">'+mdShort(lcStart())+' 이후 출시 '+vis.length+'개 · 최근 출시 순</span><select class="lc-genre" id="lcGenre" aria-label="장르로 거르기"><option value="">장르 전체</option>'+gens.map(g=>'<option'+(g===LC.genre?' selected':'')+'>'+esc(g)+'</option>').join('')+'</select></div>';
-  h+='<p class="lc-msg" aria-live="polite">'+esc(LC.msg || (LC.sel.length?('고른 게임 '+LC.sel.length+'개 · 다시 누르면 해제'):'게임을 누르면 그래프에 색과 이름이 붙습니다(5개까지).'))+'</p><div class="lc-list">';
-  if(!vis.length) h+='<p class="empty">'+(rows.length?'이 장르의 신작이 없습니다.':'수집을 시작한 뒤 출시한 게임이 이 차트에 없습니다.')+'</p>';
-  vis.forEach(r=>{ const s=LC.slot[r.aid], on=s!=null;
-    const sw=on?'<svg class="lc-sw" viewBox="0 0 16 10" aria-hidden="true"><line x1="0" y1="5" x2="16" y2="5" stroke="'+LC_PAL[s]+'" stroke-width="2.5"'+(LC_DASH[s].length?' stroke-dasharray="'+LC_DASH[s].join(' ')+'"':'')+'/></svg>':'<span class="sw"></span>';
-    const meta=[mdShort(r.rl)+' 출시', r.avg30!=null?('첫 30일 평균 '+r.avg30+'위'):('출시 '+r.days+'일째'), r.first>=7?('이 시장 차트 첫 진입은 출시 '+r.first+'일 뒤'):''].filter(Boolean).join(' · ');
-    h+='<button type="button" class="lc-item" data-lc="'+esc(r.aid)+'" data-fk="lc:'+esc(r.aid)+'" aria-pressed="'+on+'">'+sw+'<span class="ginfo" data-aid="'+esc(r.aid)+'" title="상세 보기" role="button" aria-label="상세 보기">ⓘ</span><span class="lc-tx"><span class="lc-nm">'+esc(r.t)+'</span><span class="lc-meta">'+esc(meta)+'</span></span><span class="lc-best">최고 '+r.best+'위</span></button>'; });
-  h+='</div><p class="lc-note">첫 30일 평균은 그 기간에 차트에 든 날만 셉니다.</p>';
-  setHTMLKeepFocus(lp, h);
-}
-(function(){ const lp=document.getElementById('lcPanel'); if(!lp) return;
-  lp.addEventListener('click', e=>{ if(e.target.closest('.ginfo')) return; const b=e.target.closest('[data-lc]'); if(!b) return; const aid=b.getAttribute('data-lc');
-    if(LC.slot[aid]!=null) lcRemove(aid); else lcAdd(aid);
-    if(LC.genre) lcBuildChart(); else lcStyle(); renderLcPanel(); });
-  lp.addEventListener('change', e=>{ if(e.target.id!=='lcGenre') return; LC.genre=e.target.value; lcBuildChart(); renderLcPanel(); });
-})();
-if(window.Chart && Chart.register) Chart.register({ id:'lcEndLabels', afterDatasetsDraw(c){   // 고른 선 끝에 게임 이름(글자는 글자색, 선 색은 옆의 선이 말한다)
-  if(c!==chart || chartMode!=='launch' || isMobile()) return;   // 휴대폰은 폭이 좁아 이름이 선을 덮으므로, 목록 맨 위의 선 모양 표시가 범례를 맡는다
+const lcEndLabels={ id:'lcEndLabels', afterDatasetsDraw(c){   // 고른 선 끝에 게임 이름(글자는 글자색, 선 색은 옆의 선이 말한다)
+  if(isMobile()) return;   // 휴대폰은 폭이 좁아 이름이 선을 덮으므로, 목록 맨 위의 선 모양 표시가 범례를 맡는다
   const a=c.chartArea, ctx=c.ctx, items=[];
   c.data.datasets.forEach((ds,i)=>{ if(!ds._lcOn) return; let k=ds.data.length-1; while(k>=0 && ds.data[k]==null) k--; if(k<0) return; const pt=c.getDatasetMeta(i).data[k]; if(!pt || pt.x<a.left-1 || pt.x>a.right+1) return; items.push({x:pt.x, y:pt.y, t:shortT(ds.label)}); });
   if(!items.length) return;
@@ -3535,41 +3491,89 @@ if(window.Chart && Chart.register) Chart.register({ id:'lcEndLabels', afterDatas
   items.sort((p,q)=>p.y-q.y); let last=-1e9;
   items.forEach(it=>{ const y=Math.max(it.y, last+15); last=y; const w=ctx.measureText(it.t).width; let x=it.x+7; if(x+w>c.width-4) x=it.x-7-w;
     ctx.fillStyle='rgba(255,255,255,.88)'; ctx.fillRect(x-3, y-8, w+6, 16); ctx.fillStyle='#0F172A'; ctx.fillText(it.t, x, y); });
-  ctx.restore(); } });
+  ctx.restore(); } };
+function lcStyle(){
+  const c=LC.chart; if(!c) return;
+  const any=LC.sel.length>0;
+  c.data.datasets.forEach(ds=>{ const s=LC.slot[ds.lcAid];
+    if(s!=null){ ds.borderColor=LC_PAL[s]; ds.borderWidth=2.5; ds.borderDash=LC_DASH[s]; ds.pointRadius=0; ds.pointHoverRadius=5; ds.pointBackgroundColor=LC_PAL[s]; ds.order=0; ds._lcOn=true; }
+    else { ds.borderColor=any?'rgba(130,130,125,0.14)':'rgba(130,130,125,0.30)'; ds.borderWidth=1; ds.borderDash=[]; ds.pointRadius=0; ds.order=any?2:1; ds._lcOn=false; } });
+  c.update();
+}
+function lcBuildChart(){
+  const cv=document.getElementById('lcChart'); if(!cv || !LC.rows || !window.Chart) return;
+  const rows=LC.rows.filter(r=>!LC.genre || r.gen===LC.genre || LC.sel.includes(r.aid));
+  const maxDay=Math.max(30, ...rows.map(r=>r.days)), step=isMobile()?28:14;
+  const labels=Array.from({length:maxDay+1}, (_,i)=>i);
+  const ds=rows.map(r=>({ lcAid:r.aid, label:r.t, data:r.arr.concat(new Array(Math.max(0, maxDay+1-r.arr.length)).fill(null)), borderColor:'rgba(130,130,125,0.30)', backgroundColor:'transparent', borderWidth:1, pointRadius:0, pointHoverRadius:4, spanGaps:false, tension:0.2 }));
+  if(LC.chart){ LC.chart.data.labels=labels; LC.chart.data.datasets=ds; lcStyle(); return; }
+  LC.chart=new Chart(cv, { type:'line', data:{labels, datasets:ds}, plugins:[lcEndLabels], options:{
+    responsive:true, maintainAspectRatio:false, animation:false, layout:{ padding:{ left:4, right:isMobile()?8:136, top:12 } },
+    interaction:{ mode:'nearest', intersect:false, axis:'xy' },
+    plugins:{ legend:{display:false}, zoom:{ zoom:{ wheel:{enabled:false}, pinch:{enabled:false}, drag:{enabled:false} }, pan:{enabled:false} },
+      tooltip:{ filter:(it)=>it.parsed.y!=null, callbacks:{ title:(items)=>items.length?dN(items[0].label):'', label:(c)=>`${c.dataset.label} · ${c.parsed.y}위` } } },
+    scales:{
+      y:{ reverse:true, min:1, max:100, title:{display:true, text:'순위 (위가 1위)', color:TICKC, font:{size:12}}, ticks:{ stepSize:10, color:TICKC }, grid:{ color:'rgba(130,130,125,0.14)' } },
+      x:{ title:{display:true, text:'런칭일 기준 경과일 (D+N)', color:TICKC, font:{size:12}}, grid:{display:false},
+          ticks:{ color:TICKC, maxRotation:0, autoSkip:false, callback:function(v){ const d=+this.getLabelForValue(v); return d%step===0?dN(d):null; } } } } } });
+  lcStyle();
+}
+function lcPanelInit(){
+  const lp=document.getElementById('lcPanel'); if(!lp || lp.dataset.ready) return; lp.dataset.ready='1';
+  lp.innerHTML='<div class="lc-top"><input class="search lc-search" id="lcSearch" type="search" placeholder="게임 검색 (이름·제작사)" aria-label="런칭 성적 비교에서 게임 검색"><select class="lc-genre" id="lcGenre" aria-label="장르로 거르기"></select></div>'+
+    '<p class="lc-count" id="lcCount"></p><p class="lc-msg" id="lcMsg" aria-live="polite"></p><div class="lc-list" id="lcList"></div>'+
+    '<p class="lc-note">D+30까지 평균은 그 기간에 차트에 든 날만 셉니다. 런칭일은 앱스토어에 적힌 출시일입니다.</p>';
+  lp.addEventListener('click', e=>{ if(e.target.closest('.ginfo')) return; const b=e.target.closest('[data-lc]'); if(!b) return; const aid=b.getAttribute('data-lc');
+    if(LC.slot[aid]!=null) lcRemove(aid); else lcAdd(aid);
+    if(LC.genre) lcBuildChart(); else lcStyle(); lcRenderList(); });
+  lp.addEventListener('change', e=>{ if(e.target.id!=='lcGenre') return; LC.genre=e.target.value; lcBuildChart(); lcRenderList(); });
+  lp.addEventListener('input', e=>{ if(e.target.id!=='lcSearch') return; LC.q=e.target.value; lcRenderList(); });
+}
+function lcGenreOptions(){
+  const sel=document.getElementById('lcGenre'); if(!sel || !LC.rows) return;
+  const gens=[...new Set(LC.rows.map(r=>r.gen).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'));
+  if(LC.genre && !gens.includes(LC.genre)) LC.genre='';
+  sel.innerHTML='<option value="">장르 전체</option>'+gens.map(g=>'<option>'+esc(g)+'</option>').join(''); sel.value=LC.genre;
+}
+function lcRenderList(){
+  const list=document.getElementById('lcList'); if(!list || !LC.rows) return;
+  const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,''), q=norm(LC.q), st=lcStart();
+  const hit=r=>!q || norm(r.t).includes(q) || norm(r.dev).includes(q);
+  const pool=LC.rows.filter(r=>!LC.genre || r.gen===LC.genre);
+  const found=pool.filter(hit);
+  const vis=LC.rows.filter(r=>LC.sel.includes(r.aid) || found.includes(r))
+    .sort((a,b)=>{ const sa=LC.slot[a.aid], sb=LC.slot[b.aid]; if((sa!=null)!==(sb!=null)) return sa!=null?-1:1; if(sa!=null) return sa-sb; return 0; });   // 고른 게임은 목록 맨 위(색 순서), 나머지는 최근 출시 순
+  const cnt=document.getElementById('lcCount');
+  if(cnt) cnt.textContent=mdShort(st)+' 이후 출시 '+pool.length+'개'+(q?' 중 검색 결과 '+found.length+'개':'')+' · 최근 출시 순';
+  const msg=document.getElementById('lcMsg'); if(msg) msg.textContent=LC.msg || (LC.sel.length?('고른 게임 '+LC.sel.length+'개 · 다시 누르면 해제'):'게임을 누르면 그래프에 색과 이름이 붙습니다(5개까지).');
+  // 검색어에 맞지만 수집 시작 전에 나온 게임: 목록에 없는 이유를 알린다
+  let old='';
+  if(q){ const olds=Object.keys(DATA.games).filter(a=>{ const g=DATA.games[a]; return g.release && g.release<st && (norm(g.title_kr||g.title).includes(q) || norm(g.developer).includes(q)); }).slice(0,3);
+    if(olds.length) old='<p class="lc-old">'+olds.map(a=>{ const g=DATA.games[a], t=g.title_kr||g.title||a; return '<b>'+esc(t)+'</b>'+eunNeun(t)+' '+esc(g.release)+' 출시라, 수집을 시작한 '+mdShort(st)+'보다 앞서 런칭 초기 순위가 없습니다.'; }).join('<br>')+'</p>'; }
+  let h=old;
+  if(q && !found.length && !old) h+='<p class="lc-old">이 차트에서 "'+esc(LC.q)+'"와 맞는 게임이 없습니다.</p>';   // 고른 게임이 목록에 남아 있어도 검색 결과가 없다는 것을 알린다
+  vis.forEach(r=>{ const s=LC.slot[r.aid], on=s!=null;
+    const sw=on?'<svg class="lc-sw" viewBox="0 0 16 10" aria-hidden="true"><line x1="0" y1="5" x2="16" y2="5" stroke="'+LC_PAL[s]+'" stroke-width="2.5"'+(LC_DASH[s].length?' stroke-dasharray="'+LC_DASH[s].join(' ')+'"':'')+'/></svg>':'<span class="sw"></span>';
+    const meta=[mdShort(r.rl)+' 출시', r.avg30!=null?('D+30까지 평균 '+r.avg30+'위'):('지금 '+dN(r.days)), r.first>=7?('이 시장 차트 첫 진입 '+dN(r.first)):''].filter(Boolean).join(' · ');
+    h+='<button type="button" class="lc-item" data-lc="'+esc(r.aid)+'" data-fk="lc:'+esc(r.aid)+'" aria-pressed="'+on+'">'+sw+'<span class="ginfo" data-aid="'+esc(r.aid)+'" title="상세 보기" role="button" aria-label="상세 보기">ⓘ</span><span class="lc-tx"><span class="lc-nm">'+esc(r.t)+'</span><span class="lc-meta">'+esc(meta)+'</span></span><span class="lc-best">최고 '+r.best+'위</span></button>'; });
+  if(!vis.length && !q) h+='<p class="empty">'+(LC.rows.length?'이 장르의 신작이 없습니다.':'수집을 시작한 뒤 출시한 게임이 이 차트에 없습니다.')+'</p>';
+  setHTMLKeepFocus(list, h);
+}
+function lcRefresh(){   // 시장 · 매출/인기가 바뀌면 다시 계산한다
+  if(!DATA || !document.getElementById('lcsec')) return;
+  LC.rows=lcRows();
+  LC.sel=LC.sel.filter(a=>LC.rows.some(r=>r.aid===a)); Object.keys(LC.slot).forEach(a=>{ if(!LC.sel.includes(a)) delete LC.slot[a]; });
+  lcPanelInit(); lcGenreOptions();
+  const sub=document.getElementById('lcsub');
+  if(sub) sub.innerHTML='<span class="ci">런칭일을 D+0으로 맞춰 신작끼리 '+(activeChart==='free'?'인기':'매출')+' 순위 변화를 비교합니다. 회색 선은 '+mdShort(lcStart())+' 이후 출시한 게임 전체입니다.</span><span class="ci"><span class="cact">▸ 목록에서 게임을 누르면 색과 이름(5개까지)</span></span><span class="ci">'+dinfo('런칭일은 앱스토어에 적힌 출시일입니다. 어떤 나라에 늦게 낸 게임은 그 나라 런칭일과 다를 수 있어, 목록에 이 시장 차트에 처음 든 날(D+N)을 함께 적었습니다.')+'</span>';
+  lcBuildChart(); lcRenderList();
+}
 
-// ---------- 정식판 함수 감싸기(모드 전환 · 시장 · 매출/인기) ----------
-const _setChartMode=setChartMode;
-setChartMode=function(mode){
-  if(mode==='launch'){ if(chartMode!=='launch') lcEnter(); return; }
-  if(chartMode==='launch') lcLeave();
-  return _setChartMode(mode);
-};
+// ---------- 정식판 함수 감싸기(시장 · 매출/인기) ----------
 const _selectChart=selectChart;
-selectChart=function(key){
-  const wasL=(chartMode==='launch');
-  if(wasL){ lcLeave(); chartMode='game'; }
-  _selectChart(key);
-  if(wasL) lcEnter();
-  renderFav();   // 관심 게임 표의 순위 종류도 매출/인기를 따른다
-};
-const _restyle=restyle;
-restyle=function(){ _restyle(); if(chartMode==='launch') lcStyle(); };
+selectChart=function(key){ _selectChart(key); lcRefresh(); renderFav(); };   // 런칭 성적 비교 · 관심 게임 표도 매출/인기를 따른다
 const _init=init;
-init=function(full){
-  const wasL=(chartMode==='launch');
-  LC.saved=null; LC.rows=null;   // 새 시장은 그래프를 새로 만든다
-  _init(full);
-  if(wasL && chartMode!=='launch') lcEnter();
-  renderFav();
-};
-const _applyUrlState=applyUrlState;
-applyUrlState=function(){ const first=!_urlApplied; _applyUrlState(); if(first && _initialQuery.get('mode')==='launch' && chartMode!=='launch') setChartMode('launch'); };
-document.addEventListener('click', e=>{   // 출시 후 비교를 보는 중에 표 행(그래프 강조)을 누르면 게임 차트로 바꿔 강조가 보이게(#8과 같은 규칙)
-  if(chartMode!=='launch') return;
-  if(e.target.closest && e.target.closest('.gdname,.ginfo,[data-fav-g],[data-fav-p]')) return;
-  const card=e.target.closest && e.target.closest('.pubrow,.pubcard,.watchcard');
-  if(card){ setChartMode('game'); scrollTo(document.getElementById('chartsec')); }
-}, true);
+init=function(full){ _init(full); lcRefresh(); renderFav(); };
 
 // ---------- 퍼블리셔 표의 관심 단추 ----------
 function favPubBtn(name){ const on=pubHas(name); return '<button type="button" class="favbtn" data-fav-p="'+esc(name)+'" aria-pressed="'+on+'" aria-label="'+(on?'관심 퍼블리셔에서 빼기: ':'관심 퍼블리셔에 추가: ')+esc(name)+'" title="'+(on?'관심 퍼블리셔에서 빼기':'관심 퍼블리셔에 추가')+'">'+STAR+'</button>'; }
@@ -3632,17 +3636,19 @@ function crvOpen(mk, g, scroll){
      (r&&r.zone?'<div><dt>장르 진입 맵 구역</dt><dd><span class="crv-zone"><i style="background:'+ZONES[r.zone][0]+'"></i>'+ZONES[r.zone][1]+'</span></dd></div>':'')+'</dl></div>';
   h+='<div class="crv-b"><h4>상위 게임</h4>'+((r&&r.top.length)?'<ol class="crv-ol">'+r.top.slice(0,5).map(x=>{ const t=x.meta.title_kr||x.meta.title||x.aid; return '<li><span class="crv-rk">'+x.rank+'위</span><span class="crv-tx"><span class="crv-nm">'+gm(x,t)+'</span><span class="crv-sub">'+esc(x.meta.developer||'')+'</span></span></li>'; }).join('')+'</ol>':'<p class="crv-none">이 시장 상위 100위에 이 장르 게임이 없습니다.</p>')+'</div>';
   h+='<div class="crv-b"><h4>최근 석 달 신작</h4>'+((r&&r.news.length)?'<ol class="crv-ol">'+r.news.slice(0,5).map(x=>{ const t=x.meta.title_kr||x.meta.title||x.aid; return '<li><span class="crv-tx"><span class="crv-nm">'+gm(x,t)+'</span><span class="crv-sub">'+mdShort(x.meta.release)+' 출시 · '+(x.cur!=null?'지금 '+x.cur+'위':'지금 100위 밖')+' · 최고 '+x.best+'위</span></span></li>'; }).join('')+'</ol>'+
-     '<p class="crv-foot"><button type="button" class="crv-link" data-crv-launch>이 신작들을 출시 후 비교로 보기</button></p>':'<p class="crv-none">최근 석 달 안에 나와 이 시장 차트에 든 이 장르 신작이 없습니다.</p>')+'</div>';
+     '<p class="crv-foot"><button type="button" class="crv-link" data-crv-launch>이 신작들을 런칭 성적 비교로 보기</button></p>':'<p class="crv-none">최근 석 달 안에 나와 이 시장 차트에 든 이 장르 신작이 없습니다.</p>')+'</div>';
   const others=((MATRIX&&MATRIX.markets)||[]).filter(m=>m.key!==mk).map(m=>({m, v:(MATRIX.cells[m.key]&&MATRIX.cells[m.key][g]&&MATRIX.cells[m.key][g].rev)})).filter(x=>x.v!=null).sort((p,q)=>q.v-p.v).slice(0,3);
   h+='<div class="crv-b"><h4>이 장르의 점유가 큰 다른 시장</h4>'+(others.length?'<ol class="crv-ol">'+others.map(x=>'<li><span class="crv-tx"><span class="crv-nm"><button type="button" class="crv-link" data-crv-mk="'+esc(x.m.key)+'">'+esc(x.m.name)+'</button></span><span class="crv-sub">추정 매출 점유 '+x.v+'%('+day+' 하루)</span></span></li>').join('')+'</ol>':'<p class="crv-none">다른 시장 자료가 없습니다.</p>')+'</div>';
   h+='</div><p class="crv-foot">하루 점유는 위 열지도와 같은 값이고, 월별 점유는 끝난 달의 평균 순위로 계산합니다. 1위 게임이 바뀌면 하루 값이 크게 움직입니다. 모두 차트 순위로 거꾸로 계산한 추정치이며, 진입 여부는 총 시장 규모 · 자사 IP · 경쟁사 대응을 따로 보고 판단합니다.</p>';
   box.innerHTML=h; box._news=(r&&r.news)||[];
   if(scroll) scrollTo(box,'nearest');
 }
-function goLaunch(mk, aids){
-  const go=()=>{ LC.genre=''; LC.sel=[]; LC.slot={}; aids.slice(0,LC_PAL.length).forEach(a=>{ if(DATA.games[a]) lcAdd(a); }); if(chartMode!=='launch') setChartMode('launch'); else { LC.rows=lcRows(); lcBuildChart(); renderLcPanel(); } scrollTo(document.getElementById('chartcard')); };
-  if(mk===MK_CC && DATA && chart){ go(); return; }
-  loadMarket(mk); let n=0; const iv=setInterval(()=>{ if(MK_CC===mk && FULL===MK_MARKET_CACHE[mk] && chart){ clearInterval(iv); go(); } else if(++n>50) clearInterval(iv); }, 120);
+function goLaunch(mk, aids){   // 검토 칸의 최근 신작을 런칭 성적 비교에 골라 보여 준다
+  const go=()=>{ if(activeChart!=='grossing') selectChart('grossing'); LC.genre=''; LC.q=''; const si=document.getElementById('lcSearch'); if(si) si.value='';
+    LC.sel=[]; LC.slot={}; LC.rows=lcRows(); aids.forEach(a=>{ if(LC.sel.length<LC_PAL.length && LC.rows.some(r=>r.aid===a)) lcAdd(a); });
+    lcGenreOptions(); lcBuildChart(); lcRenderList(); scrollTo(document.getElementById('lcsec')); };
+  if(mk===MK_CC && DATA){ go(); return; }
+  loadMarket(mk); let n=0; const iv=setInterval(()=>{ if(MK_CC===mk && FULL===MK_MARKET_CACHE[mk] && DATA){ clearInterval(iv); go(); } else if(++n>50) clearInterval(iv); }, 120);
 }
 (function(){
   const grid=document.getElementById('cmpGrid');
