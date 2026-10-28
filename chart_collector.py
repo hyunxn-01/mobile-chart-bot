@@ -615,19 +615,22 @@ def _market_axis_digest(market_key, axis_key):
             now = s[li] if li < len(s) else None
             if now is None:
                 continue
-            prev = next((v for v in s if v is not None), None)
+            # 2026-10-29: 직전 구간 값과 비교(전에는 처음 값이 있는 구간과 비교해, 주간 '(전주대비)' 이름표와 달리 몇 달 변화가 들어갔다.
+            #   한국 할리우드 머지 ▲71.2 = 처음 93.5위 → 이번 주 22.3위, 전주 대비로는 20.1위 → 22.3위)
+            prev = s[li - 1] if li >= 1 and li - 1 < len(s) else None
             meta = games.get(aid) or {}
             rows.append((now, prev, meta.get('title_kr') or meta.get('title') or aid, meta.get('genre', '')))
         if not rows:
             return None
         rows.sort(key=lambda r: r[0])
         top = ', '.join(f"{r[0]}.{r[2]}({r[3]})" for r in rows[:5])
-        movers = [(r[2], r[1] - r[0]) for r in rows if r[1] is not None]
+        movers = [(r[2], round(r[1] - r[0], 1)) for r in rows if r[1] is not None]
         ris = ', '.join(f"{m[0]}(▲{m[1]})" for m in sorted([m for m in movers if m[1] >= 1], key=lambda m: -m[1])[:3]) or '—'
         fal = ', '.join(f"{m[0]}(▼{abs(m[1])})" for m in sorted([m for m in movers if m[1] <= -1], key=lambda m: m[1])[:3]) or '—'
         gc = Counter((r[3] or '기타') for r in rows[:30])
         genres = ', '.join(f"{k} {v}" for k, v in gc.most_common(6))
-        return f"기간 {labels[0]}~{labels[-1]}({len(labels)}구간) | 매출TOP5: {top} | 급상승: {ris} | 급하락: {fal} | 장르분포(상위30): {genres}"
+        return (f"기간 {labels[0]}~{labels[-1]}({len(labels)}구간) | 매출TOP5(마지막 구간 평균 순위): {top} | "
+                f"급상승(직전 구간 대비): {ris} | 급하락(직전 구간 대비): {fal} | 장르분포(상위30): {genres}")
     except Exception:
         return None
 
@@ -732,19 +735,41 @@ GROUNDING = (
 # 모든 브리핑 공통 문체·어휘 규칙 — 시장(_axis_prompt)·글로벌(build_global_brief) 프롬프트가 같이 쓴다.
 # 2026-10-14: 두 프롬프트에 복사돼 있던 같은 문장을 한 자리로 합쳤다(기존 문장 그대로). 끝에 비유·의인화 금지와 사용자 어휘 규칙(컨텐츠·무과금·유지한다·추가한다)을 덧붙였다.
 #   사용자 결정 2026-10-14(개조식·▲표기·'데이터 누적 중'·굵게 범위는 그대로, AXIS_PV는 올리지 않음 — 다음 월요일 정기 갱신 때 자연 적용).
+#   2026-10-29: 다른 낱말로 읽히는 명사형 · '무상 지급' · '몫' 금지 두 문장 추가(적용 설계안, 시험판 brief_test.py의 문체 · 어휘 EDITS 그대로).
 STYLE_RULES = (
-    "이모지·구분선(---) 금지. 문장에 'ㅡ' 대시(em·en 대시 포함) 쓰지 말고 마침표·쉼표·괄호·콜론으로. 문장은 짧은 개조식(명사형 종결. 예: '좌우함'·'유리'). 모호한 조어 금지, 실무에서 쓰는 명확한 용어로. '지난 분석/저번 분석/앞서' 같은 자기참조 표현 금지. 브리핑은 그것만 봐도 이해되게 사실을 직접 서술(연속성은 '지속·유지·전환' 등 현재 사실로만). 한국어, 군더더기 없이. '게임/Games/游戏'는 분석 카테고리이지 장르가 아니다(장르는 구체 서브장르 MMORPG·4X·매치3 등으로만, '상위 100이 전부 게임' 류 자명한 서술 금지). 게임명 고유명사 외엔 한국어로만(游戏·ゲーム 등 외국어 일반어 금지). 게임명은 데이터·디제스트에 나온 원 표기(스토어 타이틀) 그대로 쓰고 다른 언어로 번역·현지화하지 마라(예: 'Pokémon GO'를 '포켓몬 GO'로, 'Monopoly GO'를 '모노폴리 GO'로 바꾸지 말 것). 웹검색 기사에서 다른 표기를 봐도 본문 게임명은 원 표기로 통일."
+    "이모지·구분선(---) 금지. 문장에 'ㅡ' 대시(em·en 대시 포함) 쓰지 말고 마침표·쉼표·괄호·콜론으로. 문장은 짧은 개조식(명사형 종결. 예: '좌우함'·'유리'). 다른 낱말로 읽히는 명사형(예: '이르다'의 '이름')은 '이른 편'처럼 바꾼다. 모호한 조어 금지, 실무에서 쓰는 명확한 용어로. '지난 분석/저번 분석/앞서' 같은 자기참조 표현 금지. 브리핑은 그것만 봐도 이해되게 사실을 직접 서술(연속성은 '지속·유지·전환' 등 현재 사실로만). 한국어, 군더더기 없이. '게임/Games/游戏'는 분석 카테고리이지 장르가 아니다(장르는 구체 서브장르 MMORPG·4X·매치3 등으로만, '상위 100이 전부 게임' 류 자명한 서술 금지). 게임명 고유명사 외엔 한국어로만(游戏·ゲーム 등 외국어 일반어 금지). 게임명은 데이터·디제스트에 나온 원 표기(스토어 타이틀) 그대로 쓰고 다른 언어로 번역·현지화하지 마라(예: 'Pokémon GO'를 '포켓몬 GO'로, 'Monopoly GO'를 '모노폴리 GO'로 바꾸지 말 것). 웹검색 기사에서 다른 표기를 봐도 본문 게임명은 원 표기로 통일."
     " [비유·의인화 금지] 시장·게임·장르·매출·퍼블리셔를 주어로 사람의 동작을 쓰지 않는다(쥔다·흡수한다·침투한다·작동한다·나눠 먹는다 금지). 비유 명사(허브·상수·요새·파이)도 쓰지 않는다. 그 말을 지우고 실제로 일어난 일(순위·국가·수치·행동)을 적을 수 있으면 비유다. 업계에서 굳어진 말(캐시카우·롱런·순위 방어·모멘텀·UA 드라이브·안착·되돌림)은 그대로 쓴다. 예: '전략 신작이 쥔 구조' → '매출 1위는 전략 신작', '글로벌 흥행이 한국까지 침투' → '글로벌 상위권 게임이 한국에서도 4위', '전역 과금층을 흡수' → '여러 시장에서 상위권'."
-    " [어휘] 'content'는 '콘텐츠'가 아니라 '컨텐츠'로 쓴다. 과금하지 않는 유저·경로는 '무료'가 아니라 '무과금'(무료 게임·Top Free 차트 이름은 그대로). '그대로 둔다'는 '그대로 유지한다', '더한다'는 '추가한다'로 쓴다. 실체가 없는 '수단'은 쓰지 않는다."
+    " [어휘] 'content'는 '콘텐츠'가 아니라 '컨텐츠'로 쓴다. 과금하지 않는 유저·경로는 '무료'가 아니라 '무과금'(무료 게임·Top Free 차트 이름은 그대로). 아이템 · 재화를 대가 없이 주는 것은 '무상 지급'으로 쓴다. '몫'은 쓰지 않는다(매출이면 '매출'). '그대로 둔다'는 '그대로 유지한다', '더한다'는 '추가한다'로 쓴다. 실체가 없는 '수단'은 쓰지 않는다."
 )
+
+
+# 2026-10-29 브리핑 규칙 보강(적용 설계안 pending/2026-10-28-차트봇-AI브리핑-적용설계안.md, 사용자 승인 "전 시간축 검토로").
+#   문장 정본은 워크스페이스 시험 스크립트(견본/2026-10-28-실무활용 brief_test.py EDITS · SUM_NEW, brief_verify.py VERIFY_V2)이고 그대로 옮겼다.
+#   시험 기록: 견본/2026-10-28-실무활용/브리핑시험_점검기록.md(5~15판 · 점검표 검토 재시험).
+#   LAUNCH = 신작 런칭 추이 자료가 붙는 주요 시장 주간에만, WEEKLY = 주간 축에만, OTHER = 월간 · 분기용, 나머지는 시장 · 지역 모든 시간축.
+#   문체 · 어휘 두 문장은 STYLE_RULES 안에 넣었다. CHECK_OTHER · MOVE_OTHER는 시험한 주간 문장을 월간 · 분기 자료에 맞춰 고쳐 쓴 것(주간 8주 자료가 없음).
+BRIEF_LAUNCH_DEF = "자료의 '신작 런칭 추이'로 이 항목 끝에 신작 불릿을 쓴다. 첫 신작 불릿은 '차트인 신작:'으로 시작해 이번 주 처음 든 게임을 (출시일 · D+N · 지금 순위 · 유형)으로 쓴다. 그다음 상위권 신작마다 불릿 하나씩, '게임명(세부 장르 · 퍼블리셔): 유형'으로 시작해 그 유형으로 판정된 근거 수치(최고 순위와 그날, D+7 · D+14 · D+30 순위, 최근 7일 평균과 직전 7일)와 같은 시장 기준값(차트에 남은 게임의 D+14 · D+30 순위 중앙값) 대비 위치를 쓴다. 기준값과는 같은 시점끼리만 비교하고(D+14 순위는 D+14 기준값과), 그 시점이 안 된 게임은 비교하지 않는다. 기준값은 차트에 남은 게임만의 순위라서 신작의 목표치(KPI)로 쓰지 않고, 쓸 때는 '차트에 남은 게임 기준'임과 그 시점에 몇 개 중 몇 개가 남았는지를 밝힌다. 지금의 정착 현황은 상위권 신작 불릿 뒤에 '정착 현황:'으로 시작하는 불릿 하나로 한 번만 쓴다. 유형 이름과 숫자는 자료 그대로 쓰고, 자료에 없는 유형을 만들지 않는다. 차트인 신작이 없으면 '- 차트인 신작: 이번 주 없음'으로 쓴다. 신작의 배경 · 원인은 신뢰 매체로 확인될 때만 게임마다 한 문장으로 덧붙이고, 기사 문장을 그대로 옮기지 않는다. 그 한 문장도 개조식으로 직접 줄여 쓰고(기사체 '~했다' · '~이다' 금지), 같은 사실을 두 번 쓰지 않는다. 신작에 대한 판단(진출 · 보류 · 운영 계획 등)은 핵심 시사점에 쓰고, 그때 유형 분포 · 기준값 · 정착 현황을 근거로 든다. 유형이 '관찰 중'(D+14 전)인 게임은 핵심 시사점에서 판단의 근거로 쓰지 않는다. 신작의 최근 7일 평균이 직전 7일과 달라도 같은 순위 구간(10위 안 · 11~30위 · 31~100위) 안이면, 어느 항목에서든 상승 · 하락 · 하락세라고 쓰지 않고 유형 이름으로 쓴다. "
+BRIEF_SIG_RULES = "게임 하나의 성과를 장르 · 시장 전체의 판단(진출 · 보류 · 매출 계획 · 평가 기준)으로 넓히지 않고, 사례가 하나면 그 게임에 대한 사실로만 쓴다('~로 판단하기 이르다' 같은 일반 결론도 쓰지 않는다). 게임 사례로 내린 판단은 괄호 근거에 사례 수를 밝힌다(예: '사례 둘'). 순위 자료로 확인되지 않는 원인(광고 · UA 집행, 업데이트 효과 등)은 쓰지 않거나, 쓸 때는 추측임을 밝힌다. 괄호의 근거는 그 판단 쪽을 뒷받침하는 사실만 든다. 반대로도 읽히는 사실은 근거로 쓰지 않는다(예: 같은 장르 신작 2개가 함께 30위 안에 있다는 사실은 경쟁 과열의 근거가 아니다). 근거로 드는 게임은 판단 대상 장르 · 유형에 속한다고 자료에서 확인되는 게임만 든다. 원인을 추측이라고 밝힌 현상을 근거로 권고하지 않는다. 기사로 확인된 업데이트 · 이벤트와 순위 변화가 같은 주에 겹친 것은 '시기가 겹침'으로만 쓰고, 이를 근거로 장르 · 시장의 일반 법칙이나 권고를 만들지 않는다. 어느 시장 · 어느 게임에나 맞는 운영 일반론(순위 방어가 관건, 한 주 순위만으로 판단하기 이르다, 업데이트 · 이벤트 일정 확보, 이벤트 공백 관리, UA 예산 확보 등)은 권고로도 판단으로도 쓰지 않는다. 판단에 쓰는 기간 · 순위 · 개수는 자료에 있거나 자료에서 계산되는 값만 쓴다. 불릿 수를 채우려고 근거가 약한 판단을 만들지 않는다. "
+BRIEF_SIG_LAUNCH = "차트에 남은 게임만 보고 끌어낸 조건을 신작의 지표 · 기준으로 제안하지 않는다. 정착 가능성을 말할 때는 'D+14 순위 구간별 지금 차트 잔존' 자료를 근거로 든다. "
+BRIEF_WATCH_ONE = "살펴볼 것 한 가지('A와 B'처럼 둘을 묶지 않는다. 예: 이벤트 주기·BM 구성·UA 소재·현지화 방식·라이브 운영)"
+BRIEF_WATCH_EXTRA = '이 세 가지 밖의 기사 내용 · 지난 성과는 덧붙이지 않는다. '
+BRIEF_CHECK_RULES = "다 쓴 뒤 개수 · 순위 · 비율과 '가장 ~한' · '모두' · '처음' · '유일' 같은 비교 문장을 자료와 다시 대조하고(같은 값이면 '가장'이라 쓰지 않는다), 같은 브리핑 안에서 같은 대상의 숫자가 다르게 적히지 않았는지, 핵심 시사점에서 같은 사실을 여러 불릿에 되풀이하지 않았는지 확인한다. '자료에 없음' · '원인 미확인'처럼 없는 정보를 알리는 문장은 본문 어디에도 쓰지 않는다(추측한 원인을 쓸 때의 추측 표시는 예외). "
+BRIEF_CHECK_WEEKLY = "전주와 이번 주 두 주 비교만으로 '고정' · '자주' · '매주' 같은 지속 상태를 쓰지 않는다. 지속 여부는 '최근 8주 중 주간 TOP5에 든 주 수' · '주간 1위 차례' 자료로 말한다. "
+BRIEF_CHECK_OTHER = "직전 구간과 이번 구간 두 구간 비교만으로 '고정' · '자주' 같은 지속 상태를 쓰지 않는다. "
+BRIEF_MOVE_WEEKLY = '순위 변화 · TOP5 교체는 주간 평균 순위(전주 · 이번 주)끼리 비교하고, 하루 순위와 섞지 않는다. '
+BRIEF_MOVE_OTHER = '순위 변화 · TOP5 교체는 같은 기간 평균 순위(직전 구간 · 이번 구간)끼리 비교한다. '
+BRIEF_SUM_RULES = "(5) 비유·의인화(쥔다·흡수·침투·허브 등) 금지. 'content'는 '컨텐츠'로. (6) 분석 불릿에 붙은 조건 · 단서(무엇의 기준인지, 사례 수, 추측 표시)를 빼서 뜻을 넓히지 않는다. (7) 판단 · 권고는 '핵심 시사점' 요약에만 쓰고, 다른 섹션 요약에는 '점검 필요' · '검토' 같은 할 일 문장을 붙이지 않는다.\n"
+BRIEF_VERIFY = "다음은 앱스토어 매출 차트 [자료]와 그 자료로 쓴 [브리핑]이다. 브리핑의 문장을 하나씩 자료와 대조해 아래에 해당하는 문장만 고쳐라.\n[점검표] 문장마다 아래 15개를 모두 본다.\n1. 유형 이름 · 순위 · 평균값 · 날짜 · 개수가 자료와 같은가. 같은 브리핑 안에서 같은 대상의 숫자가 다르지 않은가.\n2. 기준값(차트에 남은 게임의 순위 중앙값)을 신작의 목표치(KPI)로 쓰지 않았는가. 쓸 때 '차트에 남은 게임 기준'과 그 시점 잔존 수를 밝혔는가. 기준값은 같은 시점끼리만 비교했는가(D+14 순위는 D+14 기준값과).\n3. 유형이 '관찰 중'인 게임을 핵심 시사점의 판단 근거로 쓰지 않았는가. 근거로 든 개수(예: '지금 남은 2개') 안에 관찰 중 게임이 섞인 경우도 해당한다.\n4. 같은 순위 구간(10위 안 · 11~30위 · 31~100위) 안의 최근 7일 평균 변화를 상승 · 하락 · 하락세로 부르지 않았는가.\n5. 게임 사례로 내린 판단에 사례 수를 밝혔는가. 게임 하나(장르마다 하나씩인 경우 포함)의 성과를 장르 · 시장 전체의 판단(진출 · 보류 · 매출 계획 · 평가 기준)으로 넓히지 않았는가.\n6. 순위 자료로 확인되지 않는 원인을 단정하지 않았는가(쓰려면 추측 표시).\n7. 괄호의 근거가 판단과 같은 방향인가. 근거로 든 게임이 판단 대상 장르 · 유형에 속한다고 자료에서 확인되는가.\n8. 추측한 원인이나 같은 주에 겹친 업데이트 · 이벤트를 근거로 권고 · 일반 법칙을 만들지 않았는가.\n9. 어느 시장 · 어느 게임에나 맞는 운영 일반론(순위 방어가 관건, 업데이트 일정 확보 등)을 권고 · 판단으로 쓰지 않았는가.\n10. 판단에 쓴 기간 · 순위 · 개수 · 비율이 자료에 있거나 자료에서 계산되는가. '가장' · '유일' · '처음' · '모두' · '서로 다른'이 자료로 확인되는가(같은 값이면 '가장'이 아니다). 자료의 범위(예: 최근 8주)를 넘어 말하지 않았는가. 두 주 비교만으로 '고정' · '자주' · '매주'를 쓰지 않았는가. 성공한 몇 게임의 순위나 남은 게임만 보고 만든 조건을 신작의 목표 · 지표로 삼지 않았는가.\n11. 차트인 신작 배경이 게임마다 한 문장이고 기사 문장을 그대로 옮기지 않았는가(고칠 때 링크는 그대로 둔다).\n12. 눈여겨볼 게임: 살펴볼 것이 하나이고 이번 기간 차트 성과만 썼는가. 할 일 문장('~를 검토' · '점검 필요')이나 기사 내용 덧붙임이 없는가.\n13. 각 절 첫 불릿(요약)이 그 절 분석의 단서(무엇의 기준인지, 사례 수, 추측 표시)를 빼지 않았고 할 일 문장이 없는가. 분석을 고쳤으면 요약도 맞췄는가.\n14. 어휘: 아이템 · 재화를 대가 없이 주는 것은 '무상 지급'('무료 지급' 아님), 과금하지 않는 유저는 '무과금', '컨텐츠'(콘텐츠 아님), '몫'은 쓰지 않음(매출이면 '매출'). 비유 · 의인화, 다른 낱말로 읽히는 명사형('이름' 등)이 없는가.\n15. 핵심 시사점에서 같은 사실 · 같은 결론을 여러 불릿에 되풀이하지 않았는가(되풀이한 뒤쪽 불릿을 지운다).\n\n[걸렸던 문장 예시] 다른 시험 판에서 실제로 걸린 문장이다. 같은 종류를 찾는다.\n- (1) '30위 안에 남은 신작 2개가 모두 MMORPG' → 자료상 30위 안 신작은 차트인 신작까지 4개.\n- (10) '롤플레잉은 타이틀 수 대비 최상위 비중이 가장 낮음' → 캐주얼 17개 · 액션 9개는 TOP5 0개라 더 낮음.\n- (1 · 10) '가십하버가 로블록스를 앞서 2위' → 둘 다 주간 평균 2.9위라 공동 2위.\n- (10) '미국 신작이 출시 2주 안에 매출 100위에 든 사례 없음' → 자료는 'D+14 그날 100위 밖'이고 출시 14일 안 첫 진입은 2개.\n- (2) D+12 게임의 D+7 순위를 D+14 기준값과 비교 → 그 시점이 안 된 게임은 비교하지 않는다.\n- (3) '지금 남은 2개' 가운데 관찰 중 게임이 섞였는데 '철수 판단은 이른 편'의 근거로 씀.\n- (5) 제우스 하나('사례 하나')로 'MMORPG 신작 매출 계획의 기본 시나리오'를 정함.\n- (7) 'MMORPG 신작 2개가 함께 30위 안'을 근거로 '경쟁 과열이라 출시 일정 조정' → 근거가 반대 방향.\n- (10) 남은 게임 셋만 보고 'D+14 40위 안 여부를 정착 1차 지표로' 제안.\n- (8) '대형 업데이트 주에 순위를 크게 회복 → 신작 출시 주차의 변수'(같은 주에 겹친 두 사례로 법칙과 권고를 만듦).\n- (14) '무료로 지급', '3~5위는 퍼즐 전문 퍼블리셔 몫'.\n\n[고치지 않는 것] 남은 게임 대부분의 흐름(예: 잔존 9개 중 7개가 고점 뒤 하락)을 매출 계획의 전제로 쓴 문장. 웹 기사로 확인한 배경 사실. 게임의 장르 · 퍼블리셔 · 출시 시기 같은 일반 정보. '추측'이라고 밝힌 원인. 링크 · 줄바꿈 · '## 제목' · 각 절 첫 불릿의 형식.\n판단만 자료와 맞지 않으면 판단 부분만 빼고 그 불릿의 사실은 남긴다. 다만 '## 핵심 시사점' 불릿은 판단이 빠지면 앞 절의 사실을 되풀이하게 되므로, 자료에 맞게 좁힌 판단이 남지 않으면 그 불릿을 지운다(그 절에 판단 불릿이 하나도 남지 않게 되면 근거가 가장 많은 불릿 하나는 판단을 자료에 맞게 좁혀 남긴다). 불릿을 통째로 지우는 것은 그 불릿의 사실까지 자료와 틀릴 때와 이 경우만 한다. 장르 · 퍼블리셔 같은 일반 정보가 자료에 없다는 이유로 판단이나 불릿을 지우지 않는다.\n고칠 때는 자료로 확인되는 사실만 남기도록 그 문장만 최소로 바꾸고, 고칠 수 없으면 그 불릿을 지운다. 해당하지 않는 문장은 한 글자도 바꾸지 마라.\n출력 형식: 고친 브리핑 전문을 그대로 내고, 그 뒤에 '[고친 문장]' 한 줄을 두고 고친 문장마다 '- [점검표 번호] 전: … / 후: … / 이유: …'를 적는다(지운 불릿은 '후: 지움'). 고친 것이 없으면 '[고친 문장]' 아래에 '- 없음'.\n\n"
 
 
 _ANALYSIS_INSTR = ("각 항목은 '## 제목' 한 줄로 시작하고, 그 아래 분석 불릿(-)들로만 쓴다(요약 줄은 넣지 말 것, 바로 분석부터). 각 불릿은 그 항목의 핵심 근거·세부를 하나씩, 중요한 것을 빠짐없이(보통 3개 안팎, 중요하면 그 이상), 서로 다른 포인트로 중복 없이 담는다. '분석' 같은 라벨을 붙이지 말고 내용만 쓸 것. 항목 제목은 그대로 둘 것. 요약은 이 분석을 근거로 별도 단계에서 자동 생성되므로 여기서는 쓰지 마라.\n")
 
 
-def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False, prior_note=''):
+def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False, prior_note='', launch=False):
+    """launch=True: 자료에 '신작 런칭 추이'가 붙은 경우(주요 시장 주간)에만 신작 규칙을 넣는다(2026-10-29)."""
     scope = f"'{scope_label}' 지역(여러 나라 합산) 시장" if is_region else f"'{scope_label}' 단일 시장"
     win = _AXIS_WIN.get(axis_label, axis_label)
+    weekly = (axis_label == '주간')
     s_struct = "지역 전체에서 강세 장르·퍼블리셔 점유" if is_region else "강세 장르·퍼블리셔가 매출을 얼마나 쥐는지(점유)"
     _pb = (f"\n\n[직전 '{axis_label}' 분석 메모 — 저비중·연속성 검증용] {prior_note}\n"
            "→ 위 신호가 이번 데이터로도 유효한지 '## 주요 순위 변동'에 현재 사실로만 반영하라(맞으면 '~ 지속', 바뀌면 '~로 전환'). '지난 분석/저번' 자기참조 금지. "
@@ -755,9 +780,14 @@ def _axis_prompt(scope_label, axis_label, digest, is_region, grounded=False, pri
             + _ANALYSIS_INSTR +
             "## 시장 구조\n## 주요 게임·퍼블리셔\n## 주요 순위 변동\n## 장르 기회\n## 핵심 시사점\n## 눈여겨볼 게임\n\n"
             f"각 항목은 '{axis_label}'({win}) 시간축 기준으로 해석한다. 시장 구조: {s_struct}. "
-            "주요 게임·퍼블리셔: 이 기간 매출 상위 게임의 성격과 강한 퍼블리셔. "
-            f"주요 순위 변동: 이 기간({win}) 진입·급상승·급하락 위주(근거 약하면 '- 데이터 누적 중'). "
-            "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. 핵심 시사점: 앞 네 항목의 사실에서 알 수 있는 것(시장의 상태·기회·위험에 대한 판단. 진출·보류·우선순위에 대한 판단도 여기에 쓴다). 불릿 끝에 근거가 된 사실을 괄호로 한 구절 붙인다(가장 중요). 눈여겨볼 게임: 이 시장에서 게임 사업 PM이 살펴볼 만한 게임 2~4개. 불릿마다 게임명, 살펴볼 것 한 가지(이벤트 주기·BM 구성·UA 소재·현지화 방식·라이브 운영 등), 살펴볼 만한 이유가 된 이번 기간의 차트 성과(TOP5 유지 기간·급상승한 시장 수 등)를 쓴다. 앞 네 항목에 쓴 게임 설명을 되풀이하지 말고, 성과의 원인은 단정하지 않는다. '~를 검토'·'~를 추적'·'~에 반영' 같은 할 일 문장으로 쓰지 않는다. 핵심 시사점은 한 줄로 끝내지 말고 분석 불릿을 여러 개 붙일 것. 쓰기 전에 '핵심 시사점'을 먼저 정하고, 앞 네 항목은 그 판단에 필요한 사실만 담는다(판단과 무관한 나열 금지). 앞 네 항목과 눈여겨볼 게임의 불릿에는 판단·권고를 붙이지 않는다. 판단은 '핵심 시사점'에만 쓴다. 글 끝에 작성 과정 설명(찾지 못한 것·넣지 않은 것)을 쓰지 않는다. "
+            "주요 게임·퍼블리셔: 이 기간 매출 상위 게임의 성격과 강한 퍼블리셔. " + (BRIEF_LAUNCH_DEF if launch else "") +
+            f"주요 순위 변동: 이 기간({win}) 진입·급상승·급하락 위주(근거 약하면 '- 데이터 누적 중'). " + (BRIEF_MOVE_WEEKLY if weekly else BRIEF_MOVE_OTHER) +
+            "장르 기회: 경쟁 약한데 성과 나는 틈새 또는 포화 장르. 핵심 시사점: 앞 네 항목의 사실에서 알 수 있는 것(시장의 상태·기회·위험에 대한 판단. 진출·보류·우선순위에 대한 판단도 여기에 쓴다). 불릿 끝에 근거가 된 사실을 괄호로 한 구절 붙인다(가장 중요). "
+            + BRIEF_SIG_RULES + (BRIEF_SIG_LAUNCH if launch else "") +
+            "눈여겨볼 게임: 이 시장에서 게임 사업 PM이 살펴볼 만한 게임 2~4개. 불릿마다 게임명, " + BRIEF_WATCH_ONE + ", 살펴볼 만한 이유가 된 이번 기간의 차트 성과(TOP5 유지 기간·급상승한 시장 수 등)를 쓴다. 앞 네 항목에 쓴 게임 설명을 되풀이하지 말고, 성과의 원인은 단정하지 않는다. "
+            + BRIEF_WATCH_EXTRA +
+            "'~를 검토'·'~를 추적'·'~에 반영' 같은 할 일 문장으로 쓰지 않는다. 핵심 시사점은 한 줄로 끝내지 말고 분석 불릿을 여러 개 붙일 것. 쓰기 전에 '핵심 시사점'을 먼저 정하고, 앞 네 항목은 그 판단에 필요한 사실만 담는다(판단과 무관한 나열 금지). 앞 네 항목과 눈여겨볼 게임의 불릿에는 판단·권고를 붙이지 않는다. 판단은 '핵심 시사점'에만 쓴다. 글 끝에 작성 과정 설명(찾지 못한 것·넣지 않은 것)을 쓰지 않는다. "
+            + BRIEF_CHECK_RULES + (BRIEF_CHECK_WEEKLY if weekly else BRIEF_CHECK_OTHER) +
             "굵게(**)는 게임명·장르·퍼블리셔·국가명에만. " + STYLE_RULES + _pb + INDUSTRY_VOICE + (GROUNDING if grounded else ""))
 
 
@@ -791,11 +821,13 @@ def _summarize_sections(analysis_text, usage_label=''):
         "규칙: (1) 요약은 반드시 그 섹션 분석에 실제로 나온 내용만 담는다. 분석에 없는 새 게임·수치·주장을 절대 넣지 마라. "
         "(2) 그 섹션에서 가장 중요한 1~2개 포인트만 한 문장(개조식 명사형 종결, 대략 70자 이내)으로. "
         "(3) 굵게(**)는 게임명·장르·퍼블리셔·국가명에만. 'ㅡ' 대시 금지(마침표·쉼표·괄호·콜론으로). 게임명은 분석에 나온 표기 그대로. "
-        "(4) '요약' 같은 라벨을 붙이지 말 것. (5) 비유·의인화(쥔다·흡수·침투·허브 등) 금지. 'content'는 '컨텐츠'로.\n"
+        "(4) '요약' 같은 라벨을 붙이지 말 것. " + BRIEF_SUM_RULES +   # 2026-10-29: (6) 단서 유지 · (7) 할 일 문장 금지 추가
         "출력 형식: 각 섹션을 '## 제목'(원문과 똑같이) 다음 줄에 '- 요약문' 한 줄로만. 다른 설명·머리말 없이.\n\n"
         + analysis_text
     )
-    out = call_claude_with_retry(prompt, max_tokens=1200, web_search=False,
+    # 2026-10-29: 한도 1,200 → 3,000. Opus 5.5는 사고를 끌 수 없어(effort low) 보이지 않는 사고가 한도를 먹는다.
+    #   시험에서 1,200일 때 요약 줄이 둘째 절 중간에서 잘렸고(출력 1,290토큰 중 보이는 글 465자), 한도를 올린 뒤 1,245 · 1,427 · 1,865토큰을 쓴 판도 있었다.
+    out = call_claude_with_retry(prompt, max_tokens=3000, web_search=False,
                                  usage_label=(usage_label + '(요약2단계)'), thinking_off=True)
     if not out:
         print('[WARN] 2단계 요약 생성 실패 → 분석만으로 진행(폴백)')
@@ -839,6 +871,77 @@ def _gen_brief_2step(analysis_prompt, grounded, usage_label):
     return _merge_summaries(analysis, summaries)
 
 
+def _verify_brief(text, data, usage_label=''):
+    """[3단계 검토] 다 쓴 브리핑(요약 줄 포함)을 그 브리핑을 만든 자료와 문장 단위로 대조해, 점검표에 걸리는 문장만 고친다(2026-10-29).
+    반환 (글, 고친 문장 기록). 검토 호출이 실패하거나 결과가 깨지면('## 제목' 수가 다르거나 글이 60% 아래로 줄면) 검토 전 글을 그대로 돌려준다.
+    시험: 15판 브리핑 4개를 두 번씩 검토해 사람이 찾은 오류 6건을 두 번 모두 잡음(견본/2026-10-28-실무활용/브리핑시험_점검기록.md)."""
+    if not text or not data:
+        return text, ''
+    try:
+        out = call_claude_with_retry(BRIEF_VERIFY + "[자료]\n" + data + "\n\n[브리핑]\n" + text,
+                                     usage_label=(usage_label + '(검토3단계)'))
+    except Exception as e:
+        print(f'[WARN] {usage_label} 검토 실패 → 검토 전 글 사용: {e}')
+        return text, ''
+    if not out:
+        print(f'[WARN] {usage_label} 검토 결과 없음 → 검토 전 글 사용')
+        return text, ''
+    body, _, log = out.partition('[고친 문장]')
+    body = body.strip()
+    if '##' in body:
+        body = body[body.index('##'):].strip()   # 앞에 붙은 머리말이 있으면 '##'부터
+    n0, n1 = len(re.findall(r'^##\s', text, re.M)), len(re.findall(r'^##\s', body, re.M))
+    if n1 != n0 or len(body) < 0.6 * len(text):
+        print(f'[WARN] {usage_label} 검토 결과가 깨짐(절 {n0}→{n1}, 글자 {len(text)}→{len(body)}) → 검토 전 글 사용')
+        return text, ''
+    log = log.strip()
+    print(f"[OK] {usage_label} 검토: 고친 문장 {sum(1 for ln in log.splitlines() if ln.strip().startswith('- ') and '없음' not in ln)}건")
+    return body, log
+
+
+def _weekly_rank_digest(market_key):
+    """주간 순위 자료(2026-10-29, 시험판 wow_digest 그대로): 진짜 전주 대비 급상승 · 급하락, 100위 안에 새로 든 게임,
+    주간 평균 TOP5(전주 · 이번 주, 평균값 · 같은 평균은 같은 순위), 이번 주 TOP5의 최근 8주 TOP5 주 수, 8주 동안 주마다 1위.
+    commit된 docs/markets/{key}.json의 주간 시계열을 읽는다. 자료가 없으면 ''."""
+    fp = Path('docs') / 'markets' / f'{market_key}.json'
+    try:
+        g = json.loads(fp.read_text(encoding='utf-8'))['charts']['grossing']
+        tf = g['timeframes']['weekly']; L = tf['labels']; S = tf['series']; G = g.get('games') or {}
+    except Exception:
+        return ''
+    if len(L) < 2:
+        return ''
+    nm = lambda a: (G.get(a) or {}).get('title_kr') or (G.get(a) or {}).get('title') or a
+    md = lambda s: f"{int(s[5:7])}/{int(s[8:10])}"
+    pairs = [(nm(a), s[-2], s[-1]) for a, s in S.items() if len(s) >= 2]
+    both = [(n, round(p - c, 1)) for n, p, c in pairs if p is not None and c is not None]
+    up = sorted([x for x in both if x[1] >= 1], key=lambda x: -x[1])[:3]
+    dn = sorted([x for x in both if x[1] <= -1], key=lambda x: x[1])[:3]
+    new = sorted([(n, c) for n, p, c in pairs if p is None and c is not None], key=lambda x: x[1])[:3]
+    top_prev = sorted([(p, n) for n, p, c in pairs if p is not None])[:5]
+    top_now = sorted([(c, n) for n, p, c in pairs if c is not None])[:5]
+
+    def ranked(top):   # 같은 평균은 같은 순위
+        out, prev_v, rank = [], None, 0
+        for i, (v, n) in enumerate(top):
+            if v != prev_v:
+                rank = i + 1
+            out.append(f"{rank}.{n}({v})"); prev_v = v
+        return ', '.join(out)
+    K = min(8, len(L)); weeks_top = []
+    for k in range(len(L) - K, len(L)):
+        wk = sorted([(s[k], nm(a)) for a, s in S.items() if len(s) > k and s[k] is not None])
+        weeks_top.append([n for v, n in wk[:5]])
+    stay8 = ', '.join(f"{n} {sum(1 for t in weeks_top if n in t)}/{K}주" for c, n in top_now)
+    first8 = ' → '.join(t[0] for t in weeks_top if t)
+    return (f"(전주대비: {md(L[-2])}주 → {md(L[-1])}주 주간 평균 순위) 급상승: " + (', '.join(f"{n}(▲{d})" for n, d in up) or '없음')
+            + " | 급하락: " + (', '.join(f"{n}(▼{abs(d)})" for n, d in dn) or '없음')
+            + " | 이번 주 100위 안에 든 게임(전주 100위 밖, 출시 시기와 무관): " + (', '.join(f"{n}({c}위)" for n, c in new) or '없음')
+            + f" | 매출TOP5(주간 평균 순위, 괄호는 평균값, 같은 평균은 같은 순위): 전주({md(L[-2])}주) " + ranked(top_prev)
+            + f" / 이번 주({md(L[-1])}주) " + ranked(top_now)
+            + f" | 최근 {K}주({md(L[-K])}주~{md(L[-1])}주) 중 주간 TOP5에 든 주 수(이번 주 TOP5): {stay8} | 같은 {K}주의 주간 1위 차례: {first8}")
+
+
 def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
     """완료된 시간축만 브리핑 생성. weekly=신선한 스냅샷 digest, 그 외=commit된 market JSON 윈도우. 축별 7일 게이팅·이력 보존."""
     prev_axes = _axes_prev(fp)
@@ -846,12 +949,17 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
     axes = {}
     for axis_key, axis_label in BRIEF_AXES:
         digest = weekly_digest if axis_key == 'weekly' else _market_axis_digest(market_key, axis_key)
-        if axis_key == 'weekly' and digest:   # [데이터 보강] 전주 대비 순위변동(WoW)을 커밋된 주간 시계열에서 덧붙여 '움직임' 근거 강화(없으면 그대로)
-            _mv = _market_axis_digest(market_key, 'weekly')
-            if _mv and '급상승:' in _mv:
-                _seg = _mv.split('장르분포')[0]; _i = _seg.find('급상승:')
-                if _i >= 0:
-                    digest = digest + ' | (전주대비) ' + _seg[_i:].strip().rstrip('| ').strip()
+        launch = False
+        if axis_key == 'weekly' and digest:   # [데이터 보강] 커밋된 주간 시계열에서 전주 대비 · 주간 평균 TOP5 · 8주 기록을 덧붙인다(없으면 그대로)
+            # 2026-10-29: 전에는 _market_axis_digest의 급상승 · 급하락(처음 나온 주 대비)을 '(전주대비)'로 붙였다. 진짜 전주 대비로 바꿈.
+            _wk = _weekly_rank_digest(market_key)
+            if _wk:
+                digest = digest + ' | ' + _wk
+            if not is_region:   # 주요 시장만 신작 런칭 추이(지역 합산 순위에는 나라 기준 유형을 시험하지 않음)
+                _ld = _launch_digest(market_key)
+                if _ld:
+                    digest = digest + ' | ' + _ld
+                    launch = True
         if not digest:
             if axis_key in prev_axes:   # 미완성이지만 과거 생성분 있으면 유지
                 axes[axis_key] = prev_axes[axis_key]
@@ -862,7 +970,10 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
             continue
         try:
             _grounded = (axis_key == 'weekly')   # #11: 최근(주간) 축만 웹검색으로 원인·출처 보강
-            text = _gen_brief_2step(_axis_prompt(scope_label, axis_label, digest, is_region, grounded=_grounded, prior_note=_prior_signal(prev)), grounded=_grounded, usage_label=f"{scope_label}/{axis_label}")   # 2단계: 분석 생성→그 분석을 요약→첫 불릿 병합
+            text = _gen_brief_2step(_axis_prompt(scope_label, axis_label, digest, is_region, grounded=_grounded, prior_note=_prior_signal(prev), launch=launch), grounded=_grounded, usage_label=f"{scope_label}/{axis_label}")   # 2단계: 분석 생성→그 분석을 요약→첫 불릿 병합
+            vlog = ''
+            if text:   # 3단계: 자료와 대조해 어긋난 문장만 고침(2026-10-29 사용자 결정 "전 시간축 검토로"). 실패 · 깨짐이면 검토 전 글
+                text, vlog = _verify_brief(text, digest, usage_label=f"{scope_label}/{axis_label}")
         except Exception as e:
             print(f'[WARN] {scope_label} {axis_label} 브리핑 실패: {e}')
             if axis_key in prev_axes:
@@ -873,18 +984,31 @@ def _build_scope_axes(fp, scope_label, market_key, weekly_digest, is_region):
             if axis_key in prev_axes:
                 axes[axis_key] = prev_axes[axis_key]
             continue
-        axes[axis_key] = {'generated': now_s, 'text': text, 'pv': AXIS_PV, 'model': CLAUDE_MODEL, 'history': _axis_hist(prev)}
+        axes[axis_key] = {'generated': now_s, 'text': text, 'pv': AXIS_PV, 'model': CLAUDE_MODEL, 'history': _axis_hist(prev),
+                          'verify': vlog}   # 검토가 고친 문장 기록(화면에는 안 쓰임, 2026-10-29)
         print(f'[OK] {scope_label} · {axis_label} 브리핑 생성')
     return axes
 
 
-def _country_digest(g):
-    """국가 매출 차트 1개 → 'TOP5 + 장르분포' 한 줄 다이제스트."""
+def _launch_digest(cc):
+    """주요 시장 주간 자료에 붙일 '신작 런칭 추이'(launch_types.py, 2026-10-28 사용자와 정한 유형 기준). 실패하면 ''(브리핑은 신작 규칙 없이 생성)."""
+    try:
+        import launch_types
+        return launch_types.launch_digest(cc)
+    except Exception as e:
+        print(f'[WARN] {cc} 신작 런칭 추이 자료 실패 → 신작 규칙 없이 생성: {e}')
+        return ''
+
+
+def _country_digest(g, day=None):
+    """국가 매출 차트 1개 → 'TOP5 + 장르분포' 한 줄 다이제스트.
+    2026-10-29: 마지막 하루 순위임을 이름표에 밝힌다(주간 브리핑이 주간 평균 TOP5와 섞어 비교하던 것을 막음). day 기본값은 오늘(수집일)."""
     from collections import Counter
+    d = day or f"{datetime.now().month}/{datetime.now().day}"
     top = ', '.join(f"{a.get('rank')}.{a.get('title_kr') or a.get('title')}({a.get('genre', '')})" for a in g[:5])
     gc = Counter(a.get('genre', '기타') for a in g)
     genres = ', '.join(f"{k} {v}" for k, v in gc.most_common(6))
-    return f"매출TOP5: {top} | 장르분포(상위100): {genres}"
+    return f"{d} 하루 매출TOP5: {top} | {d} 하루 장르분포(상위100): {genres}"
 
 
 def build_major_briefs(collected):
