@@ -1883,7 +1883,7 @@ function renderAgg(keyName, period, els, labelName){
   if(!n || !Object.keys(DATA.games).length){ els.sub.textContent=''; els.wrap.innerHTML='<p class="empty">데이터가 쌓이면 표시됩니다.</p>'; return; }
   const startIdx=period?Math.max(0,n-period):0;
   const showRev=(activeChart==='grossing');
-  els.sub.innerHTML=`<span class="ci">${fmtTick(labels[startIdx]||'')} ~ ${fmtTick(labels[n-1]||'')} 동안 ${labelName}마다 차트에 든 게임 수와 순위입니다.</span><span class="ci"><span class="cact">▸ 행을 누르면 그래프에 표시</span></span>`;
+  els.sub.innerHTML=`<span class="ci">${fmtTick(labels[startIdx]||'')} ~ ${fmtTick(labels[n-1]||'')} 동안 ${labelName}마다 차트에 든 게임 수와 순위입니다.${showRev?' 추정 매출은 오늘 차트에 든 게임만 더한 점유입니다(모든 줄의 합 100%).':''}</span><span class="ci"><span class="cact">▸ 행을 누르면 그래프에 표시</span></span>`;   // 2026-10-29 글랜스 테스트: 기간 값(게임 수 · 순위)과 오늘 값(추정 매출)이 한 표에 있음을 설명 줄에 밝힌다(표 머리에 '(오늘)'을 붙이면 칸 폭에 잘렸다)
   const full=aggregate(keyName, period);
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
   const q=norm((els.search||{}).value);
@@ -1904,7 +1904,7 @@ function renderAgg(keyName, period, els, labelName){
     h+='</div>';
   } else {
     h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+
-      '<th>#</th>'+sortTh(labelName,'key',aggSort,'pname')+sortTh('게임 수','num_games',aggSort)+sortTh('최고 순위','best_rank',aggSort)+sortTh('평균 순위','avg_rank',aggSort)+(showRev?sortTh('추정 매출(오늘)','rev',aggSort,'',' '+dinfo('오늘 매출 차트에 든 게임만 더한 추정 매출 점유입니다(모든 줄의 합이 100%). 기간 안에 차트에서 빠진 게임은 0으로 셉니다.')):'')+'<th class="pname">게임</th></tr></thead><tbody>';
+      '<th>#</th>'+sortTh(labelName,'key',aggSort,'pname')+sortTh('게임 수','num_games',aggSort)+sortTh('최고 순위','best_rank',aggSort)+sortTh('평균 순위','avg_rank',aggSort)+(showRev?sortTh('추정 매출','rev',aggSort):'')+'<th class="pname">게임</th></tr></thead><tbody>';
     list.forEach(({e,rank})=>{
       const aids=e.games.map(g=>g.app_id).filter(a=>DATA.games[a]);
       const allSel=aids.length>0 && aids.every(a=>selected.includes(a));
