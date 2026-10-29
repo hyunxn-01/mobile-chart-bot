@@ -2146,8 +2146,8 @@ function gopBuildTicks(){
 // 사용자가 이 구간의 재생 단추 · 슬라이더 · 기간 목록 · 원을 누르면 멈춘다(재생 중 표시는 '❚❚ 정지'라 그 단추를 누르면 바로 멈춘다). 휴대폰과 '동작 줄이기' 설정에서는 돌리지 않는다.
 // 타이머는 수동 재생과 같은 _gopTraj.timer를 쓰므로, 슬라이더 · 기간 변경 · 시장 변경이 부르는 gopStop()이 그대로 자동 재생도 멈춘다. 시장이 바뀌면 setupGopTraj가 다시 시작한다.
 // 2026-10-29 글랜스 테스트(사용자 "다고쳐줘"): 바로가기로 오면 재생이 첫 달부터 시작해 1.8초 뒤에는 지난 달(8월) 원이 보였고, 아래 요약(이번 달)과
-// 원 위치가 반대로 보여 처음 보는 검토자 둘 다 요점을 못 잡았다. 그래서 한 바퀴를 '지금 달에서 5초 → 처음으로 되감기 → 처음에서 잠깐 → 천천히 앞으로'로 바꿨다.
-// 자동 재생(2026-10-18 사용자 결정)은 그대로이고, 화면에 들어온 순간과 한 바퀴가 끝날 때 지금 달이 보인다.
+// 원 위치가 반대로 보여 처음 보는 검토자 둘 다 요점을 못 잡았다. 그래서 한 바퀴를 '재생 막대 끝(마지막으로 끝난 달)에서 5초 → 처음으로 되감기 → 처음에서 잠깐 → 천천히 앞으로'로 바꿨다.
+// 자동 재생(2026-10-18 사용자 결정)은 그대로이고, 화면에 들어온 순간과 한 바퀴가 끝날 때 끝 달이 보인다. 그림 위 결론 줄도 그 달 기준이다(gopTopRender).
 var GDEMO={stopped:false, t0:0, nowHold:5000, back:600, startHold:1200, vis:false, paused:false, lastF:null};
 function gopDemoAllowed(){ return !GDEMO.stopped && !isMobile() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
 function gopDemoStart(){
@@ -2166,11 +2166,11 @@ function gopDemoTick(now){
   if(!GDEMO.vis){ _gopTraj.timer=null; GDEMO.paused=true; return; }
   if(!GDEMO.t0) GDEMO.t0=now;
   var span=G.eIdx-G.sIdx, dur=Math.max(6000, span*2500), sh=GDEMO.startHold, nh=GDEMO.nowHold, bk=GDEMO.back, el=now-GDEMO.t0, f;
-  if(el<nh) f=1;                                                                    // 지금 달(아래 요약과 같은 시점)에서 5초 멈춤
+  if(el<nh) f=1;                                                                    // 끝 달(그림 위 결론 줄과 같은 시점)에서 5초 멈춤
   else if(el<nh+bk) f=1-(el-nh)/bk;                                                 // 0.6초 만에 빠르게 처음으로 되감기
   else if(el<nh+bk+sh) f=0;                                                         // 처음에서 1.2초 멈춤
   else if(el<nh+bk+sh+dur) f=(el-nh-bk-sh)/dur;                                     // 천천히 앞으로
-  else { GDEMO.t0=now; f=1; }                                                       // 지금 달에 닿으면 다시 처음 단계로(무한 반복)
+  else { GDEMO.t0=now; f=1; }                                                       // 끝 달에 닿으면 다시 처음 단계로(무한 반복)
   if(f!==GDEMO.lastF){ GDEMO.lastF=f; sl.value=Math.round(f*1000); gopRenderTraj(G.sIdx+f*span); }   // 2026-10-26 P1-7: 처음 · 끝에서 멈춘 동안은 같은 그림이라 다시 그리지 않는다
   _gopTraj.timer=requestAnimationFrame(gopDemoTick);
 }
@@ -2202,7 +2202,7 @@ function gopTrajRangeChange(){
   gopBuildTicks(); gopRenderTraj(ei); gopTopRender();
 }
 // 2026-10-29 글랜스 테스트(사용자 "다고쳐줘"): 재생 그림이 켜져 있으면 그림 위 결론 줄을 그림이 보여 주는 달(재생 막대 끝 = 끝난 달의 평균 순위)과 같은
-// 기준으로 쓴다. 오늘 차트로 쓰면 지금 달 그림(9월)과 원 위치가 어긋났다(4X: 문장은 1위 집중도 81%, 그림은 여러 게임 경쟁 구역). 재생이 없으면 renderGenreOpp의 오늘 기준 줄이 남는다.
+// 기준으로 쓴다. 오늘 차트로 쓰면 끝 달 그림(9월)과 원 위치가 어긋났다(4X: 문장은 1위 집중도 81%, 그림은 여러 게임 경쟁 구역). 재생이 없으면 renderGenreOpp의 오늘 기준 줄이 남는다.
 function gopTopRender(){
   var tb=document.getElementById('gopTop'), G=_gopTraj.geom; if(!tb || !_gopTraj.on || !G) return;
   var cur=gopInterp(G, G.eIdx), lab=gopFmtLabel(gopRefs().labels[G.eIdx]);
