@@ -68,6 +68,7 @@ COUNTRIES = ['kr', 'us', 'jp', 'cn', 'tw', 'gb', 'de', 'fr', 'ca', 'au']
 COUNTRIES_EXTRA = ['it', 'es', 'nl', 'ru', 'se', 'sa', 'ae', 'eg', 'tr',
                    'br', 'mx', 'ar', 'co', 'id', 'th', 'vn', 'ph', 'my', 'sg', 'in', 'pk', 'bd']
 PRIMARY_COUNTRY = 'kr'                 # 기존 일일 메일·AI 브리핑 기준 국가(현행 유지)
+SEND_DAILY_EMAIL = False   # 2026-10-31 사용자 "국내모바일차이 이메일보내는거 멈춰줘": 매일 종합 메일(엑셀 첨부) 발송을 멈춘다. 한국 차트 수집 · 저장과 다국가 브리핑은 그대로. 되살리려면 True(GMAIL_* 비밀값 필요)
 CHARTS_DIR = DATA_DIR / 'charts'       # data/charts/{country}/{grossing|free}/{date}.json
 CHARTS_DIR.mkdir(exist_ok=True)
 
@@ -2034,10 +2035,10 @@ def send_email_via_gmail(subject, html_body, attachment_path=None):
 def main():
     print(f"\n=== 한국 App Store 게임 차트 수집 ({datetime.now()}) ===\n")
 
-    missing = [k for k, v in {
-        'ANTHROPIC_API_KEY': ANTHROPIC_API_KEY, 'GMAIL_USER': GMAIL_USER,
-        'GMAIL_APP_PASSWORD': GMAIL_APP_PASSWORD, 'RECIPIENT_EMAIL': RECIPIENT_EMAIL,
-    }.items() if not v]
+    need = {'ANTHROPIC_API_KEY': ANTHROPIC_API_KEY}
+    if SEND_DAILY_EMAIL:   # 메일을 보낼 때만 메일 비밀값이 필요하다
+        need.update({'GMAIL_USER': GMAIL_USER, 'GMAIL_APP_PASSWORD': GMAIL_APP_PASSWORD, 'RECIPIENT_EMAIL': RECIPIENT_EMAIL})
+    missing = [k for k, v in need.items() if not v]
     if missing:
         raise RuntimeError(f"환경변수 누락: {missing}")
 
@@ -2113,14 +2114,17 @@ def main():
     except Exception as e:
         print(f'[WARN] AI 브리핑 저장 실패: {e}')
 
-    print("[4/4] 엑셀·메일 발송 (매일 종합)...")
-    try:
-        excel_path = create_comprehensive_excel_report(current, analyses, combined, chart_used)
-    except Exception as _xe:
-        print(f'[WARN] 엑셀 리포트 생성 실패(비치명, 파이프라인 계속): {_xe}'); excel_path = None
-    subject = f'[모바일 게임 차트] 종합 보고 {today} ({chart_used})'
-    html_body = build_comprehensive_email_html(today, chart_used, current, analyses, combined)
-    send_email_via_gmail(subject, html_body, attachment_path=excel_path)
+    if SEND_DAILY_EMAIL:
+        print("[4/4] 엑셀·메일 발송 (매일 종합)...")
+        try:
+            excel_path = create_comprehensive_excel_report(current, analyses, combined, chart_used)
+        except Exception as _xe:
+            print(f'[WARN] 엑셀 리포트 생성 실패(비치명, 파이프라인 계속): {_xe}'); excel_path = None
+        subject = f'[모바일 게임 차트] 종합 보고 {today} ({chart_used})'
+        html_body = build_comprehensive_email_html(today, chart_used, current, analyses, combined)
+        send_email_via_gmail(subject, html_body, attachment_path=excel_path)
+    else:
+        print("[4/4] 매일 종합 메일 발송 꺼짐(SEND_DAILY_EMAIL=False) — 엑셀 · 메일 건너뜀")
 
     save_current_data(current)
 
