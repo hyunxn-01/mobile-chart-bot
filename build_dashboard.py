@@ -396,25 +396,44 @@ def build_region_market(region_key, name, member_ccs):
 CC_NAMES = {'kr': '한국', 'us': '미국', 'jp': '일본', 'cn': '중국', 'tw': '대만'}
 
 
-def _market_genre_shares(market_obj):
-    """그 시장 grossing 최신 기준 장르별 {매출 점유%, 게임수 점유%}(미상 제외).
-    매출 점유 = Σ rank^-REV_ALPHA(프론트 revShare와 동일 모델)를 시장 내 정규화."""
-    lst = ((((market_obj or {}).get('charts') or {}).get('grossing') or {}).get('genres') or {}).get('list') or []
-    rows = {}
-    for e in lst:
-        g = (e.get('genre') or '').strip()
-        if not g or g == '미상':
+def _market_genre_shares(market_obj, days=7):
+    """그 시장 grossing 최근 days일 평균 장르별 {매출 점유%, 게임수 점유%}(미상 · 빈 장르는 칸으로 내지 않음).
+    매출 점유 = 그날 Σ rank^-REV_ALPHA(프론트 revShare와 동일 모델)를 그날 시장 전체로 정규화한 값의 날짜 평균,
+    게임수 점유 = 그날 장르 게임 수 / 그날 차트 전체 게임 수의 날짜 평균.
+    2026-10-31(사용자 "그럼 선택까지해서 다반영해줘"): 전에는 최신 하루(genres.list) 기준이라 하루 등락으로 1위 장르가 바뀌었고(10/30 11개 시장 중 7곳),
+    순위 추이 장르 목록(프론트 genreRev7, 최근 7일 평균)과 같은 장르 값이 달랐다(한국 팀배틀러 5.5% 대 26.1%). 분모에 장르 없는 게임도 넣어 프론트 목록과 같은 값이 되게 한다."""
+    g = (((market_obj or {}).get('charts') or {}).get('grossing') or {})
+    tf = ((g.get('timeframes') or {}).get('daily') or {})
+    labels = tf.get('labels') or []
+    series = tf.get('series') or {}
+    games = g.get('games') or {}
+    n = len(labels)
+    rev, cnt, used = {}, {}, 0
+    for i in range(max(0, n - days), n):
+        w, c, tw, tc = {}, {}, 0.0, 0
+        for aid, s in series.items():
+            r = s[i] if i < len(s) else None
+            if not r:
+                continue
+            x = float(r) ** (-REV_ALPHA)
+            tw += x
+            tc += 1
+            gn = ((games.get(aid) or {}).get('genre') or '').strip()
+            if not gn or gn == '미상':
+                continue
+            w[gn] = w.get(gn, 0.0) + x
+            c[gn] = c.get(gn, 0) + 1
+        if not tw or not tc:
             continue
-        revw = 0.0
-        for gm in (e.get('games') or []):
-            r = gm.get('rank')
-            if r:
-                revw += float(r) ** (-REV_ALPHA)
-        rows[g] = {'rev_w': revw, 'n': e.get('num_games', 0) or 0}
-    totrev = sum(v['rev_w'] for v in rows.values()) or 1.0
-    totn = sum(v['n'] for v in rows.values()) or 1
-    return {g: {'rev': round(v['rev_w'] / totrev * 1000) / 10,
-                'pre': round(v['n'] / totn * 1000) / 10} for g, v in rows.items()}
+        used += 1
+        for gn, v in w.items():
+            rev[gn] = rev.get(gn, 0.0) + v / tw
+        for gn, v in c.items():
+            cnt[gn] = cnt.get(gn, 0.0) + v / tc
+    if not used:
+        return {}
+    return {gn: {'rev': round(rev.get(gn, 0.0) / used * 1000) / 10,
+                 'pre': round(cnt.get(gn, 0.0) / used * 1000) / 10} for gn in set(rev) | set(cnt)}
 
 
 def build_genre_matrix(built):
@@ -430,7 +449,7 @@ def build_genre_matrix(built):
         for g, v in sh.items():
             gtot[g] = gtot.get(g, 0) + v['rev']
     genres = sorted(gtot.keys(), key=lambda g: -gtot[g])
-    return {'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+    return {'generated': datetime.now().strftime('%Y-%m-%d %H:%M'), 'basis': 'avg7',   # 2026-10-31: 칸 값이 최근 7일 평균임을 프론트에 알림(전에는 최신 하루)
             'metric_default': 'rev', 'markets': cols, 'genres': genres, 'cells': cells}
 
 
