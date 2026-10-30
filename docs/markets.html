@@ -3069,10 +3069,10 @@ function renderCmp(){
   let gmx=0; if(!byGenre) markets.forEach(mk=> genres.forEach(g=>{ const v=cval(mk.key,g); if(v!=null&&v>gmx) gmx=v; }));
   gmx=gmx||1;
   const rowMax={}; genres.forEach(g=>{ let m=0; markets.forEach(mk=>{ const v=cval(mk.key,g); if(v!=null&&v>m)m=v; }); rowMax[g]=m||1; });
-  // 2026-10-18 사용자: 시장 기준이면 색을 시장별(세로)로. 2026-10-31(사용자 "그럼 선택까지해서 다반영해줘"): 글랜스 세 번째 시험에서 두 검토자 모두 '색이 아홉 가지라 시장끼리 진하기를 견줄 수 없다'고 해
-  // 시장 기준도 한 가지 색(파랑)의 진하기로 바꿈. 시장 이름 옆 색 표시는 뜻이 없어져 숨기되, 기준을 바꿔도 글자가 움직이지 않게 자리는 둔다(visibility)
-  const CMP_ONE='#2563eb', mkColor=()=>CMP_ONE;
-  let h='<div class="cmp-corner">장르</div>'+markets.map((mk,i)=>'<div class="cmp-mh" title="'+esc(mk.name)+'"><span class="cmp-dot cmp-dot-hidden" style="background:'+mkColor(i)+'"></span>'+esc(mk.name)+'</div>').join('');
+  const mkColor=i=>MKT_PALETTE[i % MKT_PALETTE.length];   // 2026-10-18 사용자: 시장 기준이면 색을 시장별(세로)로, 색 표시는 시장 이름 옆에. 기준을 바꿔도 글자가 움직이지 않게 표시 자리는 늘 둔다(visibility)
+  // 칸 색은 읽는 방향 표시다: 시장 기준 = 시장마다 다른 색(같은 세로 열끼리 비교), 장르 기준 = 장르마다 다른 색(같은 가로 줄끼리 비교). 2026-10-31 글랜스 세 번째 시험 지적('시장끼리 진하기를 견줄 수 없다')으로
+  // 한 가지 색으로 바꿨다가 같은 날 되돌림(사용자 "히트맵 색 왜 변경해 이거 가로 세로 어디봐야되는지 표기하는건데"). 한 가지 색으로 바꾸지 않는다
+  let h='<div class="cmp-corner">장르</div>'+markets.map((mk,i)=>'<div class="cmp-mh" title="'+esc(mk.name)+'"><span class="cmp-dot'+(byGenre?' cmp-dot-hidden':'')+'" style="background:'+mkColor(i)+'"></span>'+esc(mk.name)+'</div>').join('');
   genres.forEach(g=>{
     const gc=genreColor(g), gl=_hexLum(gc);
     h+='<div class="cmp-glabel"><span class="cmp-dot'+(byGenre?'':' cmp-dot-hidden')+'" style="background:'+gc+'"></span>'+esc(g)+'</div>';
@@ -3091,7 +3091,7 @@ function renderCmp(){
   var _sub=document.getElementById('cmpsub');
   if(_sub) _sub.innerHTML=byGenre
     ? '<span class="ci">한 장르의 전 세계 추정 매출을 100%로 보고 시장마다 나눈 비중입니다(시장 규모 반영).</span><span class="ci"><span class="cact">▸ 칸을 누르면 해당 게임 목록</span></span><span class="ci">'+dinfo('차트 순위로 거꾸로 계산한 추정 매출에 나라별 시장 규모를 곱한 근사치입니다. 색은 장르마다 다릅니다.')+'</span>'
-    : '<span class="ci">진할수록 그 시장에서 장르 비중이 큽니다(모든 시장이 같은 색이라 시장끼리 견줄 수 있습니다).</span><span class="ci"><span class="cact">▸ 칸을 누르면 해당 게임 목록</span></span>';
+    : '<span class="ci">색은 시장마다 다르고, 진할수록 그 시장에서 장르 비중이 큽니다.</span><span class="ci"><span class="cact">▸ 칸을 누르면 해당 게임 목록</span></span>';
   renderCmpInsight();
 }
 function renderCmpInsight(){
