@@ -1615,7 +1615,7 @@ function genreDatasets(){
   names.sort((a,b)=> a==='장르 없음'?1 : b==='장르 없음'?-1 : share(b,li)-share(a,li));   // '장르 없음'은 항상 맨 뒤(스택 끝)
   // 퍼센트 기반 선차트: 기본은 선만(도트 없음), 범례 클릭으로 강조하면 그 장르에 도트 표시(게임 차트와 동일)
   // 2026-10-16 C안(사용자 선택): 선은 최근 7일 평균, 기본은 모두 회색이고 목록에서 고른 장르만 색·점·선 끝 이름(게임 차트와 같은 규칙).
-  // 그날 값은 ds.daily에 두어 목록의 '점유' 칸과 툴팁이 쓴다.
+  // 그날 값은 ds.daily에 두어 툴팁이 쓴다(목록의 '점유' 칸은 2026-10-31부터 선과 같은 7일 평균 ds.data).
   const ma7=a=> a.map((_,i)=>{ let s=0,c=0; for(let k=Math.max(0,i-6);k<=i;k++){ if(a[k]!=null){ s+=a[k]; c++; } } return c?Math.round(s/c*10)/10:null; });
   return names.map((g,i)=>{
     const col=genreColor(g), on=genreSel.includes(g);
@@ -1654,10 +1654,11 @@ function renderGenreLegend(){
   const any=genreSel.length>0;
   // 장르별 게임 수·추정매출 점유(집계 리스트 기준)
   // 매출(추정매출 점유)은 항상 매출차트 장르 구성으로 합산 — 인기차트로 토글해도 불변(게임수·점유 칸만 활성차트 반영)
-  const _grg=((FULL.charts&&FULL.charts.grossing&&FULL.charts.grossing.genres&&FULL.charts.grossing.genres.list))||[];
-  const _grossRev={}; _grg.forEach(g=>{ _grossRev[g.genre]=(g.games||[]).reduce((s,x)=>s+(revShare(x.app_id)||0),0); });
-  const gstats={}; ((DATA.genres&&DATA.genres.list)||[]).forEach(g=>{ gstats[g.genre]={n:g.num_games, rev:(_grossRev[g.genre]!=null?_grossRev[g.genre]:0)}; });
-  const rows=ds.map(d=>{ const arr=d.daily||d.data||[]; const g=d.label||''; const st=gstats[g]||{};
+  // 2026-10-31(사용자 "둘 다 권장안으로"): 점유 · 매출 칸과 묶음은 최근 7일 평균(그래프 선 · 위 요점과 같은 기준). 전에는 오늘 하루 값이라 요점 '4X 9.3%' 옆 목록이 10%였고,
+  // 하루 등락으로 묶음이 뒤집혔다(10/30 팀배틀러 오늘 26.1% '주력' · 7일 평균 5.5%, RTS 오늘 3.2% '소형' · 7일 평균 16.3%). 게임 칸은 오늘 상위 100위 안의 게임 수 그대로.
+  const _grossRev=genreRev7();
+  const gstats={}; ((DATA.genres&&DATA.genres.list)||[]).forEach(g=>{ gstats[g.genre]={n:g.num_games}; });
+  const rows=ds.map(d=>{ const arr=d.data||[]; const g=d.label||''; const st=Object.assign({}, gstats[g]||{}, {rev:(_grossRev[g]!=null?_grossRev[g]:0)});
     return {g, on:genreSel.includes(g), share:(arr.length?arr[arr.length-1]:null), n:(st.n!=null?st.n:null), rev:(st.rev!=null?Math.round(st.rev*1000)/10:null), col:d.pointBackgroundColor||d.backgroundColor||'#888'}; });
   // 매출 구간별 그룹(주력≥20% · 중간 5–20% · 소형<5%), 그룹 안은 매출 내림차순
   const tier=r=> r.g==='장르 없음' ? 2 : (r.rev!=null&&r.rev>=20)?0 : (r.rev!=null&&r.rev>=5)?1 : 2;   // '장르 없음'은 항상 소형 그룹
@@ -1668,10 +1669,10 @@ function renderGenreLegend(){
       '<span class="gl-dot" style="background:'+r.col+'"></span>'+
       '<span class="gl-name">'+esc(r.g)+'</span>'+
       '<span class="gl-meta">'+(r.n!=null?r.n:'–')+'</span>'+
-      '<span class="gl-meta">'+(r.share!=null?r.share+'%':'–')+'</span>'+
-      '<span class="gl-meta gl-rev">'+(r.rev!=null?r.rev+'%':'–')+'</span>'+
+      '<span class="gl-meta">'+(r.share!=null?r.share.toFixed(1)+'%':'–')+'</span>'+   // 2026-10-31: 7일 평균은 소수가 섞여 '12%'와 '12.3%'가 한 열에 섞였다 → 한 자리로 맞춤
+      '<span class="gl-meta gl-rev">'+(r.rev!=null?r.rev.toFixed(1)+'%':'–')+'</span>'+
       '</button>';
-  let html='<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출 '+dinfo('추정 매출 비중: 순위가 높을수록 매출이 크다는 가정으로 차트 순위에서 거꾸로 계산한 값입니다. 실제 매출이 아니며, 과금 방식 · 나라별 결제 금액 · 웹 상점 매출은 반영하지 않습니다.')+'</span></div>';
+  let html='<div class="gl-head gl-cols"><span></span><span>장르</span><span class="gh-r">게임</span><span class="gh-r">점유</span><span class="gh-r">매출 '+dinfo('점유(차트 안 게임 수 비율)와 매출은 최근 7일 평균으로, 그래프 선과 같은 기준입니다. 게임은 오늘 상위 100위 안의 게임 수입니다. 추정 매출 비중: 순위가 높을수록 매출이 크다는 가정으로 매출 차트 순위에서 거꾸로 계산한 값입니다. 실제 매출이 아니며, 과금 방식 · 나라별 결제 금액 · 웹 상점 매출은 반영하지 않습니다.')+'</span></div>';
   groups.forEach(grp=>{ if(grp.rows.length) html+='<div class="gl-group"><span class="gg-bar"></span>'+grp.t+'</div>'+grp.rows.map(rowHTML).join(''); });
   setHTMLKeepFocus(el, html);   // 2026-10-26 P1-5: 키보드로 장르를 누르면 그 단추에 초점이 남는다
   el.querySelectorAll('.gl-item').forEach(b=> b.addEventListener('click',()=> toggleGenre(b.dataset.genre)));
@@ -1941,7 +1942,12 @@ function renderAgg(keyName, period, els, labelName){
     });
     h+='</tbody></table></div>';
   }
-  { const top3=full.slice(0,3); const totG=full.reduce((a,e)=>a+(e.num_games||0),0); const t3G=top3.reduce((a,e)=>a+(e.num_games||0),0); const gShare=totG?Math.round(t3G/totG*100):0; const names='<b>'+top3.map(e=>esc(e.key)).join(' · ')+'</b>'; let rd,imp; if(showRev){ const totR=full.reduce((a,e)=>a+revOf(e),0); const t3R=top3.reduce((a,e)=>a+revOf(e),0); const rShare=totR?Math.round(t3R/totR*100):0; const diag=(rShare-gShare>=12)?('게임 수에 비해 매출 비중이 큰 <b>과점</b>이며, 소수 IP에 매출이 집중된 시장입니다.'):((gShare-rShare>=12)?'매출 비중보다 게임 수 비중이 큽니다. 게임 수로 경쟁하는 시장입니다.':'게임 수 비중과 매출 비중이 비슷합니다.'); rd=['점유', '상위 3개 '+labelName+'('+names+')가 게임 수로는 <b>'+gShare+'%</b>, 추정 매출로는 <b>'+rShare+'%</b>를 차지합니다. '+diag]; imp=['볼 포인트', (rShare-gShare>=12)?('신규 진입 시 경쟁 상대는 게임 수가 아니라 상위 '+labelName+'의 라이브 운영과 과금 설계입니다. 그 '+labelName+'의 수익 모델과 업데이트 주기를 벤치마크 대상으로 봅니다.'):('점유가 분산되어 있어 특정 '+labelName+'보다 시장 전체의 경쟁 강도를 봅니다.')]; } else { const conc=gShare>=55?('소수 '+labelName+'에 집중된 시장입니다.'):(gShare>=35?'집중도는 중간입니다.':'분산된 시장입니다.'); rd=['점유', '상위 3개 '+labelName+'('+names+')가 차트의 <b>'+gShare+'%</b>를 차지합니다. '+conc]; imp=['볼 포인트','인기 차트는 신규 유입을 보여 줍니다. 상위 3개 '+labelName+'의 비중이 높으면 신작이 진입할 자리가 적은지, 낮으면 순위 교체가 빠른지를 봅니다.']; } h=pmCallout([rd,imp])+h; }
+  { const top3=full.slice(0,3); const totG=full.reduce((a,e)=>a+(e.num_games||0),0); const t3G=top3.reduce((a,e)=>a+(e.num_games||0),0); const gShare=totG?Math.round(t3G/totG*100):0; const names='<b>'+top3.map(e=>esc(e.key)).join(' · ')+'</b>'; let rd,imp; if(showRev){ const totR=full.reduce((a,e)=>a+revOf(e),0); const t3R=top3.reduce((a,e)=>a+revOf(e),0); const rShare=totR?Math.round(t3R/totR*100):0;
+    // 2026-10-31(사용자 "둘 다 권장안으로"): 차이 12%p만 보면 '12% 대 21%'(1.75배)도 '비슷합니다'였다 → 1.5배 이상이고 5%p 이상 차이도 같은 판정. 판정 문장은 배수로 쓰고,
+    // '과점'은 상위 3개의 추정 매출이 50% 이상일 때만 붙인다(전에는 25%에도 '과점'. 31개국 · 지역 자료로 세어 보면 '과점' 판정 60경우 중 39경우가 50% 미만이었다).
+    const revBig=(rShare-gShare>=12)||(rShare>=gShare*1.5&&rShare-gShare>=5), cntBig=!revBig&&((gShare-rShare>=12)||(gShare>=rShare*1.5&&gShare-rShare>=5));
+    const times=(a,b)=> b>0?(' <b>'+(Math.round(a/b*10)/10)+'배</b>'):'';
+    const diag=revBig?('게임 수 비중보다 추정 매출 비중이'+times(rShare,gShare)+' 큽니다.'+(rShare>=50?' 매출의 절반 이상을 차지하는 <b>과점</b>입니다.':'')):(cntBig?('추정 매출 비중보다 게임 수 비중이'+times(gShare,rShare)+' 큽니다. 게임 수로 경쟁하는 시장입니다.'):'게임 수 비중과 매출 비중이 비슷합니다.'); rd=['점유', '상위 3개 '+labelName+'('+names+')가 게임 수로는 <b>'+gShare+'%</b>, 추정 매출로는 <b>'+rShare+'%</b>를 차지합니다. '+diag]; imp=['볼 포인트', revBig?('신규 진입 시 경쟁 상대는 게임 수가 아니라 상위 '+labelName+'의 라이브 운영과 과금 설계입니다. 그 '+labelName+'의 수익 모델과 업데이트 주기를 벤치마크 대상으로 봅니다.'):('점유가 분산되어 있어 특정 '+labelName+'보다 시장 전체의 경쟁 강도를 봅니다.')]; } else { const conc=gShare>=55?('소수 '+labelName+'에 집중된 시장입니다.'):(gShare>=35?'집중도는 중간입니다.':'분산된 시장입니다.'); rd=['점유', '상위 3개 '+labelName+'('+names+')가 차트의 <b>'+gShare+'%</b>를 차지합니다. '+conc]; imp=['볼 포인트','인기 차트는 신규 유입을 보여 줍니다. 상위 3개 '+labelName+'의 비중이 높으면 신작이 진입할 자리가 적은지, 낮으면 순위 교체가 빠른지를 봅니다.']; } h=pmCallout([rd,imp])+h; }
   setHTMLKeepFocus(els.wrap, h);
   els.wrap.querySelectorAll('th.sortable').forEach(th=> th.addEventListener('click',()=>{ const kk=th.dataset.k; if(aggSort.k===kk) aggSort.dir*=-1; else aggSort={k:kk, dir:(kk==='best_rank'||kk==='avg_rank'||kk==='key')?1:-1}; renderAggSection(); }));
   els.wrap.querySelectorAll('.pubrow').forEach(row=>{
@@ -2586,11 +2592,19 @@ var _rpCache=null;
 function revPeriod(periodDays){
   const g=FULL.charts&&FULL.charts.grossing; if(!g||!g.timeframes||!g.timeframes.daily) return {};
   const tf=g.timeframes.daily, n=(tf.labels||[]).length, si=periodDays?Math.max(0,n-periodDays):0;
-  if(_rpCache && _rpCache.g===g && _rpCache.si===si && _rpCache.n===n) return _rpCache.by;
+  if(!_rpCache || _rpCache.g!==g || _rpCache.n!==n) _rpCache={g, n, bySi:{}};   // 기간마다 따로 둔다(집계 표의 고른 기간과 장르 목록의 7일이 서로 지우지 않게)
+  if(_rpCache.bySi[si]) return _rpCache.bySi[si];
   const by={}; let days=0;
   for(let i=si;i<n;i++){ const w={}; let T=0; for(const aid in tf.series){ const r=tf.series[aid][i]; if(r!=null){ w[aid]=revWeight(r); T+=w[aid]; } } if(!T) continue; days++; for(const aid in w) by[aid]=(by[aid]||0)+w[aid]/T; }
   if(days) for(const aid in by) by[aid]/=days;
-  _rpCache={g,si,n,by}; return by;
+  _rpCache.bySi[si]=by; return by;
+}
+// 순위 추이 장르 목록의 '매출' 칸: 매출 차트의 최근 7일 하루 평균 추정 매출 점유를 장르로 더한다(장르가 비면 '장르 없음', 모든 장르의 합 100%).
+function genreRev7(){
+  const g=FULL.charts&&FULL.charts.grossing; if(!g||!g.games) return {};
+  const by=revPeriod(7), out={};
+  for(const aid in by){ const k=String((g.games[aid]||{}).genre||'').trim()||'장르 없음'; out[k]=(out[k]||0)+by[aid]; }
+  return out;
 }
 function revDaily(aid){ let w=grossWeights().byAid[aid]; if(w==null){ const r=gmLatest('grossing',aid); if(r==null) return null; w=revWeight(r); } return REV_TOP1_DAILY*w; }
 function wonShort(v){ if(v==null) return '–'; v=Math.round(v);
