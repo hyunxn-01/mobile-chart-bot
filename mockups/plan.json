@@ -414,7 +414,7 @@
    },
    "ai_emphasis": "해설이 차트 위에 붙는다. 주석을 누르면 해당 선이 강조되고 옆 KPI(현재 순위 · 19주 최고 · 1위 주 수)가 그 게임으로 바뀐다. '왜 움직였나'는 브리핑 문장이 답한다.",
    "data_files": [
-    "docs/markets/weekly_lite.json",
+    "docs/markets/<kr|us|jp|cn|tw>.json",
     "docs/markets/briefs_index.json",
     "docs/markets/major_<cc>.json"
    ],
