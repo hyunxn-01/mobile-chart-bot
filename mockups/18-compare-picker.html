@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시장 골라 비교 · 견본 18</title>
+<style>
+:root{--ink:#1c1b22;--sub:#6a6875;--line:#e4e2ec;--bg:#fff;--soft:#f5f4fa;--c0:#5b4bdb;--c1:#e0663b;--c2:#1f9e8f;--c3:#c33f8e;--up:#14864d;--down:#c2352b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+a{color:var(--c0)}
+.bar-top{background:var(--ink);color:#fff;padding:10px 0}
+.wrap{max-width:1380px;margin:0 auto;padding:0 20px}
+.bar-top .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12.5px}
+.bar-top a{color:#c9c3ff}
+h1{font-size:22px;margin:18px 0 2px}
+.intro{color:var(--sub);font-size:13px;margin:0 0 12px}
+.picker{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:12px 14px;background:var(--soft);border-radius:12px}
+.picker .lbl{font-size:12.5px;color:var(--sub);margin-right:4px}
+.pk{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:5px 11px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.pk .dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.pk[aria-pressed=true]{border-color:var(--ink);font-weight:700}
+.pk:disabled{opacity:.4;cursor:not-allowed}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:22px;margin:18px 0 40px}
+.cols{display:grid;gap:12px}
+.col{border:1px solid var(--line);border-radius:12px;padding:12px 14px;border-top:5px solid var(--cc)}
+.col h2{font-size:17px;margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.col h2 small{font-size:11.5px;color:var(--sub);font-weight:500}
+.sec{font-size:11.5px;color:var(--sub);margin:12px 0 4px;letter-spacing:.03em;font-weight:700}
+.gr{display:grid;grid-template-columns:minmax(0,1fr) 46px;gap:2px 6px;align-items:center;font-size:12px;margin:0 0 5px}
+.gr .nm{grid-column:1/3;display:flex;justify-content:space-between;color:var(--sub);font-size:11.5px;white-space:nowrap;overflow:hidden}
+.gr .track{height:12px;background:var(--soft);border-radius:3px;position:relative}
+.gr .fill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--cc)}
+.gr .val{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.gr.max .val{color:var(--cc)}
+.games{list-style:none;margin:0;padding:0}
+.games li{display:grid;grid-template-columns:20px 24px minmax(0,1fr);gap:6px;align-items:center;font-size:12.5px;padding:3px 0}
+.games li .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.games li.common .t{font-weight:700}
+.games li.common .t::after{content:' ● 공통';color:var(--sub);font-size:10.5px;font-weight:500}
+.games .n{color:var(--sub);text-align:right;font-variant-numeric:tabular-nums}
+.mk-icon{width:24px;height:24px;border-radius:6px;background:var(--soft);display:block}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.kpi{background:var(--soft);border-radius:12px;padding:12px 14px}
+.kpi h3{margin:0 0 6px;font-size:13px}
+.kpi ol{margin:0;padding-left:18px;font-size:12.5px}
+.kpi li{margin:2px 0}
+.kpi .sp{font-variant-numeric:tabular-nums;color:var(--sub)}
+.dots{display:inline-flex;gap:2px;vertical-align:middle;margin-left:4px}
+.dots i{width:8px;height:8px;border-radius:50%;display:inline-block}
+aside{position:sticky;top:12px;align-self:start;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+aside header{background:var(--soft);padding:12px 16px}
+aside header b{font-size:14px}
+aside header p{margin:2px 0 0;font-size:12px;color:var(--sub)}
+.ai{max-height:78vh;overflow:auto;padding:4px 16px 14px}
+.ai h4{font-size:12px;color:var(--sub);margin:12px 0 4px}
+.ai p{margin:0 0 10px;font-size:13.5px;line-height:1.6;padding-left:10px;border-left:3px solid var(--line)}
+.ai mark{background:none;font-weight:800;border-bottom:3px solid var(--mc,#ffd166)}
+.ai .none{color:var(--sub);font-size:13px}
+.mk-up{color:var(--up);font-weight:700}.mk-down{color:var(--down);font-weight:700}
+.mk-q{color:var(--sub)}
+.note{font-size:11.5px;color:var(--sub);margin:8px 0 0}
+.mk-err{background:#fff0ef;border:1px solid #f3b9b4;color:#8a1f17;padding:12px 14px;border-radius:8px;margin:16px 0}
+footer{border-top:1px solid var(--line);color:var(--sub);font-size:12px;padding:14px 0 36px}
+@media (max-width:1000px){.layout{grid-template-columns:1fr}aside{position:static}.ai{max-height:none}}
+@media (max-width:640px){.cols{grid-template-columns:1fr 1fr!important}.kpis{grid-template-columns:1fr}}
+@media (max-width:420px){.wrap{padding:0 16px}.cols{grid-template-columns:1fr!important}}
+</style>
+</head>
+<body>
+<div class="bar-top"><div class="wrap"><span>견본 18 · 시장 골라 비교 · <a href="index.html">견본 목록</a></span><span id="stamp">불러오는 중…</span></div></div>
+<main class="wrap">
+  <h1>두세 시장을 골라 나란히 — Claude 해설은 고른 조합에 맞춰 걸러집니다</h1>
+  <p class="intro" id="intro"></p>
+  <div class="picker" id="picker" role="group" aria-label="비교할 시장(2~4개)"><span class="lbl">비교할 시장 2~4개</span></div>
+  <div class="layout">
+    <section>
+      <div class="kpis"><div class="kpi"><h3>가장 갈리는 장르 <small style="color:var(--sub);font-weight:500">(점유 최대 − 최소)</small></h3><ol id="spread"></ol></div>
+        <div class="kpi"><h3>고른 시장 모두의 매출 상위 20에 든 게임</h3><ol id="common"></ol></div></div>
+      <div class="cols" id="cols"></div>
+      <p class="note">장르 점유: genre_matrix.json의 매출 가중 점유(최근 7일 평균, 순위로 가중한 추정치). 상위 게임: 주요 시장은 그 나라 매출 순위(xmarket_lite.json, <span class="xd"></span>), 지역은 회원국 매출 상위 20에 가장 많이 든 게임(같으면 평균 순위 순). 행은 고른 시장들에 같은 순서로 맞춰 둔다.</p>
+    </section>
+    <aside aria-live="polite">
+      <header><b>Claude 해설 · 고른 시장만</b><p id="ai-meta"></p></header>
+      <div class="ai" id="ai"></div>
+    </aside>
+  </div>
+</main>
+<footer class="wrap">데이터: docs/markets/genre_matrix.json · xmarket_lite.json · index.json(지역 회원국) · briefs_index.json · global_brief.json · major_* / region_*.json.</footer>
+<script>/*MK-CORE-BEGIN*/
+/* MK core — 견본 공통 도우미(각 견본 HTML 안에 그대로 들어 있다. 원본: 견본 작업 세션의 core.js)
+   데이터: 저장소 루트에서 정적 서버로 열었을 때 ../docs/markets/ 아래 JSON을 읽는다. */
+(function () {
+  'use strict';
+  const BASE = '../docs/markets/';
+  const cache = {};
+  const CC = {
+    global: '전 시장', cn: '중국', jp: '일본', kr: '한국', tw: '대만', us: '미국', ae: 'UAE', ar: '아르헨티나', au: '호주',
+    br: '브라질', ca: '캐나다', co: '콜롬비아', de: '독일', eg: '이집트', es: '스페인', fr: '프랑스', gb: '영국',
+    id: '인도네시아', in: '인도', it: '이탈리아', mx: '멕시코', my: '말레이시아', nl: '네덜란드', ph: '필리핀',
+    pk: '파키스탄', ru: '러시아', sa: '사우디', se: '스웨덴', sg: '싱가포르', th: '태국', tr: '터키', vn: '베트남',
+    europe: '유럽', na_oceania: '북미·오세아니아', middle_east: '중동', latam: '중남미', sea: '동남아', south_asia: '남아시아'
+  };
+  const MAJORS = ['kr', 'us', 'jp', 'cn', 'tw'];
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  async function json(name) {
+    if (cache[name]) return cache[name];
+    const url = BASE + name + '.json';
+    cache[name] = fetch(url).then(r => {
+      if (!r.ok) throw new Error(url + ' 응답 ' + r.status);
+      return r.json();
+    });
+    try { return await cache[name]; } catch (e) { delete cache[name]; throw e; }
+  }
+  function name(k) { return CC[k] || (k ? String(k).toUpperCase() : ''); }
+  function briefFile(tab) {
+    if (!tab || tab.key === 'global' || tab.type === 'global') return 'global_brief';
+    return (tab.type === 'major' ? 'major_' : 'region_') + tab.key;
+  }
+  /* 브리핑 목록: [{key,type,name,file}] — 맨 앞은 전 시장 */
+  async function briefTabs() {
+    const idx = await json('briefs_index');
+    return [{ key: 'global', type: 'global', name: '전 시장', file: 'global_brief' }]
+      .concat((idx.tabs || []).map(t => ({ key: t.key, type: t.type, name: t.name, countries: t.countries, file: briefFile(t) })));
+  }
+  /* 브리핑 한 개: {tab, generated, text, history:[{date,text}], monthly, quarterly} */
+  async function brief(tab) {
+    const d = await json(tab.file || briefFile(tab));
+    const w = (d.axes && d.axes.weekly) || { text: d.text, history: d.history, generated: d.generated };
+    return {
+      tab, raw: d, generated: w.generated || d.generated, text: w.text || d.text || '', model: w.model || '',
+      history: (w.history || d.history || []).map(h => ({ date: h.date, generated: h.generated, text: h.text })),
+      monthly: d.axes && d.axes.monthly ? d.axes.monthly.text : '', quarterly: d.axes && d.axes.quarterly ? d.axes.quarterly.text : ''
+    };
+  }
+  async function allBriefs() {
+    const tabs = await briefTabs();
+    return Promise.all(tabs.map(t => brief(t)));
+  }
+  /* 브리핑 글 → 섹션. 섹션의 첫 항목이 헤드라인(요약), 나머지가 상세. '- '로 시작하지 않는 줄은 앞 항목에 붙는 인용(매체 인용문). */
+  function parseBrief(text) {
+    const out = [];
+    let sec = null, last = null;
+    String(text || '').split('\n').forEach(line => {
+      const l = line.replace(/\s+$/, '');
+      if (!l.trim()) return;
+      const h = l.match(/^#{1,3}\s+(.*)$/);
+      if (h) { sec = { title: h[1].trim(), items: [] }; out.push(sec); last = null; return; }
+      if (!sec) { sec = { title: '', items: [] }; out.push(sec); }
+      const b = l.match(/^\s*[-*]\s+(.*)$/);
+      if (b) { last = { md: b[1].trim(), quotes: [] }; sec.items.push(last); return; }
+      if (last) last.quotes.push(l.trim()); else { last = { md: l.trim(), quotes: [] }; sec.items.push(last); }
+    });
+    out.forEach(s => {
+      s.headline = s.items.length ? s.items[0] : null;
+      s.details = s.items.slice(1);
+      s.items.forEach(it => {
+        it.text = plain(it.md + (it.quotes.length ? ' ' + it.quotes.join(' ') : ''));
+        it.full = it.quotes.length ? it.md + ' “' + it.quotes.join(' ') + '”' : it.md;
+      });
+    });
+    return out;
+  }
+  /* 인라인 마크다운(굵게, 링크, ▲▼ 숫자) → HTML */
+  function md(s, opt) {
+    opt = opt || {};
+    let h = esc(s);
+    h = h.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, (m, t, u) => opt.noLinks ? t : '<a href="' + u + '" target="_blank" rel="noopener">' + t + '</a>');
+    h = h.replace(/\*\*([^*]+)\*\*/g, (m, t) => '<b>' + t + '</b>');
+    h = h.replace(/▲\s?(\d+(?:\.\d+)?)/g, '<span class="mk-up">▲$1</span>').replace(/▼\s?(\d+(?:\.\d+)?)/g, '<span class="mk-down">▼$1</span>');
+    if (opt.mark && opt.mark.length) {
+      opt.mark.filter(Boolean).forEach(w => {
+        const re = new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')(?![^<]*>)', 'g');
+        h = h.replace(re, '<mark>$1</mark>');
+      });
+    }
+    return h;
+  }
+  function itemHtml(it, opt) {
+    let h = md(it.md, opt);
+    if (it.quotes && it.quotes.length) h += ' <q class="mk-q">' + md(it.quotes.join(' '), opt) + '</q>';
+    return h;
+  }
+  function plain(s) { return String(s || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*/g, ''); }
+  function bolds(s) { const r = []; String(s || '').replace(/\*\*([^*]+)\*\*/g, (m, t) => { r.push(t.trim()); }); return r; }
+  function links(s) { const r = []; String(s || '').replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, (m, t, u) => { r.push({ t, u }); }); return r; }
+  function moves(s) { const r = []; String(s || '').replace(/([▲▼])\s?(\d+(?:\.\d+)?)/g, (m, a, v) => { r.push({ dir: a === '▲' ? 1 : -1, v: +v }); }); return r; }
+  /* 시사점 문장 끝 괄호(근거) 떼기 */
+  function evidence(s) {
+    const t = String(s || '').trim();
+    if (!t.endsWith(')')) return { claim: t, evidence: '' };
+    let depth = 0;
+    for (let i = t.length - 1; i >= 0; i--) {
+      if (t[i] === ')') depth++;
+      else if (t[i] === '(') { depth--; if (depth === 0) return { claim: t.slice(0, i).trim(), evidence: t.slice(i + 1, -1).trim() }; }
+    }
+    return { claim: t, evidence: '' };
+  }
+  /* 권고 문장의 신호(규칙 기반): go 우선 · watch 관망 · hold 보류 */
+  /* 강한 표현이 약한 표현보다 먼저 판정한다. 관망 표현이 있으면 관망. 우선 · 보류 강한 표현이 함께 있으면 혼재. */
+  const SIG = {
+    watch: ['확인 후', '불확실', '2~3주', '구분 불가', '미룸', '관망', '아직 이름', '판단 근거로 쓰기에는'],
+    holdStrong: ['보류', '하향', '후순위'],
+    goStrong: ['우선순위 상위', '1순위', '진출 우선'],
+    holdWeak: ['포화', '리스크가 큼', '리스크 큼', '어려', '제한적', '여지가 없'],
+    goWeak: ['유지', '유리', '기회', '현실적', '낮은 편', '가능']
+  };
+  function signal(text) {
+    const t = plain(text);
+    const hit = {};
+    Object.keys(SIG).forEach(k => { hit[k] = SIG[k].filter(w => t.includes(w)); });
+    let s = null;
+    if (hit.watch.length) s = 'watch';
+    else if (hit.goStrong.length && hit.holdStrong.length) s = 'mixed';
+    else if (hit.holdStrong.length) s = 'hold';
+    else if (hit.goStrong.length) s = 'go';
+    else if (hit.holdWeak.length && hit.goWeak.length) s = 'mixed';
+    else if (hit.holdWeak.length) s = 'hold';
+    else if (hit.goWeak.length) s = 'go';
+    const words = [].concat(hit.watch, hit.goStrong, hit.holdStrong, hit.goWeak, hit.holdWeak);
+    return { signal: s, hits: hit, words };
+  }
+  const SIGNAL_LABEL = { go: '우선', watch: '관망', hold: '보류', mixed: '혼재' };
+  const SIGNAL_RULES = SIG;
+  /* 주간 순위 요약(weekly_lite) 한 시장 */
+  function weekly(lite, mk, chart) {
+    const c = (((lite || {}).markets || {})[mk] || {}).charts || {};
+    const ch = c[chart || 'grossing'] || { games: {}, timeframes: { weekly: { labels: [], series: {} } } };
+    const tf = ch.timeframes.weekly, labels = tf.labels || [], n = labels.length, ni = n - 1, pi = n - 2;
+    const rows = Object.keys(tf.series).map(id => {
+      const v = tf.series[id], g = ch.games[id] || {};
+      const now = v[ni] == null ? null : v[ni], prev = v[pi] == null ? null : v[pi];
+      return { id, title: g.title || id, dev: g.developer || '', icon: g.icon || '', now, prev, series: v,
+        delta: now != null && prev != null ? +(prev - now).toFixed(1) : null, isNew: now != null && prev == null, isOut: now == null && prev != null };
+    });
+    rows.sort((a, b) => (a.now == null ? 999 : a.now) - (b.now == null ? 999 : b.now));
+    /* 주마다 1위(평균 순위가 가장 낮은 게임) */
+    const tops = [];
+    for (let i = 0; i < n; i++) {
+      let best = null, ba = null;
+      for (const id in tf.series) { const x = tf.series[id][i]; if (x != null && (best == null || x < best)) { best = x; ba = id; } }
+      tops.push(ba);
+    }
+    let streak = 0; const top = tops[ni];
+    for (let i = ni; i >= 0 && tops[i] === top; i--) streak++;
+    return { labels, n, rows, tops, top, topStreak: streak, games: ch.games, series: tf.series };
+  }
+  /* 나라 파일(<cc>.json)의 주간 시계열 전체 */
+  function countryWeekly(co, chart) {
+    const ch = ((co || {}).charts || {})[chart || 'grossing'] || {};
+    const tf = (ch.timeframes || {}).weekly || { labels: [], series: {} };
+    return { labels: tf.labels || [], series: tf.series || {}, games: ch.games || {}, publishers: ch.publishers, genres: ch.genres, daily: (ch.timeframes || {}).daily, monthly: (ch.timeframes || {}).monthly };
+  }
+  /* 여러 나라 순위 요약(xmarket_lite) 풀기 */
+  function xm(x) {
+    const mk = x.markets || [];
+    const games = {};
+    Object.keys(x.games || {}).forEach(id => {
+      const g = x.games[id];
+      const o = { id, title: g.t, dev: g.d, icon: g.i ? (x.icon_head + g.i + x.icon_tail) : '', genre: g.gr || '', release: g.rl, updated: g.up, g: {}, f: {} };
+      (g.g || []).forEach(r => { o.g[mk[r[0]]] = { now: r[1], prev: r[2] }; });
+      (g.f || []).forEach(r => { o.f[mk[r[0]]] = { now: r[1], prev: r[2] }; });
+      games[id] = o;
+    });
+    function top(cc, kind, n) {
+      kind = kind || 'g';
+      return Object.values(games).filter(o => o[kind][cc] && o[kind][cc].now != null)
+        .sort((a, b) => a[kind][cc].now - b[kind][cc].now).slice(0, n || 100);
+    }
+    return { date: x.date, markets: mk, games, top };
+  }
+  function genreShares(gm, key) {
+    const c = (gm.cells || {})[key] || {};
+    return Object.keys(c).map(g => ({ genre: g, rev: c[g].rev, pre: c[g].pre })).sort((a, b) => b.rev - a.rev);
+  }
+  /* SVG 도우미 */
+  function spark(vals, o) {
+    o = Object.assign({ w: 120, h: 28, invert: false, stroke: 'currentColor', width: 1.5, fill: '', dot: true, min: null, max: null, pad: 2 }, o || {});
+    const pts = vals.map((v, i) => [i, v]).filter(p => p[1] != null);
+    if (!pts.length) return '<svg width="' + o.w + '" height="' + o.h + '"></svg>';
+    const ys = pts.map(p => p[1]);
+    const mn = o.min != null ? o.min : Math.min.apply(null, ys), mx = o.max != null ? o.max : Math.max.apply(null, ys);
+    const X = i => o.pad + (vals.length < 2 ? 0 : i * (o.w - 2 * o.pad) / (vals.length - 1));
+    const Y = v => { const t = mx === mn ? 0.5 : (v - mn) / (mx - mn); return o.pad + (o.invert ? t : 1 - t) * (o.h - 2 * o.pad); };
+    let d = '', seg = false;
+    vals.forEach((v, i) => { if (v == null) { seg = false; return; } d += (seg ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(v).toFixed(1); seg = true; });
+    const lp = pts[pts.length - 1];
+    let s = '<svg class="mk-spark" width="' + o.w + '" height="' + o.h + '" viewBox="0 0 ' + o.w + ' ' + o.h + '" aria-hidden="true">';
+    if (o.band) s += '<rect x="0" y="' + Math.min(Y(o.band[0]), Y(o.band[1])).toFixed(1) + '" width="' + o.w + '" height="' + Math.abs(Y(o.band[0]) - Y(o.band[1])).toFixed(1) + '" fill="' + (o.bandFill || 'rgba(0,0,0,.08)') + '"/>';
+    s += '<path d="' + d + '" fill="none" stroke="' + o.stroke + '" stroke-width="' + o.width + '" stroke-linejoin="round" stroke-linecap="round"/>';
+    if (o.dot) s += '<circle cx="' + X(lp[0]).toFixed(1) + '" cy="' + Y(lp[1]).toFixed(1) + '" r="' + (o.width + 1) + '" fill="' + (o.dotColor || o.stroke) + '"/>';
+    return s + '</svg>';
+  }
+  function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+  function errBox(target, e) {
+    const node = typeof target === 'string' ? document.querySelector(target) : target;
+    const msg = '<div class="mk-err" role="alert"><b>데이터를 불러오지 못했습니다.</b> ' + esc(e && e.message ? e.message : e) +
+      '<br>저장소 루트에서 정적 서버를 띄우고(<code>python3 -m http.server</code>) <code>/mockups/</code> 아래 주소로 열어 주세요.</div>';
+    if (node) node.innerHTML = msg; else document.body.insertAdjacentHTML('afterbegin', msg);
+    console.warn('[MK] load failed', e);
+  }
+  function icon(url, cls) { return url ? '<img class="' + (cls || 'mk-icon') + '" src="' + esc(url) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility=\'hidden\'">' : '<span class="' + (cls || 'mk-icon') + '"></span>'; }
+  function wk(label) { if (!label) return ''; const p = label.split('-'); return (+p[1]) + '/' + (+p[2]) + ' 주'; }
+  function day(s) { if (!s) return ''; const p = String(s).slice(0, 10).split('-'); return p[0] + '.' + p[1] + '.' + p[2]; }
+  function n1(v) { return v == null || isNaN(v) ? '–' : (Math.round(v * 10) / 10).toFixed(1); }
+  function fmt(v, d) { return v == null || isNaN(v) ? '–' : Number(v).toLocaleString('ko-KR', { maximumFractionDigits: d == null ? 0 : d }); }
+  /* 이름 비교용: 공백 · 기호를 빼고 소문자 */
+  function norm(s) { return String(s || '').toLowerCase().replace(/[\s:：·・\-_'’"“”()（）\[\]!！?？.,®™]/g, ''); }
+  /* 브리핑 문장에서 이름이 나온 게임 찾기: games = [{id,title}] */
+  function findGames(text, games) {
+    const names = bolds(text).map(norm).filter(x => x.length >= 2);
+    const t = norm(plain(text));
+    return games.filter(g => { const n = norm(g.title); if (n.length < 2) return false; return names.some(b => b === n || (b.length >= 3 && (n.startsWith(b) || b.startsWith(n)))) || (n.length >= 4 && t.includes(n)); });
+  }
+  /* 화면이 다 그려졌는지 확인 스크립트에 알린다 */
+  function ready(ok, note) { document.documentElement.setAttribute('data-mk-ready', ok ? 'ok' : 'error'); if (note) document.documentElement.setAttribute('data-mk-note', note); }
+  const PROJECT = '앱스토어(App Store) 31개국 게임 매출 · 인기 차트를 매일 모으고, Claude가 매주 11개 분석 단위(전 시장 · 주요 5개 시장 · 6개 지역)의 시장 브리핑을 쓰는 차트봇.';
+  window.MK = { BASE, CC, MAJORS, esc, json, name, briefFile, briefTabs, brief, allBriefs, parseBrief, md, itemHtml, plain, bolds, links, moves,
+    evidence, signal, SIGNAL_RULES, SIGNAL_LABEL, weekly, countryWeekly, xm, genreShares, spark, el, errBox, icon, wk, day, n1, fmt, norm, findGames, ready, PROJECT };
+})();
+
+/*MK-CORE-END*/</script>
+<script>
+(async function () {
+  const $ = s => document.querySelector(s);
+  $('#intro').textContent = MK.PROJECT;
+  const COLORS = ['var(--c0)', 'var(--c1)', 'var(--c2)', 'var(--c3)'];
+  const HEX = ['#5b4bdb', '#e0663b', '#1f9e8f', '#c33f8e'];
+  try {
+    const [gm, xraw, idx, tabs] = await Promise.all([MK.json('genre_matrix'), MK.json('xmarket_lite'), MK.json('index'), MK.briefTabs()]);
+    const X = MK.xm(xraw);
+    const briefs = await Promise.all(tabs.map(t => MK.brief(t)));
+    const global = briefs[0];
+    const byKey = {}; briefs.forEach(b => byKey[b.tab.key] = b);
+    $('#stamp').textContent = '장르 점유 ' + gm.generated + ' · 나라별 순위 ' + MK.day(X.date) + ' · 브리핑 Claude 작성 ' + MK.day(global.generated) + ' 발행';
+    document.querySelectorAll('.xd').forEach(e => e.textContent = MK.day(X.date) + ' 기준');
+    const members = {}; (idx.regions || []).forEach(r => members[r.key] = r.members);
+    const markets = gm.markets;
+    let picked = ['kr', 'us', 'europe'];
+    function drawPicker() {
+      $('#picker').innerHTML = '<span class="lbl">비교할 시장 2~4개</span>' + markets.map(m => {
+        const i = picked.indexOf(m.key), on = i >= 0;
+        return '<button class="pk" data-k="' + m.key + '" aria-pressed="' + on + '"' + (!on && picked.length >= 4 ? ' disabled' : '') + '><span class="dot" style="background:' + (on ? HEX[i] : 'var(--line)') + '"></span>' + MK.esc(m.name) + '</button>';
+      }).join('');
+    }
+    $('#picker').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return; const k = b.dataset.k, i = picked.indexOf(k);
+      if (i >= 0) { if (picked.length <= 2) return; picked.splice(i, 1); } else if (picked.length < 4) picked.push(k);
+      render();
+    });
+    function topGames(k, n) {
+      if (members[k]) {
+        const ms = members[k];
+        const agg = Object.values(X.games).map(g => { const rs = ms.map(c => g.g[c] && g.g[c].now).filter(r => r != null && r <= 20); return { g, cnt: rs.length, avg: rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : 99 }; })
+          .filter(o => o.cnt > 0).sort((a, b) => b.cnt - a.cnt || a.avg - b.avg);
+        return agg.slice(0, n).map(o => ({ g: o.g, label: o.cnt + '/' + ms.length + '국' }));
+      }
+      return X.top(k, 'g', n).map(g => ({ g, label: g.g[k].now + '위' }));
+    }
+    function nameSet(k) { return [MK.name(k)].concat((members[k] || []).map(MK.name)); }
+    function render() {
+      drawPicker();
+      const P = picked.map(k => markets.find(m => m.key === k));
+      // aligned genre rows
+      const union = [];
+      P.forEach(m => MK.genreShares(gm, m.key).slice(0, 6).forEach(x => { if (!union.includes(x.genre)) union.push(x.genre); }));
+      const val = (k, g) => ((gm.cells[k] || {})[g] || {}).rev || 0;
+      union.sort((a, b) => P.reduce((s, m) => s + val(m.key, b), 0) - P.reduce((s, m) => s + val(m.key, a), 0));
+      const rows = union.slice(0, 12);
+      const vmax = Math.max.apply(null, rows.map(g => Math.max.apply(null, P.map(m => val(m.key, g)))));
+      const tops = {}; P.forEach(m => tops[m.key] = topGames(m.key, 20));
+      const common = Object.values(X.games).filter(g => P.every(m => tops[m.key].some(o => o.g.id === g.id)));
+      $('#cols').style.gridTemplateColumns = 'repeat(' + P.length + ',minmax(0,1fr))';
+      $('#cols').innerHTML = P.map((m, i) => {
+        const sh = MK.genreShares(gm, m.key);
+        return '<div class="col" style="--cc:' + COLORS[i] + '"><h2>' + MK.esc(m.name) + '<small>' + (members[m.key] ? members[m.key].length + '개국 지역' : '주요 시장') + '</small></h2>' +
+          '<div class="sec">장르 매출 가중 점유</div>' + rows.map(g => {
+            const v = val(m.key, g), best = P.every(q => val(q.key, g) <= v);
+            const rank = sh.findIndex(x => x.genre === g) + 1;
+            return '<div class="gr' + (best && v > 0 ? ' max' : '') + '"><span class="nm"><span>' + MK.esc(g) + '</span><span>' + (rank ? '시장 내 ' + rank + '위' : '') + '</span></span><span class="track"><span class="fill" style="width:' + (v / vmax * 100).toFixed(1) + '%"></span></span><span class="val">' + MK.n1(v) + '%</span></div>';
+          }).join('') +
+          '<div class="sec">매출 상위 5</div><ol class="games">' + tops[m.key].slice(0, 5).map((o, j) => '<li class="' + (common.includes(o.g) ? 'common' : '') + '"><span class="n">' + (j + 1) + '</span>' + MK.icon(o.g.icon) + '<span class="t" title="' + MK.esc(o.g.title) + '">' + MK.esc(o.g.title) + ' <small style="color:var(--sub);font-weight:400">' + o.label + '</small></span></li>').join('') + '</ol></div>';
+      }).join('');
+      // KPI: spread
+      const sp = union.map(g => { const vs = P.map(m => val(m.key, g)); return { g, vs, d: Math.max.apply(null, vs) - Math.min.apply(null, vs) }; }).sort((a, b) => b.d - a.d).slice(0, 5);
+      $('#spread').innerHTML = sp.map(x => '<li><b>' + MK.esc(x.g) + '</b> <span class="sp">' + MK.n1(x.d) + '%p</span><span class="dots">' + x.vs.map((v, i) => '<i title="' + MK.esc(P[i].name) + ' ' + MK.n1(v) + '%" style="background:' + HEX[i] + ';opacity:' + (0.25 + 0.75 * v / Math.max(0.1, Math.max.apply(null, x.vs))).toFixed(2) + '"></i>').join('') + '</span></li>').join('');
+      $('#common').innerHTML = common.length ? common.slice(0, 6).map(g => '<li>' + MK.esc(g.title) + ' <span class="sp">' + MK.esc(g.genre) + '</span></li>').join('') + (common.length > 6 ? '<li style="list-style:none;color:var(--sub)">외 ' + (common.length - 6) + '개</li>' : '') : '<li style="list-style:none;color:var(--sub)">없음 — 고른 시장들의 상위권이 서로 겹치지 않는다.</li>';
+      // AI panel
+      const ns = P.map(m => nameSet(m.key));
+      const has = (t, n) => n === '인도' ? /인도(?!네시아)/.test(t) : t.includes(n);
+      const secs = MK.parseBrief(global.text);
+      let html = '', hit = 0;
+      secs.forEach(s => {
+        const items = s.items.filter(it => ns.some(list => list.some(n => has(it.text, n))));
+        if (!items.length) return;
+        hit += items.length;
+        const markOf = [].concat.apply([], ns);
+        html += '<h4>전 시장 브리핑 「' + MK.esc(s.title) + '」</h4>' + items.map(it => {
+          let h = MK.itemHtml(it, { noLinks: false });
+          ns.forEach((list, i) => list.forEach(n => { if (n === '인도') { h = h.replace(/인도(?!네시아)/g, '<mark style="--mc:' + HEX[i] + '">인도</mark>'); return; } h = h.split(n).join('<mark style="--mc:' + HEX[i] + '">' + n + '</mark>'); }));
+          const cnt = ns.filter(list => list.some(n => has(it.text, n))).length;
+          return '<p' + (cnt >= 2 ? ' style="border-left-color:var(--ink)"' : '') + '>' + h + (cnt >= 2 ? ' <small style="color:var(--sub)">· 고른 시장 ' + cnt + '곳 함께 언급</small>' : '') + '</p>';
+        }).join('');
+      });
+      // own briefs: market structure headline as fallback context
+      html += '<h4>각 시장 브리핑의 ‘시장 구조’ 헤드라인</h4>' + P.map((m, i) => { const b = byKey[m.key]; const s = b && MK.parseBrief(b.text)[0]; return s && s.headline ? '<p style="border-left-color:' + HEX[i] + '"><b>' + MK.esc(m.name) + '</b> · ' + MK.itemHtml(s.headline) + '</p>' : ''; }).join('');
+      $('#ai').innerHTML = html || '<p class="none">고른 시장이 나오는 문장이 없습니다.</p>';
+      $('#ai-meta').textContent = 'Claude 작성 ' + MK.day(global.generated) + ' 발행 · 전 시장 브리핑에서 고른 시장(지역은 회원국 이름 포함)이 나오는 문장 ' + hit + '개. 굵은 밑줄 색 = 시장 색.';
+    }
+    render();
+    MK.ready(true);
+  } catch (e) { MK.errBox('#cols', e); MK.ready(false, String(e)); }
+})();
+</script>
+</body>
+</html>

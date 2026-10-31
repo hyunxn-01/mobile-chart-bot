@@ -1064,6 +1064,7 @@
    "data_files": [
     "docs/markets/genre_matrix.json",
     "docs/markets/xmarket_lite.json",
+    "docs/markets/index.json",
     "docs/markets/briefs_index.json",
     "docs/markets/global_brief.json",
     "docs/markets/major_<kr|us|jp|cn|tw>.json",
@@ -1105,11 +1106,12 @@
    },
    "ai_emphasis": "'AI가 이 게임을 어떻게 봐 왔나'가 연표로 쌓인다. 연표 항목을 누르면 순위 그래프의 그 주에 표시가 생긴다.",
    "data_files": [
-    "docs/markets/weekly_lite.json",
+    "docs/markets/<kr|us|jp|cn|tw>.json",
     "docs/markets/xmarket_lite.json",
-    "docs/markets/global_brief.json",
     "docs/markets/briefs_index.json",
-    "docs/markets/major_<cc>.json"
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
    ],
    "inspired_by": [
     "S30",
