@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>헤드라인 브리핑 · 견본 01</title>
+<style>
+:root{--ink:#16181d;--sub:#5b6170;--line:#e3e5ea;--bg:#f6f6f3;--card:#fff;--accent:#2445d6;--up:#0c7a43;--down:#c2352b;--hl:#fff3b0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);background:#fff}
+.top{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:14px 0 6px;flex-wrap:wrap}
+.top h1{font-size:15px;margin:0;letter-spacing:.02em}
+.top .meta{color:var(--sub);font-size:12.5px}
+.intro{color:var(--sub);font-size:13px;margin:0 0 10px}
+.tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+.tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;color:var(--ink)}
+.tabs button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.lead{padding:34px 0 18px}
+.byline{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--sub);margin-bottom:14px;flex-wrap:wrap}
+.badge{background:var(--accent);color:#fff;border-radius:4px;padding:2px 8px;font-weight:700;font-size:12px;letter-spacing:.04em}
+.lead h2{font-size:clamp(24px,3.4vw,40px);line-height:1.25;margin:0 0 22px;letter-spacing:-.01em;max-width:30ch}
+.lead h2 b{background:linear-gradient(transparent 62%,var(--hl) 0)}
+.heads{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0;border-top:2px solid var(--ink)}
+.head{padding:14px 18px 16px 0;border-bottom:1px solid var(--line)}
+.head .k{font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.03em}
+.head p{margin:4px 0 0;font-size:16.5px;line-height:1.5;font-weight:500}
+.head p b{font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0 8px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi .l{font-size:12.5px;color:var(--sub)}
+.kpi .v{font-size:30px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:12.5px;color:var(--sub)}
+.kpi .d .p{color:var(--up);font-weight:700}.kpi .d .n{color:var(--down);font-weight:700}
+.kpinote{font-size:12px;color:var(--sub);margin:4px 0 0}
+.detail{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:24px;padding:24px 0 60px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.panel h3{font-size:14px;margin:0 0 10px}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:first-of-type{border-top:0}
+summary{cursor:pointer;font-weight:700;font-size:14.5px;list-style:none}
+summary::before{content:'＋ ';color:var(--accent)}details[open] summary::before{content:'－ '}
+details ul{margin:8px 0 0;padding-left:18px}
+details li{margin:6px 0;font-size:14px}
+.mk-up{color:var(--up);font-weight:700}.mk-down{color:var(--down);font-weight:700}
+.mk-q{display:block;margin:4px 0 0;padding-left:10px;border-left:3px solid var(--line);color:var(--sub);font-size:13px;quotes:none}
+.rank{list-style:none;margin:0;padding:0}
+.rank li{display:grid;grid-template-columns:22px 28px minmax(0,1fr) 80px 52px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.rank .n{font-weight:700;color:var(--sub);text-align:right}
+.mk-icon{width:28px;height:28px;border-radius:7px;background:#eceef2;display:block}
+.rank .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank .t small{display:block;color:var(--sub);font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
+.rank .ch{text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums}
+.rank svg{color:var(--accent)}
+.hint{font-size:12px;color:var(--sub);margin-top:10px}
+.mk-err{background:#fff0ef;border:1px solid #f3b9b4;color:#8a1f17;padding:12px 14px;border-radius:8px;margin:16px 0}
+footer{color:var(--sub);font-size:12px;padding:18px 0 40px;border-top:1px solid var(--line)}
+@media (max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:1fr}}
+@media (max-width:420px){.wrap{padding:0 16px}.kpi .v{font-size:24px}.rank li{grid-template-columns:20px 26px minmax(0,1fr) 46px}.rank li svg{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top"><h1>견본 01 · 헤드라인 브리핑</h1><span class="meta"><a href="index.html">견본 목록</a> · <span id="stamp">불러오는 중…</span></span></div>
+    <p class="intro" id="intro"></p>
+    <nav class="tabs" id="tabs" aria-label="분석 단위"></nav>
+  </div>
+</header>
+<main class="wrap">
+  <section class="lead" aria-labelledby="lead-title">
+    <div class="byline"><span class="badge">AI 시장 브리핑</span><span id="by"></span></div>
+    <h2 id="lead-title">…</h2>
+    <div class="heads" id="heads"></div>
+    <div class="kpis" id="kpis"></div>
+    <p class="kpinote">위 숫자는 브리핑 글 자체에서 센 값이다(▲ · ▼ 표시, 굵게 쓴 이름, 링크). 괄호 안은 지난주(<span id="prevdate"></span>) 브리핑과의 차이.</p>
+  </section>
+  <section class="detail">
+    <div class="panel"><h3>브리핑 전문</h3><div id="full"></div></div>
+    <div class="panel"><h3 id="side-title">주요 시장 주간 순위</h3><div id="side"></div><p class="hint" id="side-hint"></p></div>
+  </section>
+</main>
+<footer class="wrap">데이터: docs/markets/briefs_index.json · global_brief / major_* / region_*.json · weekly_lite.json · index.json. 브리핑은 Claude가 쓴 글을 그대로 옮겼다.</footer>
+<script>/*MK-CORE-BEGIN*/
+/* MK core — 견본 공통 도우미(각 견본 HTML 안에 그대로 들어 있다. 원본: 견본 작업 세션의 core.js)
+   데이터: 저장소 루트에서 정적 서버로 열었을 때 ../docs/markets/ 아래 JSON을 읽는다. */
+(function () {
+  'use strict';
+  const BASE = '../docs/markets/';
+  const cache = {};
+  const CC = {
+    global: '전 시장', cn: '중국', jp: '일본', kr: '한국', tw: '대만', us: '미국', ae: 'UAE', ar: '아르헨티나', au: '호주',
+    br: '브라질', ca: '캐나다', co: '콜롬비아', de: '독일', eg: '이집트', es: '스페인', fr: '프랑스', gb: '영국',
+    id: '인도네시아', in: '인도', it: '이탈리아', mx: '멕시코', my: '말레이시아', nl: '네덜란드', ph: '필리핀',
+    pk: '파키스탄', ru: '러시아', sa: '사우디', se: '스웨덴', sg: '싱가포르', th: '태국', tr: '터키', vn: '베트남',
+    europe: '유럽', na_oceania: '북미·오세아니아', middle_east: '중동', latam: '중남미', sea: '동남아', south_asia: '남아시아'
+  };
+  const MAJORS = ['kr', 'us', 'jp', 'cn', 'tw'];
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  async function json(name) {
+    if (cache[name]) return cache[name];
+    const url = BASE + name + '.json';
+    cache[name] = fetch(url).then(r => {
+      if (!r.ok) throw new Error(url + ' 응답 ' + r.status);
+      return r.json();
+    });
+    try { return await cache[name]; } catch (e) { delete cache[name]; throw e; }
+  }
+  function name(k) { return CC[k] || (k ? String(k).toUpperCase() : ''); }
+  function briefFile(tab) {
+    if (!tab || tab.key === 'global' || tab.type === 'global') return 'global_brief';
+    return (tab.type === 'major' ? 'major_' : 'region_') + tab.key;
+  }
+  /* 브리핑 목록: [{key,type,name,file}] — 맨 앞은 전 시장 */
+  async function briefTabs() {
+    const idx = await json('briefs_index');
+    return [{ key: 'global', type: 'global', name: '전 시장', file: 'global_brief' }]
+      .concat((idx.tabs || []).map(t => ({ key: t.key, type: t.type, name: t.name, countries: t.countries, file: briefFile(t) })));
+  }
+  /* 브리핑 한 개: {tab, generated, text, history:[{date,text}], monthly, quarterly} */
+  async function brief(tab) {
+    const d = await json(tab.file || briefFile(tab));
+    const w = (d.axes && d.axes.weekly) || { text: d.text, history: d.history, generated: d.generated };
+    return {
+      tab, raw: d, generated: w.generated || d.generated, text: w.text || d.text || '', model: w.model || '',
+      history: (w.history || d.history || []).map(h => ({ date: h.date, generated: h.generated, text: h.text })),
+      monthly: d.axes && d.axes.monthly ? d.axes.monthly.text : '', quarterly: d.axes && d.axes.quarterly ? d.axes.quarterly.text : ''
+    };
+  }
+  async function allBriefs() {
+    const tabs = await briefTabs();
+    return Promise.all(tabs.map(t => brief(t)));
+  }
+  /* 브리핑 글 → 섹션. 섹션의 첫 항목이 헤드라인(요약), 나머지가 상세. '- '로 시작하지 않는 줄은 앞 항목에 붙는 인용(매체 인용문). */
+  function parseBrief(text) {
+    const out = [];
+    let sec = null, last = null;
+    String(text || '').split('\n').forEach(line => {
+      const l = line.replace(/\s+$/, '');
+      if (!l.trim()) return;
+      const h = l.match(/^#{1,3}\s+(.*)$/);
+      if (h) { sec = { title: h[1].trim(), items: [] }; out.push(sec); last = null; return; }
+      if (!sec) { sec = { title: '', items: [] }; out.push(sec); }
+      const b = l.match(/^\s*[-*]\s+(.*)$/);
+      if (b) { last = { md: b[1].trim(), quotes: [] }; sec.items.push(last); return; }
+      if (last) last.quotes.push(l.trim()); else { last = { md: l.trim(), quotes: [] }; sec.items.push(last); }
+    });
+    out.forEach(s => {
+      s.headline = s.items.length ? s.items[0] : null;
+      s.details = s.items.slice(1);
+      s.items.forEach(it => {
+        it.text = plain(it.md + (it.quotes.length ? ' ' + it.quotes.join(' ') : ''));
+        it.full = it.quotes.length ? it.md + ' “' + it.quotes.join(' ') + '”' : it.md;
+      });
+    });
+    return out;
+  }
+  /* 인라인 마크다운(굵게, 링크, ▲▼ 숫자) → HTML */
+  function md(s, opt) {
+    opt = opt || {};
+    let h = esc(s);
+    h = h.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, (m, t, u) => opt.noLinks ? t : '<a href="' + u + '" target="_blank" rel="noopener">' + t + '</a>');
+    h = h.replace(/\*\*([^*]+)\*\*/g, (m, t) => '<b>' + t + '</b>');
+    h = h.replace(/▲\s?(\d+(?:\.\d+)?)/g, '<span class="mk-up">▲$1</span>').replace(/▼\s?(\d+(?:\.\d+)?)/g, '<span class="mk-down">▼$1</span>');
+    if (opt.mark && opt.mark.length) {
+      opt.mark.filter(Boolean).forEach(w => {
+        const re = new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')(?![^<]*>)', 'g');
+        h = h.replace(re, '<mark>$1</mark>');
+      });
+    }
+    return h;
+  }
+  function itemHtml(it, opt) {
+    let h = md(it.md, opt);
+    if (it.quotes && it.quotes.length) h += ' <q class="mk-q">' + md(it.quotes.join(' '), opt) + '</q>';
+    return h;
+  }
+  function plain(s) { return String(s || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*/g, ''); }
+  function bolds(s) { const r = []; String(s || '').replace(/\*\*([^*]+)\*\*/g, (m, t) => { r.push(t.trim()); }); return r; }
+  function links(s) { const r = []; String(s || '').replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, (m, t, u) => { r.push({ t, u }); }); return r; }
+  function moves(s) { const r = []; String(s || '').replace(/([▲▼])\s?(\d+(?:\.\d+)?)/g, (m, a, v) => { r.push({ dir: a === '▲' ? 1 : -1, v: +v }); }); return r; }
+  /* 시사점 문장 끝 괄호(근거) 떼기 */
+  function evidence(s) {
+    const t = String(s || '').trim();
+    if (!t.endsWith(')')) return { claim: t, evidence: '' };
+    let depth = 0;
+    for (let i = t.length - 1; i >= 0; i--) {
+      if (t[i] === ')') depth++;
+      else if (t[i] === '(') { depth--; if (depth === 0) return { claim: t.slice(0, i).trim(), evidence: t.slice(i + 1, -1).trim() }; }
+    }
+    return { claim: t, evidence: '' };
+  }
+  /* 권고 문장의 신호(규칙 기반): go 우선 · watch 관망 · hold 보류 */
+  /* 강한 표현이 약한 표현보다 먼저 판정한다. 관망 표현이 있으면 관망. 우선 · 보류 강한 표현이 함께 있으면 혼재. */
+  const SIG = {
+    watch: ['확인 후', '불확실', '2~3주', '구분 불가', '미룸', '관망', '아직 이름', '판단 근거로 쓰기에는'],
+    holdStrong: ['보류', '하향', '후순위'],
+    goStrong: ['우선순위 상위', '1순위', '진출 우선'],
+    holdWeak: ['포화', '리스크가 큼', '리스크 큼', '어려', '제한적', '여지가 없'],
+    goWeak: ['유지', '유리', '기회', '현실적', '낮은 편', '가능']
+  };
+  function signal(text) {
+    const t = plain(text);
+    const hit = {};
+    Object.keys(SIG).forEach(k => { hit[k] = SIG[k].filter(w => t.includes(w)); });
+    let s = null;
+    if (hit.watch.length) s = 'watch';
+    else if (hit.goStrong.length && hit.holdStrong.length) s = 'mixed';
+    else if (hit.holdStrong.length) s = 'hold';
+    else if (hit.goStrong.length) s = 'go';
+    else if (hit.holdWeak.length && hit.goWeak.length) s = 'mixed';
+    else if (hit.holdWeak.length) s = 'hold';
+    else if (hit.goWeak.length) s = 'go';
+    const words = [].concat(hit.watch, hit.goStrong, hit.holdStrong, hit.goWeak, hit.holdWeak);
+    return { signal: s, hits: hit, words };
+  }
+  const SIGNAL_LABEL = { go: '우선', watch: '관망', hold: '보류', mixed: '혼재' };
+  const SIGNAL_RULES = SIG;
+  /* 주간 순위 요약(weekly_lite) 한 시장 */
+  function weekly(lite, mk, chart) {
+    const c = (((lite || {}).markets || {})[mk] || {}).charts || {};
+    const ch = c[chart || 'grossing'] || { games: {}, timeframes: { weekly: { labels: [], series: {} } } };
+    const tf = ch.timeframes.weekly, labels = tf.labels || [], n = labels.length, ni = n - 1, pi = n - 2;
+    const rows = Object.keys(tf.series).map(id => {
+      const v = tf.series[id], g = ch.games[id] || {};
+      const now = v[ni] == null ? null : v[ni], prev = v[pi] == null ? null : v[pi];
+      return { id, title: g.title || id, dev: g.developer || '', icon: g.icon || '', now, prev, series: v,
+        delta: now != null && prev != null ? +(prev - now).toFixed(1) : null, isNew: now != null && prev == null, isOut: now == null && prev != null };
+    });
+    rows.sort((a, b) => (a.now == null ? 999 : a.now) - (b.now == null ? 999 : b.now));
+    /* 주마다 1위(평균 순위가 가장 낮은 게임) */
+    const tops = [];
+    for (let i = 0; i < n; i++) {
+      let best = null, ba = null;
+      for (const id in tf.series) { const x = tf.series[id][i]; if (x != null && (best == null || x < best)) { best = x; ba = id; } }
+      tops.push(ba);
+    }
+    let streak = 0; const top = tops[ni];
+    for (let i = ni; i >= 0 && tops[i] === top; i--) streak++;
+    return { labels, n, rows, tops, top, topStreak: streak, games: ch.games, series: tf.series };
+  }
+  /* 나라 파일(<cc>.json)의 주간 시계열 전체 */
+  function countryWeekly(co, chart) {
+    const ch = ((co || {}).charts || {})[chart || 'grossing'] || {};
+    const tf = (ch.timeframes || {}).weekly || { labels: [], series: {} };
+    return { labels: tf.labels || [], series: tf.series || {}, games: ch.games || {}, publishers: ch.publishers, genres: ch.genres, daily: (ch.timeframes || {}).daily, monthly: (ch.timeframes || {}).monthly };
+  }
+  /* 여러 나라 순위 요약(xmarket_lite) 풀기 */
+  function xm(x) {
+    const mk = x.markets || [];
+    const games = {};
+    Object.keys(x.games || {}).forEach(id => {
+      const g = x.games[id];
+      const o = { id, title: g.t, dev: g.d, icon: g.i ? (x.icon_head + g.i + x.icon_tail) : '', genre: g.gr || '', release: g.rl, updated: g.up, g: {}, f: {} };
+      (g.g || []).forEach(r => { o.g[mk[r[0]]] = { now: r[1], prev: r[2] }; });
+      (g.f || []).forEach(r => { o.f[mk[r[0]]] = { now: r[1], prev: r[2] }; });
+      games[id] = o;
+    });
+    function top(cc, kind, n) {
+      kind = kind || 'g';
+      return Object.values(games).filter(o => o[kind][cc] && o[kind][cc].now != null)
+        .sort((a, b) => a[kind][cc].now - b[kind][cc].now).slice(0, n || 100);
+    }
+    return { date: x.date, markets: mk, games, top };
+  }
+  function genreShares(gm, key) {
+    const c = (gm.cells || {})[key] || {};
+    return Object.keys(c).map(g => ({ genre: g, rev: c[g].rev, pre: c[g].pre })).sort((a, b) => b.rev - a.rev);
+  }
+  /* SVG 도우미 */
+  function spark(vals, o) {
+    o = Object.assign({ w: 120, h: 28, invert: false, stroke: 'currentColor', width: 1.5, fill: '', dot: true, min: null, max: null, pad: 2 }, o || {});
+    const pts = vals.map((v, i) => [i, v]).filter(p => p[1] != null);
+    if (!pts.length) return '<svg width="' + o.w + '" height="' + o.h + '"></svg>';
+    const ys = pts.map(p => p[1]);
+    const mn = o.min != null ? o.min : Math.min.apply(null, ys), mx = o.max != null ? o.max : Math.max.apply(null, ys);
+    const X = i => o.pad + (vals.length < 2 ? 0 : i * (o.w - 2 * o.pad) / (vals.length - 1));
+    const Y = v => { const t = mx === mn ? 0.5 : (v - mn) / (mx - mn); return o.pad + (o.invert ? t : 1 - t) * (o.h - 2 * o.pad); };
+    let d = '', seg = false;
+    vals.forEach((v, i) => { if (v == null) { seg = false; return; } d += (seg ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(v).toFixed(1); seg = true; });
+    const lp = pts[pts.length - 1];
+    let s = '<svg class="mk-spark" width="' + o.w + '" height="' + o.h + '" viewBox="0 0 ' + o.w + ' ' + o.h + '" aria-hidden="true">';
+    if (o.band) s += '<rect x="0" y="' + Math.min(Y(o.band[0]), Y(o.band[1])).toFixed(1) + '" width="' + o.w + '" height="' + Math.abs(Y(o.band[0]) - Y(o.band[1])).toFixed(1) + '" fill="' + (o.bandFill || 'rgba(0,0,0,.08)') + '"/>';
+    s += '<path d="' + d + '" fill="none" stroke="' + o.stroke + '" stroke-width="' + o.width + '" stroke-linejoin="round" stroke-linecap="round"/>';
+    if (o.dot) s += '<circle cx="' + X(lp[0]).toFixed(1) + '" cy="' + Y(lp[1]).toFixed(1) + '" r="' + (o.width + 1) + '" fill="' + (o.dotColor || o.stroke) + '"/>';
+    return s + '</svg>';
+  }
+  function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+  function errBox(target, e) {
+    const node = typeof target === 'string' ? document.querySelector(target) : target;
+    const msg = '<div class="mk-err" role="alert"><b>데이터를 불러오지 못했습니다.</b> ' + esc(e && e.message ? e.message : e) +
+      '<br>저장소 루트에서 정적 서버를 띄우고(<code>python3 -m http.server</code>) <code>/mockups/</code> 아래 주소로 열어 주세요.</div>';
+    if (node) node.innerHTML = msg; else document.body.insertAdjacentHTML('afterbegin', msg);
+    console.warn('[MK] load failed', e);
+  }
+  function icon(url, cls) { return url ? '<img class="' + (cls || 'mk-icon') + '" src="' + esc(url) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility=\'hidden\'">' : '<span class="' + (cls || 'mk-icon') + '"></span>'; }
+  function wk(label) { if (!label) return ''; const p = label.split('-'); return (+p[1]) + '/' + (+p[2]) + ' 주'; }
+  function day(s) { if (!s) return ''; const p = String(s).slice(0, 10).split('-'); return p[0] + '.' + p[1] + '.' + p[2]; }
+  function n1(v) { return v == null || isNaN(v) ? '–' : (Math.round(v * 10) / 10).toFixed(1); }
+  function fmt(v, d) { return v == null || isNaN(v) ? '–' : Number(v).toLocaleString('ko-KR', { maximumFractionDigits: d == null ? 0 : d }); }
+  /* 이름 비교용: 공백 · 기호를 빼고 소문자 */
+  function norm(s) { return String(s || '').toLowerCase().replace(/[\s:：·・\-_'’"“”()（）\[\]!！?？.,®™]/g, ''); }
+  /* 브리핑 문장에서 이름이 나온 게임 찾기: games = [{id,title}] */
+  function findGames(text, games) {
+    const names = bolds(text).map(norm).filter(x => x.length >= 2);
+    const t = norm(plain(text));
+    return games.filter(g => { const n = norm(g.title); if (n.length < 2) return false; return names.some(b => b === n || (b.length >= 3 && (n.startsWith(b) || b.startsWith(n)))) || (n.length >= 4 && t.includes(n)); });
+  }
+  /* 화면이 다 그려졌는지 확인 스크립트에 알린다 */
+  function ready(ok, note) { document.documentElement.setAttribute('data-mk-ready', ok ? 'ok' : 'error'); if (note) document.documentElement.setAttribute('data-mk-note', note); }
+  const PROJECT = '앱스토어(App Store) 31개국 게임 매출 · 인기 차트를 매일 모으고, Claude가 매주 11개 분석 단위(전 시장 · 주요 5개 시장 · 6개 지역)의 시장 브리핑을 쓰는 차트봇.';
+  window.MK = { BASE, CC, MAJORS, esc, json, name, briefFile, briefTabs, brief, allBriefs, parseBrief, md, itemHtml, plain, bolds, links, moves,
+    evidence, signal, SIGNAL_RULES, SIGNAL_LABEL, weekly, countryWeekly, xm, genreShares, spark, el, errBox, icon, wk, day, n1, fmt, norm, findGames, ready, PROJECT };
+})();
+
+/*MK-CORE-END*/</script>
+<script>
+(async function () {
+  const $ = s => document.querySelector(s);
+  $('#intro').textContent = MK.PROJECT;
+  try {
+    const [tabs, lite, idx] = await Promise.all([MK.briefTabs(), MK.json('weekly_lite'), MK.json('index')]);
+    $('#stamp').textContent = '차트 갱신 ' + idx.generated + ' · 주간 순위 ' + MK.wk(MK.weekly(lite, 'kr').labels.slice(-1)[0]);
+    let cur = tabs[0];
+    $('#tabs').innerHTML = tabs.map((t, i) => '<button type="button" data-i="' + i + '" aria-pressed="' + (i === 0) + '">' + MK.esc(t.name) + '</button>').join('');
+    $('#tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cur = tabs[+b.dataset.i]; $('#tabs').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); render(cur).catch(err => MK.errBox('#full', err)); });
+
+    function stats(text) {
+      const m = MK.moves(text);
+      return { up: m.filter(x => x.dir > 0).length, down: m.filter(x => x.dir < 0).length,
+        names: new Set(MK.bolds(text)).size, links: MK.links(text).length };
+    }
+    function kpi(label, now, prev, unit) {
+      const d = prev == null ? null : now - prev;
+      const ds = d == null ? '지난주 없음' : (d > 0 ? '<span class="p">+' + d + '</span>' : d < 0 ? '<span class="n">' + d + '</span>' : '±0');
+      return '<div class="kpi"><div class="l">' + label + '</div><div class="v">' + now + '<small style="font-size:14px;font-weight:500"> ' + unit + '</small></div><div class="d">지난주 ' + (prev == null ? '–' : prev) + ' (' + ds + ')</div></div>';
+    }
+    async function render(tab) {
+      const b = await MK.brief(tab);
+      const secs = MK.parseBrief(b.text);
+      const prev = b.history[0];
+      $('#by').textContent = 'Claude 작성 · ' + MK.day(b.generated) + ' 발행 · ' + tab.name + (tab.countries ? ' (' + tab.countries + '개국)' : '');
+      const first = secs.find(s => s.headline) || {};
+      $('#lead-title').innerHTML = first.headline ? MK.md(first.headline.md, { noLinks: true }) : '브리핑 없음';
+      $('#heads').innerHTML = secs.slice(1).filter(s => s.headline).map(s =>
+        '<div class="head"><div class="k">' + MK.esc(s.title) + '</div><p>' + MK.md(s.headline.md, { noLinks: true }) + '</p></div>').join('');
+      const a = stats(b.text), p = prev ? stats(prev.text) : null;
+      $('#prevdate').textContent = prev ? MK.day(prev.date) : '없음';
+      $('#kpis').innerHTML = kpi('급상승(▲) 언급', a.up, p && p.up, '건') + kpi('급하락(▼) 언급', a.down, p && p.down, '건') +
+        kpi('굵게 짚은 이름', a.names, p && p.names, '개') + kpi('외부 출처 링크', a.links, p && p.links, '개');
+      $('#full').innerHTML = secs.map((s, i) => '<details' + (i < 1 ? ' open' : '') + '><summary>' + MK.esc(s.title) + '</summary><ul>' +
+        s.details.map(it => '<li>' + MK.itemHtml(it) + '</li>').join('') + '</ul></details>').join('');
+      renderSide(tab);
+    }
+    function row(r, i, extra) {
+      const ch = r.delta == null ? (r.isNew ? '<b class="mk-up">NEW</b>' : '') : (r.delta > 0 ? '<span class="mk-up">▲' + MK.n1(r.delta) + '</span>' : r.delta < 0 ? '<span class="mk-down">▼' + MK.n1(-r.delta) + '</span>' : '–');
+      return '<li><span class="n">' + (i + 1) + '</span>' + MK.icon(r.icon) + '<span class="t">' + MK.esc(r.title) + '<small>' + MK.esc(extra || r.dev) + ' · 평균 ' + MK.n1(r.now) + '위</small></span>' +
+        MK.spark(r.series.slice(-8), { w: 80, h: 24, invert: true }) + '<span class="ch">' + ch + '</span></li>';
+    }
+    function renderSide(tab) {
+      if (MK.MAJORS.includes(tab.key)) {
+        const w = MK.weekly(lite, tab.key);
+        $('#side-title').textContent = tab.name + ' 매출 상위 10 (주간 평균 순위)';
+        $('#side').innerHTML = '<ol class="rank">' + w.rows.filter(r => r.now != null).slice(0, 10).map((r, i) => row(r, i)).join('') + '</ol>';
+        $('#side-hint').textContent = MK.wk(w.labels[w.n - 1]) + ' 기준, 변동은 전주 평균 순위 대비. 선은 최근 8주(데이터가 있는 주만).';
+      } else {
+        $('#side-title').textContent = '주요 5개 시장 이번 주 1위';
+        $('#side').innerHTML = '<ol class="rank">' + MK.MAJORS.map((mk, i) => {
+          const w = MK.weekly(lite, mk); const r = w.rows.find(x => x.id === w.top) || w.rows[0];
+          return row(r, i, MK.name(mk) + ' · 연속 ' + w.topStreak + '주');
+        }).join('') + '</ol>';
+        $('#side-hint').textContent = '주간 평균 순위가 가장 낮은 게임. 이 분석 단위의 개별 순위는 브리핑 전문에서 확인.';
+      }
+    }
+    await render(cur);
+    MK.ready(true);
+  } catch (e) { MK.errBox('#full', e); MK.ready(false, String(e)); }
+})();
+</script>
+</body>
+</html>

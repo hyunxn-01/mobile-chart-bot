@@ -1,0 +1,2154 @@
+{
+ "generated": "2026-10-31",
+ "description": "KPI 지표형 대시보드 조사(sources.md)에서 스스로 정한 요소 · 분류 체계. 축과 값은 조사한 대시보드들에서 직접 뽑았다. 열람(opened) 출처의 값은 문서에서 확인한 것, 검색 결과만(search_only) 본 출처의 값은 검색 요약에 적힌 기능에서 추론한 것(confidence=inferred)이다.",
+ "element_vocabulary": {
+  "kpi_card": "숫자 하나 + 라벨(+증감 · 스파크라인)",
+  "delta": "이전 기간 · 기준 대비 차이",
+  "sparkline": "값 옆 작은 추세선",
+  "threshold_color": "임계값에 따른 색",
+  "target_marker": "목표 · 기준 표시",
+  "trend_chart": "시계열 차트",
+  "rank_table": "순위 표",
+  "rank_meta": "지난 순위 · 최고 순위 · 머문 기간 · NEW 표시",
+  "share_chart": "점유 막대 · 트리맵",
+  "heatmap": "행렬 색칸",
+  "map": "지도",
+  "filter_bar": "위쪽 필터 · 탭",
+  "segment_picker": "세그먼트 선택",
+  "side_panel": "옆 패널",
+  "ai_summary": "AI 요약 글",
+  "ai_card": "AI 발견 카드",
+  "ai_annotation": "차트 위 AI 주석",
+  "chat": "질문 창",
+  "source_note": "출처 · 계산 메모",
+  "archive_nav": "지난 회차 넘기기",
+  "alert": "급등 · 급락 알림",
+  "watchlist": "관심 목록"
+ },
+ "axes": {
+  "ai_surface": {
+   "label": "AI 서술이 놓이는 자리",
+   "definition": "AI(또는 사람이 쓴 해설)가 화면의 어디에 붙는가. 해설이 없으면 none.",
+   "values": {
+    "lead_summary": "화면 맨 위에 대시보드 전체를 요약하는 글 덩어리가 먼저 온다 (Looker 대시보드 요약, Bloomberg 기사 위 3줄, OWID 주제 페이지 핵심 인사이트).",
+    "side_panel": "본 화면 옆에 열리는 패널 · 사이드바에 해설이 모인다 (Zoho Zia 인사이트 패널, Metabot 채팅 사이드바, PostHog AI 사이드바).",
+    "per_widget_note": "차트 · 위젯 하나마다 그 위젯에 대한 짧은 해설이 붙는다 (Sisense Narratives, Power BI 시각화별 서술, Observable 예제의 차트 아래 메모).",
+    "chart_annotation": "해설 문장이 차트 안의 해당 지점 · 칸에 직접 꽂힌다 (Domo의 주석 대시보드, Datadog 이상 이슈가 해당 위젯으로 연결).",
+    "insight_feed": "해설이 카드 여러 장의 목록 · 캐러셀로 쌓이고, 카드 하나가 발견 하나다 (GA4 홈 인사이트 카드, Datadog Watchdog 캐러셀, Yellowfin Signals, ThoughtSpot AI Highlights).",
+    "document_flow": "글이 주인공이고 차트가 문단 사이에 끼는 문서 흐름 (Metabase Documents, Yellowfin Stories, PocketGamer.biz 주간 차트 칼럼, Narrative BI 리포트).",
+    "chat": "질문하고 답을 받는 대화 창이 해설의 통로다 (Mixpanel Agent, Qlik Insight Advisor Chat, Looker 'Chat with this dashboard').",
+    "none": "해설 없이 지표 · 차트만 있다 (Grafana Stat, Stripe 홈, SteamDB, Billboard, Finviz)."
+   }
+  },
+  "ai_job": {
+   "label": "AI(해설)가 하는 일",
+   "definition": "해설이 사용자에게 주는 주된 정보의 종류.",
+   "values": {
+    "summarize": "무엇이 일어났는지 요약한다.",
+    "explain_drivers": "왜 바뀌었는지 기여 요인 · 원인을 짚는다 (Tellius 추세 요인, ThoughtSpot 최대 기여 요인, Datadog 기여 태그).",
+    "flag_anomaly": "예상 범위를 벗어난 변화를 골라 표시한다 (ThoughtSpot 예상/예상 밖, Datadog 이상 탐지, Yellowfin Signals).",
+    "rank_findings": "발견을 흥미도 · 우선순위로 줄 세운다 (Metabase Research 흥미도, GA4 카드 순서, Watchdog 우선순위).",
+    "recommend": "무엇을 할지 권고한다 (Amplitude Dashboard Agent 권고).",
+    "answer": "사용자의 질문에 답한다 (Metabot, Qlik Insight Advisor, Mixpanel Agent).",
+    "none": "해설이 없다."
+   }
+  },
+  "kpi_form": {
+   "label": "KPI 표현 방식",
+   "definition": "핵심 숫자를 어떤 모양으로 보여 주는가(대표 하나를 고른다).",
+   "values": {
+    "big_number": "숫자 하나를 크게 (Metabase Number, Observable big 클래스).",
+    "number_delta": "값 + 이전 기간 대비 증감 (Metabase Trend, PostHog 상단 지표, Tableau VOTD KPI 카드).",
+    "number_sparkline": "값 + 작은 추세선 (Grafana Stat, Streamlit st.metric 차트, Stripe 홈, Sisense KPI Card).",
+    "target_bullet": "목표 · 기준 대비 위치를 막대 · 게이지로 (Few 불릿 그래프, IBCS 차이 표기, Grafana Bar gauge).",
+    "status_color": "상태를 색으로 판정 (RAG 성과표, Grafana 임계값 색, Geckoboard 경고).",
+    "rank_position": "순위 자체와 지난 순위 · 최고 순위 · 머문 기간 (Billboard, SteamDB, 앱 순위 도구).",
+    "share_area": "점유를 면적 · 막대 길이로 (Finviz 트리맵, 장르 점유 막대, Sensor Tower 장르 점유).",
+    "none": "KPI 숫자 카드가 따로 없다."
+   }
+  },
+  "layout": {
+   "label": "화면 골격",
+   "definition": "정보 덩어리를 화면에 어떻게 나눠 놓는가.",
+   "values": {
+    "kpi_strip_then_detail": "KPI 한 줄을 위에 놓고 그 아래 상세 차트 (Metabase 'KPIs with large chart below', Observable Plot 예제, PostHog 웹 분석).",
+    "hero_chart_side_kpi": "큰 차트 하나 + 옆에 KPI 몇 개 (Metabase 'Large chart with KPIs to the right', Observable 모기지 예제).",
+    "uniform_grid": "비슷한 크기 카드의 격자 (Metabase KPI Grid, Geckoboard TV 대시보드, GA4 카드).",
+    "linear_report": "위에서 아래로 읽는 한 줄 흐름 (Observable 웹 로그 예제, Metabase Documents, OWID 데이터 인사이트).",
+    "list_table": "순위 목록 · 표가 화면의 중심 (Billboard, SteamDB, 42matters, IBCS 표).",
+    "area_map": "지도 · 트리맵 · 히트맵 같은 면 전체 시각화가 중심 (Finviz, Observable 전력망 지도, NYT 선거 지도).",
+    "side_by_side_panels": "같은 틀의 패널을 대상별로 나란히 (AppTweak 나라별 차트 9개, Appfigures 목록 나란히).",
+    "master_detail": "목록 · 본화면과 상세 · 옆 패널이 짝을 이룸 (Linear Insights 옆 패널, Zoho 인사이트 패널, Metabase Research 사이드바)."
+   }
+  },
+  "comparison": {
+   "label": "비교 기준",
+   "definition": "숫자가 좋은지 나쁜지 판단하게 해 주는 기준.",
+   "values": {
+    "previous_period": "직전 기간 대비 (Metabase Trend, PostHog, Stripe).",
+    "target": "목표 · 계획 대비 (Few 불릿, IBCS, RAG 성과표).",
+    "expected_range": "과거 흐름으로 만든 예상 범위 대비 (ThoughtSpot 신뢰 구간, Datadog 이상 탐지).",
+    "peer_segments": "다른 시장 · 세그먼트 · 경쟁작 대비 (AppTweak 나라 비교, AppMagic 100개 비교, Sensor Tower 벤치마크).",
+    "own_history": "자기 과거 최고치 · 머문 기간 대비 (Billboard 최고 순위 · 차트 주 수, SteamDB 최고 동접).",
+    "none": "기준 없이 현재 값만."
+   }
+  },
+  "interaction": {
+   "label": "탐색 방식",
+   "definition": "사용자가 화면을 어떻게 움직여 보는가.",
+   "values": {
+    "static": "보기만 한다(TV 대시보드, 메일 리포트).",
+    "global_filter": "위쪽 필터 · 탭으로 화면 전체 대상 바꾸기 (Grafana 템플릿 변수, Ludo.ai 위쪽 필터).",
+    "click_to_filter": "화면 안 항목을 누르면 나머지가 그 항목으로 걸러짐 (PostHog 경로 클릭, Metabase 상호작용 대시보드).",
+    "drill_down": "요약에서 상세 단계로 내려감 (Grafana 계층형 대시보드, Metabase X-ray 확대).",
+    "ask_question": "질문을 입력 · 선택해 답을 받음 (Metabot, Qlik, Mixpanel).",
+    "pick_and_compare": "대상 여러 개를 골라 나란히 비교 (AppMagic 비교 대시보드, Linear 측정 × 기준 선택)."
+   }
+  },
+  "density": {
+   "label": "정보 밀도",
+   "definition": "한 화면에 담는 양.",
+   "values": {
+    "glance": "몇 초 안에 읽히는 몇 개의 큰 숫자 (Geckoboard TV, Stripe 홈의 다섯 숫자).",
+    "standard": "일반 업무용 대시보드 (카드 10개 안팎, Metabase 권장).",
+    "dense": "분석가용 촘촘한 화면 (Bloomberg, Finviz, AppTweak 9개 차트)."
+   }
+  },
+  "evidence_link": {
+   "label": "해설과 근거의 연결",
+   "definition": "해설 문장이 무엇으로 자기 주장을 뒷받침하는가.",
+   "values": {
+    "numbers_inline": "문장 안에 숫자를 직접 적는다 (대부분의 AI 요약).",
+    "links_to_widget": "문장을 누르면 근거 차트 · 위젯으로 이동 · 강조된다 (Datadog 이슈 → 위젯 스크롤, Zoho 글 보기/차트 보기).",
+    "external_sources": "외부 출처 링크를 단다 (Bloomberg 요약, PocketGamer 칼럼의 데이터 출처).",
+    "confidence_label": "예상 · 예상 밖, 신뢰 정도를 라벨로 붙인다 (ThoughtSpot 예상/예상 밖, Metabot의 '다시 확인' 안내).",
+    "inspectable_query": "답을 만든 쿼리 · 계산을 열어 볼 수 있다 (Lightdash 에이전트, Metabot이 만든 질문 편집).",
+    "none": "해설이 없거나 근거 표시가 없다."
+   }
+  },
+  "time_mode": {
+   "label": "시간 표현",
+   "definition": "시간 흐름을 어떻게 다루는가.",
+   "values": {
+    "snapshot": "지금 한 시점 (트리맵, 현재 순위표).",
+    "trend_series": "시계열 추세 (순위 이력 선, 이동평균).",
+    "cadence_archive": "정해진 주기로 발행되고 지난 회차를 넘겨 볼 수 있다 (주간 칼럼, 예약 리포트, 메일 리포트).",
+    "realtime": "수 분 단위로 갱신 (SteamDB, Appfigures 매시간, 전력망 예제)."
+   }
+  },
+  "audience": {
+   "label": "주 독자",
+   "definition": "화면이 누구를 위해 짜였는가.",
+   "values": {
+    "executive": "결론과 판단이 먼저 필요한 경영 · 사업 결정자.",
+    "analyst": "직접 파고드는 분석가 · 기획자.",
+    "operator": "현장에서 상태를 지켜보는 운영 · 당직 · 사무실 벽 화면.",
+    "public_reader": "공개 독자(뉴스 · 칼럼 · 포트폴리오 방문자)."
+   }
+  },
+  "primary_visual": {
+   "label": "주 시각화",
+   "definition": "화면에서 가장 큰 면적을 차지하는 시각화 종류.",
+   "values": {
+    "line_trend": "선 그래프 추세.",
+    "bar_rank": "막대 · 순위 막대.",
+    "heatmap_matrix": "행 × 열 색칸 행렬.",
+    "treemap": "면적 분할.",
+    "scatter_quadrant": "두 지표 산점도와 사분면.",
+    "map": "지리 지도.",
+    "table": "표 · 목록.",
+    "state_timeline": "상태 띠 · 시간 축 칸.",
+    "small_multiples": "같은 작은 차트 반복.",
+    "text_first": "글이 주된 면적.",
+    "waterfall": "증감 누적 막대."
+   }
+  }
+ },
+ "dashboards": [
+  {
+   "id": "O01",
+   "name": "Metabase X-rays",
+   "url": "https://github.com/metabase/metabase/blob/master/docs/exploration-and-organization/x-rays.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "자동 생성 차트 묶음",
+    "확대 · 축소 · 관련 항목 제안",
+    "대시보드로 저장"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "uniform_grid",
+    "comparison": "none",
+    "interaction": "drill_down",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "small_multiples"
+   }
+  },
+  {
+   "id": "O02",
+   "name": "Metabase Number",
+   "url": "https://github.com/metabase/metabase/blob/master/docs/questions/visualizations/numbers.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "큰 숫자",
+    "접두 · 접미 · 소수점",
+    "구간별 조건부 색"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "big_number",
+    "layout": "uniform_grid",
+    "comparison": "target",
+    "interaction": "static",
+    "density": "glance",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "O03",
+   "name": "Metabase Trend",
+   "url": "https://github.com/metabase/metabase/blob/master/docs/questions/visualizations/trend.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "최근 기간 값",
+    "이전 기간 대비 증감",
+    "비교 최대 3개(이전 기간 · 이전 값 · 목표 · 다른 열)",
+    "좋음/나쁨 색 뒤집기"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_delta",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "glance",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "O04",
+   "name": "Metabase Metabot",
+   "url": "https://github.com/metabase/metabase/blob/master/docs/ai/metabot.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "채팅 사이드바",
+    "차트 분석 요청",
+    "응답 메뉴(복사 · 피드백 · 다시 실행)",
+    "결과 재확인 안내",
+    "만든 질문을 편집기로 열기"
+   ],
+   "axes": {
+    "ai_surface": "chat",
+    "ai_job": "answer",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "none",
+    "interaction": "ask_question",
+    "density": "standard",
+    "evidence_link": "inspectable_query",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "O05",
+   "name": "Metabase Research",
+   "url": "https://github.com/metabase/metabase/blob/master/docs/ai/research.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "질문 → 조사 계획",
+    "차트 여러 개 자동 생성",
+    "흥미도 정렬",
+    "별표 · 댓글 · 숨김",
+    "사이드바 맨 위 요약",
+    "데이터 점에서 더 탐색"
+   ],
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "rank_findings",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "none",
+    "interaction": "drill_down",
+    "density": "dense",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "small_multiples"
+   }
+  },
+  {
+   "id": "O06",
+   "name": "Metabase Documents",
+   "url": "https://github.com/metabase/metabase/blob/master/docs/documents/introduction.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "글 + 차트 문서",
+    "차트 옆 보조 글",
+    "/ 명령으로 차트 · AI 삽입",
+    "@ 언급"
+   ],
+   "axes": {
+    "ai_surface": "document_flow",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "linear_report",
+    "comparison": "none",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "O07",
+   "name": "Metabase 대시보드 섹션 틀",
+   "url": "https://github.com/metabase/metabase/blob/master/docs/dashboards/introduction.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "KPI 격자",
+    "큰 차트 + 오른쪽 KPI",
+    "KPI + 아래 큰 차트",
+    "변수가 들어가는 글 카드",
+    "탭",
+    "필터"
+   ],
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "none",
+    "kpi_form": "big_number",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "none",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "O08",
+   "name": "Grafana Stat",
+   "url": "https://github.com/grafana/grafana/blob/main/docs/sources/visualizations/panels-visualizations/visualizations/stat/index.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "값",
+    "스파크라인",
+    "변화율",
+    "임계값 색",
+    "계산 방식 선택"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_sparkline",
+    "layout": "uniform_grid",
+    "comparison": "target",
+    "interaction": "global_filter",
+    "density": "glance",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "operator",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "O09",
+   "name": "Grafana Bar gauge",
+   "url": "https://github.com/grafana/grafana/blob/main/docs/sources/visualizations/panels-visualizations/visualizations/bar-gauge/index.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "필드마다 막대 게이지",
+    "범위 안 채움",
+    "임계값 색"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "target_bullet",
+    "layout": "uniform_grid",
+    "comparison": "target",
+    "interaction": "static",
+    "density": "glance",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "operator",
+    "primary_visual": "bar_rank"
+   }
+  },
+  {
+   "id": "O10",
+   "name": "Grafana State timeline",
+   "url": "https://github.com/grafana/grafana/blob/main/docs/sources/visualizations/panels-visualizations/visualizations/state-timeline/index.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "대상별 상태 띠",
+    "상태 구간 색",
+    "시간 축"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "status_color",
+    "layout": "linear_report",
+    "comparison": "none",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "operator",
+    "primary_visual": "state_timeline"
+   }
+  },
+  {
+   "id": "O11",
+   "name": "Grafana 대시보드 모범 사례",
+   "url": "https://github.com/grafana/grafana/blob/main/docs/sources/visualizations/dashboards/build-dashboards/best-practices/index.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "지표 선택 틀(USE · RED · 4대 신호)",
+    "서비스 계층 행",
+    "계층 드릴다운",
+    "의미 있는 색",
+    "축 정규화"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "status_color",
+    "layout": "side_by_side_panels",
+    "comparison": "target",
+    "interaction": "drill_down",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "operator",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "O14",
+   "name": "Observable 예제: 미국 전력망",
+   "url": "https://github.com/observablehq/framework/blob/main/examples/eia/src/index.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "큰 지도 카드",
+    "상위 5 막대",
+    "수요 대 예측 선",
+    "국가 간 교류",
+    "출처 메모"
+   ],
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "none",
+    "kpi_form": "share_area",
+    "layout": "area_map",
+    "comparison": "previous_period",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "external_sources",
+    "time_mode": "realtime",
+    "audience": "public_reader",
+    "primary_visual": "map"
+   }
+  },
+  {
+   "id": "O15",
+   "name": "Observable 예제: Plot 다운로드",
+   "url": "https://github.com/observablehq/framework/blob/main/examples/plot/src/index.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "KPI 카드 4개 줄",
+    "카드가 원천 링크",
+    "이동평균 선",
+    "버전별 막대",
+    "두 번째 KPI 줄"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "big_number",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "none",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "external_sources",
+    "time_mode": "trend_series",
+    "audience": "public_reader",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "O16",
+   "name": "Observable 예제: 웹 로그",
+   "url": "https://github.com/observablehq/framework/blob/main/examples/api/src/index.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "차트마다 아래 설명 메모",
+    "히트맵 같은 산점도",
+    "상위 경로 2열",
+    "한 줄 흐름"
+   ],
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "linear_report",
+    "comparison": "none",
+    "interaction": "static",
+    "density": "dense",
+    "evidence_link": "numbers_inline",
+    "time_mode": "trend_series",
+    "audience": "public_reader",
+    "primary_visual": "heatmap_matrix"
+   }
+  },
+  {
+   "id": "O17",
+   "name": "Observable 예제: 호텔 예약",
+   "url": "https://github.com/observablehq/framework/blob/main/examples/hotel-bookings/src/index.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "세그먼트 선택",
+    "선택이 제목 문구까지 바꿈",
+    "행 병합 KPI 카드",
+    "계절별 막대"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "big_number",
+    "layout": "uniform_grid",
+    "comparison": "peer_segments",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "bar_rank"
+   }
+  },
+  {
+   "id": "O18",
+   "name": "Observable 예제: 모기지 금리",
+   "url": "https://github.com/observablehq/framework/blob/main/examples/mortgage-rates/src/index.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "금리 카드 2개",
+    "큰 차트(2×2)",
+    "확대 가능한 전체 기간 차트"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_delta",
+    "layout": "hero_chart_side_kpi",
+    "comparison": "previous_period",
+    "interaction": "drill_down",
+    "density": "standard",
+    "evidence_link": "external_sources",
+    "time_mode": "trend_series",
+    "audience": "public_reader",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "O19",
+   "name": "Observable Framework 격자 · 카드",
+   "url": "https://github.com/observablehq/framework/blob/main/docs/markdown.md",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "2~4열 격자",
+    "colspan · rowspan",
+    "좁은 화면 열 수 감소",
+    "card · tip 블록"
+   ],
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "none",
+    "kpi_form": "big_number",
+    "layout": "uniform_grid",
+    "comparison": "none",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "small_multiples"
+   }
+  },
+  {
+   "id": "O20",
+   "name": "Streamlit st.metric",
+   "url": "https://github.com/streamlit/streamlit/blob/develop/lib/streamlit/elements/metric.py",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "라벨",
+    "값",
+    "증감(색 정상 · 반대 · 끔)",
+    "테두리",
+    "값 아래 미니 차트"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_sparkline",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "glance",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "O21",
+   "name": "PostHog 웹 분석 대시보드",
+   "url": "https://github.com/PostHog/posthog.com/blob/master/contents/docs/web-analytics/dashboard.mdx",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "상단 지표 + 이전 기간 비교",
+    "추세",
+    "경로 표(누르면 전체 필터)",
+    "유입 경로 표"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_delta",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "previous_period",
+    "interaction": "click_to_filter",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "O22",
+   "name": "PostHog AI",
+   "url": "https://github.com/PostHog/posthog.com/blob/master/contents/docs/posthog-ai/index.mdx",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "채팅 사이드바",
+    "화면 곳곳 인라인 진입점",
+    "분석 후 설명",
+    "대시보드 · 알림 생성"
+   ],
+   "axes": {
+    "ai_surface": "side_panel",
+    "ai_job": "answer",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "none",
+    "interaction": "ask_question",
+    "density": "standard",
+    "evidence_link": "inspectable_query",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "O23",
+   "name": "Plausible Analytics",
+   "url": "https://github.com/plausible/analytics",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "한 페이지 핵심 지표",
+    "주간 · 월간 메일 리포트",
+    "급등 · 급락 알림"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "flag_anomaly",
+    "kpi_form": "number_delta",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "previous_period",
+    "interaction": "click_to_filter",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "cadence_archive",
+    "audience": "public_reader",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "O25",
+   "name": "Lightdash 에이전트형 BI",
+   "url": "https://github.com/lightdash/lightdash",
+   "access": "opened",
+   "confidence": "observed_in_doc",
+   "elements": [
+    "대화형 분석",
+    "근거 쿼리 열람",
+    "검증된 답 재사용",
+    "대시보드"
+   ],
+   "axes": {
+    "ai_surface": "chat",
+    "ai_job": "answer",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "none",
+    "interaction": "ask_question",
+    "density": "standard",
+    "evidence_link": "inspectable_query",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S01",
+   "name": "Tableau Dashboard Narratives",
+   "url": "https://help.tableau.com/current/pro/desktop/en-us/dashboard-narratives.htm",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "대시보드 요약",
+    "차트별 인사이트",
+    "대상 시트 선택",
+    "갱신 시 요약 변경"
+   ],
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S02",
+   "name": "Holistics AI dashboard summaries",
+   "url": "https://docs.holistics.io/release-notes/ai-dashboard-summaries",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "대시보드 옆 자동 요약",
+    "추세 · 변화 강조",
+    "요약 저장"
+   ],
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S03",
+   "name": "Databox AI Summary",
+   "url": "https://help.databox.com/understanding-the-ai-summary-visualization",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "대시보드 블록형 AI 요약",
+    "자동 갱신",
+    "편집 가능",
+    "길이 · 문체 선택"
+   ],
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "number_delta",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S04",
+   "name": "Strategy Auto Narratives",
+   "url": "https://www.strategysoftware.com/strategyone/whats-new/auto-narratives-ai-powered-dashboard-summaries",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "AI 대시보드 요약"
+   ],
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S05",
+   "name": "Domo 경영 성과 브리핑 에이전트",
+   "url": "https://domo-webflow.domo.com/ai/agents/executive-performance-briefing-ai-agent",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "KPI 카드",
+    "차트 옆 생성 서술",
+    "한 화면 통합",
+    "주석 대시보드"
+   ],
+   "axes": {
+    "ai_surface": "chart_annotation",
+    "ai_job": "explain_drivers",
+    "kpi_form": "number_delta",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "cadence_archive",
+    "audience": "executive",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S06",
+   "name": "Oracle EPM GenAI 요약",
+   "url": "https://docs.oracle.com/en/cloud/saas/readiness/epm/2025/splan-apr25/25apr-sales-planning-wn-f38307.htm",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "인사이트 요약"
+   ],
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "target",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S07",
+   "name": "Power BI Narrative with Copilot",
+   "url": "https://learn.microsoft.com/en-gb/power-BI/create-reports/copilot-create-narrative",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "보고서 · 페이지 · 시각화 범위 요약",
+    "KPI 카드 요약",
+    "PDF · PPT 내보내기"
+   ],
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "number_delta",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S08",
+   "name": "ThoughtSpot AI Highlights",
+   "url": "https://docs.thoughtspot.com/cloud/latest/liveboard-ai-highlights",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "예상/예상 밖 변화 분류",
+    "신뢰 구간",
+    "탭별 요약",
+    "최대 기여 요인"
+   ],
+   "axes": {
+    "ai_surface": "insight_feed",
+    "ai_job": "flag_anomaly",
+    "kpi_form": "number_sparkline",
+    "layout": "uniform_grid",
+    "comparison": "expected_range",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "confidence_label",
+    "time_mode": "trend_series",
+    "audience": "executive",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S09",
+   "name": "ThoughtSpot Monitor",
+   "url": "https://docs.thoughtspot.com/cloud/latest/monitor",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "KPI 예측 범위 알림"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "flag_anomaly",
+    "kpi_form": "number_sparkline",
+    "layout": "uniform_grid",
+    "comparison": "expected_range",
+    "interaction": "static",
+    "density": "glance",
+    "evidence_link": "confidence_label",
+    "time_mode": "trend_series",
+    "audience": "operator",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S10",
+   "name": "Qlik Insight Advisor",
+   "url": "https://help.qlik.com/en-US/cloud-services/Subsystems/Hub/Content/Sense_Hub/Insights/insight-advisor-natural-language.htm",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "자연어 질문",
+    "맞는 차트",
+    "추가 인사이트 보기",
+    "대시보드용 자연어 인사이트 개체"
+   ],
+   "axes": {
+    "ai_surface": "chat",
+    "ai_job": "answer",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "none",
+    "interaction": "ask_question",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "bar_rank"
+   }
+  },
+  {
+   "id": "S11",
+   "name": "Looker 대시보드 요약",
+   "url": "https://docs.cloud.google.com/looker/docs/conversational-analytics-looker-data-agents-dashboards",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "맨 위 요약(무엇 · 하이라이트 · 의미)",
+    "대시보드와 대화",
+    "예약 발송에 요약 포함"
+   ],
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "none",
+    "interaction": "ask_question",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "cadence_archive",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S12",
+   "name": "GA4 홈 인사이트 카드",
+   "url": "https://www.1clickreport.com/blog/ga4-generated-insights-2026-ai-summaries-guide",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "자동 인사이트 카드",
+    "맞춤 인사이트",
+    "모든 인사이트 보기",
+    "상호작용 기반 순서",
+    "기여도 분석"
+   ],
+   "axes": {
+    "ai_surface": "insight_feed",
+    "ai_job": "flag_anomaly",
+    "kpi_form": "number_delta",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "click_to_filter",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S13",
+   "name": "Sisense Narratives",
+   "url": "https://docs.sisense.com/main/SisenseLinux/sisense-narratives.htm",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "위젯별 서술 토글",
+    "서술 패널",
+    "KPI 카드 플러그인(여러 지표 · 추세 · 스파크라인)"
+   ],
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "number_sparkline",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S14",
+   "name": "Zoho Analytics Zia Insights",
+   "url": "https://www.zoho.com/analytics/help/zia/zia-insights-dashboard.html",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "대시보드 전체 인사이트 패널",
+    "구성요소별 아이콘",
+    "글 보기 · 차트 보기",
+    "추세 · 급등락 · 이상 · 기여 요인",
+    "요약"
+   ],
+   "axes": {
+    "ai_surface": "side_panel",
+    "ai_job": "explain_drivers",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "none",
+    "interaction": "click_to_filter",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S15",
+   "name": "Amplitude Dashboard Agent",
+   "url": "https://amplitude.com/docs/agents/dashboard-agent",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "차트 분석",
+    "추세 · 이상 · 차트 간 상관",
+    "우선순위 인사이트",
+    "권고",
+    "반복 분석"
+   ],
+   "axes": {
+    "ai_surface": "side_panel",
+    "ai_job": "recommend",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "cadence_archive",
+    "audience": "analyst",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S16",
+   "name": "Amplitude KPI 표시 · 템플릿",
+   "url": "https://amplitude.com/docs/analytics/dashboard-preferences.md",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "차트 · 표 · KPI 표시 전환",
+    "핵심 지표 표시"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_delta",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S17",
+   "name": "Mixpanel Agent",
+   "url": "https://docs.mixpanel.com/docs/mixpanel-agent",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "질문 → 차트",
+    "보드에 저장",
+    "보드 해석"
+   ],
+   "axes": {
+    "ai_surface": "chat",
+    "ai_job": "answer",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "none",
+    "interaction": "ask_question",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S18",
+   "name": "Datadog 이상 탐지 · Watchdog",
+   "url": "https://docs.datadoghq.com/dashboards/graph_insights/investigate_anomalies/",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "이상 자동 탐지",
+    "동시 이상을 이슈로 묶음",
+    "기여 태그",
+    "이슈 → 위젯 스크롤",
+    "우선순위 캐러셀"
+   ],
+   "axes": {
+    "ai_surface": "insight_feed",
+    "ai_job": "flag_anomaly",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "expected_range",
+    "interaction": "click_to_filter",
+    "density": "dense",
+    "evidence_link": "links_to_widget",
+    "time_mode": "realtime",
+    "audience": "operator",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S19",
+   "name": "Yellowfin Signals · Stories",
+   "url": "https://www.yellowfinbi.com/blog/industrys-first-automated-analysis-and-cross-vendor-storytelling",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "변화 자동 감지",
+    "글 + 시각화 이야기",
+    "대시보드에 붙는 이야기"
+   ],
+   "axes": {
+    "ai_surface": "document_flow",
+    "ai_job": "flag_anomaly",
+    "kpi_form": "none",
+    "layout": "linear_report",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "cadence_archive",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S20",
+   "name": "Tellius 자동 인사이트",
+   "url": "https://www.tellius.com/product/auto-insights",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "추세 요인 순위",
+    "유의성 조정",
+    "자연어 요약 + 시각화 + 통계",
+    "요인 드릴다운"
+   ],
+   "axes": {
+    "ai_surface": "insight_feed",
+    "ai_job": "explain_drivers",
+    "kpi_form": "number_delta",
+    "layout": "master_detail",
+    "comparison": "previous_period",
+    "interaction": "drill_down",
+    "density": "dense",
+    "evidence_link": "numbers_inline",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "waterfall"
+   }
+  },
+  {
+   "id": "S21",
+   "name": "Narrative BI",
+   "url": "https://narrative.bi/platform/",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "예약 서술 리포트",
+    "이상 알림",
+    "전년 비교"
+   ],
+   "axes": {
+    "ai_surface": "document_flow",
+    "ai_job": "summarize",
+    "kpi_form": "number_delta",
+    "layout": "linear_report",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "glance",
+    "evidence_link": "numbers_inline",
+    "time_mode": "cadence_archive",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S22",
+   "name": "Bloomberg AI 뉴스 요약",
+   "url": "https://www.bloomberg.com/company/press/bloomberg-launches-gen-ai-summarization-for-news-content",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "기사 위 3줄 요약",
+    "기업 뉴스 시간순 요약",
+    "전문가 평가"
+   ],
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "linear_report",
+    "comparison": "none",
+    "interaction": "static",
+    "density": "dense",
+    "evidence_link": "external_sources",
+    "time_mode": "realtime",
+    "audience": "analyst",
+    "primary_visual": "text_first"
+   }
+  },
+  {
+   "id": "S24",
+   "name": "Sensor Tower Top Charts",
+   "url": "https://sensortower.com/blog/sensor-tower-introduces-app-analytics-metrics-and-a-sleek-new-ui",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "상위 앱 · 퍼블리셔",
+    "경쟁 비교",
+    "매출 · 다운로드 추세"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "rank_position",
+    "layout": "list_table",
+    "comparison": "previous_period",
+    "interaction": "global_filter",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "analyst",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S25",
+   "name": "Sensor Tower Game Intelligence",
+   "url": "https://sensortower.com/ko/product/game-intelligence",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "하위 장르 · 테마 · 아트 · BM 분류",
+    "하위 장르 대시보드",
+    "매일 갱신"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "share_area",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "peer_segments",
+    "interaction": "global_filter",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "bar_rank"
+   }
+  },
+  {
+   "id": "S26",
+   "name": "Sensor Tower 게임 분류 리포트",
+   "url": "https://sensortower.com/blog/mobile-game-taxonomy-report-2021",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "연도별 장르 점유",
+    "해설 글"
+   ],
+   "axes": {
+    "ai_surface": "document_flow",
+    "ai_job": "summarize",
+    "kpi_form": "share_area",
+    "layout": "linear_report",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "trend_series",
+    "audience": "public_reader",
+    "primary_visual": "bar_rank"
+   }
+  },
+  {
+   "id": "S27",
+   "name": "AppMagic",
+   "url": "https://appmagic.rocks/tool-descriptions/essentials-new",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "매출 · 무료 차트",
+    "장르 태그",
+    "시장 세그먼트 대시보드(선두 · 분산 · 진입 장벽)",
+    "최대 100개 비교"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "share_area",
+    "layout": "side_by_side_panels",
+    "comparison": "peer_segments",
+    "interaction": "pick_and_compare",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "bar_rank"
+   }
+  },
+  {
+   "id": "S28",
+   "name": "AppTweak Top Charts",
+   "url": "https://help.apptweak.com/en/articles/4202346-compare-different-top-charts-across-countries",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "나라별 차트 9개 나란히",
+    "상위 10 순위 이력",
+    "과거 날짜 차트",
+    "두 날짜 사이 상승 폭 정렬"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "rank_position",
+    "layout": "side_by_side_panels",
+    "comparison": "peer_segments",
+    "interaction": "pick_and_compare",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "small_multiples"
+   }
+  },
+  {
+   "id": "S29",
+   "name": "Appfigures Top Charts",
+   "url": "https://appfigures.com/products/store-performance",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "매시간 순위",
+    "증감 · 이력",
+    "목록 나란히",
+    "관심 앱"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "rank_position",
+    "layout": "side_by_side_panels",
+    "comparison": "previous_period",
+    "interaction": "pick_and_compare",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "analyst",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S30",
+   "name": "GameAnalytics MarketIQ",
+   "url": "https://docs.gameanalytics.com/products-and-features/marketIQ/store-intelligence",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "상위 차트",
+    "뜨는 게임",
+    "관심 게임 · 스튜디오"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "rank_position",
+    "layout": "list_table",
+    "comparison": "previous_period",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S31",
+   "name": "GameAnalytics GameIntel",
+   "url": "https://gamesbeat.com/gameanalytics-launches-gameintel-market-intelligence-platform/",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "상위 차트",
+    "상위 게임 · 퍼블리셔",
+    "최근 출시",
+    "소프트런칭"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "rank_position",
+    "layout": "uniform_grid",
+    "comparison": "none",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "analyst",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S32",
+   "name": "GameRefinery 장르 대시보드",
+   "url": "https://docs.gamerefinery.com/en/articles/6632072-what-are-the-latest-trends-in-my-market-and-in-specific-segments",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "장르 점유",
+    "장르별 기능 도입률 추이",
+    "하위 장르 매출 상위",
+    "세그먼트 탐색기"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "share_area",
+    "layout": "master_detail",
+    "comparison": "peer_segments",
+    "interaction": "drill_down",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "heatmap_matrix"
+   }
+  },
+  {
+   "id": "S33",
+   "name": "Ludo.ai 시장 인텔리전스",
+   "url": "https://ludo.ai/market-intelligence",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "위쪽 필터(출처 · 장르 · 지역)",
+    "게임 목록"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "rank_position",
+    "layout": "list_table",
+    "comparison": "none",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S34",
+   "name": "42matters 국가별 매출 상위",
+   "url": "https://42matters.com/top-grossing-mobile-games-india",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "나라별 매출 상위 목록"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "rank_position",
+    "layout": "list_table",
+    "comparison": "none",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "public_reader",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S35",
+   "name": "모바일인덱스 GAME",
+   "url": "https://ditoday.com/?p=90947",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "세부 태그 장르 분석",
+    "퍼블리셔 점유",
+    "순위 통계",
+    "출시 달력"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "share_area",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "peer_segments",
+    "interaction": "global_filter",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "bar_rank"
+   }
+  },
+  {
+   "id": "S36",
+   "name": "PocketGamer.biz 주간 차트 칼럼",
+   "url": "https://www.pocketgamer.biz/weekly-global-mobile-games-charts/",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "기간 머리말",
+    "나라별 무료 · 매출 순위",
+    "신규 진입 · 순위 변동 해설",
+    "퍼블리셔 해설"
+   ],
+   "axes": {
+    "ai_surface": "document_flow",
+    "ai_job": "summarize",
+    "kpi_form": "rank_position",
+    "layout": "linear_report",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "external_sources",
+    "time_mode": "cadence_archive",
+    "audience": "public_reader",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S37",
+   "name": "EK Gaming 월간 매출 상위 20",
+   "url": "https://ekgamingllc.com/?p=9340",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "상위 20",
+    "추세 해설",
+    "인수합병 목록"
+   ],
+   "axes": {
+    "ai_surface": "document_flow",
+    "ai_job": "summarize",
+    "kpi_form": "rank_position",
+    "layout": "linear_report",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "cadence_archive",
+    "audience": "executive",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S38",
+   "name": "SteamDB Charts",
+   "url": "https://steamdb.com/charts",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "동시 접속 상위 100",
+    "최고치",
+    "뜨는 게임"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "rank_position",
+    "layout": "list_table",
+    "comparison": "own_history",
+    "interaction": "static",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "public_reader",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S39",
+   "name": "Stripe 대시보드 홈",
+   "url": "https://docs.stripe.com/dashboard/basics",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "핵심 숫자 다섯",
+    "스파크라인",
+    "기간 비교",
+    "처리할 알림"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_sparkline",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "previous_period",
+    "interaction": "global_filter",
+    "density": "glance",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "executive",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S40",
+   "name": "Linear Insights",
+   "url": "https://linear.app/docs/insights",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "측정값 · 기준 · 세그먼트 선택",
+    "그래프 + 표",
+    "옆 패널"
+   ],
+   "axes": {
+    "ai_surface": "side_panel",
+    "ai_job": "none",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "none",
+    "interaction": "pick_and_compare",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "bar_rank"
+   }
+  },
+  {
+   "id": "S41",
+   "name": "Geckoboard 대시보드 · TV",
+   "url": "https://www.geckoboard.com/blog/data-visualization-for-tv-dashboards-a-teardown",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "TV 최적화 배치",
+    "큰 숫자",
+    "경고 표시",
+    "과도한 정밀도 피하기"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "big_number",
+    "layout": "uniform_grid",
+    "comparison": "target",
+    "interaction": "static",
+    "density": "glance",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "operator",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S42",
+   "name": "Klipfolio PowerMetrics",
+   "url": "https://klipfolio.com/lp/executive-dashboards",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "관리되는 지표 목록",
+    "경영 대시보드"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_delta",
+    "layout": "uniform_grid",
+    "comparison": "target",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "executive",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S43",
+   "name": "Bold BI KPI 예제",
+   "url": "https://www.boldbi.com/blog/build-your-own-kpi-examples-with-sample-data-sources/",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "산업별 예제 데이터",
+    "KPI 위젯"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_delta",
+    "layout": "uniform_grid",
+    "comparison": "target",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S45",
+   "name": "Tableau VOTD 아마존 매출 KPI",
+   "url": "https://thedataschool.co.uk/mila-kholodiy/my-first-viz-of-the-day/",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "KPI 카드 5개",
+    "이전 기간 비교",
+    "변화에만 강조색"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_delta",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "executive",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S46",
+   "name": "Tableau KPI 위젯 12종",
+   "url": "https://www.tableau.com/en-gb/data-insights/dashboard-showcase/superstore",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "월간 성과 KPI 위젯 12종"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "number_sparkline",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "executive",
+    "primary_visual": "small_multiples"
+   }
+  },
+  {
+   "id": "S47",
+   "name": "Tableau Public 인기 KPI 시각화",
+   "url": "https://tableau.com/blog/ten-most-favorited-vizzes-celebrate-ten-viz-tastic-years-tableau-public",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "KPI 대시보드",
+    "KPI 표현 방법 모음"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "big_number",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "trend_series",
+    "audience": "public_reader",
+    "primary_visual": "small_multiples"
+   }
+  },
+  {
+   "id": "S48",
+   "name": "Billboard 차트",
+   "url": "https://www.billboard.com/charts/billboard-200/2024-02-17",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "NEW · RE-ENTRY",
+    "지난주 순위",
+    "최고 순위",
+    "차트 주 수"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "rank_position",
+    "layout": "list_table",
+    "comparison": "own_history",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "none",
+    "time_mode": "cadence_archive",
+    "audience": "public_reader",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S49",
+   "name": "Finviz 지도 · Matrix",
+   "url": "https://finviz.com/blog/the-finviz-matrix-market-breadth-visualized/",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "트리맵(크기 · 색)",
+    "섹터 묶음",
+    "섹터 강도 매트릭스"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "share_area",
+    "layout": "area_map",
+    "comparison": "previous_period",
+    "interaction": "drill_down",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "treemap"
+   }
+  },
+  {
+   "id": "S50",
+   "name": "OWID 데이터 인사이트 · 핵심 인사이트",
+   "url": "https://ourworldindata.org/redesigning-from-one-to-two-columns",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "맨 위 핵심 인사이트",
+    "결론을 담은 제목",
+    "차트 + 짧은 글",
+    "더 보기 링크"
+   ],
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "linear_report",
+    "comparison": "none",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "external_sources",
+    "time_mode": "snapshot",
+    "audience": "public_reader",
+    "primary_visual": "line_trend"
+   }
+  },
+  {
+   "id": "S51",
+   "name": "Few 불릿 그래프",
+   "url": "https://www.domo.com/learn/charts/bullet-graphs",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "측정 막대",
+    "목표 표시",
+    "질적 구간 배경",
+    "회색조"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "target_bullet",
+    "layout": "list_table",
+    "comparison": "target",
+    "interaction": "static",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "bar_rank"
+   }
+  },
+  {
+   "id": "S52",
+   "name": "IBCS 표준 보고",
+   "url": "https://zebrabi.com/designing-financial-reports-dashboards-and-business-presentations/",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "실적 · 계획 · 차이 표기",
+    "차이 열 강조",
+    "일관된 행 정의"
+   ],
+   "axes": {
+    "ai_surface": "none",
+    "ai_job": "none",
+    "kpi_form": "target_bullet",
+    "layout": "list_table",
+    "comparison": "target",
+    "interaction": "static",
+    "density": "dense",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S53",
+   "name": "RAG 성과 대시보드",
+   "url": "https://democracy.kent.gov.uk/documents/s132000/Performance%20Dashboard%20Covering%20Report.pdf",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "KPI별 목표 대비 RAG",
+    "목표 달성 KPI 수",
+    "담당자 해설"
+   ],
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "status_color",
+    "layout": "list_table",
+    "comparison": "target",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "cadence_archive",
+    "audience": "executive",
+    "primary_visual": "table"
+   }
+  },
+  {
+   "id": "S54",
+   "name": "NYT 선거 결과 지도",
+   "url": "https://source.opennews.org/articles/us-elections-roundup-november-2013/",
+   "access": "search_only",
+   "confidence": "inferred",
+   "elements": [
+    "실시간 결과 지도",
+    "주요 경합 요약",
+    "분 단위 추이"
+   ],
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "summarize",
+    "kpi_form": "big_number",
+    "layout": "area_map",
+    "comparison": "none",
+    "interaction": "drill_down",
+    "density": "dense",
+    "evidence_link": "none",
+    "time_mode": "realtime",
+    "audience": "public_reader",
+    "primary_visual": "map"
+   }
+  }
+ ],
+ "summary": {
+  "dashboards": 74,
+  "opened": 22,
+  "search_only": 52,
+  "value_counts": {
+   "ai_surface": {
+    "none": 38,
+    "chat": 4,
+    "lead_summary": 8,
+    "document_flow": 6,
+    "per_widget_note": 9,
+    "side_panel": 4,
+    "chart_annotation": 1,
+    "insight_feed": 4
+   },
+   "ai_job": {
+    "summarize": 19,
+    "none": 39,
+    "answer": 5,
+    "rank_findings": 1,
+    "flag_anomaly": 6,
+    "explain_drivers": 3,
+    "recommend": 1
+   },
+   "kpi_form": {
+    "none": 21,
+    "big_number": 8,
+    "number_delta": 14,
+    "number_sparkline": 7,
+    "target_bullet": 3,
+    "status_color": 3,
+    "share_area": 7,
+    "rank_position": 11
+   },
+   "layout": {
+    "uniform_grid": 23,
+    "master_detail": 12,
+    "linear_report": 10,
+    "kpi_strip_then_detail": 12,
+    "side_by_side_panels": 4,
+    "area_map": 3,
+    "hero_chart_side_kpi": 1,
+    "list_table": 9
+   },
+   "comparison": {
+    "none": 22,
+    "target": 11,
+    "previous_period": 30,
+    "peer_segments": 6,
+    "expected_range": 3,
+    "own_history": 2
+   },
+   "interaction": {
+    "drill_down": 8,
+    "static": 38,
+    "ask_question": 6,
+    "global_filter": 13,
+    "click_to_filter": 5,
+    "pick_and_compare": 4
+   },
+   "density": {
+    "standard": 48,
+    "glance": 9,
+    "dense": 17
+   },
+   "evidence_link": {
+    "none": 38,
+    "inspectable_query": 3,
+    "links_to_widget": 9,
+    "external_sources": 6,
+    "numbers_inline": 16,
+    "confidence_label": 2
+   },
+   "time_mode": {
+    "snapshot": 28,
+    "realtime": 13,
+    "trend_series": 23,
+    "cadence_archive": 10
+   },
+   "audience": {
+    "analyst": 31,
+    "executive": 23,
+    "operator": 7,
+    "public_reader": 13
+   },
+   "primary_visual": {
+    "small_multiples": 6,
+    "table": 19,
+    "text_first": 16,
+    "line_trend": 17,
+    "bar_rank": 9,
+    "state_timeline": 1,
+    "map": 2,
+    "heatmap_matrix": 2,
+    "waterfall": 1,
+    "treemap": 1
+   }
+  }
+ }
+}

@@ -1,0 +1,1171 @@
+{
+ "generated": "2026-10-31",
+ "based_on": "mockups/research/taxonomy.json",
+ "rule": "견본 20개는 분류 축 11개의 값 조합이 모두 다르고, 어떤 두 견본도 최소 4개 축에서 값이 다르다. 화면 구조를 정하는 4개 축(ai_surface · layout · primary_visual · kpi_form)의 조합도 20개 모두 다르다. 색 · 글꼴은 분류 축에 넣지 않았으므로 차이로 세지 않는다.",
+ "axes": [
+  "ai_surface",
+  "ai_job",
+  "kpi_form",
+  "layout",
+  "comparison",
+  "interaction",
+  "density",
+  "evidence_link",
+  "time_mode",
+  "audience",
+  "primary_visual"
+ ],
+ "axis_values_used": {
+  "ai_surface": [
+   "chart_annotation",
+   "chat",
+   "document_flow",
+   "insight_feed",
+   "lead_summary",
+   "per_widget_note",
+   "side_panel"
+  ],
+  "ai_job": [
+   "answer",
+   "explain_drivers",
+   "flag_anomaly",
+   "rank_findings",
+   "recommend",
+   "summarize"
+  ],
+  "kpi_form": [
+   "big_number",
+   "none",
+   "number_delta",
+   "number_sparkline",
+   "rank_position",
+   "share_area",
+   "status_color",
+   "target_bullet"
+  ],
+  "layout": [
+   "area_map",
+   "hero_chart_side_kpi",
+   "kpi_strip_then_detail",
+   "linear_report",
+   "list_table",
+   "master_detail",
+   "side_by_side_panels",
+   "uniform_grid"
+  ],
+  "comparison": [
+   "expected_range",
+   "none",
+   "own_history",
+   "peer_segments",
+   "previous_period"
+  ],
+  "interaction": [
+   "ask_question",
+   "click_to_filter",
+   "drill_down",
+   "global_filter",
+   "pick_and_compare",
+   "static"
+  ],
+  "density": [
+   "dense",
+   "glance",
+   "standard"
+  ],
+  "evidence_link": [
+   "confidence_label",
+   "external_sources",
+   "links_to_widget",
+   "numbers_inline"
+  ],
+  "time_mode": [
+   "cadence_archive",
+   "snapshot",
+   "trend_series"
+  ],
+  "audience": [
+   "analyst",
+   "executive",
+   "operator",
+   "public_reader"
+  ],
+  "primary_visual": [
+   "bar_rank",
+   "heatmap_matrix",
+   "line_trend",
+   "scatter_quadrant",
+   "small_multiples",
+   "state_timeline",
+   "table",
+   "text_first",
+   "treemap",
+   "waterfall"
+  ]
+ },
+ "distinctness": {
+  "min_pairwise_axis_distance": 4,
+  "closest_pair": [
+   4,
+   18
+  ],
+  "pairwise_axis_distance": {
+   "01-02": 7,
+   "01-03": 10,
+   "01-04": 7,
+   "01-05": 9,
+   "01-06": 7,
+   "01-07": 7,
+   "01-08": 7,
+   "01-09": 7,
+   "01-10": 8,
+   "01-11": 8,
+   "01-12": 8,
+   "01-13": 8,
+   "01-14": 7,
+   "01-15": 7,
+   "01-16": 8,
+   "01-17": 9,
+   "01-18": 7,
+   "01-19": 9,
+   "01-20": 8,
+   "02-03": 9,
+   "02-04": 8,
+   "02-05": 10,
+   "02-06": 8,
+   "02-07": 6,
+   "02-08": 9,
+   "02-09": 8,
+   "02-10": 8,
+   "02-11": 7,
+   "02-12": 8,
+   "02-13": 10,
+   "02-14": 6,
+   "02-15": 5,
+   "02-16": 8,
+   "02-17": 8,
+   "02-18": 8,
+   "02-19": 8,
+   "02-20": 7,
+   "03-04": 7,
+   "03-05": 8,
+   "03-06": 11,
+   "03-07": 9,
+   "03-08": 10,
+   "03-09": 9,
+   "03-10": 8,
+   "03-11": 11,
+   "03-12": 8,
+   "03-13": 7,
+   "03-14": 8,
+   "03-15": 11,
+   "03-16": 5,
+   "03-17": 8,
+   "03-18": 9,
+   "03-19": 5,
+   "03-20": 8,
+   "04-05": 10,
+   "04-06": 8,
+   "04-07": 8,
+   "04-08": 9,
+   "04-09": 9,
+   "04-10": 7,
+   "04-11": 8,
+   "04-12": 6,
+   "04-13": 8,
+   "04-14": 7,
+   "04-15": 8,
+   "04-16": 7,
+   "04-17": 7,
+   "04-18": 4,
+   "04-19": 7,
+   "04-20": 8,
+   "05-06": 8,
+   "05-07": 8,
+   "05-08": 9,
+   "05-09": 10,
+   "05-10": 11,
+   "05-11": 10,
+   "05-12": 10,
+   "05-13": 6,
+   "05-14": 11,
+   "05-15": 9,
+   "05-16": 10,
+   "05-17": 10,
+   "05-18": 10,
+   "05-19": 9,
+   "05-20": 11,
+   "06-07": 7,
+   "06-08": 9,
+   "06-09": 4,
+   "06-10": 8,
+   "06-11": 5,
+   "06-12": 10,
+   "06-13": 8,
+   "06-14": 8,
+   "06-15": 7,
+   "06-16": 10,
+   "06-17": 7,
+   "06-18": 7,
+   "06-19": 9,
+   "06-20": 8,
+   "07-08": 10,
+   "07-09": 8,
+   "07-10": 9,
+   "07-11": 9,
+   "07-12": 8,
+   "07-13": 10,
+   "07-14": 9,
+   "07-15": 7,
+   "07-16": 8,
+   "07-17": 7,
+   "07-18": 8,
+   "07-19": 10,
+   "07-20": 8,
+   "08-09": 9,
+   "08-10": 10,
+   "08-11": 9,
+   "08-12": 8,
+   "08-13": 4,
+   "08-14": 10,
+   "08-15": 8,
+   "08-16": 10,
+   "08-17": 11,
+   "08-18": 9,
+   "08-19": 10,
+   "08-20": 9,
+   "09-10": 7,
+   "09-11": 5,
+   "09-12": 10,
+   "09-13": 8,
+   "09-14": 8,
+   "09-15": 8,
+   "09-16": 9,
+   "09-17": 9,
+   "09-18": 8,
+   "09-19": 6,
+   "09-20": 7,
+   "10-11": 8,
+   "10-12": 7,
+   "10-13": 9,
+   "10-14": 8,
+   "10-15": 9,
+   "10-16": 5,
+   "10-17": 5,
+   "10-18": 7,
+   "10-19": 6,
+   "10-20": 7,
+   "11-12": 10,
+   "11-13": 8,
+   "11-14": 7,
+   "11-15": 7,
+   "11-16": 9,
+   "11-17": 8,
+   "11-18": 6,
+   "11-19": 9,
+   "11-20": 8,
+   "12-13": 8,
+   "12-14": 9,
+   "12-15": 10,
+   "12-16": 6,
+   "12-17": 9,
+   "12-18": 8,
+   "12-19": 8,
+   "12-20": 10,
+   "13-14": 10,
+   "13-15": 8,
+   "13-16": 9,
+   "13-17": 10,
+   "13-18": 9,
+   "13-19": 7,
+   "13-20": 10,
+   "14-15": 8,
+   "14-16": 7,
+   "14-17": 9,
+   "14-18": 7,
+   "14-19": 9,
+   "14-20": 8,
+   "15-16": 9,
+   "15-17": 10,
+   "15-18": 7,
+   "15-19": 9,
+   "15-20": 9,
+   "16-17": 8,
+   "16-18": 8,
+   "16-19": 8,
+   "16-20": 10,
+   "17-18": 8,
+   "17-19": 9,
+   "17-20": 8,
+   "18-19": 9,
+   "18-20": 8,
+   "19-20": 7
+  }
+ },
+ "data_note": "모든 데이터는 저장소 루트 기준 docs/markets/ 아래 파일을 견본(mockups/)에서 상대 경로 ../docs/markets/로 읽는다. 브리핑 파일 이름은 briefs_index.json의 tabs로 정한다: 전 시장=global_brief, 주요 시장=major_<key>, 지역=region_<key>.",
+ "mockups": [
+  {
+   "no": 1,
+   "file": "01-headline-lead.html",
+   "slug": "headline-lead",
+   "name": "헤드라인 브리핑",
+   "concept": "맨 위에 AI 브리핑의 섹션별 첫 줄(헤드라인)을 크게 세우고, 그 아래 KPI 줄과 근거 차트를 둔다. 시장 탭이 브리핑 · KPI · 차트를 함께 바꾼다.",
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "summarize",
+    "kpi_form": "number_delta",
+    "layout": "kpi_strip_then_detail",
+    "comparison": "previous_period",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "text_first"
+   },
+   "ai_emphasis": "화면 첫 면적의 절반을 AI 헤드라인에 준다. KPI는 '브리핑이 이번 주 짚은 것'(급상승 · 급하락 언급 수, 언급 게임 수, 인용 출처 수)을 지난주 브리핑과 비교해 보여 줘서, 숫자 카드 자체가 AI 분석의 양과 변화를 말하게 한다.",
+   "data_files": [
+    "docs/markets/index.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json",
+    "docs/markets/weekly_lite.json"
+   ],
+   "inspired_by": [
+    "S11",
+    "S22",
+    "S01",
+    "O07"
+   ],
+   "components": [
+    "프로젝트 소개",
+    "AI 시장 브리핑",
+    "주요 시장 주간 순위"
+   ],
+   "derived_metrics": [
+    "브리핑 속 ▲ · ▼ 언급 수와 지난주 대비",
+    "브리핑이 이름을 든 게임 수",
+    "외부 출처 링크 수",
+    "주간 1위 게임과 연속 1위 주 수"
+   ],
+   "min_axis_distance_to_others": 7
+  },
+  {
+   "no": 2,
+   "file": "02-insight-feed.html",
+   "slug": "insight-feed",
+   "name": "인사이트 카드 피드",
+   "concept": "브리핑 문장 하나하나를 발견 카드로 쪼개 흥미도 순으로 깐다. 카드마다 문장 속 핵심 숫자를 크게 뽑고, 위쪽 칩으로 시장 · 섹션을 거른다.",
+   "axes": {
+    "ai_surface": "insight_feed",
+    "ai_job": "rank_findings",
+    "kpi_form": "big_number",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "click_to_filter",
+    "density": "dense",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "text_first"
+   },
+   "ai_emphasis": "AI 문장이 곧 카드다. 카드 맨 위 큰 숫자(▲80.4, 9개 단위 등)는 문장에서 뽑았고, 카드 순서는 숫자 크기 · 섹션 가중치로 정한 '흥미도' 점수(계산식 화면에 공개)를 따른다.",
+   "data_files": [
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S12",
+    "S18",
+    "O05"
+   ],
+   "components": [
+    "AI 시장 브리핑",
+    "급변",
+    "진입 · 이탈"
+   ],
+   "derived_metrics": [
+    "문장별 흥미도 점수(변동 폭 · 시장 수 · 섹션 가중)",
+    "시장 · 섹션별 카드 수"
+   ],
+   "min_axis_distance_to_others": 5
+  },
+  {
+   "no": 3,
+   "file": "03-annotated-trend.html",
+   "slug": "annotated-trend",
+   "name": "주석 달린 순위 추이",
+   "concept": "한 시장의 상위 게임 주간 순위 추이를 큰 선 그래프로 그리고, 브리핑이 그 게임을 언급한 문장을 선 끝에 말풍선 주석으로 꽂는다.",
+   "axes": {
+    "ai_surface": "chart_annotation",
+    "ai_job": "explain_drivers",
+    "kpi_form": "rank_position",
+    "layout": "hero_chart_side_kpi",
+    "comparison": "own_history",
+    "interaction": "click_to_filter",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "line_trend"
+   },
+   "ai_emphasis": "해설이 차트 위에 붙는다. 주석을 누르면 해당 선이 강조되고 옆 KPI(현재 순위 · 19주 최고 · 1위 주 수)가 그 게임으로 바뀐다. '왜 움직였나'는 브리핑 문장이 답한다.",
+   "data_files": [
+    "docs/markets/weekly_lite.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/major_<cc>.json"
+   ],
+   "inspired_by": [
+    "S05",
+    "S18",
+    "O18"
+   ],
+   "components": [
+    "순위 추이",
+    "선택 게임 순위 이력",
+    "AI 시장 브리핑"
+   ],
+   "derived_metrics": [
+    "주간 평균 순위 19주 추이",
+    "게임별 19주 최고 순위 · 1위 주 수"
+   ],
+   "min_axis_distance_to_others": 5
+  },
+  {
+   "no": 4,
+   "file": "04-side-analyst.html",
+   "slug": "side-analyst",
+   "name": "옆 패널 분석가",
+   "concept": "왼쪽은 시장 타일 격자(1위 게임 · 최대 장르 점유 · 신규 진입 수), 오른쪽은 늘 열려 있는 AI 패널. 타일을 누르면 패널이 그 시장 브리핑으로 바뀌고 글 보기 / 근거 보기를 오간다.",
+   "axes": {
+    "ai_surface": "side_panel",
+    "ai_job": "summarize",
+    "kpi_form": "number_delta",
+    "layout": "master_detail",
+    "comparison": "peer_segments",
+    "interaction": "click_to_filter",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "bar_rank"
+   },
+   "ai_emphasis": "AI 패널이 화면 높이 전체를 차지하는 고정 영역이다. '근거 보기'로 바꾸면 같은 문장 옆에 데이터 막대가 붙어 문장과 숫자를 짝지어 보여 준다.",
+   "data_files": [
+    "docs/markets/genre_matrix.json",
+    "docs/markets/weekly_lite.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S14",
+    "O04",
+    "O22"
+   ],
+   "components": [
+    "AI 시장 브리핑",
+    "시장 비교와 장르 점유",
+    "진입 · 이탈"
+   ],
+   "derived_metrics": [
+    "시장별 최대 장르 매출 가중 점유와 11개 단위 평균 대비",
+    "주간 신규 진입 수"
+   ],
+   "min_axis_distance_to_others": 4
+  },
+  {
+   "no": 5,
+   "file": "05-expected-band.html",
+   "slug": "expected-band",
+   "name": "예상 범위 밖 변화",
+   "concept": "주요 5개 시장의 상위 게임마다 지난 18주 주간 순위로 예상 범위를 만들고, 이번 주가 그 밖이면 '예상 밖'으로 표시한다. 예상 밖 칸에만 브리핑 해설을 붙인다.",
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "flag_anomaly",
+    "kpi_form": "number_sparkline",
+    "layout": "uniform_grid",
+    "comparison": "expected_range",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "confidence_label",
+    "time_mode": "trend_series",
+    "audience": "executive",
+    "primary_visual": "line_trend"
+   },
+   "ai_emphasis": "AI 해설의 자리가 '예상 밖' 판정에 묶인다. 정상 범위 안의 카드는 회색, 밖의 카드는 강조색 + 브리핑 원문 + '예상 밖 · 범위 계산식' 라벨.",
+   "data_files": [
+    "docs/markets/<kr|us|jp|cn|tw>.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S08",
+    "S09",
+    "S18"
+   ],
+   "components": [
+    "급변",
+    "지속 상승",
+    "순위 추이"
+   ],
+   "derived_metrics": [
+    "게임별 18주 평균 ± 표준편차 범위",
+    "이번 주 순위의 범위 이탈 여부",
+    "연속 상승 주 수"
+   ],
+   "min_axis_distance_to_others": 6
+  },
+  {
+   "no": 6,
+   "file": "06-bullet-scorecard.html",
+   "slug": "bullet-scorecard",
+   "name": "불릿 성적표",
+   "concept": "31개 나라를 행으로 한 성적표. 열마다 지표 하나를 불릿 그래프로 그리고 31개국 중앙값을 기준 표시로 둔다. 맨 끝 열은 그 나라를 다룬 AI 브리핑의 판정 한 줄.",
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "target_bullet",
+    "layout": "list_table",
+    "comparison": "peer_segments",
+    "interaction": "static",
+    "density": "dense",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "table"
+   },
+   "ai_emphasis": "숫자 열 여럿 끝에 'AI 판정' 열을 가장 넓게 둔다. 그 나라가 속한 시장 · 지역 브리핑의 핵심 시사점 첫 줄이 들어가 표 전체가 AI 판정으로 끝난다.",
+   "data_files": [
+    "docs/markets/xmarket_lite.json",
+    "docs/markets/index.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S51",
+    "S52",
+    "O09"
+   ],
+   "components": [
+    "시장 비교와 장르 점유",
+    "매출 순위와 인기 순위의 갭",
+    "AI 시장 브리핑"
+   ],
+   "derived_metrics": [
+    "나라별 매출 상위 10의 장르 수",
+    "매출 · 인기 상위 10 동시 진입 수",
+    "상위 20의 7일 평균 순위 변동 폭",
+    "31개국 중앙값"
+   ],
+   "min_axis_distance_to_others": 4
+  },
+  {
+   "no": 7,
+   "file": "07-rag-decisions.html",
+   "slug": "rag-decisions",
+   "name": "AI 판정 신호등",
+   "concept": "11개 분석 단위의 '핵심 시사점'을 문장마다 우선 / 관망 / 보류 신호로 바꿔 타일에 깐다. 신호는 문장 속 표현(우선순위 상위, 보류, 확인 후 등)으로 정한 규칙이고 규칙을 화면에 공개한다.",
+   "axes": {
+    "ai_surface": "insight_feed",
+    "ai_job": "recommend",
+    "kpi_form": "status_color",
+    "layout": "uniform_grid",
+    "comparison": "none",
+    "interaction": "click_to_filter",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "table"
+   },
+   "ai_emphasis": "AI가 쓴 권고를 경영 보고용 신호등으로 다시 읽는다. 문장 끝 괄호 속 근거를 '근거' 줄로 떼어 보여 주고, 신호 칩을 누르면 같은 신호 문장만 남는다.",
+   "data_files": [
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S53",
+    "S15",
+    "O03"
+   ],
+   "components": [
+    "AI 시장 브리핑",
+    "장르 진입 맵"
+   ],
+   "derived_metrics": [
+    "시장별 우선 · 관망 · 보류 문장 수",
+    "전체 신호 분포"
+   ],
+   "min_axis_distance_to_others": 6
+  },
+  {
+   "no": 8,
+   "file": "08-weekly-edition.html",
+   "slug": "weekly-edition",
+   "name": "주간 신문판",
+   "concept": "브리핑을 신문 1면처럼 조판한다. 본문 사이사이에 언급된 게임의 미니 순위 그래프를 끼우고, 지난 12주 호를 넘겨 볼 수 있다.",
+   "axes": {
+    "ai_surface": "document_flow",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "linear_report",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "external_sources",
+    "time_mode": "cadence_archive",
+    "audience": "public_reader",
+    "primary_visual": "text_first"
+   },
+   "ai_emphasis": "글이 주인공이다. 브리핑 속 외부 매체 인용 · 링크를 각주로 정리해 '해설의 근거'를 지면 아래에 모은다.",
+   "data_files": [
+    "docs/markets/global_brief.json",
+    "docs/markets/weekly_lite.json"
+   ],
+   "inspired_by": [
+    "S36",
+    "O06",
+    "S19"
+   ],
+   "components": [
+    "프로젝트 소개",
+    "AI 시장 브리핑",
+    "선택 게임 순위 이력"
+   ],
+   "derived_metrics": [
+    "언급 게임의 주요 시장 주간 순위(미니 그래프)",
+    "호별 각주 수"
+   ],
+   "min_axis_distance_to_others": 4
+  },
+  {
+   "no": 9,
+   "file": "09-chart-list.html",
+   "slug": "chart-list",
+   "name": "빌보드식 순위표",
+   "concept": "한 시장의 매출(또는 인기) 상위 100을 음악 차트처럼 보여 준다: 이번 주 · 지난주 · 최고 순위 · 차트 주 수 · NEW / RE-ENTRY. 브리핑이 다룬 게임 줄 아래에 AI 한 줄이 펼쳐진다.",
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "rank_position",
+    "layout": "list_table",
+    "comparison": "own_history",
+    "interaction": "global_filter",
+    "density": "dense",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "public_reader",
+    "primary_visual": "table"
+   },
+   "ai_emphasis": "순위표 줄 사이에 AI 줄이 끼어 차트 해설자처럼 읽힌다. 'AI가 다룬 게임만' 토글로 해설이 붙은 줄만 남길 수 있다.",
+   "data_files": [
+    "docs/markets/<kr|us|jp|cn|tw>.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S48",
+    "S38",
+    "S36"
+   ],
+   "components": [
+    "주요 시장 주간 순위",
+    "진입 · 이탈",
+    "지속 상승"
+   ],
+   "derived_metrics": [
+    "주간 평균 순위",
+    "지난주 순위",
+    "19주 최고 순위",
+    "차트에 머문 주 수",
+    "신규 · 재진입"
+   ],
+   "min_axis_distance_to_others": 4
+  },
+  {
+   "no": 10,
+   "file": "10-genre-treemap.html",
+   "slug": "genre-treemap",
+   "name": "장르 면적 지도",
+   "concept": "한 시장의 장르 매출 가중 점유를 트리맵으로 그린다. 색은 '매출 점유 − 게임 수 점유'로 돈이 몰리는 장르와 붐비는 장르를 가른다. 브리핑이 다룬 장르 칸엔 AI 배지가 붙는다.",
+   "axes": {
+    "ai_surface": "chart_annotation",
+    "ai_job": "summarize",
+    "kpi_form": "share_area",
+    "layout": "area_map",
+    "comparison": "none",
+    "interaction": "global_filter",
+    "density": "dense",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "treemap"
+   },
+   "ai_emphasis": "AI 배지를 누르면 그 장르를 다룬 브리핑 문장이 칸 위에 펼쳐진다. 면적은 데이터, 배지는 해설로 역할을 나눈다.",
+   "data_files": [
+    "docs/markets/genre_matrix.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S49",
+    "S25",
+    "S27"
+   ],
+   "components": [
+    "시장 비교와 장르 점유",
+    "장르 진입 맵"
+   ],
+   "derived_metrics": [
+    "장르별 매출 가중 점유(최근 7일)",
+    "장르별 게임 수 점유",
+    "두 점유의 차"
+   ],
+   "min_axis_distance_to_others": 5
+  },
+  {
+   "no": 11,
+   "file": "11-small-multiples.html",
+   "slug": "small-multiples",
+   "name": "11개 시장 한 장",
+   "concept": "11개 분석 단위를 같은 틀의 작은 패널로 나란히 놓는다. 패널마다 상위 3개 장르 점유 막대와 그 시장 브리핑의 '핵심 시사점' 첫 줄.",
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "big_number",
+    "layout": "side_by_side_panels",
+    "comparison": "peer_segments",
+    "interaction": "drill_down",
+    "density": "dense",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "public_reader",
+    "primary_visual": "small_multiples"
+   },
+   "ai_emphasis": "패널마다 AI 한 줄이 가장 큰 글씨다. 같은 틀이 11번 반복되어 시장 간 AI 판단 차이가 한눈에 비교되고, 패널을 누르면 그 시장 브리핑 전체가 펼쳐진다.",
+   "data_files": [
+    "docs/markets/genre_matrix.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S28",
+    "O19",
+    "S46"
+   ],
+   "components": [
+    "시장 비교와 장르 점유",
+    "AI 시장 브리핑"
+   ],
+   "derived_metrics": [
+    "시장별 최대 장르 점유",
+    "상위 3 장르 점유 합"
+   ],
+   "min_axis_distance_to_others": 5
+  },
+  {
+   "no": 12,
+   "file": "12-ask-brief.html",
+   "slug": "ask-brief",
+   "name": "브리핑에 묻기",
+   "concept": "질문 창 하나. 미리 준비한 질문이나 직접 쓴 단어로 11개 브리핑을 뒤져 해당 문장들을 시장별로 모아 답하고, 옆에 관련 데이터 차트를 붙인다.",
+   "axes": {
+    "ai_surface": "chat",
+    "ai_job": "answer",
+    "kpi_form": "none",
+    "layout": "master_detail",
+    "comparison": "none",
+    "interaction": "ask_question",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "text_first"
+   },
+   "ai_emphasis": "대화형으로 AI 분석을 꺼내 쓴다. 단, 실시간 LLM이 아니라 Claude가 이미 쓴 브리핑을 낱말로 찾아 모으는 방식임을 화면에 밝힌다. 답마다 출처(어느 시장 · 어느 섹션)를 단다.",
+   "data_files": [
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json",
+    "docs/markets/genre_matrix.json",
+    "docs/markets/xmarket_lite.json"
+   ],
+   "inspired_by": [
+    "O04",
+    "S10",
+    "S17",
+    "O25"
+   ],
+   "components": [
+    "AI 시장 브리핑",
+    "관심 게임과 퍼블리셔",
+    "시장 비교와 장르 점유"
+   ],
+   "derived_metrics": [
+    "낱말이 나온 시장 수 · 문장 수",
+    "장르 질문이면 11개 단위 점유 막대",
+    "게임 질문이면 31개국 현재 순위"
+   ],
+   "min_axis_distance_to_others": 6
+  },
+  {
+   "no": 13,
+   "file": "13-data-insights.html",
+   "slug": "data-insights",
+   "name": "결론이 제목인 차트",
+   "concept": "전 시장 브리핑의 헤드라인 문장을 그대로 차트 제목으로 쓰고, 그 문장을 뒷받침하는 차트를 자동으로 골라 붙인 '데이터 인사이트' 묶음.",
+   "axes": {
+    "ai_surface": "per_widget_note",
+    "ai_job": "summarize",
+    "kpi_form": "none",
+    "layout": "linear_report",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "trend_series",
+    "audience": "public_reader",
+    "primary_visual": "line_trend"
+   },
+   "ai_emphasis": "AI 결론이 차트의 제목 자리를 차지한다. 차트는 문장에 나온 게임 · 장르 · 시장을 읽어 골랐고, 문장과 차트가 어긋날 수 있다는 점을 표시한다.",
+   "data_files": [
+    "docs/markets/global_brief.json",
+    "docs/markets/weekly_lite.json",
+    "docs/markets/xmarket_lite.json",
+    "docs/markets/genre_matrix.json"
+   ],
+   "inspired_by": [
+    "S50",
+    "O16",
+    "S26"
+   ],
+   "components": [
+    "AI 시장 브리핑",
+    "순위 추이",
+    "시장 비교와 장르 점유"
+   ],
+   "derived_metrics": [
+    "문장에 나온 게임의 시장별 현재 · 7일 전 순위",
+    "장르의 11개 단위 점유"
+   ],
+   "min_axis_distance_to_others": 4
+  },
+  {
+   "no": 14,
+   "file": "14-drivers-waterfall.html",
+   "slug": "drivers-waterfall",
+   "name": "진입 · 이탈 폭포",
+   "concept": "한 시장의 이번 주 매출 차트 진입 · 이탈을 장르별로 쌓은 폭포 차트. 막대를 누르면 그 장르로 들어오고 나간 게임 목록, 옆 패널에선 브리핑의 '주요 순위 변동' 해설.",
+   "axes": {
+    "ai_surface": "side_panel",
+    "ai_job": "explain_drivers",
+    "kpi_form": "number_delta",
+    "layout": "hero_chart_side_kpi",
+    "comparison": "previous_period",
+    "interaction": "drill_down",
+    "density": "dense",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "waterfall"
+   },
+   "ai_emphasis": "데이터가 '무엇이 바뀌었나(장르별 순증감)'를, AI 패널이 '왜'를 맡는다. 패널 문장에 나온 게임이 폭포 막대 안 어디에 있는지 표시해 둘을 잇는다.",
+   "data_files": [
+    "docs/markets/weekly_lite.json",
+    "docs/markets/xmarket_lite.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/major_<cc>.json"
+   ],
+   "inspired_by": [
+    "S20",
+    "S08",
+    "O01"
+   ],
+   "components": [
+    "진입 · 이탈",
+    "급변",
+    "AI 시장 브리핑"
+   ],
+   "derived_metrics": [
+    "장르별 신규 진입 수 · 이탈 수 · 순증감",
+    "주간 급상승 · 급하락 상위"
+   ],
+   "min_axis_distance_to_others": 6
+  },
+  {
+   "no": 15,
+   "file": "15-tv-glance.html",
+   "slug": "tv-glance",
+   "name": "벽걸이 TV",
+   "concept": "사무실 벽 화면용. 큰 숫자 여섯 개와, 몇 초마다 넘어가는 AI 헤드라인 띠. 시장도 차례로 돈다.",
+   "axes": {
+    "ai_surface": "insight_feed",
+    "ai_job": "summarize",
+    "kpi_form": "big_number",
+    "layout": "uniform_grid",
+    "comparison": "previous_period",
+    "interaction": "static",
+    "density": "glance",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "operator",
+    "primary_visual": "bar_rank"
+   },
+   "ai_emphasis": "AI 헤드라인 띠가 화면 아래 1/3을 차지하고 자동으로 넘어간다. 숫자는 몇 초 안에 읽히게 크게, 문장은 한 줄씩.",
+   "data_files": [
+    "docs/markets/index.json",
+    "docs/markets/weekly_lite.json",
+    "docs/markets/xmarket_lite.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S41",
+    "S39",
+    "O08"
+   ],
+   "components": [
+    "주요 시장 주간 순위",
+    "AI 시장 브리핑",
+    "진입 · 이탈"
+   ],
+   "derived_metrics": [
+    "추적 나라 수 · 게임 수",
+    "시장별 1위 게임과 연속 1위 주 수",
+    "주간 신규 진입 수"
+   ],
+   "min_axis_distance_to_others": 5
+  },
+  {
+   "no": 16,
+   "file": "16-gap-quadrant.html",
+   "slug": "gap-quadrant",
+   "name": "매출 vs 인기 사분면",
+   "concept": "한 나라의 게임을 가로=인기 순위, 세로=매출 순위로 찍은 사분면. '받는 사람은 적은데 돈은 버는' · '많이 받는데 못 버는' 게임이 갈린다. 브리핑이 언급한 게임 점엔 AI 주석.",
+   "axes": {
+    "ai_surface": "chart_annotation",
+    "ai_job": "explain_drivers",
+    "kpi_form": "big_number",
+    "layout": "hero_chart_side_kpi",
+    "comparison": "none",
+    "interaction": "global_filter",
+    "density": "standard",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "scatter_quadrant"
+   },
+   "ai_emphasis": "점 위에 붙은 AI 주석이 갭의 이유(장르 · BM)를 설명한다. 사분면별 게임 수 KPI와 갭 상위 목록이 옆을 채운다.",
+   "data_files": [
+    "docs/markets/xmarket_lite.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S27",
+    "S49",
+    "S05"
+   ],
+   "components": [
+    "매출 순위와 인기 순위의 갭",
+    "관심 게임과 퍼블리셔"
+   ],
+   "derived_metrics": [
+    "게임별 매출 순위 − 인기 순위",
+    "사분면별 게임 수"
+   ],
+   "min_axis_distance_to_others": 5
+  },
+  {
+   "no": 17,
+   "file": "17-entry-heatmap.html",
+   "slug": "entry-heatmap",
+   "name": "장르 진입 판정 지도",
+   "concept": "장르 × 11개 분석 단위 히트맵(매출 가중 점유). 브리핑이 그 시장에서 그 장르를 두고 쓴 판정(우선 · 관망 · 보류)을 칸에 기호로 겹친다.",
+   "axes": {
+    "ai_surface": "chart_annotation",
+    "ai_job": "recommend",
+    "kpi_form": "share_area",
+    "layout": "area_map",
+    "comparison": "peer_segments",
+    "interaction": "click_to_filter",
+    "density": "dense",
+    "evidence_link": "links_to_widget",
+    "time_mode": "snapshot",
+    "audience": "executive",
+    "primary_visual": "heatmap_matrix"
+   },
+   "ai_emphasis": "색은 데이터, 기호는 AI 판정. 칸을 누르면 판정의 근거 문장이 아래에 뜬다. 점유가 큰데 AI가 보류한 칸처럼 데이터와 해설이 엇갈리는 곳을 찾게 한다.",
+   "data_files": [
+    "docs/markets/genre_matrix.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S32",
+    "S35",
+    "S53"
+   ],
+   "components": [
+    "장르 진입 맵",
+    "시장 비교와 장르 점유",
+    "AI 시장 브리핑"
+   ],
+   "derived_metrics": [
+    "장르 × 시장 매출 가중 점유",
+    "판정 기호 수"
+   ],
+   "min_axis_distance_to_others": 5
+  },
+  {
+   "no": 18,
+   "file": "18-compare-picker.html",
+   "slug": "compare-picker",
+   "name": "시장 골라 비교",
+   "concept": "2~4개 시장을 골라 나란히 놓는다. 열마다 장르 점유 막대와 상위 게임, 옆 패널엔 전 시장 브리핑의 '시장별 차이' 문장 중 고른 시장이 나오는 것만.",
+   "axes": {
+    "ai_surface": "side_panel",
+    "ai_job": "summarize",
+    "kpi_form": "share_area",
+    "layout": "side_by_side_panels",
+    "comparison": "peer_segments",
+    "interaction": "pick_and_compare",
+    "density": "standard",
+    "evidence_link": "numbers_inline",
+    "time_mode": "snapshot",
+    "audience": "analyst",
+    "primary_visual": "bar_rank"
+   },
+   "ai_emphasis": "AI 패널이 사용자가 고른 조합에 맞춰 문장을 걸러 준다. 고른 시장 이름이 문장 안에서 강조된다.",
+   "data_files": [
+    "docs/markets/genre_matrix.json",
+    "docs/markets/xmarket_lite.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/major_<kr|us|jp|cn|tw>.json",
+    "docs/markets/region_<key>.json"
+   ],
+   "inspired_by": [
+    "S40",
+    "S27",
+    "S28"
+   ],
+   "components": [
+    "시장 비교와 장르 점유",
+    "AI 시장 브리핑"
+   ],
+   "derived_metrics": [
+    "고른 시장들의 장르 점유 차이",
+    "공통 상위 게임"
+   ],
+   "min_axis_distance_to_others": 4
+  },
+  {
+   "no": 19,
+   "file": "19-game-dossier.html",
+   "slug": "game-dossier",
+   "name": "게임 한 개 파일",
+   "concept": "게임 하나를 골라 그 게임의 모든 것을 한 장에: 주요 5개 시장 주간 순위 이력, 31개국 현재 순위 칸, 그리고 지난 13주 브리핑이 이 게임을 언급한 문장 연표.",
+   "axes": {
+    "ai_surface": "insight_feed",
+    "ai_job": "summarize",
+    "kpi_form": "rank_position",
+    "layout": "master_detail",
+    "comparison": "own_history",
+    "interaction": "global_filter",
+    "density": "dense",
+    "evidence_link": "links_to_widget",
+    "time_mode": "trend_series",
+    "audience": "analyst",
+    "primary_visual": "line_trend"
+   },
+   "ai_emphasis": "'AI가 이 게임을 어떻게 봐 왔나'가 연표로 쌓인다. 연표 항목을 누르면 순위 그래프의 그 주에 표시가 생긴다.",
+   "data_files": [
+    "docs/markets/weekly_lite.json",
+    "docs/markets/xmarket_lite.json",
+    "docs/markets/global_brief.json",
+    "docs/markets/briefs_index.json",
+    "docs/markets/major_<cc>.json"
+   ],
+   "inspired_by": [
+    "S30",
+    "S29",
+    "S22"
+   ],
+   "components": [
+    "관심 게임과 퍼블리셔",
+    "선택 게임 순위 이력",
+    "AI 시장 브리핑"
+   ],
+   "derived_metrics": [
+    "주간 평균 순위 이력",
+    "31개국 현재 · 7일 전 순위",
+    "주차별 브리핑 언급 수"
+   ],
+   "min_axis_distance_to_others": 5
+  },
+  {
+   "no": 20,
+   "file": "20-brief-timeline.html",
+   "slug": "brief-timeline",
+   "name": "AI 주제 연표",
+   "concept": "지난 13주 전 시장 브리핑에서 굵게 쓴 이름(게임 · 장르 · 퍼블리셔)을 행으로, 주를 열로 깐 상태 띠. ▲ · ▼와 함께 쓰였는지를 색으로 칠하고, 맨 위엔 이번 주 새로 등장 · 사라진 주제를 요약한다.",
+   "axes": {
+    "ai_surface": "lead_summary",
+    "ai_job": "summarize",
+    "kpi_form": "status_color",
+    "layout": "area_map",
+    "comparison": "own_history",
+    "interaction": "click_to_filter",
+    "density": "dense",
+    "evidence_link": "numbers_inline",
+    "time_mode": "cadence_archive",
+    "audience": "analyst",
+    "primary_visual": "state_timeline"
+   },
+   "ai_emphasis": "AI 분석 자체의 흐름을 데이터로 본다. '브리핑이 무엇에 주목해 왔나'가 주인공이고, 칸을 누르면 그 주의 원문 문장이 뜬다.",
+   "data_files": [
+    "docs/markets/global_brief.json"
+   ],
+   "inspired_by": [
+    "O10",
+    "S19",
+    "S21"
+   ],
+   "components": [
+    "AI 시장 브리핑",
+    "지속 상승",
+    "급변"
+   ],
+   "derived_metrics": [
+    "이름별 13주 언급 여부 · ▲▼ 동반 여부",
+    "이번 주 새 주제 · 사라진 주제"
+   ],
+   "min_axis_distance_to_others": 7
+  }
+ ]
+}

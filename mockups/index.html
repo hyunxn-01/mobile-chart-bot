@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KPI × AI 견본 20 · 비교 목록</title>
+<style>
+:root{--ink:#1b1d22;--sub:#606776;--line:#e2e4e9;--bg:#fbfbfa;--card:#fff;--acc:#2f54eb;--chip:#f1f3f7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.6 system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+a{color:var(--acc)}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px}
+header{padding:32px 0 8px}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.01em}
+.lede{color:var(--sub);max-width:76ch;margin:0 0 14px}
+.facts{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:150px}
+.fact b{display:block;font-size:22px;line-height:1.2}
+.fact span{font-size:12.5px;color:var(--sub)}
+.links{font-size:13.5px;color:var(--sub);margin-bottom:18px}
+.filters{position:sticky;top:0;z-index:5;background:rgba(251,251,250,.96);backdrop-filter:blur(4px);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:16px}
+.filters .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters label{font-size:12.5px;color:var(--sub)}
+.filters select,.filters input{font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:#fff;max-width:100%}
+.count{font-size:12.5px;color:var(--sub);margin-left:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;padding-bottom:30px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.thumb{display:block;aspect-ratio:16/9;background:#eef0f4 center top/cover no-repeat;border-bottom:1px solid var(--line)}
+.body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.no{font-size:12px;color:var(--acc);font-weight:700;letter-spacing:.04em}
+.card h2{font-size:18px;margin:0;line-height:1.3}
+.card h2 a{color:inherit;text-decoration:none}
+.card h2 a:hover{text-decoration:underline}
+.concept{margin:0;font-size:13.5px}
+.ai{margin:0;font-size:12.8px;color:var(--sub);border-left:3px solid var(--acc);padding-left:9px}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{background:var(--chip);border-radius:6px;padding:2px 7px;font-size:11.8px;white-space:nowrap}
+.chip i{font-style:normal;color:var(--sub)}
+.chip.hit{background:#dfe6ff;outline:1px solid #b9c7ff}
+.files{font-size:11.8px;color:var(--sub);word-break:break-all}
+.open{margin-top:auto;font-size:13px;font-weight:600}
+section.matrix{padding:10px 0 40px}
+section h3{font-size:17px;margin:0 0 6px}
+.note{font-size:12.8px;color:var(--sub);margin:0 0 10px;max-width:90ch}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+table{border-collapse:collapse;font-size:12px}
+th,td{border-bottom:1px solid var(--line);padding:5px 7px;text-align:left;white-space:nowrap}
+th{background:#f7f8fa;position:sticky;top:0}
+td.d{text-align:center;font-variant-numeric:tabular-nums;width:26px;padding:4px 2px}
+.ax td{white-space:normal;min-width:110px}
+footer{color:var(--sub);font-size:12px;border-top:1px solid var(--line);padding:16px 0 40px}
+@media (max-width:420px){.wrap{padding:0 16px}.grid{grid-template-columns:1fr}h1{font-size:22px}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <h1>KPI 지표형 × AI 분석 강조 대시보드 견본 20</h1>
+  <p class="lede">앱스토어 31개국 게임 차트봇의 대시보드를 'Claude가 매주 쓰는 AI 시장 브리핑'이 돋보이는 KPI 지표형으로 처음부터 다시 짜 본 견본들이다. 웹에서 조사한 KPI 대시보드 사례로 분류 축을 직접 정했고(<a href="research/taxonomy.json">taxonomy.json</a>), 그 축의 값 조합이 서로 겹치지 않게 20개를 설계했다(<a href="plan.json">plan.json</a>). 모든 견본은 저장소의 실제 데이터(<code>docs/markets/</code>)를 읽는다.</p>
+  <div class="facts" id="facts"></div>
+  <div class="links">조사 출처: <a href="research/sources.md">research/sources.md</a> · 분류 체계: <a href="research/taxonomy.json">research/taxonomy.json</a> · 설계: <a href="plan.json">plan.json</a> · 화면 사진: <code>screenshots/</code></div>
+</header>
+<div class="filters">
+  <div class="wrap row" id="filters"></div>
+</div>
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+  <section class="matrix">
+    <h3>분류 값 한눈에</h3>
+    <p class="note">행은 견본, 열은 분류 축이다. 축과 값의 정의는 taxonomy.json에 있다.</p>
+    <div class="tablewrap"><table id="axtable"></table></div>
+  </section>
+  <section class="matrix">
+    <h3>서로 얼마나 다른가</h3>
+    <p class="note" id="distnote"></p>
+    <div class="tablewrap"><table id="dist"></table></div>
+  </section>
+</main>
+<footer class="wrap">견본은 저장소 루트에서 정적 서버(<code>python3 -m http.server</code>)를 띄우고 <code>/mockups/</code>로 열었을 때 데이터를 읽는다. 앱 아이콘은 App Store 이미지 서버에서 받으며, 받지 못하면 빈칸으로 남는다.</footer>
+<script>
+(async function () {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  try {
+    const [plan, tax] = await Promise.all([fetch('plan.json').then(r => { if (!r.ok) throw new Error('plan.json ' + r.status); return r.json(); }),
+      fetch('research/taxonomy.json').then(r => { if (!r.ok) throw new Error('taxonomy.json ' + r.status); return r.json(); })]);
+    const AX = plan.axes, A = tax.axes;
+    const short = (ax, v) => (A[ax] && A[ax].values[v] ? A[ax].values[v].split(/[(.]/)[0].trim() : v);
+    const S = tax.summary;
+    $('#facts').innerHTML = [
+      [S.dashboards, '분류한 대시보드'], [S.opened, '그중 직접 열람'], [S.search_only, '검색 결과만'],
+      [AX.length, '분류 축'], [plan.mockups.length, '견본'], [plan.distinctness.min_pairwise_axis_distance + ' / ' + AX.length, '두 견본 사이 최소 차이 축 수']
+    ].map(f => '<div class="fact"><b>' + esc(f[0]) + '</b><span>' + esc(f[1]) + '</span></div>').join('');
+    // filters
+    const state = {};
+    $('#filters').innerHTML = AX.slice(0, 6).map(ax => '<label>' + esc(A[ax].label) + ' <select data-ax="' + ax + '"><option value="">전체</option>' +
+      Object.keys(A[ax].values).filter(v => plan.mockups.some(m => m.axes[ax] === v)).map(v => '<option value="' + v + '">' + esc(v) + '</option>').join('') + '</select></label>').join('') +
+      '<input id="q" type="search" placeholder="이름 · 개념 검색" aria-label="검색"><span class="count" id="count"></span>';
+    $('#filters').addEventListener('input', e => { if (e.target.dataset.ax) state[e.target.dataset.ax] = e.target.value; draw(); });
+    function draw() {
+      const q = ($('#q').value || '').trim();
+      const list = plan.mockups.filter(m => Object.keys(state).every(ax => !state[ax] || m.axes[ax] === state[ax]) &&
+        (!q || (m.name + m.concept + m.ai_emphasis).includes(q)));
+      $('#count').textContent = list.length + ' / ' + plan.mockups.length + '개';
+      $('#grid').innerHTML = list.map(m => {
+        const no = String(m.no).padStart(2, '0');
+        return '<article class="card"><a class="thumb" href="' + m.file + '" style="background-image:url(screenshots/' + m.file.replace('.html', '.png') + ')" aria-label="' + esc(m.name) + ' 열기"></a>' +
+          '<div class="body"><div class="no">견본 ' + no + '</div><h2><a href="' + m.file + '">' + esc(m.name) + '</a></h2>' +
+          '<p class="concept">' + esc(m.concept) + '</p><p class="ai"><b>AI 강조</b> · ' + esc(m.ai_emphasis) + '</p>' +
+          '<div class="chips">' + AX.map(ax => '<span class="chip' + (state[ax] ? ' hit' : '') + '" title="' + esc(A[ax].label + ': ' + (A[ax].values[m.axes[ax]] || '')) + '"><i>' + esc(A[ax].label.replace(/\s.*$/, '')) + '</i> ' + esc(m.axes[ax]) + '</span>').join('') + '</div>' +
+          '<div class="files">데이터: ' + esc(m.data_files.map(f => f.replace('docs/markets/', '')).join(', ')) + '</div>' +
+          '<a class="open" href="' + m.file + '">열기 → ' + esc(m.file) + '</a></div></article>';
+      }).join('') || '<p>조건에 맞는 견본이 없습니다.</p>';
+    }
+    draw();
+    // axis table
+    $('#axtable').innerHTML = '<thead><tr><th>견본</th>' + AX.map(ax => '<th title="' + esc(A[ax].definition) + '">' + esc(A[ax].label) + '</th>').join('') + '</tr></thead><tbody class="ax">' +
+      plan.mockups.map(m => '<tr><th><a href="' + m.file + '">' + String(m.no).padStart(2, '0') + ' ' + esc(m.name) + '</a></th>' + AX.map(ax => '<td title="' + esc(A[ax].values[m.axes[ax]] || '') + '">' + esc(m.axes[ax]) + '</td>').join('') + '</tr>').join('') + '</tbody>';
+    // distance matrix
+    const D = plan.distinctness.pairwise_axis_distance, ms = plan.mockups;
+    const dist = (a, b) => a === b ? null : D[String(Math.min(a, b)).padStart(2, '0') + '-' + String(Math.max(a, b)).padStart(2, '0')];
+    $('#distnote').textContent = '칸의 숫자는 두 견본의 분류 값이 다른 축의 수(최대 ' + AX.length + ')다. ' + plan.rule;
+    $('#dist').innerHTML = '<thead><tr><th></th>' + ms.map(m => '<th>' + String(m.no).padStart(2, '0') + '</th>').join('') + '</tr></thead><tbody>' +
+      ms.map(a => '<tr><th>' + String(a.no).padStart(2, '0') + ' ' + esc(a.name) + '</th>' + ms.map(b => {
+        const d = dist(a.no, b.no); if (d == null) return '<td class="d">·</td>';
+        const t = d / AX.length; return '<td class="d" style="background:rgba(47,84,235,' + (0.08 + 0.6 * t).toFixed(2) + ');color:' + (t > .6 ? '#fff' : 'inherit') + '">' + d + '</td>';
+      }).join('') + '</tr>').join('') + '</tbody>';
+    document.documentElement.setAttribute('data-mk-ready', 'ok');
+  } catch (e) {
+    $('#grid').innerHTML = '<p role="alert">목록을 불러오지 못했습니다: ' + esc(e.message) + ' — 저장소 루트에서 정적 서버로 열어 주세요.</p>';
+    document.documentElement.setAttribute('data-mk-ready', 'error');
+  }
+})();
+</script>
+</body>
+</html>
