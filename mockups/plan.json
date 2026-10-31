@@ -891,6 +891,7 @@
    "data_files": [
     "docs/markets/weekly_lite.json",
     "docs/markets/xmarket_lite.json",
+    "docs/markets/<cc>.json",
     "docs/markets/briefs_index.json",
     "docs/markets/major_<cc>.json"
    ],
@@ -978,6 +979,7 @@
    "ai_emphasis": "점 위에 붙은 AI 주석이 갭의 이유(장르 · BM)를 설명한다. 사분면별 게임 수 KPI와 갭 상위 목록이 옆을 채운다.",
    "data_files": [
     "docs/markets/xmarket_lite.json",
+    "docs/markets/index.json",
     "docs/markets/briefs_index.json",
     "docs/markets/global_brief.json",
     "docs/markets/major_<kr|us|jp|cn|tw>.json",
