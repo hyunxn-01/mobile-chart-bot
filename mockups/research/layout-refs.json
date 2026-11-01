@@ -1,0 +1,1397 @@
+{
+  "generated": "2026-11-01",
+  "total": 138,
+  "by_type": {
+    "a": 14,
+    "b": 116,
+    "c": 8
+  },
+  "type_legend": {
+    "a": "로그인 없이 열리는 실제 대시보드 · 공개 데모 · 제품 둘러보기 (일부는 로그인/이메일 필요 여부 미확인, evidence에 표기)",
+    "b": "대시보드 화면 사진이 있을 것으로 보이는 제품 소개 · 도움말 · 사례 페이지 (사진 유무는 사용자 PC에서 확인 필요)",
+    "c": "대시보드 화면이 나오는 영상(또는 영상이 실린 페이지)"
+  },
+  "method": "클라우드 환경에서 WebFetch가 막혀(외부 웹사이트 접속 불가) WebSearch 결과(제목·주소·검색 요약문)만으로 수집. evidence의 따옴표 문장은 검색 결과에 나온 문장을 옮긴 것이며, 검색 도구가 보여 준 요약문 속 문장이라 원문과 조금 다를 수 있음. 'viewed: 열람'은 GitHub README 이미지를 내려받아 직접 본 것만 해당.",
+  "items": [
+    {
+      "id": 1,
+      "name": "Appfigures – 공개 앱 프로필 (Downloads 탭)",
+      "url": "https://appfigures.com/reports/app-profile/41862202668/downloads",
+      "type": "a",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과에 app-profile 주소가 다수 색인됨; 로그인 없이 열리는지는 미확인)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 2,
+      "name": "Video Game Insights (VG Insights)",
+      "url": "https://vginsights.com",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"The platform is available for free in an effort to help indie developers make better informed decisions regarding game production.\" (로그인 필요 여부 미확인)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 3,
+      "name": "AppsFlyer – Interactive product tour: Start analyzing your data",
+      "url": "https://appsflyer.com/interactive-product-tours/analyze",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"Start analyzing your data\" (페이지 제목, 제품 둘러보기)",
+      "viewed": "미열람",
+      "category": "광고·UA 측정(MMP)"
+    },
+    {
+      "id": 4,
+      "name": "Amplitude – Explore Demo",
+      "url": "https://amplitude.com/explore-demo",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"Get a Free Look into Amplitude with Our Pre-Loaded Demo Account\" (페이지 제목) — 단, \"all you need is an email address to sign up\" (이메일 등록 필요 가능)",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 5,
+      "name": "GameAnalytics – Toolbox (데모 영상 + self-guided tour)",
+      "url": "https://gameanalytics.com/toolbox",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"Turn game data into insights with real-time analytics\" (페이지 제목) — 검색 결과 요약: 데모 영상과 interactive self-guided tour 제공",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 6,
+      "name": "Google Analytics 4 – Demo account (Flood-It! 게임 앱 속성 포함)",
+      "url": "https://goo.gle/ga-demo",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"The Google Analytics demo account is a fully functional Google Analytics account that any Google user can access.\" / \"The Flood-It! property contains games reporting and data from the app and website.\" (Google 계정 로그인 필요)",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 7,
+      "name": "OpenPanel – Live demo",
+      "url": "https://demo.openpanel.dev",
+      "type": "a",
+      "image_url": null,
+      "evidence": "근거 없음 (README 이미지 안에 \"Test live demo\" 버튼과 https://demo.openpanel.dev 주소가 보임)",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 8,
+      "name": "Grafana Play",
+      "url": "https://play.grafana.org",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"a free, public Grafana environment where you can explore dashboards ... all without an account\"",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 9,
+      "name": "Metabase – Embedding demo",
+      "url": "https://metabase.com/embedding-demo",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"Embedding demo\" (페이지 제목; 예시 앱 데모 모음)",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 10,
+      "name": "Rill – Dashboard Quickstart (공개 데모 프로젝트 링크)",
+      "url": "https://docs.rilldata.com/explore/dashboard-101",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"a set of demo projects already deployed on Rill Cloud and publicly available for everyone to try out\"",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 11,
+      "name": "Tableau – Explore player demographics to create more engaging games (sample workbook)",
+      "url": "https://www.tableau.com/solutions/workbook/track-bugs-and-manage-developer-workloads",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"Explore player demographics to create more engaging games\" (페이지 제목; 로그인 없이 열리는지 미확인)",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 12,
+      "name": "Klipfolio – Solutions for data analysts (live dashboard examples)",
+      "url": "https://www.klipfolio.com/solutions/data-analysts",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"At-a-glance view of each department's performance\" (라이브 예시 설명; 로그인 없이 열리는지 미확인)",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 13,
+      "name": "Matomo – Online demo",
+      "url": "https://demo.matomo.cloud",
+      "type": "a",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과에 'the Matomo demo installation'으로 소개된 주소)",
+      "viewed": "미열람",
+      "category": "마케팅·웹 분석"
+    },
+    {
+      "id": 14,
+      "name": "Plausible Analytics – Live demo",
+      "url": "https://plausible.io/plausible.io",
+      "type": "a",
+      "image_url": null,
+      "evidence": "\"you can also explore our live demo where you can see the actual traffic of our website\" (주소는 plausible/analytics README의 \"Live Demo\" 링크에서 확인)",
+      "viewed": "미열람",
+      "category": "마케팅·웹 분석"
+    },
+    {
+      "id": 15,
+      "name": "42matters – App Market Explorer",
+      "url": "https://42matters.com/app-market-explorer",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: \"visually explore the most complete database of mobile and connected TV (CTV) apps and publishers\")",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 16,
+      "name": "Appfigures – Product tour",
+      "url": "https://appfigures.com/tour",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"One View of All Your App Performance Data\" (페이지 제목)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 17,
+      "name": "Appfigures – Store Performance",
+      "url": "https://app.appfigures.com/products/store-performance",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"See Your Store Performance at a Glance\" (페이지 제목)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 18,
+      "name": "AppMagic – Essentials (tool description)",
+      "url": "https://appmagic.rocks/tool-descriptions/essentials-new",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"find all recently released FPS games that have managed to hit the top charts and compare their performance on a single dashboard\"",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 19,
+      "name": "Apptopia – Real-time app analytics",
+      "url": "https://engage.apptopia.com/real-time-app-analytics",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 20,
+      "name": "Apptopia – TrustRadius 제품 화면 모음",
+      "url": "https://www.trustradius.com/vendors/apptopia-inc",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"provides download, revenue, and usage estimates for every ranked app and publisher in the world\" (스크린샷 설명문)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 21,
+      "name": "FoxData – How to Use the FoxData Dashboard to Instantly Get the Insights You Need",
+      "url": "https://foxdata.com/en/blogs/how-to-use-the-foxdata-dashboard-to-instantly-get-the-insights-you-need/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"The dashboard provides an overview of your app's performance across various categories in the App Store or Google Play.\"",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 22,
+      "name": "FoxData – Steam Charts",
+      "url": "https://foxdata.com/en/blogs/foxdata-steam-charts-track-steam-market-trends-player-data-top-selling-games/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"FoxData Steam Charts: Track Steam Market Trends, Player Data & Top-Selling Games\" (페이지 제목)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 23,
+      "name": "Gamalytic",
+      "url": "https://gamalytic.com",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과는 제3자 비교 글뿐, 공개 화면 여부 미확인)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 24,
+      "name": "GameRefinery (Liftoff) – Service update 2.0",
+      "url": "https://gamerefinery.com/gamerefinery-service-update-2-0",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 25,
+      "name": "Newzoo Platform (Shyft 소개 페이지)",
+      "url": "https://www.shyft.ai/tools/newzoo-platform",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Unlock a full view of a game's performance, with metrics like MAU, DAU, and game revenue data, across different markets, devices, or segments.\"",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 26,
+      "name": "Sensor Tower – App Analytics metrics and a sleek new UI (2015 blog)",
+      "url": "https://sensortower.com/blog/sensor-tower-introduces-app-analytics-metrics-and-a-sleek-new-ui",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"This section collectively includes the overview for any app in the store, category rankings, review history and review analysis, as well as featured app rankings.\"",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 27,
+      "name": "Sensor Tower – Game Intelligence 소개",
+      "url": "https://go.sensortower.com/game-intelligence.html",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 28,
+      "name": "Sensor Tower – New Video Game Insights interface (blog)",
+      "url": "https://develop.sensortower.com/blog/new-video-game-insights-interface",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Today, we are taking a significant step forward by elevating the Video Game Insights (VGI) interface to be in alignment with the core Sensor Tower frontend.\"",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 29,
+      "name": "Sensor Tower – Q2 2021 product updates",
+      "url": "https://sensortower.com/blog/q2-2021-product-updates",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 30,
+      "name": "SteamData.ai – Steam Analytics for Game Publishers",
+      "url": "https://steamdata.ai/solutions/for-publishers",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 31,
+      "name": "VG Insights – 2024-01 customizable dashboard 공지",
+      "url": "https://wp.vginsights.com/2024/01",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"top 10 games of last week by followers, units sold, revenue and more\" / \"Steam market size\" (첫 위젯 설명)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 32,
+      "name": "모바일인덱스 (IGAWorks)",
+      "url": "https://www.mobileindex.com",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"모바일 게임 시장 전반의 흐름을 한눈에 파악할 수 있는 통계·인사이트 등 주요 정보를 보여주는 플랫폼\" (2016년 디지털데일리 기사 문장)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 33,
+      "name": "App Radar by SplitMetrics",
+      "url": "https://splitmetrics.com/appradar/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"App Radar Demo - ASO Dashboard Offers a quick overview of your most important app metrics.\"",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 34,
+      "name": "AppFollow 3.5: March Edition (release notes)",
+      "url": "https://appfollow.io/blog/appfollow-3-5-reviews-ratings-integrations-addon",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 35,
+      "name": "AppFollow – Home Hub (help 4416118653585)",
+      "url": "https://support.appfollow.io/hc/en-us/articles/4416118653585",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"the country where review ratings decreased the most\" (\"Falling the most\" 카드 설명) — '한눈에' 문구는 없음",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 36,
+      "name": "AppTweak – ASO Performance Dashboard (help)",
+      "url": "https://help.apptweak.com/en/articles/10063847-aso-performance-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 37,
+      "name": "AppTweak – How to get started with dashboards (help)",
+      "url": "https://help.apptweak.com/en/articles/10040470-how-to-get-started-with-dashboards",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 38,
+      "name": "AppTweak – Introduces Personal Dashboard (blog)",
+      "url": "https://www.apptweak.com/en/aso-blog/apptweak-introduces-personal-dashboard-aso",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"AppTweak Introduces Personal Dashboard\" (페이지 제목)",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 39,
+      "name": "AppTweak – Must-have dashboards for app store marketing and ASO (blog)",
+      "url": "https://www.apptweak.com/en/aso-blog/must-have-dashboards-for-app-store-marketing-and-aso",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Executive Dashboard Template showing App Store and Google Play combined downloads, download trends and share, and a performance overview\"",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 40,
+      "name": "AppTweak – Using the Dashboard for Apple Ads (help)",
+      "url": "https://help.apptweak.com/en/articles/10449713-using-the-dashboard-for-apple-ads",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"select an app and campaign group to see an overview of your performance; track one or multiple metrics over time, by day or week\"",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 41,
+      "name": "ASOMobile – Dashboard from ASOMobile (blog)",
+      "url": "https://asomobile.net/en/blog/dashboard-from-asomobile",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"The Dashboard page is located in the Apps section. On the Dashboard you will see: 1. Rank in the categories (Most impactful, Biggest Winners, Biggest Losers).\"",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 42,
+      "name": "FoxData – Realtime app ranking (blog: Who's rising, who's falling)",
+      "url": "https://foxdata.com/cn/blogs/whos-rising-whos-falling-foxdatas-realtime-app-ranking-helps-you-seize-the-turning-point/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Who's rising, who's falling: FoxData's realtime app ranking helps you seize the turning point\" (페이지 주소의 제목; 중국어판)",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 43,
+      "name": "MobileAction – App Profile (help center)",
+      "url": "https://helpcenter.mobileaction.co/app-profile",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"a quick overview of visibility metrics, paid user acquisition (where available), user reviews, and geographic distribution\"",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 44,
+      "name": "MobileAction – Navigate to Overview (help)",
+      "url": "https://helpcenter.mobileaction.co/en/navigate-to-overview",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: 날짜 범위를 바꾸면 페이지 모든 영역이 갱신)",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 45,
+      "name": "AppGrowing (국제판) – 광고 인텔리전스",
+      "url": "https://appgrowing.net",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "경쟁작 모니터링"
+    },
+    {
+      "id": 46,
+      "name": "Crayon – Analyze (product)",
+      "url": "https://crayon.co/product/analyze",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과의 제3자 소개: \"360-degree competitor dashboard\")",
+      "viewed": "미열람",
+      "category": "경쟁작 모니터링"
+    },
+    {
+      "id": 47,
+      "name": "FoxData – How to Monitor App Performance with a Data-Based Marketing Intelligence Platform",
+      "url": "https://foxdata.com/en/blogs/how-to-monitor-app-performance-with-a-databased-marketing-intelligence-platform/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Add your own flagship app alongside competitors. Within seconds, you see how your downloads, revenue, and user activity stack up against theirs.\"",
+      "viewed": "미열람",
+      "category": "경쟁작 모니터링"
+    },
+    {
+      "id": 48,
+      "name": "Liquid and Grit – Impact Portal",
+      "url": "https://product.liquidandgrit.com/information-by-product/impact-portal",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"The online resource with over 34k libraries and all of our product insights\" (페이지 제목)",
+      "viewed": "미열람",
+      "category": "경쟁작 모니터링"
+    },
+    {
+      "id": 49,
+      "name": "Liquid and Grit – Impact Portal: Database tool",
+      "url": "https://product.liquidandgrit.com/information-by-product/impact-portal/database-tool",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "경쟁작 모니터링"
+    },
+    {
+      "id": 50,
+      "name": "Segwise – How to Build a Competitor Dashboard for Insights",
+      "url": "https://segwise.ai/blog/build-competitor-dashboard-insights",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "경쟁작 모니터링"
+    },
+    {
+      "id": 51,
+      "name": "Similarweb – Web Intelligence (help, dashboards & competitive trackers)",
+      "url": "https://support.similarweb.com/hc/en-us/articles/360018977477-Web-Intelligence",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: Competitive Trackers가 경쟁사 성과를 자동 알림과 함께 모니터링)",
+      "viewed": "미열람",
+      "category": "경쟁작 모니터링"
+    },
+    {
+      "id": 52,
+      "name": "Amazon Appstore – App Health Insights dashboard (Developer Console docs)",
+      "url": "https://developer.amazon.com/docs/reports-promo/app-health-insights-dashboard.html",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "스토어 콘솔"
+    },
+    {
+      "id": 53,
+      "name": "Apple App Store Connect – Analytics help (View app metrics)",
+      "url": "https://developer.apple.com/help/app-store-connect/view-app-analytics/view-app-metrics",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"a high-level summary of your app's performance, highlighting key metrics and recent trends\" (Overview 설명)",
+      "viewed": "미열람",
+      "category": "스토어 콘솔"
+    },
+    {
+      "id": 54,
+      "name": "Apple – Measuring app performance (App Store Connect Analytics)",
+      "url": "https://developer.apple.com/app-store-connect/analytics",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Now you can access monetization and subscription data in Analytics to better understand the performance of your In-App Purchases and offers.\"",
+      "viewed": "미열람",
+      "category": "스토어 콘솔"
+    },
+    {
+      "id": 55,
+      "name": "Google Play Console – App statistics / Dashboard (help 139628)",
+      "url": "https://support.google.com/googleplay/android-developer/answer/139628",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"The Dashboard page gives an overview of key metrics, trends, notifications, and insights.\"",
+      "viewed": "미열람",
+      "category": "스토어 콘솔"
+    },
+    {
+      "id": 56,
+      "name": "Steamworks – Traffic reporting (docs)",
+      "url": "https://partner.steamgames.com/doc/marketing/traffic_reporting",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "스토어 콘솔"
+    },
+    {
+      "id": 57,
+      "name": "Adjust – Custom dashboards (help)",
+      "url": "https://help.adjust.com/en/article/custom-dashboards",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "광고·UA 측정(MMP)"
+    },
+    {
+      "id": 58,
+      "name": "Adjust – Datascape product page",
+      "url": "https://www.adjust.com/product/datascape/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "광고·UA 측정(MMP)"
+    },
+    {
+      "id": 59,
+      "name": "Adjust – Overview dashboard (Datascape help)",
+      "url": "https://help.adjust.com/en/article/overview-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"The Overview dashboard is a high-level dashboard that gives you an instant snapshot of your most important KPIs and performance metrics.\"",
+      "viewed": "미열람",
+      "category": "광고·UA 측정(MMP)"
+    },
+    {
+      "id": 60,
+      "name": "Airbridge – Overview dashboard (blog)",
+      "url": "https://airbridge.io/blog/overview-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: 지표 위젯이 직전 기간 대비 변화를 표시)",
+      "viewed": "미열람",
+      "category": "광고·UA 측정(MMP)"
+    },
+    {
+      "id": 61,
+      "name": "Airbridge – Overview dashboard (help)",
+      "url": "https://help.airbridge.io/ja/guides/overview-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "광고·UA 측정(MMP)"
+    },
+    {
+      "id": 62,
+      "name": "AppsFlyer – Introduction to the AppsFlyer Dashboard (help 209680753)",
+      "url": "https://support.appsflyer.com/hc/en-us/articles/209680753",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: 기본 대시보드는 Overview dashboard)",
+      "viewed": "미열람",
+      "category": "광고·UA 측정(MMP)"
+    },
+    {
+      "id": 63,
+      "name": "SplitMetrics – Overview dashboard for Apple Search Ads",
+      "url": "https://splitmetrics.com/blog/overview-dashboard-apple-search-ads/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "광고·UA 측정(MMP)"
+    },
+    {
+      "id": 64,
+      "name": "Amplitude – Product Analytics Dashboard Template",
+      "url": "https://www.amplitude.com/templates/product-analytics-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (페이지에 \"View chart in demo\" 링크가 있다고 검색 결과에 나옴)",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 65,
+      "name": "Countly – Mobile Analytics (feature page)",
+      "url": "https://countly.com/feature/mobile-analytics",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 66,
+      "name": "Firebase blog – Improving the Google Analytics dashboard in Firebase",
+      "url": "https://firebase.blog/posts/2021/11/updated-google-analytics-dashboard/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Improving the Google Analytics dashboard in Firebase\" (페이지 제목)",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 67,
+      "name": "Firebase – Analytics reports (docs)",
+      "url": "https://firebase.google.com/docs/analytics/reports",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"a summary of data about linked apps for monitoring engagement, revenue, and release success\" (Dashboard 설명)",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 68,
+      "name": "GameAnalytics – Dashboards (docs: Overview, Monetization, Realtime 등)",
+      "url": "https://docs.gameanalytics.com/features/dashboards",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 69,
+      "name": "GameAnalytics – Engagement Dashboard (docs)",
+      "url": "https://docs.gameanalytics.com/features/dashboards/engagement",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"how the app is doing in terms of retention, players each month, and how engaged they are\"",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 70,
+      "name": "GameAnalytics – How to build killer dashboards in game analytics (blog)",
+      "url": "https://www.gameanalytics.com/blog/how-to-build-killer-dashboards-in-game-analytics",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 71,
+      "name": "GameAnalytics – Overview Dashboard (docs)",
+      "url": "https://docs.gameanalytics.com/features/dashboards/overview",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Overview Dashboard\" (페이지 제목) — 내용: \"DAU and New Users, users by country, sessions counts and playtime, retention, and new vs returning users\"",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 72,
+      "name": "Mixpanel – Board templates (docs)",
+      "url": "https://docs.mixpanel.com/docs/boards/templates",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 73,
+      "name": "Mixpanel – Introducing the Company KPIs Dashboard template",
+      "url": "https://mixpanel.com/blog/company-kpis-dashboard-template-release-metrics/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: growth, engagement, retention 지표용 ready-made Board)",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 74,
+      "name": "SaaS UI – PostHog dashboard pattern (실제 제품 화면 모음)",
+      "url": "https://www.saasui.design/pattern/dashboard/posthog",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 75,
+      "name": "Seer Interactive – How to Use the GA4 Demo Account",
+      "url": "https://www.seerinteractive.com/insights/how-to-use-the-ga4-demo-account",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 76,
+      "name": "Techotopia – A Guided Tour of the Firebase Analytics Dashboard",
+      "url": "https://techotopia.com/index.php/A_Guided_Tour_of_the_Firebase_Analytics_Dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 77,
+      "name": "Unity Analytics – Dashboards (docs: Game performance)",
+      "url": "https://docs.unity.com/en-us/analytics/dashboards/dashboards",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: Game performance 대시보드가 게임 상태의 overview)",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 78,
+      "name": "AccelByte – Game Health dashboards (Grafana Cloud, docs)",
+      "url": "https://docs.accelbyte.io/gaming-services/services/utilities/grafana-cloud-observability/game-health-dashboards",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: Game Health Overview에 Current Total Players In Match 등 패널)",
+      "viewed": "미열람",
+      "category": "게임 라이브 운영"
+    },
+    {
+      "id": 79,
+      "name": "Grafana – alt:V Server Metrics (dashboard 20241)",
+      "url": "https://grafana.com/grafana/dashboards/20241-alt-v-server-metrics/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"It includes various metrics to help you track server performance, player statistics, and system health.\"",
+      "viewed": "미열람",
+      "category": "게임 라이브 운영"
+    },
+    {
+      "id": 80,
+      "name": "Grafana – Gameforge success story",
+      "url": "https://grafana.com/success/gameforge/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "게임 라이브 운영"
+    },
+    {
+      "id": 81,
+      "name": "Metaplay – Observing a deployment (LiveOps/Grafana docs)",
+      "url": "https://docs.metaplay.io/cloud-deployments/how-to-guides/observing-a-deployment",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "게임 라이브 운영"
+    },
+    {
+      "id": 82,
+      "name": "Brandwatch – G2 Esports case study",
+      "url": "https://www.brandwatch.com/case-studies/g2-esports/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"How G2 Esports uses real-time social insights to stay ahead of gaming trends\" (페이지 제목)",
+      "viewed": "미열람",
+      "category": "스트리밍·커뮤니티 모니터링"
+    },
+    {
+      "id": 83,
+      "name": "Esports Charts – Dashboard Update: Executive View & Business UI",
+      "url": "https://escharts.com/news/dashboard-update-executive-view-ui",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"essential insights on tournaments & livestreaming events for industry professionals\"",
+      "viewed": "미열람",
+      "category": "스트리밍·커뮤니티 모니터링"
+    },
+    {
+      "id": 84,
+      "name": "Esports Charts – Products",
+      "url": "https://escharts.com/products",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"viewership charts, languages and platforms breakdown, each match or round viewership, teams popularity ratings, daily & stages analysis\" (Events Dashboard 설명)",
+      "viewed": "미열람",
+      "category": "스트리밍·커뮤니티 모니터링"
+    },
+    {
+      "id": 85,
+      "name": "Stream Hatchet – Web Dashboard",
+      "url": "https://streamhatchet.com/products/web-dashboard/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Gain access to real-time and historical viewership data at a minute-level granularity across all major streaming platforms. Track top channels, games, and other industry trends.\"",
+      "viewed": "미열람",
+      "category": "스트리밍·커뮤니티 모니터링"
+    },
+    {
+      "id": 86,
+      "name": "Stream Hatchet – Welcome to Stream Hatchet Starter (blog)",
+      "url": "https://streamhatchet.com/blog/welcome-to-stream-hatchet-starter-an-introduction-to-live-streaming-data-analytics/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Next up is the \\\"Games\\\" section, which shows the leaderboards for top games in live streaming.\"",
+      "viewed": "미열람",
+      "category": "스트리밍·커뮤니티 모니터링"
+    },
+    {
+      "id": 87,
+      "name": "Streams Charts – Updated game page (news)",
+      "url": "https://streamscharts.com/news/updated-game-page-on-streams-charts",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Charts with peak viewers and channels stats by month. Languages distribution of channels by month. Lifetime data. Game stats by month. Top LIVE streams.\"",
+      "viewed": "미열람",
+      "category": "스트리밍·커뮤니티 모니터링"
+    },
+    {
+      "id": 88,
+      "name": "Talkwalker – Social listening",
+      "url": "https://www.talkwalker.com/lp/products/social-listening",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "스트리밍·커뮤니티 모니터링"
+    },
+    {
+      "id": 89,
+      "name": "Appbot – Dashboards",
+      "url": "https://appbot.co/features/dashboards/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "리뷰·VOC 모니터링"
+    },
+    {
+      "id": 90,
+      "name": "Appbot – Widget glossary for Appbot dashboards (help)",
+      "url": "https://support.appbot.co/help-docs/widget-glossary-for-appbot-dashboards/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "리뷰·VOC 모니터링"
+    },
+    {
+      "id": 91,
+      "name": "Instabug (Luciq) – Introducing the App Overview page",
+      "url": "https://www.luciq.ai/blog/introducing-the-app-overview-page",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"see the latest or most adopted releases at a glance\"",
+      "viewed": "미열람",
+      "category": "앱 운영 품질"
+    },
+    {
+      "id": 92,
+      "name": "Amazon Q in QuickSight – Generative BI (AWS community article)",
+      "url": "https://community.aws/content/2bdXbPBGkcEYF9IvK6kN87pjY8G/amazon-q-in-amazon-quicksight--generative-bi-capabilities-for-dashboard-authoring-executive-summary-data-stories",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 93,
+      "name": "Amazon QuickSight – Creating executive summaries with Amazon Q",
+      "url": "https://docs.aws.amazon.com/quicksight/latest/user/gen-bi-executive-summaries.html",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"find key insights at a glance without pinpointing specific data from a dashboard's visuals\"",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 94,
+      "name": "AppTweak – Reporting Agent dashboard builder (help, AI)",
+      "url": "https://help.apptweak.com/en/articles/14468944-reporting-agent-dashboard-builder",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 95,
+      "name": "Looker – Dashboard Summarization extension (Google dev community)",
+      "url": "https://discuss.google.dev/t/how-to-build-ai-driven-looker-dashboards-using-the-summarization-extension/161829",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"For every query in your dashboard, the extension automatically generates a concise summary of the data, highlighting key trends, outliers, and noteworthy patterns.\"",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 96,
+      "name": "Power BI – Copilot: summarize content (Microsoft Learn)",
+      "url": "https://learn.microsoft.com/en-us/power-bi/create-reports/copilot-pane-summarize-content",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"You can summarize report pages by using Copilot in smart narrative visuals on the page, in the Copilot pane, or in report subscriptions.\"",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 97,
+      "name": "Power BI – Updates to Copilot in Power BI (blog)",
+      "url": "https://powerbi.microsoft.com/en-us/blog/updates-to-copilot-in-power-bi-more-ways-to-see-learn-from-and-ask-about-your-report-data/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"a high-level overview of major trends, patterns, and KPIs\" (구독 메일 요약 설명)",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 98,
+      "name": "Power BI – Write Copilot prompts to create narrative visuals",
+      "url": "https://learn.microsoft.com/en-us/power-bi/create-reports/copilot-prompts-narratives",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 99,
+      "name": "Tableau Pulse – Explore Metrics (help)",
+      "url": "https://help.tableau.com/current/online/en-us/pulse_explore_metrics.htm",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Your insight summary generates when you follow two or more metrics.\"",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 100,
+      "name": "Tableau Pulse – Trailhead: Discover Tableau Pulse",
+      "url": "https://trailhead.salesforce.com/content/learn/modules/tableau-pulse-quick-look/discover-tableau-pulse",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 101,
+      "name": "Tableau Pulse – 제품 페이지 (Salesforce)",
+      "url": "https://www.salesforce.com/products/tableau-pulse/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"a personalized, AI-generated natural language summary of insights on what's happening across your metrics\"",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 102,
+      "name": "ThoughtSpot – Business Monitoring with ThoughtSpot (blog)",
+      "url": "https://www.thoughtspot.com/blog/business-monitoring-with-thoughtspot",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Business Monitoring with ThoughtSpot\" (페이지 제목)",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 103,
+      "name": "ThoughtSpot – KPI change analysis (mobile docs)",
+      "url": "https://docs.thoughtspot.com/cloud/latest/mobile-kpi-change-analysis",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Clicking the KPI card reveals a detailed natural language summary of the change, and the change contributors for the selected KPI.\"",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 104,
+      "name": "ThoughtSpot – Liveboard AI Highlights (docs)",
+      "url": "https://docs.thoughtspot.com/cloud/latest/liveboard-ai-highlights",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"AI Highlights are calculated for the first five time-series KPIs on a particular Liveboard tab. Each tab gets its own summary.\"",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 105,
+      "name": "ThoughtSpot – Liveboard Insights (data visualization)",
+      "url": "https://www.thoughtspot.com/product/data-visualization-tools",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 106,
+      "name": "Grafana – Business Observability: North Star Metrics (dashboard template)",
+      "url": "https://grafana.com/grafana/dashboards/24280-template-business-observability-north-star-metrics",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"a business observability dashboard tracking North Star metrics and key business KPIs\"",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 107,
+      "name": "Tableau Exchange – Gaming Analytics accelerator",
+      "url": "https://exchange.tableau.com/products/863",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 108,
+      "name": "Tableau – Com2uS customer story (game analysis)",
+      "url": "https://www.tableau.com/solutions/customer/com2us-creating-new-rules-game-analysis-user-friendly-data",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 제목에 \"com2us_main_image\" 이미지 표기만 있음)",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 109,
+      "name": "Tableau – Playlab customer story",
+      "url": "https://www.tableau.com/solutions/customer/gaming-firm-playlab-speeds-data-insights-300",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Gaming firm, Playlab speeds data to insights by up to 300%\" (페이지 제목)",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 110,
+      "name": "Two Minute Reports – App store report (Looker Studio template)",
+      "url": "https://twominutereports.com/templates/app-store-report-looker-studio",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 111,
+      "name": "Two Minute Reports – Mobile app report (Looker Studio template)",
+      "url": "https://twominutereports.com/templates/mobile-app-report-looker-studio",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "회사용 BI·KPI"
+    },
+    {
+      "id": 112,
+      "name": "Databox – App Store Connect Sales Overview template",
+      "url": "https://databox.com/template/app-store-connect-sales-overview",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 113,
+      "name": "Databox – Appfigures Sales Performance dashboard template",
+      "url": "https://databox.com/dashboard-examples/appfigures-sales-performance-dashboard-template",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: revenue, downloads, user engagement)",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 114,
+      "name": "Databox – Databoards (big TV screen office wall KPI dashboard)",
+      "url": "https://databox.com/product/databoards",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Databox Databoard example: big tv screen office wall metric KPI dashboard\" (검색 결과 제목)",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 115,
+      "name": "Databox – Mobile analytics dashboards",
+      "url": "https://databox.com/product/mobile",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"daily scorecards, weekly summaries, and performance alerts directly to your mobile phone\"",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 116,
+      "name": "Fugo – GameAnalytics dashboard (dashboard finder)",
+      "url": "https://www.fugo.ai/dashboard/gameanalytics-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 117,
+      "name": "Fugo – Sensor Tower dashboard (dashboard finder)",
+      "url": "https://fugo.ai/dashboard/sensor-tower-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 118,
+      "name": "Geckoboard – Dashboard examples",
+      "url": "https://www.geckoboard.com/dashboard-examples/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Team in a meeting room viewing a Geckoboard dashboard on a TV screen\" (검색 결과 제목/이미지 설명) / 리뷰: \"glance at the screen I have hanging on the wall to know the health of the business\"",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 119,
+      "name": "Geckoboard – TV dashboards",
+      "url": "https://www.geckoboard.com/product/tv-dashboards/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"easy to read across a room and understand at a glance\"",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 120,
+      "name": "Klipfolio – Klips: Learning with sample dashboards (help)",
+      "url": "https://support.klipfolio.com/hc/en-us/articles/31779501842967-Klips-Learning-with-sample-dashboards",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"Klips includes the following sample dashboards: Executive Dashboard, Lead Funnel Dashboard, Sales Dashboard\"",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 121,
+      "name": "Mixpanel × Geckoboard – Mixpanel dashboards",
+      "url": "https://www.geckoboard.com/integrations/mixpanel/",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 122,
+      "name": "ScreenCloud – Competitor intelligence dashboard",
+      "url": "https://screencloud.com/dashboards/competitor-intelligence-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 123,
+      "name": "SquaredUp – Steam player data dashboard (user story)",
+      "url": "https://squaredup.com/user-stories/steam-player-data-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "KPI 모니터링 화면(TV·월보드)"
+    },
+    {
+      "id": 124,
+      "name": "Umami – Create a public dashboard (docs)",
+      "url": "https://docs.umami.is/docs/guides/create-a-public-dashboard",
+      "type": "b",
+      "image_url": null,
+      "evidence": "\"The share URL provides a read-only view of your website's analytics that anyone with the link can access without logging in.\"",
+      "viewed": "미열람",
+      "category": "마케팅·웹 분석"
+    },
+    {
+      "id": 125,
+      "name": "Apache Superset (GitHub README)",
+      "url": "https://github.com/apache/superset",
+      "type": "b",
+      "image_url": "https://raw.githubusercontent.com/apache/superset/master/docs/static/img/screenshots/dashboard.jpg",
+      "evidence": "\"Craft Beautiful, Dynamic Dashboards\" (README 문장)",
+      "viewed": "열람",
+      "category": "오픈소스 대시보드(GitHub)"
+    },
+    {
+      "id": 126,
+      "name": "Countly – mobile/game analytics (GitHub README)",
+      "url": "https://github.com/Countly/countly-server",
+      "type": "b",
+      "image_url": "https://count.ly/github/countly-highlights.png?v3",
+      "evidence": "\"Built in reports and customizable dashboards\" (README 문장; 이미지 서버 접속 막혀 미열람)",
+      "viewed": "README 열람, 이미지 미열람",
+      "category": "오픈소스 대시보드(GitHub)"
+    },
+    {
+      "id": 127,
+      "name": "Metabase (GitHub README)",
+      "url": "https://github.com/metabase/metabase",
+      "type": "b",
+      "image_url": "https://raw.githubusercontent.com/metabase/metabase/master/docs/images/metabase-product-screenshot-updated.png",
+      "evidence": "\"Build handsome, interactive dashboards with filters, auto-refresh, fullscreen, custom click behavior, and more.\" (README 문장)",
+      "viewed": "열람",
+      "category": "오픈소스 대시보드(GitHub)"
+    },
+    {
+      "id": 128,
+      "name": "OpenPanel (GitHub README)",
+      "url": "https://github.com/Openpanel-dev/openpanel",
+      "type": "b",
+      "image_url": "https://raw.githubusercontent.com/Openpanel-dev/openpanel/main/apps/public/public/ogimage.png",
+      "evidence": "\"Real-time Dashboards: Live data updates and interactive charts\" (README 문장)",
+      "viewed": "열람",
+      "category": "오픈소스 대시보드(GitHub)"
+    },
+    {
+      "id": 129,
+      "name": "Plausible Analytics (GitHub README)",
+      "url": "https://github.com/plausible/analytics",
+      "type": "b",
+      "image_url": "https://raw.githubusercontent.com/plausible/analytics/master/.github/plausible-analytics-dashboard.webp",
+      "evidence": "\"Get weekly or monthly reports via email or Slack, including traffic spike/drop notifications.\" (README 문장)",
+      "viewed": "열람",
+      "category": "오픈소스 대시보드(GitHub)"
+    },
+    {
+      "id": 130,
+      "name": "Redash (GitHub README)",
+      "url": "https://github.com/getredash/redash",
+      "type": "b",
+      "image_url": "https://raw.githubusercontent.com/getredash/website/8e820cd02c73a8ddf4f946a9d293c54fd3fb08b9/website/_assets/images/redash-anim.gif",
+      "evidence": "\"Create beautiful visualizations with drag and drop, and combine them into a single dashboard.\" (README 문장)",
+      "viewed": "열람",
+      "category": "오픈소스 대시보드(GitHub)"
+    },
+    {
+      "id": 131,
+      "name": "Sensor Tower – Cuspera 제품 페이지 ('Product Feature - App Overview' 영상)",
+      "url": "https://cuspera.com/products/sensor-tower-x-3210",
+      "type": "c",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과에 \"Product Feature - App Overview\" 영상 썸네일 표기만 있음)",
+      "viewed": "미열람",
+      "category": "앱·게임 시장 정보"
+    },
+    {
+      "id": 132,
+      "name": "AppTweak – Video 1: Intro (ASO walkthrough 영상)",
+      "url": "https://help.apptweak.com/en/articles/9331276-video-1-intro-3-mins-start-here",
+      "type": "c",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "ASO·순위 추적"
+    },
+    {
+      "id": 133,
+      "name": "Apple WWDC25 session 252 – App Store Connect analytics overview",
+      "url": "https://developer.apple.com/videos/play/wwdc2025/252/",
+      "type": "c",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: 새 overview 페이지는 customer journey 순서로 구성)",
+      "viewed": "미열람",
+      "category": "스토어 콘솔"
+    },
+    {
+      "id": 134,
+      "name": "GameAnalytics – Introducing Custom Dashboards and Widgets (영상 포함 글)",
+      "url": "https://gameanalytics.com/?p=1279",
+      "type": "c",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: 제품 디자이너가 새 대시보드 기능을 영상으로 설명)",
+      "viewed": "미열람",
+      "category": "제품·게임 KPI 분석 도구"
+    },
+    {
+      "id": 135,
+      "name": "Amazon Q in QuickSight – 영상 (AWS resources)",
+      "url": "https://amer.resources.awscloud.com/vidyard-all-players-2/amazon-q-in-quicksight",
+      "type": "c",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 136,
+      "name": "Atrium – Tableau Pulse demo",
+      "url": "https://atrium.ai/resources/tableau-pulse-demo",
+      "type": "c",
+      "image_url": null,
+      "evidence": "근거 없음 (검색 결과 요약: Tableau Pulse hands-on overview)",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 137,
+      "name": "InterWorks – Tableau Pulse set up and use case demo (영상)",
+      "url": "https://interworks.com/blog/2024/01/03/tableau-pulse-set-up-and-use-case-demo/",
+      "type": "c",
+      "image_url": null,
+      "evidence": "근거 없음",
+      "viewed": "미열람",
+      "category": "AI 요약 + 지표"
+    },
+    {
+      "id": 138,
+      "name": "Lightdash (GitHub README)",
+      "url": "https://github.com/lightdash/lightdash",
+      "type": "c",
+      "image_url": "https://raw.githubusercontent.com/lightdash/lightdash/master/static/screenshots/platform-overview-readme.jpg",
+      "evidence": "근거 없음 (README 이미지는 'Platform overview' 영상 썸네일로, 대시보드 화면이 아님)",
+      "viewed": "열람",
+      "category": "오픈소스 대시보드(GitHub)"
+    }
+  ]
+}
