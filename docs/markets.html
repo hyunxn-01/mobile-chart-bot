@@ -2850,7 +2850,7 @@ function renderMarketBrief(text){
       else { cur.bullets.push(t); }
     });
     if(!cards.length) return '<div class="aib-sec"><div class="mkb-li">'+inline(raw)+'</div></div>';
-    const isStrat=c=>/진출\s*전략|시사점|전략|실행\s*방안|눈여겨볼\s*게임/.test(c.title);   // 전략·시사점·실행 방안·눈여겨볼 게임 카드 = 두괄식 상단(2026-10-14 '실행 방안' 추가, 2026-10-19 '눈여겨볼 게임' 추가 — '실행 방안'은 10-19 생성분 지난 기록용으로 남김)
+    const isStrat=c=>/진출\s*전략|시사점|전략|실행\s*방안|눈여겨볼\s*게임|^주요\s*게임$/.test(c.title);   // 전략·시사점·실행 방안·눈여겨볼 게임·주요 게임 카드 = 두괄식 상단(2026-10-14 '실행 방안' 추가, 2026-10-19 '눈여겨볼 게임' 추가 — '실행 방안'은 10-19 생성분 지난 기록용으로 남김. 2026-11-02 '눈여겨볼 게임' → '주요 게임'(11/9 생성분부터): 이름이 정확히 '주요 게임'일 때만, 지난 기록의 '주요 게임·퍼블리셔'는 아래 줄 그대로)
     const strat=cards.filter(isStrat), rest=cards.filter(c=>!isStrat(c));
     const bl=b=>'<div class="mkb-li">'+inline(b)+'</div>';
     // 요약(첫 불릿)이 여러 문장으로 길어지면 첫 문장만 요약, 나머지는 분석으로 내림(요약>분석 방지 · grounding 문장이 요약에 붙는 문제 보정). 110자 이하 단문 요약은 건드리지 않음.
@@ -2862,7 +2862,7 @@ function renderMarketBrief(text){
       return {sum:s0, rest}; };
     const card=(c,o)=>{ const sp=sumSplit(c.bullets); let h='<div class="aib-sec'+(o.key?' aib-sec-key':'')+'"><div class="aib-h"><span class="aib-ht">'+inline(c.title)+'</span>'+(sp.rest.length?'<button type="button" class="aib-more" data-open="0" onclick="toggleBriefDetail(this)">자세히 ▾</button>':'')+'</div>'; if(sp.rest.length){ h+='<div class="aib-sum">'+bl(sp.sum)+'</div><div class="aib-detail" hidden>'+sp.rest.map(bl).join('')+'</div>'; } else { h+=bl(sp.sum); } return h+'</div>'; };   // 2026-10-18 L4: '자세히'는 제목 줄 오른쪽   // 접힘=요약(첫 문장)만 / 자세히=분석(카드별 토글)
     // 2026-10-24 밤 사용자 "ai 브리핑은 요약과 자세히는 유지하자": 모든 항목을 종전 카드(요약 한 줄 + 자세히 단추)로 보인다.
-    // 핵심 항목(시사점 · 눈여겨볼 게임 · 실행 방안)은 위 줄에 넓게, 나머지 항목은 아래 줄에 나란히.
+    // 핵심 항목(시사점 · 주요 게임(지난 기록은 눈여겨볼 게임) · 실행 방안)은 위 줄에 넓게, 나머지 항목은 아래 줄에 나란히.
     let html='';
     if(strat.length) html+='<div class="aib-row aib-row-key">'+strat.map(c=>card(c,{key:true})).join('')+'</div>';
     if(rest.length) html+='<div class="aib-row">'+rest.map(c=>card(c,{})).join('')+'</div>';
