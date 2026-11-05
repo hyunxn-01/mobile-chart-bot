@@ -13,10 +13,10 @@
 | **무엇** | 한국 App Store 게임 매출 차트 자동 수집·분석·리포트 봇 |
 | **목적** | 사업PM 포트폴리오의 시장 인텔리전스(Market Intelligence) 축 |
 | **실행 주기** | 매일 한국시간 오전 7시 37분 (cron-job.org 트리거) |
-| **출력** | 이메일 리포트 (평일=라이트 / 종합 보고일=엑셀 첨부) |
-| **AI 모델** | Claude Opus 5.5 (`claude-opus-5-5`, 코드 상단 `CLAUDE_MODEL` 상수로 관리. 2026-10-18에 Opus 4.8에서 교체). 중국어 · 일본어 게임명 한글 표기는 Claude Sonnet 5.5(`claude-sonnet-5-5`, `TRANSLATE_MODEL`, 2026-10-20에 Sonnet 4.6에서 교체) |
-| **월 운영비** | 약 $2 (Opus 4.7 · 하루 1회 호출 당시 추정). Opus 5.5 단가는 입력 $4 · 출력 $20 / 100만 토큰으로 Opus 4.8($5 · $25)보다 20% 낮다 |
-| **저장소** | GitHub Private 레포 |
+| **출력** | 웹 대시보드(GitHub Pages). 메일 발송 여부는 `chart_collector.py`의 `SEND_DAILY_EMAIL` |
+| **AI 모델** | 코드 상단 `CLAUDE_MODEL` 상수로 관리. 중국어 · 일본어 게임명 한글 표기는 `TRANSLATE_MODEL` |
+| **월 운영비** | 저장소 밖 운영 문서(위키 `chartbot-AI브리핑`의 비용 항목)에 적습니다 |
+| **저장소** | GitHub 공개 레포 |
 
 핵심 아이디어: **주식 차트의 이동평균선 개념을 게임 차트에 적용**했습니다.
 1일선·1주선·1달선·분기선·1년선을 두고, 단기선과 장기선의 움직임이 일치하는지로
@@ -48,7 +48,7 @@
                                              ▼
                                     ┌────────────────┐
                                     │  Gmail SMTP    │
-                                    │ (이메일 리포트) │
+                                    │ (켤 때만 발송)  │
                                     └────────────────┘
                                              │
                                              ▼
@@ -67,19 +67,7 @@ GitHub Actions가 이를 레포에 커밋합니다. 이 누적 데이터가 다�
 
 ## 3. 파일 구조와 역할
 
-```
-mobile-chart-bot/
-├── chart_collector.py          # 봇의 전부. 수집·분석·리포트·발송 전 과정
-├── requirements.txt            # anthropic, requests, openpyxl, pandas
-├── README.md                   # GitHub용 간단 소개
-├── HANDOFF.md                  # 이 문서
-├── .github/workflows/
-│   └── daily_chart.yml         # GitHub Actions 워크플로우 정의
-└── data/
-    └── history/
-        ├── .gitkeep            # 빈 폴더 유지용
-        └── YYYY-MM-DD.json     # 일별 차트 스냅샷 (봇이 자동 생성·커밋)
-```
+파일 구성은 같은 폴더 `README.md` 「파일 구조」를 봅니다.
 
 ### chart_collector.py 내부 구조 (섹션별)
 
@@ -90,8 +78,8 @@ mobile-chart-bot/
 | 3. 평균 순위 + 비교 계산 | 이동평균 순위 산출, 단순 비교, 기간 비교 |
 | 4. 유의문구 생성 | 데이터 부족 시 경고 메시지 |
 | 5. 시간축별 분석 함수 | analyze_daily / weekly / monthly / quarterly / yearly |
-| 6. 활성 시간축 판단 | 오늘 날짜로 어떤 시간축을 분석할지 결정 |
-| 7. Claude 요약 | 재시도 로직 포함 API 호출, 일간/종합 요약 생성 |
+| 6. 활성 시간축 판단 | 분석할 시간축 목록 (`get_active_timeframes`) |
+| 7. Claude 요약 | 재시도 로직 포함 API 호출 (한국 일일 요약 호출은 꺼짐) |
 | 8. 엑셀 | 시간축별 시트가 있는 종합 엑셀 생성 |
 | 9. 메일 본문 | 일간/종합 HTML 본문 생성 |
 | 10. 메일 발송 | Gmail SMTP로 발송 (첨부 옵션) |
@@ -103,7 +91,7 @@ mobile-chart-bot/
 
 새 환경에서 이 봇을 다시 세팅하려면 아래 두 가지가 필요합니다.
 
-### 4-1. GitHub Secrets (레포 Settings → Secrets and variables → Actions)
+### 4-1. GitHub Secrets (레포 Settings → Secrets and variables → Actions. `GMAIL_*` · `RECIPIENT_EMAIL`은 메일을 켤 때만 필요)
 
 | Secret 이름 | 값 | 비고 |
 |---|---|---|
@@ -152,10 +140,9 @@ GitHub Settings → Developer settings → Personal access tokens → Fine-grain
 
 ## 5. 핵심 로직 — 캘린더 기반 다중 시간축
 
-각 시간축은 **자기 날짜에만 활성화**됩니다. 데이터가 부족하면 건너뛰지 않고
-유의문구(⚠️)를 표시합니다.
+모든 시간축을 날짜와 무관하게 매일 계산하고(`get_active_timeframes`), 표시할지는 `main()`이 비교 가능 여부로 정합니다.
 
-| 시간축 | 보고 시점 | 비교 대상 (과거 vs 최근) | 방식 |
+| 시간축 | 결과가 바뀌는 때 | 비교 대상 (과거 vs 최근) | 방식 |
 |---|---|---|---|
 | **1일선** | 매일 | 어제 vs 오늘 | 단순 비교 (순위) |
 | **1주선** | 매주 월요일 | 전전주(월~일) vs 전주(월~일) | 이동평균 (평균 순위) |
@@ -163,10 +150,9 @@ GitHub Settings → Developer settings → Personal access tokens → Fine-grain
 | **분기선** | 1/1, 4/1, 7/1, 10/1 | 전전분기 vs 전분기 | 이동평균 (평균 순위) |
 | **1년선** | 매년 1/1 | 재작년 vs 작년 | 이동평균 (평균 순위) |
 
-### 리포트 두 종류
+### 리포트와 변동 임계값
 
-- **일간 리포트** (평일, 1일선만 활성): 가벼운 본문, 엑셀 없음, 변동 임계값 10등
-- **종합 리포트** (시간축 2개 이상 활성): 엑셀 첨부(시간축별 시트), 변동 임계값 5등
+메일을 켜면 매일 종합 리포트 한 종류를 보냅니다(`main()`). 변동 임계값은 시간축별 `analyze_*` 함수의 `threshold`를 봅니다.
 
 ### 단기 vs 중장기 판별 (AI 분석의 핵심)
 
@@ -179,12 +165,12 @@ GitHub Settings → Developer settings → Personal access tokens → Fine-grain
 ## 6. 동작 흐름 (단계별)
 
 1. **트리거**: cron-job.org가 매일 07:37 KST에 GitHub API 호출 → 워크플로우 실행
-2. **환경변수 확인**: Secrets 4개 존재 검증 (없으면 즉시 에러)
-3. **활성 시간축 판단**: 오늘 날짜로 어떤 시간축을 분석할지 결정
+2. **환경변수 확인**: 필요한 Secrets 존재 검증 (`main()`의 `need`, 없으면 즉시 에러)
+3. **활성 시간축 판단**: 분석할 시간축 목록을 받음 (`get_active_timeframes`)
 4. **차트 수집**: Apple RSS에서 Top 100 수집 (Top Grossing 실패 시 Top Free fallback)
 5. **시간축별 분석**: 활성 시간축마다 과거/최근 데이터 로드 → 비교
-6. **AI 요약**: 일간이면 짧은 요약, 종합이면 다중 시간축 인사이트 (529 에러 시 재시도)
-7. **리포트 발송**: 모드에 따라 라이트 이메일 또는 엑셀 첨부 이메일
+6. **AI 요약**: 한국 차트 일일 요약 호출은 꺼짐(`attach_insights`). AI 호출은 다국가 브리핑에서 발생 (529 에러 시 재시도)
+7. **리포트 발송**: `SEND_DAILY_EMAIL`을 켰을 때만 엑셀 첨부 이메일
 8. **데이터 저장**: 오늘 차트를 `data/history/`에 저장 → Actions가 레포에 커밋
 
 ---
@@ -218,7 +204,9 @@ GitHub Settings → Developer settings → Personal access tokens → Fine-grain
 
 ---
 
-## 9. 향후 작업 (백로그)
+## 9. 지난 구상
+
+이 문서를 처음 쓸 때의 구상이고 지금 할 일 목록이 아닙니다. 시각화 대시보드와 유저 쪽 분석은 그 뒤 따로 만들었습니다.
 
 ### 이 봇 자체 고도화
 - **파생 지표**: 순위 표준편차(안정성), 차트 연속 거주 일수, 시간축별 최고·최저 순위
@@ -244,19 +232,17 @@ GitHub Settings → Developer settings → Personal access tokens → Fine-grain
 2. **시크릿은 포함되어 있지 않습니다.** API 키·Gmail 비번 등은 GitHub Secrets에만
    있고 코드엔 없습니다. 로컬 실행 시 환경변수로 직접 주입해야 합니다.
 
-3. **모델 변경은 한 곳에서.** AI 모델을 바꾸려면 `chart_collector.py` 상단의
-   `CLAUDE_MODEL` 상수 한 줄만 수정하면 됩니다.
+3. **모델은 세 상수에서 지정합니다.** `chart_collector.py` 상단의 `CLAUDE_MODEL` · `TRANSLATE_MODEL`과
+   `genre_classify.py`의 `AI_MODEL`입니다.
 
-4. **실제 메일 발송 주의.** `main()`을 그냥 실행하면 진짜로 메일을 보냅니다.
+4. **실제 메일 발송 주의.** `SEND_DAILY_EMAIL`을 켠 채 `main()`을 실행하면 진짜로 메일을 보냅니다.
    테스트 시에는 발송 부분을 주석 처리하거나 `RECIPIENT_EMAIL`을 본인 테스트
    주소로 두세요.
 
-5. **시간축 활성화는 날짜 의존.** 종합 리포트 로직(엑셀·다중 시간축)을 테스트하려면
-   `get_active_timeframes()`가 여러 시간축을 반환하는 날짜(월요일, 매월 1일 등)를
-   기준으로 하거나, 코드에서 `today_dt`를 임시로 고정해 테스트하세요.
+5. **시간축은 날짜와 무관하게 매일 모두 계산됩니다**(`get_active_timeframes()`). 기간 경계를 바꿔 테스트하려면
+   코드에서 `today_dt`를 임시로 고정하세요.
 
-6. **이어서 하면 좋은 다음 작업**: 위 9번 백로그 중 "파생 지표" 또는
-   "VoC 리뷰 감성분석 봇"이 우선순위 후보입니다.
+6. **9번은 지난 구상입니다.** 다음 작업은 이 문서가 정하지 않습니다.
 
 ---
 
