@@ -62,8 +62,8 @@ HISTORY_FREE_DIR = DATA_DIR / 'history_free'   # Top Free(인기) 차트 누적 
 HISTORY_FREE_DIR.mkdir(exist_ok=True)
 
 # === 다국가 수집(iOS App Store 스토어프런트) ===
-# 1차: T1 코어 10개국. 안정 후 EXTRA를 COUNTRIES에 합쳐 32개국으로 확장.
-# 현재 수집(주요 10개국). 나머지 22개국은 사이트 완성 후 맨 마지막에 확장(저장 메타-분리 #98 후).
+# COUNTRIES는 T1 코어 10개국, COUNTRIES_EXTRA는 나머지 22개국이다.
+# 매일 수집은 둘을 합친 32개국을 받는다(main의 collect_all_countries 호출).
 COUNTRIES = ['kr', 'us', 'jp', 'cn', 'tw', 'gb', 'de', 'fr', 'ca', 'au']
 COUNTRIES_EXTRA = ['it', 'es', 'nl', 'ru', 'se', 'sa', 'ae', 'eg', 'tr',
                    'br', 'mx', 'ar', 'co', 'id', 'th', 'vn', 'ph', 'my', 'sg', 'in', 'pk', 'bd']
@@ -2140,7 +2140,7 @@ def main():
 
     print("[다국가] 전체 국가 iOS 차트 수집·저장 + 주요시장/지역/글로벌 브리핑...")
     try:
-        collected = collect_all_countries(COUNTRIES + COUNTRIES_EXTRA)  # [임시·1회] 전 32개국 수집→전 지역 브리핑 생성(이후 코어10로 복귀, 지역탭은 persist 로직으로 유지)
+        collected = collect_all_countries(COUNTRIES + COUNTRIES_EXTRA)  # 전 32개국 수집→전 지역 브리핑 생성(코어 10개국만 받게 되돌려도 지역탭은 persist 로직으로 유지된다)
         majors = build_major_briefs(collected)      # 주요 시장 개별 먼저
         regions = build_regional_briefs(collected)  # 중소규모 지역 묶음(전 지역 생성)
         write_briefs_index(majors, regions)         # 탭 인덱스(주요→지역)
