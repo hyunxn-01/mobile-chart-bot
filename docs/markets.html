@@ -155,10 +155,19 @@
   .layout{ display:flex; gap:18px; align-items:flex-start; }
   .chartbox{ flex:1 1 auto; min-width:0; }
   .canvas-wrap{ position:relative; width:100%; height:520px; }
-  .chartbar{ position:relative; height:13px; margin-top:10px; background:var(--chip); border-radius:7px; cursor:pointer; }
-  .chartbar-thumb{ position:absolute; top:0; bottom:0; left:0; width:100%; background:var(--accent);
-    opacity:.45; border-radius:7px; cursor:grab; transition:opacity .12s; }
-  .chartbar-thumb:hover{ opacity:.62; } .chartbar-thumb:active{ opacity:.78; cursor:grabbing; }
+  /* 2026-11-11 보는 구간 막대(사용자 "막대만 가지고오자"): 가는 줄 위에 남색 구간과 둥근 손잡이 둘. 가운데 구간을 끌면 통째로 옮겨지고,
+     손잡이를 끌면 그쪽 끝만 바뀐다. 잡은 손잡이 위에 그 날짜가 뜬다. 전에는 높이 13px인 막대 하나였다 */
+  .chartbar{ position:relative; height:28px; margin-top:4px; cursor:pointer; }
+  .chartbar::before{ content:''; position:absolute; left:0; right:0; top:50%; height:4px; margin-top:-2px; background:var(--hair); border-radius:999px; }
+  .chartbar-thumb{ position:absolute; top:0; bottom:0; left:0; width:100%; cursor:grab; }
+  .chartbar-thumb::before{ content:''; position:absolute; left:0; right:0; top:50%; height:4px; margin-top:-2px; background:var(--act); border-radius:999px; }
+  .chartbar-thumb:active{ cursor:grabbing; }
+  .chartbar-h{ position:absolute; top:50%; z-index:1; width:28px; height:28px; min-height:0; margin:-14px 0 0 -14px; padding:0; border:0; background:none; cursor:ew-resize; touch-action:none; }
+  .chartbar-h::before{ content:''; position:absolute; left:50%; top:50%; width:18px; height:18px; margin:-9px 0 0 -9px; border-radius:999px; background:var(--act); box-shadow:0 0 0 2px var(--bg); }
+  .chartbar-h:hover::before, .chartbar-h.is-drag::before{ box-shadow:0 0 0 2px var(--bg), 0 0 0 6px var(--chip); box-shadow:0 0 0 2px var(--bg), 0 0 0 6px color-mix(in srgb, var(--act) 18%, transparent); }
+  .chartbar-tip{ position:absolute; bottom:100%; z-index:3; margin-bottom:2px; padding:2px 9px; transform:translateX(-50%); border-radius:999px; background:var(--ink); color:var(--bg);
+    font-size:13px; font-weight:700; line-height:1.5; white-space:nowrap; font-variant-numeric:tabular-nums; pointer-events:none; }
+  .chartbar-tip[hidden]{ display:none; }
   .viewhint{ display:none; }
   .panel{ flex:0 0 440px; min-width:0; max-width:440px; border:1px solid var(--line); border-radius:12px;
     background:var(--panel); padding:11px; }
@@ -478,8 +487,9 @@
     .chartbox{ width:calc(100% - 8px); }
     .canvas-wrap{ height:340px; }
     .canvas-wrap canvas{ touch-action:pan-y; }
-    .chartbar{ height:20px; touch-action:none; }
+    .chartbar{ height:36px; touch-action:none; }
     .chartbar-thumb{ touch-action:none; }
+    .chartbar-h{ width:36px; height:36px; margin:-18px 0 0 -18px; }   /* 2026-11-11: 손가락으로 잡는 자리 36px */
     .srcrow{ flex-wrap:wrap; gap:8px; }
     .tabs{ overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; }
     .tab{ white-space:nowrap; }
@@ -858,7 +868,8 @@
     .chartbox:focus-within .zoombtns{ opacity:1; pointer-events:auto; }
   }
   .zoombtns button:focus-visible{ outline:2px solid var(--act); outline-offset:2px; }
-  .chartbar:focus-visible{ outline:2px solid var(--act); outline-offset:3px; }
+  .chartbar-thumb:focus-visible, .chartbar-h:focus-visible{ outline:none; }   /* 2026-11-11: 초점은 가운데 구간과 손잡이가 따로 받는다 */
+  .chartbar-thumb:focus-visible::before, .chartbar-h:focus-visible::before{ box-shadow:0 0 0 2px var(--bg), 0 0 0 4px var(--act); }
   /* 2026-10-26 P2-1: 데이터가 오기 전에 AI 브리핑 · 주간 순위의 자리를 잡아 둔다(늦게 나타나며 아래 내용을 밀어 내던 것, 내용 밀림 점수 0.50).
      높이는 2026-10-26 데이터로 다 그린 뒤 잰 값보다 조금 작게 잡았고, 다 그리면 is-loading을 뗀다 */
   #mkbrief.is-loading #mkbriefAxis{ min-height:38px; }
@@ -1180,7 +1191,7 @@
         <canvas id="chart" role="img" aria-label="모바일 게임 순위 추이 꺾은선 그래프. 위쪽이 1위. 선택한 게임의 선이 강조됩니다."></canvas>
         <div class="zoombtns" id="zoombtns"><button id="zoomIn" type="button" aria-label="확대">＋</button><button id="zoomOut" type="button" aria-label="축소">－</button></div>
       </div>
-      <div class="chartbar" id="chartbar" title="막대를 끌면 보는 구간이 이동합니다" tabindex="0" role="scrollbar" aria-controls="chart" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="그래프에서 보는 구간(확대한 뒤 왼쪽 · 오른쪽 화살표로 옮김)"><div class="chartbar-thumb" id="chartthumb"></div></div>   <!-- 2026-10-26 P1-4: 키보드로도 옮긴다 -->
+      <div class="chartbar" id="chartbar" role="group" aria-label="그래프에서 보는 구간"><div class="chartbar-thumb" id="chartthumb" title="가운데 막대를 끌면 보는 구간이 통째로 이동합니다" tabindex="0" role="scrollbar" aria-controls="chart" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="보는 구간 옮기기(확대한 뒤 왼쪽 · 오른쪽 화살표로 옮김)"></div><button type="button" class="chartbar-h" id="chartHmin" role="slider" aria-controls="chart" aria-label="보는 구간의 시작"></button><button type="button" class="chartbar-h" id="chartHmax" role="slider" aria-controls="chart" aria-label="보는 구간의 끝"></button><span class="chartbar-tip" id="chartbarTip" hidden></span></div>   <!-- 2026-10-26 P1-4: 키보드로도 옮긴다 -->
       <p class="viewhint" id="viewhint">전체 보기</p>
     </div>
     <aside class="panel">
@@ -1518,10 +1529,12 @@ function toggle(aid){
   restyle();
 }
 
+let chartbarTipSync=null;   // 2026-11-11: 손잡이 위 날짜 표시를 다시 맞추는 함수(setupScrollbar가 넣는다)
 function updateScrollbar(){
   if(!chart) return;
   const total=chart.data.labels.length;
   const bar=document.getElementById('chartbar'), thumb=document.getElementById('chartthumb'), hint=document.getElementById('viewhint');
+  const hmin=document.getElementById('chartHmin'), hmax=document.getElementById('chartHmax');
   if(total<2){ bar.style.display='none'; if(hint) hint.style.display='none'; return; }
   bar.style.display=''; if(hint) hint.style.display='';
   const ca=chart.chartArea;
@@ -1530,10 +1543,13 @@ function updateScrollbar(){
   let min=(x.min==null?0:x.min), max=(x.max==null?total-1:x.max);
   const cmin=Math.max(0,min), cmax=Math.min(total-1,max), denom=Math.max(1,total-1);
   thumb.style.left=(cmin/denom*100)+'%';
-  thumb.style.width=Math.max(5,(cmax-cmin)/denom*100)+'%';
+  thumb.style.width=((cmax-cmin)/denom*100)+'%';   // 2026-11-11: 양 끝을 손잡이가 표시하므로 구간의 최소 폭(5%)을 두지 않는다
+  if(hmin && hmax){ const L=chart.data.labels;   // 손잡이 자리와 화면 읽기 프로그램용 값(몇째 칸인지, 그 날짜)
+    [[hmin,cmin],[hmax,cmax]].forEach(([h,v])=>{ h.style.left=(v/denom*100)+'%'; h.setAttribute('aria-valuemin','0'); h.setAttribute('aria-valuemax', String(total-1));
+      h.setAttribute('aria-valuenow', String(Math.round(v))); h.setAttribute('aria-valuetext', String(L[Math.round(v)]||'')); }); }
   const out=(min<=0 && max>=total-1);
-  { const span=Math.max(0,denom-(cmax-cmin)); bar.setAttribute('aria-valuenow', String(span>0?Math.round(cmin/span*100):0)); }   // 2026-10-26 P1-4: 키보드 · 화면 읽기 프로그램용 위치(0 ~ 100)
-  bar.style.opacity = out ? '0.6' : '1';
+  { const span=Math.max(0,denom-(cmax-cmin)); thumb.setAttribute('aria-valuenow', String(span>0?Math.round(cmin/span*100):0)); }   // 2026-10-26 P1-4: 키보드 · 화면 읽기 프로그램용 위치(0 ~ 100)
+  if(chartbarTipSync) chartbarTipSync();   // 2026-11-11: 전체 보기에서도 손잡이로 구간을 좁힐 수 있어 막대를 흐리게 하지 않는다(전에는 opacity 0.6)
   if(chart.canvas) chart.canvas.style.cursor = out ? 'default' : 'grab';
   if(hint){ const L=chart.data.labels;
     hint.textContent = out ? '전체 보기. 휠로 확대하고 막대를 끌어 옮길 수 있습니다.' : `${L[Math.round(cmin)]||''}부터 ${L[Math.round(cmax)]||''}까지 보고 있습니다`; }
@@ -1551,14 +1567,14 @@ function setupScrollbar(){
     if(nmin<0){nmin=0;nmax=dr.span;} if(nmax>denom()){nmax=denom();nmin=denom()-dr.span;}
     chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar(); });
   const end=()=>{dr=null;}; thumb.addEventListener('pointerup',end); thumb.addEventListener('pointercancel',end); thumb.addEventListener('lostpointercapture',end);   // 2026-10-26: 끌다가 붙잡기가 풀려도 끌기 상태를 정리
-  bar.addEventListener('pointerdown',e=>{ if(e.target===thumb) return;
+  bar.addEventListener('pointerdown',e=>{ if(e.target!==bar) return;
     const x=chart.scales.x; const cmin=Math.max(0,x.min==null?0:x.min), cmax=Math.min(tot()-1,x.max==null?tot()-1:x.max), span=cmax-cmin;
     const rect=bar.getBoundingClientRect(); const frac=(e.clientX-rect.left)/rect.width;
     let nmin=frac*denom()-span/2, nmax=nmin+span;
     if(nmin<0){nmin=0;nmax=span;} if(nmax>denom()){nmax=denom();nmin=denom()-span;}
     chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar(); });
   // 2026-10-26 P1-4: 키보드로 보는 구간 옮기기(왼쪽 · 오른쪽 화살표는 보는 폭의 10%, Home · End는 처음 · 끝, + · -는 확대 · 축소)
-  bar.addEventListener('keydown',e=>{
+  thumb.addEventListener('keydown',e=>{
     if(e.key==='+'||e.key==='='){ e.preventDefault(); zoomChart(1.5); return; }
     if(e.key==='-'){ e.preventDefault(); zoomChart(1/1.5); return; }
     if(['ArrowLeft','ArrowRight','Home','End'].indexOf(e.key)<0) return;
@@ -1568,6 +1584,34 @@ function setupScrollbar(){
     let nmin = e.key==='Home' ? 0 : e.key==='End' ? denom()-span : cmin+(e.key==='ArrowRight'?1:-1)*Math.max(1,span*0.1);
     if(nmin<0) nmin=0; if(nmin+span>denom()) nmin=denom()-span;
     chart.zoomScale('x',{min:nmin,max:nmin+span},'none'); updateScrollbar(); });
+  // 2026-11-11 손잡이 둘(사용자 "막대만 가지고오자"): 손잡이를 끌면 그쪽 끝만 바뀐다(가장 좁게는 세 칸).
+  // 잡거나, 마우스를 올리거나, 키보드로 가면 그 손잡이의 날짜가 위에 뜬다. 키보드는 좌우 화살표 한 칸, PageUp · PageDown 전체의 10%, Home · End 끝까지.
+  const hmin=document.getElementById('chartHmin'), hmax=document.getElementById('chartHmax'), tip=document.getElementById('chartbarTip');
+  if(hmin && hmax && tip){
+    const minSpan=()=>Math.min(3, denom());
+    const cur=()=>{ const x=chart.scales.x; return { min:Math.max(0,x.min==null?0:x.min), max:Math.min(tot()-1,x.max==null?tot()-1:x.max) }; };
+    let tipFor=null, hd=null;   // 날짜를 보이는 손잡이, 끌고 있는 손잡이('min' | 'max')
+    const syncTip=()=>{ if(!tipFor || !chart){ tip.hidden=true; return; } const c=cur(), v=(tipFor==='min'?c.min:c.max);
+      tip.textContent=fmtTick(chart.data.labels[Math.round(v)]||''); tip.style.left=(v/denom()*100)+'%'; tip.hidden=false; };
+    chartbarTipSync=syncTip;
+    const setEnd=(which,v)=>{ const c=cur(); let nmin=c.min, nmax=c.max;
+      if(which==='min') nmin=Math.max(0, Math.min(v, Math.round(c.max)-minSpan())); else nmax=Math.min(denom(), Math.max(v, Math.round(c.min)+minSpan()));
+      chart.zoomScale('x',{min:nmin,max:nmax},'none'); updateScrollbar(); };
+    [['min',hmin],['max',hmax]].forEach(([which,h])=>{
+      const rest=()=>{ if(hd!==which && document.activeElement!==h && !h.matches(':hover') && tipFor===which){ tipFor=null; syncTip(); } };
+      h.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); hd=which; h.classList.add('is-drag'); tipFor=which; syncTip(); try{h.setPointerCapture(e.pointerId);}catch(_){} });
+      h.addEventListener('pointermove',e=>{ if(hd!==which) return; const rect=bar.getBoundingClientRect(); setEnd(which, Math.round((e.clientX-rect.left)/rect.width*denom())); });
+      const end=()=>{ if(hd===which){ hd=null; h.classList.remove('is-drag'); rest(); } };
+      h.addEventListener('pointerup',end); h.addEventListener('pointercancel',end); h.addEventListener('lostpointercapture',end);
+      h.addEventListener('pointerenter',()=>{ if(!hd){ tipFor=which; syncTip(); } });
+      h.addEventListener('pointerleave',rest);
+      h.addEventListener('focus',()=>{ if(!hd){ tipFor=which; syncTip(); } });
+      h.addEventListener('blur',rest);
+      h.addEventListener('keydown',e=>{ const c=cur(), now=Math.round(which==='min'?c.min:c.max), big=Math.max(1,Math.round(denom()*0.1));
+        const to={ArrowLeft:now-1, ArrowDown:now-1, ArrowRight:now+1, ArrowUp:now+1, PageDown:now-big, PageUp:now+big, Home:0, End:denom()}[e.key];
+        if(to===undefined) return; e.preventDefault(); tipFor=which; setEnd(which,to); });
+    });
+  }
 }
 
 function setupChartDrag(){
@@ -2525,6 +2569,7 @@ function init(full){
     }));
     document.getElementById('clear').addEventListener('click',()=>{ selected.length=0; restyle(); });
     setupScrollbar();
+    if(!MOB) setupChartDrag();   // 2026-11-11: 확대한 그래프를 끌어 옮기는 처리(setupChartDrag)를 부르는 줄이 없어 안내 글과 달리 끌어도 움직이지 않았다. 휴대폰은 끄고 막대로 옮긴다
     setupPanelToggle();
     const zi=document.getElementById('zoomIn'), zo=document.getElementById('zoomOut');
     if(zi) zi.addEventListener('click',()=>zoomChart(1.5));
