@@ -190,6 +190,11 @@
   .newbadge{ display:inline-block; font-size:11.5px; font-weight:700; color:#fff; background:var(--new); border-radius:5px; padding:1px 4px; margin-right:5px; vertical-align:middle; letter-spacing:.3px; }
   .grating{ flex:0 0 auto; font-size:12.5px; color:#e0a82e; white-space:nowrap; }
   .panelnote{ font-size:12.5px; color:var(--muted); margin:2px 2px 8px; line-height:1.45; }
+  /* 2026-11-16 목록 위 안내 줄(사용자 "목록대로 반영"): 기간 단추마다 안내 한 벌(.lnv)을 같은 칸에 겹쳐 두고 고른 기간의 것만 보인다.
+     높이가 가장 긴 벌에 맞춰져, 기간 단추를 바꿔도 아래 목록이 움직이지 않는다. ⓘ 풀이는 장르 목록 머리의 ⓘ처럼 줄 아래에 띄운다(아래 .gl-head .dinfo-pop 규칙을 함께 쓴다) */
+  .panelnote.lnstack{ display:grid; position:relative; }
+  .lnstack > .lnv{ grid-area:1 / 1; min-width:0; align-self:start; line-height:1.45; }
+  .lnstack > .lnv[aria-hidden="true"]{ visibility:hidden; }
   .gitem.out{ opacity:.5; }
   .gitem.out[aria-pressed="true"]{ opacity:1; }
   .empty{ font-size:14px; color:var(--muted); padding:10px 4px; }
@@ -645,7 +650,8 @@
   .dinfo:focus-visible{ border-color:var(--muted); color:var(--text); outline:2px solid var(--act); outline-offset:2px; }   /* 2026-10-26 P2-4: 키보드 초점은 남색 테두리(전에는 원 테두리 색만 바뀌었다) */
   .dinfo-pop{ display:block; flex-basis:100%; margin:4px 0 2px; padding:6px 10px; border-radius:8px; background:var(--panel); border:1px solid var(--line); color:var(--text); font-size:13px; font-style:normal; font-weight:400; line-height:1.55; }
   /* 2026-10-18 사용자 "매출에 I 눌러도 아무것도 안나와": 표 머리(장르 목록 · 갭 표)의 ⓘ도 누르면 펼침 — 좁은 칸 안이라 머리 줄 아래에 띄운다 */
-  .gl-head .dinfo-pop{ position:absolute; left:8px; right:8px; top:calc(100% + 3px); margin:0; z-index:3; text-align:left; white-space:normal; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+  .gl-head .dinfo-pop, .lnstack .dinfo-pop{ position:absolute; left:8px; right:8px; top:calc(100% + 3px); margin:0; z-index:3; text-align:left; white-space:normal; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+  .lnstack .dinfo-pop{ left:0; right:0; }   /* 2026-11-16: 게임 목록 위 안내 줄의 ⓘ 풀이(안내 줄 폭에 맞춘다) */
   .pubtable th{ position:relative; }
   .pubtable th .dinfo-pop{ position:absolute; right:0; top:calc(100% + 2px); width:320px; max-width:70vw; margin:0; text-align:left; white-space:normal; z-index:3; box-shadow:0 2px 8px rgba(0,0,0,.08); }
   /* 2026-10-18 밤 사용자 "전환 버튼 레이아웃도 통일 … 사이즈는 시장비교 기준 · 지표, 디자인은 장르 추이, 애니메이션": 공통 전환 단추(.seg).
@@ -1201,7 +1207,7 @@
         <div class="row">
           <input class="search" id="search" type="search" placeholder="게임 검색 (이름·개발사)" aria-label="게임 검색">
         </div>
-        <p class="panelnote cap"><span class="ci"><span class="cchip" style="background:var(--chip);color:var(--text)">12</span> 최근 순위</span><span class="ci"><span style="color:#e0a82e;font-size:13px">★</span> 평점</span><span class="ci"><span class="cchip" style="background:var(--new);color:#fff">신작</span> 출시 3개월 미만</span><span class="ci"><span class="cic" style="color:var(--muted)">↘</span> 차트 이탈</span></p>
+        <p class="panelnote lnstack" id="listNote"><span class="cap lnv" data-tf="daily"><span class="ci"><span class="cchip" style="background:var(--chip);color:var(--text)">12</span> 최근 순위</span><span class="ci"><span style="color:#e0a82e;font-size:13px">★</span> 평점</span><span class="ci"><span class="cchip" style="background:var(--new);color:#fff">신작</span> 출시 3개월 미만</span><span class="ci"><span class="cic" style="color:var(--muted)">↘</span> 차트 이탈</span></span></p>   <!-- 2026-11-16: 주별 · 월별 · 분기별 · 연별의 안내는 renderListNote가 같은 자리에 겹쳐 넣는다 -->
         <div class="row" style="justify-content:space-between; margin-bottom:8px;">
           <span class="selcount" id="selcount" style="margin:0">선택된 게임 없음</span>
           <button class="clearbtn" id="clear">전체 해제</button>
@@ -1370,7 +1376,7 @@ const TF_LABEL = {daily:'일별', weekly:'주별', monthly:'월별', quarterly:'
 
 let FULL=null, DATA=null, chart=null, activeTf='daily', activeChart='grossing';
 const selected=[]; // app_id, 선택 순서 유지
-let order=[];       // 게임 표시 순서(최근 순위 오름차순)
+let order=[];       // 게임 표시 순서(sortOrder가 정한다: 일별은 최근 순위순, 그 밖은 마지막으로 끝난 기간의 평균 순위순)
 
 function latestDaily(aid){
   const s=DATA.timeframes.daily.series[aid]||[];
@@ -1388,6 +1394,39 @@ function gameStatus(aid){
     daysAgo=Math.max(1, Math.round((new Date(L[latestIdx])-new Date(L[lastIdx]))/86400000));
   }
   return { inChart, lastRank, daysAgo, seen: lastIdx>=0 };
+}
+// 2026-11-16 목록의 순위와 순서는 그래프와 같은 기간의 값이다(사용자 "목록대로 반영"). 일별은 가장 최근 하루의 순위,
+// 주별 · 월별 · 분기별 · 연별은 마지막으로 끝난 기간의 평균 순위(그래프 선의 오른쪽 끝과 같은 값)다. 그 기간에 100위 안에 든 날이 없으면 값이 없다.
+function listPeriod(tf){   // 일별이거나 끝난 기간이 없으면 null
+  tf=tf||activeTf; if(tf==='daily') return null;
+  const t=DATA.timeframes[tf], n=((t&&t.labels)||[]).length; if(!n) return null;
+  return { i:n-1, name:mvLabel(tf, t.labels[n-1]), series:t.series||{} };
+}
+function periodRank(aid, lp){ const v=(lp.series[aid]||[])[lp.i]; return v==null ? null : v; }
+function cmpDaily(a,b){
+  const A=gameStatus(a), B=gameStatus(b);
+  if(A.inChart!==B.inChart) return A.inChart ? -1 : 1;   // 현재 차트 게임 먼저
+  if(A.inChart) return A.lastRank-B.lastRank;             // 현재 순위순
+  return A.daysAgo-B.daysAgo || A.lastRank-B.lastRank;    // 이탈: 최근 이탈 먼저
+}
+function sortOrder(){
+  const lp=listPeriod();
+  order=Object.keys(DATA.games).sort(!lp ? cmpDaily : (a,b)=>{
+    const ra=periodRank(a,lp), rb=periodRank(b,lp);
+    if((ra==null)!==(rb==null)) return ra==null ? 1 : -1;   // 그 기간에 값이 있는 게임 먼저
+    return (ra!=null && ra-rb) || cmpDaily(a,b);            // 평균 순위순. 값이 같거나 둘 다 없으면 일별 순서
+  });
+}
+const LIST_NOTE_TIP='평균 순위는 그 기간에 상위 100위에 든 날의 순위만 평균한 값이며, 끝난 기간까지만 계산합니다. 그래프의 선과 같은 값입니다. 그 기간에 상위 100위에 든 날이 없는 게임은 \'100위 밖\'으로 표시합니다.';
+function renderListNote(){   // 목록 위 안내 줄: 기간마다 한 벌(.lnv)을 같은 자리에 두고 고른 기간의 것만 보인다
+  const box=document.getElementById('listNote'), base=box && box.querySelector('.lnv[data-tf="daily"]'); if(!base) return;
+  const mid=base.children[1].outerHTML+base.children[2].outerHTML;   // 평점 · 신작 안내는 모든 기간에 같다
+  const key=[], add=[];
+  Object.keys(TF_LABEL).forEach(tf=>{ const lp=listPeriod(tf); if(!lp) return; const nm=esc(lp.name); key.push(tf+':'+lp.name);
+    add.push('<span class="cap lnv" data-tf="'+tf+'" aria-hidden="true"><span class="ci"><span class="cchip" style="background:var(--chip);color:var(--text)">12.3</span> '+nm+' 평균 순위'+dinfo(LIST_NOTE_TIP)+'</span>'+mid+'</span>'); });
+  if(box._k!==key.join('|')){ box._k=key.join('|'); box.querySelectorAll('.lnv:not([data-tf="daily"])').forEach(n=>n.remove()); base.insertAdjacentHTML('afterend', add.join('')); }
+  const cur=listPeriod() ? activeTf : 'daily';
+  box.querySelectorAll('.lnv').forEach(n=>{ const on=(n.dataset.tf===cur); n.setAttribute('aria-hidden', String(!on)); if(!on) n.querySelectorAll('.dinfo-pop').forEach(p=>p.remove()); });
 }
 function colorFor(aid){
   const i=selected.indexOf(aid);
@@ -1430,6 +1469,7 @@ function restyle(){
 
 function switchTf(tf){
   if(chartMode==='genre') return;  // 장르 모드에선 시간축 탭 비활성
+  const tfChanged=(tf!==activeTf);
   activeTf=tf;
   const t=DATA.timeframes[tf];
   document.querySelectorAll('.tab').forEach(b=> b.setAttribute('aria-selected', String(b.dataset.tf===tf)));
@@ -1441,7 +1481,9 @@ function switchTf(tf){
   } else { banner.style.display='none'; }
   if(chart.resetZoom) chart.resetZoom();
   { const y=chart.options.scales.y; y.reverse=true; y.min=1; y.max=100; }  // resetZoom이 장르 유동상한(점유%)을 복원해 게임차트 y축을 1~20으로 오염시키던 문제 방지 — 게임차트는 항상 순위 1~100 독립
+  sortOrder(); renderListNote();   // 2026-11-16: 목록의 순서와 안내 줄도 고른 기간을 따른다
   restyle();
+  if(tfChanged){ const l=document.getElementById('list'); if(l) l.scrollTop=0; }   // 순서가 바뀌므로 목록을 맨 위부터 보인다
   updateScrollbar();
 }
 
@@ -1456,6 +1498,7 @@ function renderList(){
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
   const q=norm(document.getElementById('search').value);
   const list=document.getElementById('list');
+  const lp=listPeriod();
   const rows=order.filter(aid=>{
     if(!q) return true;
     const g=DATA.games[aid];
@@ -1468,11 +1511,11 @@ function renderList(){
     const g=DATA.games[aid];
     const sel=selected.includes(aid);
     const c=colorFor(aid);
-    const st=gameStatus(aid);
-    const rankHtml = st.inChart ? `${st.lastRank}위`
-      : st.seen ? `${st.daysAgo}일 전 이탈` : '-';
+    let rankHtml, out;
+    if(lp){ const pr=periodRank(aid, lp); out=(pr==null); rankHtml = out ? '100위 밖' : pr.toFixed(1)+'위'; }   // 2026-11-16: 일별이 아니면 그 기간의 평균 순위(소수 한 자리), 값이 없으면 '100위 밖'
+    else { const st=gameStatus(aid); out=!st.inChart; rankHtml = st.inChart ? `${st.lastRank}위` : st.seen ? `${st.daysAgo}일 전 이탈` : '-'; }
     const btn=document.createElement('button');
-    btn.className='gitem'+(st.inChart?'':' out'); btn.setAttribute('aria-pressed', String(sel)); btn.setAttribute('data-fk','gi:'+aid);
+    btn.className='gitem'+(out?' out':''); btn.setAttribute('aria-pressed', String(sel)); btn.setAttribute('data-fk','gi:'+aid);
     const rt=ratingStr(aid);
     btn.innerHTML=`<span class="sw" style="background:${c||'#c9c8c2'}"></span>`+
       `<span class="ginfo" data-aid="${aid}" title="상세 보기" role="button" aria-label="상세 보기">ⓘ</span>`+
@@ -1855,12 +1898,6 @@ function setChartMode(mode){
 }
 
 function applyChart(){
-  order=Object.keys(DATA.games).sort((a,b)=>{
-    const A=gameStatus(a), B=gameStatus(b);
-    if(A.inChart!==B.inChart) return A.inChart ? -1 : 1;   // 현재 차트 게임 먼저
-    if(A.inChart) return A.lastRank-B.lastRank;             // 현재 순위순
-    return A.daysAgo-B.daysAgo || A.lastRank-B.lastRank;    // 이탈: 최근 이탈 먼저
-  });
   const m=document.getElementById('meta');
   const dr=DATA.date_range||[];
   m.textContent='';   // 2026-10-18 사용자 결정: 갱신 줄 · 요약 띠를 두지 않는다(꼬리말에 수집 방식이 있다)
@@ -1868,6 +1905,7 @@ function applyChart(){
     const tf=b.dataset.tf; const _empty=(((DATA.timeframes[tf]||{}).labels)||[]).length===0; b.disabled=_empty; b.title=_empty?('아직 완료된 '+b.textContent.trim()+' 구간이 없습니다. 기간이 쌓이면 자동으로 활성화됩니다'):'';
   });
   if((((DATA.timeframes[activeTf]||{}).labels)||[]).length===0) activeTf='daily';
+  sortOrder(); renderListNote();   // 2026-11-16: 목록 순서(전에는 이 함수 맨 위에서 일별 순서로만 정했다)와 목록 위 안내 줄
   renderAggSection();
   renderGap();
   renderMovers();
