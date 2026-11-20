@@ -836,6 +836,12 @@
   #mkbrief .aib-row-key{ grid-template-columns:repeat(auto-fit, minmax(min(380px, 100%), 1fr)); margin-bottom:12px; }
   #mkbrief .aib-sec{ background:#fff; border:1px solid var(--hair); border-radius:10px; padding:13px 16px 12px; margin:0; }
   #mkbrief .aib-sec-key{ background:var(--accent2soft); border-color:transparent; }
+  /* 2026-11-20 사용자 "옆에 자리도 써야될거같아 너무 공간활용이 비효율적이다": 요약 불릿은 상자 안쪽 폭이 872px(열 최소 폭 420px × 2 + 간격 32px) 이상이면 두 열로 놓는다. 그보다 좁으면 한 열이다.
+     지금 배치에서 두 열이 되는 것은 위 줄에 상자가 하나인 브리핑(글로벌)의 '핵심 시사점'이고, 화면 폭 약 990px부터다. 위 줄에 상자가 둘인 브리핑은 상자가 589px 이하(나란히)이거나 771px 이하(위아래로 쌓임)라 한 열이다.
+     불릿 하나가 두 열에 걸쳐 잘리지 않게 한다. '자세히'를 편 긴 불릿(.aib-detail)은 한 열 그대로 둔다(문장이 상자 폭을 채우고, 두 열로 나누면 읽던 줄에서 옆 열 맨 위로 올라가야 한다).
+     기준을 바꾸면 견본/2026-11-20-화면글-정리/brief_heights.py로 브리핑 36개 × 폭마다 구간이 길어지는 곳이 없는지 다시 본다 */
+  #mkbrief .aib-sum{ columns:2 420px; column-gap:32px; }
+  #mkbrief .aib-sum .mkb-li{ break-inside:avoid; }
   #mkbrief .aib-h{ font-size:15px; color:var(--ink); margin:0 0 6px; }
   #mkbrief .aib-h::before{ display:none; }
   #mkbrief .mkb-li::before{ background:#8A93A3; }
@@ -878,13 +884,14 @@
   /* 2026-10-26 P2-1: 데이터가 오기 전에 AI 브리핑 · 주간 순위의 자리를 잡아 둔다(늦게 나타나며 아래 내용을 밀어 내던 것, 내용 밀림 점수 0.50).
      높이는 2026-10-26 데이터로 다 그린 뒤 잰 값보다 조금 작게 잡았고, 다 그리면 is-loading을 뗀다.
      2026-11-20 화면 글 정리: 브리핑 본문은 요약을 불릿으로 그린 높이(글로벌 주간, 2026-11-16 생성분)의 4분의 3쯤으로 다시 맞췄다(지금 요약 지시문으로 만든 두 주의 요약 불릿 수가 30개 · 23개로 달라서).
-     주간 순위 보드는 '주 평균' 줄을 뺀 높이보다 조금 작게 맞췄다(폭 400px 이하에 따로 둔 값은 640px 이하의 값과 같아져 없앴다). 측정 도구: 견본/2026-11-20-화면글-정리/heights.py */
+     주간 순위 보드는 '주 평균' 줄을 뺀 높이보다 조금 작게 맞췄다(폭 400px 이하에 따로 둔 값은 640px 이하의 값과 같아져 없앴다). 측정 도구: 견본/2026-11-20-화면글-정리/heights.py
+     같은 날 요약 불릿 두 열을 넣은 뒤: 글로벌 주간 본문이 폭 1024px 이상에서 109px 짧아져 그 폭 묶음의 값을 같은 기준으로 다시 맞췄다(450 → 370px, 500 → 420px) */
   #mkbrief.is-loading #mkbriefAxis{ min-height:38px; }
   #mkbrief.is-loading .mkbrief-tabs{ min-height:57px; }
-  #mkbrief.is-loading .mkbrief-body{ min-height:450px; }
+  #mkbrief.is-loading .mkbrief-body{ min-height:370px; }
   #mkbrief .mkbrief-body > .empty{ margin:0; }   /* '불러오는 중…' 문단의 위 여백이 판 밖으로 번져(여백 겹침) 판 전체를 14px 내렸다가 글이 오면 올라가던 것 */
   .wk-board.is-loading{ min-height:430px; }
-  @media (max-width:1099px){ #mkbrief.is-loading .mkbrief-body{ min-height:500px; } .wk-board.is-loading{ min-height:400px; } }
+  @media (max-width:1099px){ #mkbrief.is-loading .mkbrief-body{ min-height:420px; } .wk-board.is-loading{ min-height:400px; } }
   @media (max-width:820px){ #mkbrief.is-loading .mkbrief-tabs{ min-height:94px; } #mkbrief.is-loading .mkbrief-body{ min-height:540px; } }
   @media (max-width:700px){ #mkbrief.is-loading .mkbrief-row2{ min-height:44px; } #mkbrief.is-loading .mkbrief-tabs{ min-height:100px; } #mkbrief.is-loading .mkbrief-body{ min-height:740px; } }
   @media (max-width:640px){ .wk-board.is-loading{ min-height:390px; } }
