@@ -1100,6 +1100,31 @@ details.gop-insight > summary.gopi-h::after{ content:'▾'; font-size:12px; line
 details.gop-insight[open] > summary.gopi-h{ margin-bottom:8px !important; }
 details.gop-insight[open] > summary.gopi-h::after{ transform:rotate(180deg); }
 </style>
+<style>/* 2026-11-23 구간 설명 줄 빼기 */
+.ai-sub{ display:none !important; }
+</style>
+<style>/* 2026-11-23 설명 줄 정리 2 */
+h2:has(> .tside:not(:empty)){ display:flex; align-items:center; flex-wrap:wrap; gap:4px 0; }
+h2 > .tside{ margin-left:auto; display:inline-flex; align-items:center; gap:10px; font-family:inherit; font-size:13px; font-weight:400; letter-spacing:0; color:var(--muted); }
+h2 > .tside:empty{ display:none; }
+h2 > .tside .mv-leg{ display:inline-flex; align-items:center; gap:4px; }
+.sub.cap:empty{ display:none !important; }
+/* 구간 제목 옆 '시장 [한국 ▾]': 바깥 알약 안 선택 상자의 테두리 · 바탕을 빼 알약 하나로 */
+.sec-mkt select.sec-mkt-sel{ border:0 !important; background-color:transparent !important; box-shadow:none !important; padding-top:0 !important; padding-bottom:0 !important; }
+/* 매출 · 인기 갭 표를 카드 폭에 맞춘다 */
+#gapout .pubscroll{ max-width:none !important; }
+</style>
+<style>/* 2026-11-23 머리 영역 초록 */
+.wrap-head{ max-width:none !important; background:#1f6f54; padding-top:20px !important; }
+.wrap-head > header{ max-width:1300px; margin:0 auto; }
+.wrap-head h1{ color:#fff !important; }
+.wrap-head .subtitle{ color:rgba(255,255,255,.85) !important; margin-bottom:0 !important; }
+.wrap-head .maker{ background:transparent !important; border-color:rgba(255,255,255,.5) !important; }
+.wrap-head .maker-label, .wrap-head .maker-mail{ color:rgba(255,255,255,.8) !important; }
+.wrap-head .maker-name{ color:#fff !important; }
+.wrap-head .msep{ color:rgba(255,255,255,.5) !important; }
+.wrap-head .meta{ color:#fff; }
+</style>
 </head>
 <body>
 <a class="skiplink" href="#main">본문으로 건너뛰기</a>   <!-- 2026-10-26 P3-1: 키보드 사용자가 위 고정 줄을 건너뛰는 첫 링크(Tab을 누를 때만 보인다) -->
@@ -1110,7 +1135,7 @@ details.gop-insight[open] > summary.gopi-h::after{ transform:rotate(180deg); }
       <h1>모바일 게임 다국가 시장분석 대시보드</h1>   <!-- 2026-10-19 사용자 결정: 2안의 낱말 순서를 바꿔 "다국가"가 "시장분석"을 꾸미게. PDF 제목과 같은 이름 -->
       <div class="maker"><span class="maker-label">MADE BY</span><span class="maker-name">김동현</span><span class="msep">·</span><span class="maker-mail"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>hyunxn_01@naver.com</span></div>
     </div>
-    <p class="subtitle">애플 앱스토어 31개국의 매출 · 인기 차트를 매일 수집해 추세 · 장르 · 퍼블리셔 · 급변을 읽는 사업PM 대시보드</p>   <!-- 2026-10-29 글랜스 테스트(사용자 "다고쳐줘"): 데이터가 애플 앱스토어만이라는 점을 첫 화면에(전에는 '주요 시장 앱스토어'라 맨 아래 출처 줄에서야 알았다) -->
+    <p class="subtitle">애플 앱스토어 31개국 매출 · 인기 차트 일일 분석</p>   <!-- 2026-10-29 글랜스 테스트(사용자 "다고쳐줘"): 데이터가 애플 앱스토어만이라는 점을 첫 화면에(전에는 '주요 시장 앱스토어'라 맨 아래 출처 줄에서야 알았다) -->
     <div class="mkbar">
       <label class="mklabel" for="countrySel">시장 선택</label>
       <select id="countrySel" class="mksel"><option>불러오는 중…</option></select>
@@ -1294,7 +1319,7 @@ details.gop-insight[open] > summary.gopi-h::after{ transform:rotate(180deg); }
 
   <section class="cmpsec" id="cmpsec">
     <h2>시장 비교 · 장르 점유</h2>
-    <p class="sub cap" id="cmpsub"><span class="ci">색은 시장별, 진할수록 장르 비중 큼</span></p>
+    <p class="sub cap" id="cmpsub"></p>
     <div class="cmp-controls">
       <span class="cmp-clabel">기준</span>
       <div class="seg seg-purple" role="tablist" aria-label="기준">   <!-- 2026-10-18 밤 통일 전환 단추 -->
@@ -1399,7 +1424,8 @@ Chart.register({ id:'yTitleH', afterDraw(c){
 
 // 2026-10-16 설명 문구(가안) 도우미: ⓘ 표시 · 기간 이름 · 조사(와/과)
 function dinfo(t){ return '<i class="dinfo" role="button" tabindex="0" aria-label="설명 보기" title="'+String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">i</i>'; }
-function dinfoToggle(t){ const host=t.closest('.ci')||t; const nx=host.nextElementSibling; if(nx && nx.classList.contains('dinfo-pop')){ nx.remove(); return; } const p=document.createElement('span'); p.className='dinfo-pop'; p.textContent=t.getAttribute('title')||''; host.after(p); }
+function dinfoToggle(t){ const host=t.closest('.tside')?t.closest('h2'):(t.closest('.ci')||t); const nx=host.nextElementSibling; if(nx && nx.classList.contains('dinfo-pop')){ nx.remove(); return; } const p=document.createElement('span'); p.className='dinfo-pop'; p.textContent=t.getAttribute('title')||''; host.after(p); }
+function setTitleSide(sub, html){ if(!sub) return; const sec=sub.closest('.pubsec,.seccard,.histsec,.cmpsec')||sub.parentElement; const h=sec&&sec.querySelector('h2'); if(!h) return; let s=h.querySelector(':scope > .tside'); if(!s){ s=document.createElement('span'); s.className='tside'; h.appendChild(s); } s.innerHTML=html||''; }   // 2026-11-23 설명 줄 대신 제목 줄 오른쪽 끝에 표시 · ⓘ
 document.addEventListener('click', e=>{ const t=e.target.closest && e.target.closest('.dinfo'); if(!t) return; e.preventDefault(); e.stopPropagation(); dinfoToggle(t); }, true);
 document.addEventListener('keydown', e=>{ if(e.key!=='Enter' && e.key!==' ') return; const t=e.target.closest && e.target.closest('.dinfo'); if(!t) return; e.preventDefault(); dinfoToggle(t); });
 // 2026-10-26 impeccable 점검 P1-4 · P1-5 · P3-1: 키보드 길과 키보드 위치 유지
@@ -1602,7 +1628,7 @@ function renderHistory(){
     wrap.innerHTML='<p class="empty">위 그래프에서 게임을 고르면 '+TF_LABEL[activeTf]+' 순위 이력 표시</p>';
     return;
   }
-  sub.innerHTML = `<span class="ci"><span style="color:var(--up)">▲</span> 상승 &nbsp; <span style="color:var(--ink2)">▼</span> 하락</span>`;   // 2026-10-26 P1-2: 범례 색을 칸 색(상승 빨강 · 하락 회색)에 맞췄다. 전에는 초록 상승 · 빨강 하락으로 칸과 반대였다
+  sub.innerHTML='';   // 2026-11-23 범례(▲ 상승 ▼ 하락)를 뺐다
   const labels=tf.labels;
   let h='<div class="histscroll"><table class="histtable"><thead><tr><th class="gcol">게임</th><th class="colorcol" title="그래프 색"></th><th class="avg3m" title="최근 3개월 평균 순위">3개월<br>평균</th>';
   labels.forEach(l=> h+=`<th>${esc(l)}</th>`);
@@ -2097,7 +2123,7 @@ function renderAgg(keyName, period, els, labelName){
   const startIdx=period?Math.max(0,n-period):0;
   const showRev=(activeChart==='grossing');
   const RP=showRev?revPeriod(period):{}, revOf=e=> e.games.reduce((s,g)=>s+(RP[g.app_id]||0),0);   // 2026-10-30: 추정 매출도 게임 수 · 순위와 같은 기간 값
-  els.sub.innerHTML=`<span class="ci">집계 기간 ${fmtTick(labels[startIdx]||'')} ~ ${fmtTick(labels[n-1]||'')}</span>${showRev?'<span class="ci">'+dinfo('매출 점유: 같은 기간 매출 차트의 하루 평균 추정 매출 점유(모든 줄의 합 100%)')+'</span>':''}`;   // 2026-10-29 글랜스 테스트: 추정 매출의 기준을 설명 줄에 밝힌다(표 머리에 붙이면 칸 폭에 잘렸다)
+  els.sub.innerHTML='';   // 2026-11-23 사용자 "집계 기간 6/20 ~ 11/22 i이것도 빼줘": 집계 기간 줄을 ⓘ까지 뺐다   // 2026-10-29 글랜스 테스트: 추정 매출의 기준을 설명 줄에 밝힌다(표 머리에 붙이면 칸 폭에 잘렸다)
   const full=aggregate(keyName, period);
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
   const q=norm((els.search||{}).value);
@@ -2190,7 +2216,7 @@ function renderGap(){
   if(gapSort.auto){ const nDl=rows.filter(r=>r.gap>=20).length, nRv=rows.filter(r=>r.gap<=-20).length; gapSort.dir=(nRv>nDl)?1:-1; }   // 2026-10-29 글랜스 테스트: 전에는 늘 '인기보다 매출이 낮은' 게임부터라, 인사이트(매출이 더 높은 게임이 두 배)와 반대 사례가 표 맨 위에 왔다
   const k=gapSort.k, dir=gapSort.dir;
   view.sort((a,b)=>{ if(k==='title') return dir*String(a.title).localeCompare(String(b.title),'ko'); return dir*((a[k]||0)-(b[k]||0)); });
-  sub.innerHTML=`<span class="ci"><span class="cdot" style="background:#e07c12"></span> 인기보다 매출이 낮음 &nbsp; <span class="cdot" style="background:#16a34a"></span> 매출보다 인기가 낮음</span>`;
+  sub.innerHTML='';   // 2026-11-23 범례(인기보다 매출이 낮음 · 매출보다 인기가 낮음)를 뺐다
   if(!view.length){ wrap.innerHTML='<p class="empty">검색 결과 없음</p>'; return; }
   let h='<div class="pubscroll"><table class="pubtable"><thead><tr>'+sortTh('게임','title',gapSort,'pname')+sortTh('매출 순위','gr',gapSort)+sortTh('인기 순위','fr',gapSort)+sortTh('갭','gap',gapSort,'',' '+dinfo('두 순위의 차이\n\'매출 +89\': 매출 순위가 인기 순위보다 89계단 높음 · \'인기 +42\': 그 반대'))+'</tr></thead><tbody>';
   view.forEach(r=>{
@@ -2221,7 +2247,7 @@ function renderMovers(){
   entered.sort((a,b)=>a.now-b.now); exited.sort((a,b)=>a.prev-b.prev);
   up.sort((a,b)=>b.d-a.d); down.sort((a,b)=>a.d-b.d);
   const anyUpd=up.some(e=>{ const u=updateSurge(e.aid); return u&&u.daysSince!=null&&u.daysSince<=7; });
-  sub.innerHTML=`<span class="ci">${mvLabel(moversTf,labels[ni])} ${activeChart==='grossing'?'매출':'인기'} 차트(${mvLabel(moversTf,labels[pi])} 대비)</span>`+(anyUpd?`<span class="ci"><span class="mv-upd">↻</span> 업데이트와 같은 시기에 오른 게임</span>`:``)+`<span class="ci">${dinfo('급등 · 급락 기준: 순위대 · 기간별로 다름(상위권일수록 작은 변동도 급변)\n하루 8계단 · 주 · 월 5계단')}</span>`;
+  sub.innerHTML=''; setTitleSide(sub, anyUpd?'<span class="mv-leg"><span class="mv-upd">↻</span> 업데이트와 같은 시기에 오른 게임</span>':'');   // 2026-11-23 사용자 "업데이트 마크 설명 옆으로 빼고 저란에있는거 지우고 제목 내려줘": 설명 줄은 없애고 ↻ 설명만 제목 줄 오른쪽 끝에
   const nm=aid=>{ const t=(DATA.games[aid]||{}).title||aid; return newBadge(aid)+'<span class="gdname"'+gdAttrs(aid, t)+' data-aid="'+esc(aid)+'">'+esc(t)+'</span>'; };
   const LIMIT = moversExpanded?9999:10;
   // 2026-10-30 글랜스 다시 시험: 제목은 '(14)'인데 10줄만 보여 숫자를 의심하게 됐다(실무자) → 줄이 잘린 목록 끝에 '외 N개'
@@ -2266,7 +2292,7 @@ function renderWatch(){
   }
   out.sort((a,b)=> b.score-a.score || b.dImp-a.dImp);
   const top=out.slice(0,8);
-  if(sub) sub.innerHTML='<span class="ci">최근 '+Math.min(8,(d.labels||[]).length)+'일 8계단 이상 상승 · 오른 날이 더 많은 게임</span><span class="ci">'+dinfo('최근 '+Math.min(8,(d.labels||[]).length)+'일 8계단 이상 상승 · 오른 날이 내린 날보다 많음 · 주간 추세 상승\n오늘 하루 급등한 게임은 급변 구간에 있어 제외')+'</span>';
+  if(sub) sub.innerHTML='';   // 2026-11-23 사용자 "최근 8일 8계단 이상 상승 · 오른 날이 더 많은 게임 i 빼줘"
   if(!top.length){ wrap.innerHTML='<p class="empty">지속 상승 신호가 뚜렷한 게임 없음</p>'; return; }
   let h='<div class="watchgrid">';
   top.forEach((r,i)=>{
@@ -2558,7 +2584,7 @@ function renderGenreOpp(){
   }
   setHTMLKeepFocus(wrap, s);
   const opp2=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=>b.revp-a.revp).slice(0,3).map(x=>x.genre);
-  if(sub) sub.innerHTML='<span class="ci">원 크기: 게임 수</span><span class="ci">'+dinfo('매출 규모: 차트 순위로 역산한 추정치\n1위 집중도: 그 장르 매출 가운데 1위 게임의 비율')+'</span>';
+  if(sub) sub.innerHTML='';   // 2026-11-23 사용자 "원 크기: 게임 수 이런것들도 다 빼줘"
 }
 function mdLite(raw){
   const lines=String(raw||'').split('\n');
@@ -3302,9 +3328,7 @@ function renderCmp(){
   el.style.gridTemplateColumns='132px repeat('+markets.length+',minmax(64px,1fr))';
   el.querySelectorAll('.cmp-cell').forEach(b=> b.addEventListener('click',()=>{ var mk=b.dataset.mk, g=b.dataset.g, nm=((MATRIX.markets||[]).filter(function(m){return m.key===mk;})[0]||{}).name||mk; openGenreGames(mk, nm, g); }));
   var _sub=document.getElementById('cmpsub');
-  if(_sub){ _sub.classList.add('chstack'); _sub.innerHTML=''   // 2026-11-20: 조작 칩을 지우고 기준마다 한 벌을 겹쳐 둔다(고른 기준의 것만 보인다)
-      +'<span class="chv" aria-hidden="'+(!byGenre)+'"><span class="ci">한 장르의 전 세계 추정 매출 가운데 시장별 비중(시장 규모 반영)</span><span class="ci">'+dinfo('차트 순위로 역산한 추정 매출에 나라별 시장 규모를 곱한 근사치 · 색은 장르별')+'</span></span>'
-      +'<span class="chv" aria-hidden="'+(!!byGenre)+'"><span class="ci">색은 시장별, 진할수록 장르 비중 큼</span></span>'; }
+  if(_sub) _sub.innerHTML='';   // 2026-11-23 사용자 "색은 시장별, 진할수록 장르 비중 큼 … 이런것들도 다 빼줘"
   renderCmpInsight();
 }
 function renderCmpInsight(){
@@ -3498,7 +3522,7 @@ function renderWeekly(){
       h+='<div class="wk-c wk-c1"><p class="wk-none">'+(!full ? '불러오는 중…' : '주간 데이터 부족')+'</p></div><div class="wk-c wk-c2"></div><div class="wk-c wk-c3"></div><div class="wk-c wk-cup"></div><div class="wk-c wk-cnw"></div></div>';
       return; }
     if(!capSet && cap){ capSet=true; const a=r.L[r.ni], b=r.L[r.pi];
-      cap.innerHTML=esc(kname)+' 차트 · '+wkDay(a,0)+' ~ '+wkDay(a,6)+' 주간 평균 순위, 직전 주('+wkDay(b,0)+' ~ '+wkDay(b,6)+')와 비교'+dinfo('주간 순위: 그 주에 차트에 오른 날의 순위 평균\n급등: 직전 주보다 오른 계단 수가 순위대별 기준(10위 안 2.5 · 30위 안 3.75 · 60위 안 5 · 그 아래 7.5계단) 이상인 게임 가운데 가장 많이 오른 게임(진입 · 이탈 · 급변 구간의 주별 급등과 같은 기준)\n신규 진입: 직전 주 차트에 없던 게임 가운데 순위가 가장 높은 게임'); }
+      cap.innerHTML=''; }   // 2026-11-23 사용자 "이런거도 싹다 없애" · "i … 빼줘": 주간 순위 제목 옆 기준 글과 ⓘ를 뺐다
     h+='<div class="wk-c wk-c1">'+wkFirst(r, cc)+'</div>';
     h+='<div class="wk-c wk-c2">'+(r.top[1] ? wkRow(r.top[1].aid, cc, r.G, 2) : '')+'</div>';
     h+='<div class="wk-c wk-c3">'+(r.top[2] ? wkRow(r.top[2].aid, cc, r.G, 3) : '')+'</div>';
@@ -3678,7 +3702,7 @@ function renderFav(){
     return;
   }
   const k=kindKey(), cols=favCols(), D=XM.date, N=XM.markets.length;
-  cap.textContent=kindName()+' 차트 순위 · '+mdShort(D)+' 기준 · 작은 글자는 7일 전('+mdShort(dateMinus(D,7))+') 대비 · 100위 밖은 –';
+  cap.textContent='';
   find.innerHTML=favFindLine(k, cols);
   const th=cols.map(c=>'<th>'+esc(c.nm)+(c.ext?'<br><span class="fx-d">고른 시장</span>':'')+'</th>').join('');
   let h='';
@@ -3878,7 +3902,7 @@ function lcPanelInit(){
   const lp=document.getElementById('lcPanel'); if(!lp || lp.dataset.ready) return; lp.dataset.ready='1';
   lp.innerHTML='<div class="lc-top"><input class="search lc-search" id="lcSearch" type="search" placeholder="게임 검색 (이름·제작사)" aria-label="런칭 성적 비교에서 게임 검색"><select class="lc-genre" id="lcGenre" aria-label="장르로 거르기"></select></div>'+
     '<p class="lc-count" id="lcCount"></p><p class="lc-msg" id="lcMsg" aria-live="polite"></p><div class="lc-list" id="lcList"></div>'+
-    '<p class="lc-note"><span class="ci">D+30까지 평균: 그 기간 차트에 든 날만 · 런칭일: 앱스토어 출시일 '+dinfo('나라마다 늦게 낸 게임은 그 나라 런칭일과 다를 수 있어 목록에 이 시장 차트 첫 진입일(D+N) 함께 표시')+'</span></p>';
+    '';   // 2026-11-23 사용자 "이런거도 싹다 없애": 런칭 성적 비교 아래 정의 줄(D+30까지 평균 · 런칭일)을 뺐다
   lp.addEventListener('click', e=>{ if(e.target.closest('.ginfo')) return; const b=e.target.closest('[data-lc]'); if(!b) return; const aid=b.getAttribute('data-lc');
     if(LC.slot[aid]!=null) lcRemove(aid); else lcAdd(aid);
     if(LC.genre) lcBuildChart(); else lcStyle(); lcRenderList(); });
