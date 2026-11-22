@@ -1092,6 +1092,14 @@ button.tab, .tab, .resetzoom, .clearbtn, .aib-more, .aibrief-dchip, .intro-click
 .gopi-h{ color:#1f5a46 !important; }
 .gop-insight{ background:#eceeec !important; border:0 !important; border-radius:4px !important; }  /* 페이지 바탕(#f3f5f3) 위에서도 보이도록 바탕보다 한 단계 진하게 */
 </style>
+<style>/* 2026-11-23 인사이트 접기 */
+details.gop-insight:empty{ display:none !important; }
+details.gop-insight > summary.gopi-h{ list-style:none; cursor:pointer; display:flex; align-items:center; gap:6px; margin-bottom:0 !important; user-select:none; }
+details.gop-insight > summary.gopi-h::-webkit-details-marker{ display:none; }
+details.gop-insight > summary.gopi-h::after{ content:'▾'; font-size:12px; line-height:1; color:var(--muted); transition:transform .15s; }
+details.gop-insight[open] > summary.gopi-h{ margin-bottom:8px !important; }
+details.gop-insight[open] > summary.gopi-h::after{ transform:rotate(180deg); }
+</style>
 </head>
 <body>
 <a class="skiplink" href="#main">본문으로 건너뛰기</a>   <!-- 2026-10-26 P3-1: 키보드 사용자가 위 고정 줄을 건너뛰는 첫 링크(Tab을 누를 때만 보인다) -->
@@ -1299,7 +1307,7 @@ button.tab, .tab, .resetzoom, .clearbtn, .aib-more, .aibrief-dchip, .intro-click
         <button class="cmp-metric" type="button" role="tab" aria-selected="false" data-metric="pre">차트 점유(게임 수)</button>
       </div>
     </div>
-    <div class="gop-insight pm-top" id="cmpInsight"></div>   <!-- 2026-10-29 글랜스 테스트(사용자 "다고쳐줘"): 요약을 열지도 위로(전에는 열지도 아래 화면 끝에 잘렸다) -->
+    <details class="gop-insight pm-top" id="cmpInsight"></details>   <!-- 2026-10-29 글랜스 테스트(사용자 "다고쳐줘"): 요약을 열지도 위로(전에는 열지도 아래 화면 끝에 잘렸다) -->
     <div class="cmp-wrap"><div class="cmp-grid" id="cmpGrid"></div></div>
     <div class="cmp-review" id="cmpReview" role="region" aria-label="장르 × 시장 검토" hidden></div>
   </section>
@@ -2080,7 +2088,7 @@ function aggregate(keyName, periodDays){
 
 function pmCallout(rows){
   const rs=rows.filter(Boolean).map(r=>'<div class="gopi-row"><span class="gopi-k">'+r[0]+'</span><span>'+r[1]+'</span></div>').join('');
-  return rs?('<div class="gop-insight pm-top"><div class="gopi-h">인사이트</div>'+rs+'</div>'):'';   // 2026-10-16: 구간 요점을 표 위에
+  return rs?('<details class="gop-insight pm-top"><summary class="gopi-h">인사이트</summary>'+rs+'</details>'):'';   // 2026-10-16: 구간 요점을 표 위에
 }
 function renderAgg(keyName, period, els, labelName){
   const tf=(DATA.timeframes&&DATA.timeframes.daily)||{labels:[]};
@@ -2538,7 +2546,7 @@ function renderGenreOpp(){
     const niche=gs.filter(g=> g.revp<RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);
     const small=gs.filter(g=> g.revp<RY && g.top1<CONC).sort((a,b)=> b.revp-a.revp);
     const topRev=gs.slice().sort((a,b)=>b.revp-a.revp)[0];
-    let ins='<div class="gop-insight"><div class="gopi-h">장르별 매출 · 1위 집중도 요약</div>';   // 2026-10-29: 위 결론 줄 · 재생 그림(끝난 달 평균)과 기준이 다름을 밝힌다
+    let ins='<details class="gop-insight"><summary class="gopi-h">장르별 매출 · 1위 집중도 요약</summary>';   // 2026-10-29: 위 결론 줄 · 재생 그림(끝난 달 평균)과 기준이 다름을 밝힌다
     // 2026-10-29 글랜스 테스트: 결론 줄(매출 1위 장르 · 매출 크고 여러 게임이 나눠 가지는 장르)은 그림 위 #gopTop에. 아래 요약에는 네 구역 목록과 읽는 법만 남긴다
     { const tb=document.getElementById('gopTop'); if(tb){ const tr=[];
         if(topRev) tr.push(['매출 1위 장르', '<b>'+esc(topRev.genre)+'</b>(매출 점유 '+topRev.revp+'% · 1위 집중도 '+topRev.top1+'%'+(topRev.topGame?' · 1위 '+esc(topRev.topGame):'')+')']);
@@ -2546,7 +2554,7 @@ function renderGenreOpp(){
         tb.innerHTML=tr.length?pmCallout(tr):''; } }
     ins+='<div class="gq-grid">'+cell('매출 큰 장르 · 여러 게임 경쟁','#16a34a',opp,false)+cell('매출 큰 장르 · 1위 집중도 높음','#64748b',fort,true)+cell('매출 작은 장르 · 여러 게임 경쟁','#2563eb',small,false)+cell('매출 작은 장르 · 1위 집중도 높음','#e07c12',niche,true)+'</div>';   // 그림의 네 모서리와 같은 자리 · 색
     ins+='<div class="gopi-row"><span class="gopi-k" style="color:var(--muted)">읽는 법</span><span>색 · 위치는 매출 규모와 1위 집중도일 뿐 진입 추천 아님 · 진입 여부는 총 시장 규모 · 자사 IP · 경쟁사 대응으로 따로 판단</span></div>';
-    ins+='</div>'; s+=ins;
+    ins+='</details>'; s+=ins;
   }
   setHTMLKeepFocus(wrap, s);
   const opp2=gs.filter(g=> g.revp>=RY && g.top1<CONC).sort((a,b)=>b.revp-a.revp).slice(0,3).map(x=>x.genre);
@@ -3310,7 +3318,7 @@ function renderCmpInsight(){
   const mTop=M.markets.map(mk=>{ let bg=null,bv=-1; M.genres.forEach(g=>{ const v=val(mk.key,g); if(v>bv){bv=v;bg=g;} }); return {mk:mk.name, g:bg, v:bv}; }).filter(x=>x.v>0);
   const grp={}; mTop.forEach(x=>{ (grp[x.g]=grp[x.g]||[]).push(x.mk); });
   const order=Object.keys(grp).sort((a,b)=> grp[b].length-grp[a].length), multi=order.filter(g=>grp[g].length>=2);
-  let h='<div class="gopi-h">시장 비교 요약</div>';
+  let h='<summary class="gopi-h">시장 비교 요약</summary>';
   if(mTop.length) h+='<div class="gopi-row"><span class="gopi-k">결론</span><span>'+mTop.length+'개 시장의 1위 장르 <b>'+order.length+'가지</b> · '+(multi.length?('두 시장 이상 1위: '+multi.map(g=>'<b>'+esc(g)+'</b>('+grp[g].map(esc).join(' · ')+')').join(' · ')):'두 시장 이상 1위 장르 없음')+'</span></div>';
   if(mTop.length) h+='<div class="gopi-row"><span class="gopi-k">시장별 1위 장르</span><span>'+order.map(g=>'<b>'+esc(g)+'</b> '+grp[g].map(esc).join(' · ')).join(' / ')+'</span></div>';
   if(gStrong.length) h+='<div class="gopi-row"><span class="gopi-k">장르 비중이 가장 높은 시장</span><span>'+gStrong.map(x=>'<b>'+esc(x.g)+'</b> '+esc(x.mk)+'('+x.v+'%)').join(' · ')+'</span></div>';
@@ -4035,6 +4043,14 @@ renderCmp=function(){
 };
 
 renderFav();
+})();
+</script>
+<script>/* 2026-11-23 인사이트 접기: 다시 그려도 편 상자는 편 채로 */
+(function(){
+  const OPEN=new Set();
+  const key=d=>{ const a=d.parentElement&&d.parentElement.closest('[id]'); return (d.id||'')+'|'+(a?a.id:''); };
+  document.addEventListener('toggle', e=>{ const d=e.target; if(!(d instanceof HTMLDetailsElement)||!d.classList.contains('gop-insight')) return; if(d.open) OPEN.add(key(d)); else OPEN.delete(key(d)); }, true);
+  new MutationObserver(ms=>{ if(!OPEN.size) return; for(const m of ms) for(const n of m.addedNodes){ if(n.nodeType!==1) continue; const ds=(n.matches&&n.matches('details.gop-insight'))?[n]:[...n.querySelectorAll('details.gop-insight')]; ds.forEach(d=>{ if(!d.open && OPEN.has(key(d))) d.open=true; }); } }).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 </body>
