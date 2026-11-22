@@ -2437,7 +2437,7 @@ function gopTopRender(){
   var opp=gs.filter(function(x){ return G.zoneOf(x.top1, x.revp)==='#16a34a'; }).slice(0,3), tr=[];
   tr.push(['매출 1위 장르', '<b>'+esc(gs[0].g)+'</b>(매출 점유 '+gs[0].revp+'% · 1위 집중도 '+gs[0].top1+'%)']);
   if(opp.length) tr.push(['매출 크고 여러 게임 경쟁', opp.map(function(x){ return '<b>'+esc(x.g)+'</b>('+x.revp+'%)'; }).join(' · ')]);
-  tb.innerHTML=pmCallout(tr).replace('<div class="gopi-h">인사이트</div>', '<div class="gopi-h">인사이트 <span style="font-weight:400;color:var(--muted)">· 그림과 같은 '+esc(lab)+' 기준(그 달 평균 순위)</span></div>');
+  tb.innerHTML=pmCallout(tr);   // 2026-11-23 사용자 "이런거 싹빼줘 매우 사족이야": 제목 옆 '· 그림과 같은 … 기준' 꼬리말을 지움
 }
 function gopTrajToggle(){
   _gopTraj.on=!_gopTraj.on;
@@ -2539,7 +2539,7 @@ function renderGenreOpp(){
     const niche=gs.filter(g=> g.revp<RY && g.top1>=CONC).sort((a,b)=> b.revp-a.revp);
     const small=gs.filter(g=> g.revp<RY && g.top1<CONC).sort((a,b)=> b.revp-a.revp);
     const topRev=gs.slice().sort((a,b)=>b.revp-a.revp)[0];
-    let ins='<div class="gop-insight"><div class="gopi-h">장르별 매출 · 1위 집중도 요약 <span style="font-weight:400;color:var(--muted)">· 오늘 차트 기준</span></div>';   // 2026-10-29: 위 결론 줄 · 재생 그림(끝난 달 평균)과 기준이 다름을 밝힌다
+    let ins='<div class="gop-insight"><div class="gopi-h">장르별 매출 · 1위 집중도 요약</div>';   // 2026-10-29: 위 결론 줄 · 재생 그림(끝난 달 평균)과 기준이 다름을 밝힌다
     // 2026-10-29 글랜스 테스트: 결론 줄(매출 1위 장르 · 매출 크고 여러 게임이 나눠 가지는 장르)은 그림 위 #gopTop에. 아래 요약에는 네 구역 목록과 읽는 법만 남긴다
     { const tb=document.getElementById('gopTop'); if(tb){ const tr=[];
         if(topRev) tr.push(['매출 1위 장르', '<b>'+esc(topRev.genre)+'</b>(매출 점유 '+topRev.revp+'% · 1위 집중도 '+topRev.top1+'%'+(topRev.topGame?' · 1위 '+esc(topRev.topGame):'')+')']);
@@ -3311,8 +3311,7 @@ function renderCmpInsight(){
   const mTop=M.markets.map(mk=>{ let bg=null,bv=-1; M.genres.forEach(g=>{ const v=val(mk.key,g); if(v>bv){bv=v;bg=g;} }); return {mk:mk.name, g:bg, v:bv}; }).filter(x=>x.v>0);
   const grp={}; mTop.forEach(x=>{ (grp[x.g]=grp[x.g]||[]).push(x.mk); });
   const order=Object.keys(grp).sort((a,b)=> grp[b].length-grp[a].length), multi=order.filter(g=>grp[g].length>=2);
-  const basisTxt=(M.basis==='avg7'?'최근 7일 평균 ':'오늘 하루 ')+(metric==='rev'?'추정 매출 기준':'게임 수 기준');
-  let h='<div class="gopi-h">시장 비교 요약 <span style="font-weight:400;color:var(--muted)">· '+basisTxt+'</span></div>';
+  let h='<div class="gopi-h">시장 비교 요약</div>';
   if(mTop.length) h+='<div class="gopi-row"><span class="gopi-k">결론</span><span>'+mTop.length+'개 시장의 1위 장르 <b>'+order.length+'가지</b> · '+(multi.length?('두 시장 이상 1위: '+multi.map(g=>'<b>'+esc(g)+'</b>('+grp[g].map(esc).join(' · ')+')').join(' · ')):'두 시장 이상 1위 장르 없음')+'</span></div>';
   if(mTop.length) h+='<div class="gopi-row"><span class="gopi-k">시장별 1위 장르</span><span>'+order.map(g=>'<b>'+esc(g)+'</b> '+grp[g].map(esc).join(' · ')).join(' / ')+'</span></div>';
   if(gStrong.length) h+='<div class="gopi-row"><span class="gopi-k">장르 비중이 가장 높은 시장</span><span>'+gStrong.map(x=>'<b>'+esc(x.g)+'</b> '+esc(x.mk)+'('+x.v+'%)').join(' · ')+'</span></div>';
