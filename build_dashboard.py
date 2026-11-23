@@ -524,8 +524,8 @@ def build_weekly_lite(country_objs, generated):
     return out
 
 
-# 2026-10-29 여러 나라 순위 요약 파일(markets.html의 '관심 게임 · 퍼블리셔' 표와 게임 상세 창 '시장별 순위' 전용, 사용자 "추천안으로 진행").
-# 화면이 나라 파일 31개(약 33MB)를 받지 않도록 게임마다 나라별 최근 순위와 7일 전 순위만 남긴다. 화면은 관심 목록이 있거나 상세 창을 열 때만 받는다.
+# 2026-10-29 여러 나라 순위 요약 파일(markets.html의 게임 상세 창 '시장별 순위' 전용, 사용자 "추천안으로 진행". 함께 쓰던 '관심 게임 · 퍼블리셔' 표는 2026-11-23에 뺐다).
+# 화면이 나라 파일 31개(약 33MB)를 받지 않도록 게임마다 나라별 최근 순위와 7일 전 순위만 남긴다. 화면은 상세 창을 열 때만 받는다.
 # 견본 project/mobile-chart-bot/견본/2026-10-28-실무활용/xmarket.py의 같은 이름 함수를 그대로 옮겼다.
 XM_ICON_HEAD = 'https://is1-ssl.mzstatic.com/image/thumb/'   # 아이콘 주소의 같은 앞부분은 줄여 쓰고 화면이 다시 붙인다
 XM_ICON_TAIL = '/100x100bb.jpg'
@@ -684,14 +684,14 @@ def build_markets():
         print(f"[OK] 주간 순위 요약: {len(lite['markets'])}시장 → weekly_lite.json")
     except Exception as e:
         print('[WARN] 주간 순위 요약 파일 실패(대시보드가 시장 파일로 대신 계산):', e)
-    try:   # 2026-10-29 여러 나라 순위 요약 파일. 실패해도 대시보드는 관심 구간 · 상세 창에 '여러 나라 순위를 불러오지 못했습니다'만 보이고 나머지는 그대로라 집계는 계속한다
+    try:   # 2026-10-29 여러 나라 순위 요약 파일. 실패해도 대시보드는 상세 창에 '여러 나라 순위를 불러오지 못했습니다'만 보이고 나머지는 그대로라 집계는 계속한다
         xm_order = [e['key'] for e in majors] + [e['key'] for e in singles]   # 화면의 열 순서(index.json과 같은 순서)
         xm = build_xmarket_lite(_CountryFiles(xm_order), xm_order, gen)
         (MARKETS_OUT / 'xmarket_lite.json').write_text(
             json.dumps(xm, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
         print(f"[OK] 여러 나라 순위 요약: {len(xm['markets'])}시장 · {len(xm['games'])}게임 · 기준일 {xm['date']} → xmarket_lite.json")
     except Exception as e:
-        print('[WARN] 여러 나라 순위 요약 파일 실패(관심 구간 · 상세 창 시장별 순위만 안내 문구로 바뀜):', e)
+        print('[WARN] 여러 나라 순위 요약 파일 실패(상세 창 시장별 순위만 안내 문구로 바뀜):', e)
     # 장르×시장 비교 매트릭스(히트맵용)
     matrix = build_genre_matrix(built)
     (MARKETS_OUT / 'genre_matrix.json').write_text(
